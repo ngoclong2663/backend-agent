@@ -19,7 +19,7 @@ from typing import Any
 from src.configs import config
 
 OVERLAY_JSON = Path(__file__).resolve().parents[2] / "templates" / "nextjs_overlay" / "overlay.json"
-PROMPT_VERSION = "v1"  # generate_custom_component / repair_custom_component
+PROMPT_VERSION = "v3"  # generate_custom_component / repair_custom_component
 CUSTOM_DIR = "src/components/custom"
 
 

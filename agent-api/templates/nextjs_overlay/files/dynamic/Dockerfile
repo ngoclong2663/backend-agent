@@ -1,12 +1,16 @@
 # Dynamic site: Next.js standalone Node server. MOCK_TEST_API=true serves the mock API; set MOCK_TEST_API=false
 # and API_BASE_URL=<backend URL> to use the real backend (a restart is enough, no rebuild).
 ARG NODE_IMAGE=node:22-bookworm-slim
-FROM ${NODE_IMAGE} AS build
+FROM ${NODE_IMAGE} AS deps
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN corepack enable
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile --prefer-offline
+RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm fetch --frozen-lockfile
+
+FROM deps AS build
+COPY package.json ./
+RUN pnpm install --frozen-lockfile --offline
 COPY . .
 RUN pnpm build
 

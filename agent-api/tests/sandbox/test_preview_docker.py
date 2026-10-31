@@ -4,6 +4,7 @@
 The preview image is built from backend.zip alone, so this also proves the ZIP starts on its own (DoD step 13)."""
 
 import asyncio
+import json
 import os
 import shutil
 import time
@@ -111,3 +112,87 @@ def _secret_leak(line: str, generation_id: str) -> bool:
     from src.preview.docker_preview import secret
 
     return secret(generation_id, "db") in line or secret(generation_id, "jwt") in line
+
+
+def test_cached_preview_builds_reuse_dependency_layers(tmp_path):
+    from src.orchestrator.packaging import build_source_zip
+    from src.preview.docker_frontend_preview import DockerFrontendPreviewRuntime
+    from src.preview.docker_preview import DockerPreviewRuntime
+    from tests.generation_helpers import golden_project
+    from tests.test_frontend_scaffold import scaffolded
+
+    d_client = docker.from_env()
+
+    # 1. Backend golden project built twice under different generation ids
+    proj1 = golden_project(tmp_path / "proj1")
+    zip1 = tmp_path / "b1.zip"
+    zip1.write_bytes(build_source_zip(proj1))
+
+    proj2 = golden_project(tmp_path / "proj2")
+    (proj2 / "src" / "note.txt").write_text("site2-different")
+    zip2 = tmp_path / "b2.zip"
+    zip2.write_bytes(build_source_zip(proj2))
+
+    rt = DockerPreviewRuntime()
+    gen1 = "gen_tbe1_" + uuid.uuid4().hex[:6]
+    gen2 = "gen_tbe2_" + uuid.uuid4().hex[:6]
+
+    try:
+        log1 = rt._ensure_image(gen1, zip1)
+        log2 = rt._ensure_image(gen2, zip2)
+
+        # Second build must reuse pip install layer from cache
+        assert log1 is not None and len(log1) > 0
+        assert log2 is not None
+        assert "Using cache" in log2 or "CACHED" in log2
+
+        # Check plain docker build . on unzipped backend works
+        unpacked = tmp_path / "unpacked_be"
+        shutil.unpack_archive(zip1, unpacked)
+        image, _ = d_client.images.build(path=str(unpacked), rm=True)
+        assert image is not None
+        d_client.images.remove(image.id, force=True)
+    finally:
+        asyncio.run(rt.remove(gen1))
+        asyncio.run(rt.remove(gen2))
+
+    # bga-be-deps must survive preview removal
+    assert len(d_client.images.list(name="bga-be-deps")) >= 1
+
+    # 2. Frontend golden project built twice under different site names
+    fe_proj1, _ = scaffolded(tmp_path / "fe1", "shop-dynamic", golden=True)
+    fe_zip1 = tmp_path / "fe1.zip"
+    fe_zip1.write_bytes(build_source_zip(fe_proj1))
+
+    fe_proj2, _ = scaffolded(tmp_path / "fe2", "shop-dynamic", golden=True)
+    pkg = json.loads((fe_proj2 / "package.json").read_text())
+    pkg["name"] = "different-shop-site"
+    (fe_proj2 / "package.json").write_text(json.dumps(pkg, indent=2))
+    fe_zip2 = tmp_path / "fe2.zip"
+    fe_zip2.write_bytes(build_source_zip(fe_proj2))
+
+    fe_rt = DockerFrontendPreviewRuntime()
+    fe_gen1 = "gen_tfe1_" + uuid.uuid4().hex[:6]
+    fe_gen2 = "gen_tfe2_" + uuid.uuid4().hex[:6]
+
+    try:
+        fe_log1 = fe_rt._ensure_image(fe_gen1, fe_zip1)
+        fe_log2 = fe_rt._ensure_image(fe_gen2, fe_zip2)
+
+        # Second build must reuse pnpm fetch layer from cache
+        assert fe_log1 is not None and len(fe_log1) > 0
+        assert fe_log2 is not None
+        assert "Using cache" in fe_log2 or "CACHED" in fe_log2
+
+        # Check plain docker build . on unzipped frontend works
+        unpacked_fe = tmp_path / "unpacked_fe"
+        shutil.unpack_archive(fe_zip1, unpacked_fe)
+        fe_image, _ = d_client.images.build(path=str(unpacked_fe), rm=True)
+        assert fe_image is not None
+        d_client.images.remove(fe_image.id, force=True)
+    finally:
+        asyncio.run(fe_rt.remove(fe_gen1))
+        asyncio.run(fe_rt.remove(fe_gen2))
+
+    # bga-fe-deps must survive preview removal
+    assert len(d_client.images.list(name="bga-fe-deps")) >= 1

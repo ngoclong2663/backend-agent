@@ -562,16 +562,37 @@ async def write_artifacts(ctx: JobContext, state: dict[str, Any], completed: boo
     if frontend_ready:
         writer.write("frontend.zip", "frontend", build_source_zip(workspace.frontend), "application/zip")
     if completed and plan and lanes.get("backend") == LaneStatus.COMPLETED.value:
-        writer.write("backend.zip", "source", build_source_zip(project), "application/zip")
-        openapi = _optional_json(workspace.reports / "openapi.json")
-        if openapi:
-            writer.write_json("openapi.json", "openapi", openapi)
-        if _contract_copy(ctx).is_file():
-            contract = json.loads(_contract_copy(ctx).read_text())
-            writer.write_json("seed.json", "seed", build_contract_seed(contract, plan))
-        elif spec.get("seed"):
-            timestamp = generation.created_at.isoformat() if generation.created_at else "1970-01-01T00:00:00+00:00"
-            writer.write_json("seed.json", "seed", build_seed(spec, plan, ctx.generation_id, timestamp))
+        head_file = workspace.state / "backend-packaged-head"
+        packaged_head = head_file.read_text().strip() if head_file.is_file() else None
+        current_head = ctx.workspaces._git(workspace, "rev-parse", "HEAD", repo="project").strip()
+        existing_backend = ctx.store.artifact_by_name(ctx.generation_id, "backend.zip")
+        reuse_backend = (
+            existing_backend is not None
+            and packaged_head == current_head
+            and (Path(config.artifact_root) / existing_backend.path).is_file()
+        )
+        if reuse_backend:
+            writer.keep(existing_backend)
+            existing_seed = ctx.store.artifact_by_name(ctx.generation_id, "seed.json")
+            if existing_seed is not None and (Path(config.artifact_root) / existing_seed.path).is_file():
+                writer.keep(existing_seed)
+            existing_openapi = ctx.store.artifact_by_name(ctx.generation_id, "openapi.json")
+            if existing_openapi is not None and (Path(config.artifact_root) / existing_openapi.path).is_file():
+                writer.keep(existing_openapi)
+            openapi = _optional_json(workspace.reports / "openapi.json")
+        else:
+            writer.write("backend.zip", "source", build_source_zip(project), "application/zip")
+            openapi = _optional_json(workspace.reports / "openapi.json")
+            if openapi:
+                writer.write_json("openapi.json", "openapi", openapi)
+            if _contract_copy(ctx).is_file():
+                contract = json.loads(_contract_copy(ctx).read_text())
+                writer.write_json("seed.json", "seed", build_contract_seed(contract, plan))
+            elif spec.get("seed"):
+                timestamp = generation.created_at.isoformat() if generation.created_at else "1970-01-01T00:00:00+00:00"
+                writer.write_json("seed.json", "seed", build_seed(spec, plan, ctx.generation_id, timestamp))
+            head_file.parent.mkdir(parents=True, exist_ok=True)
+            head_file.write_text(current_head)
         artifact_ids = {
             kind: writer.artifact_id(name)
             for kind, name in MAIN_ARTIFACTS.items()

@@ -83,8 +83,27 @@ class WorkspaceManager:
             self._git(workspace, "commit", "-q", "--allow-empty", "-m", "frontend created", repo="frontend")
         return workspace.frontend
 
-    def commit(self, workspace: JobWorkspace, message: str, repo: str = "project") -> str:
-        self._git(workspace, "add", "-A", repo=repo)
+    def commit(
+        self, workspace: JobWorkspace, message: str, repo: str = "project", paths: list[str] | None = None
+    ) -> str:
+        if paths:
+            repo_dir = workspace.repo(repo)
+            valid_paths: list[str] = []
+            for p in paths:
+                if p.startswith(":!"):
+                    valid_paths.append(p)
+                elif (repo_dir / p).exists():
+                    res = subprocess.run([*_GIT, "check-ignore", "-q", "--", p], cwd=repo_dir, check=False)
+                    if res.returncode != 0:
+                        valid_paths.append(p)
+                else:
+                    status = self._git(workspace, "status", "--porcelain", "--", p, repo=repo).strip()
+                    if status:
+                        valid_paths.append(p)
+            if valid_paths:
+                self._git(workspace, "add", "-A", "--", *valid_paths, repo=repo)
+        else:
+            self._git(workspace, "add", "-A", repo=repo)
         self._git(workspace, "commit", "-q", "--allow-empty", "-m", message, repo=repo)
         return self._git(workspace, "rev-parse", "HEAD", repo=repo).strip()
 

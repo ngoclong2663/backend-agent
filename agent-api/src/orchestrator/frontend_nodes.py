@@ -2,11 +2,12 @@
 `async (state, ctx) -> (state update, step summary)`. Paths in state are relative to the frontend repository
 (`<workspace>/frontend`), except `frontend_ref`, the normalized FrontendSpec in the workspace's spec directory."""
 
+import asyncio
 import json
 from pathlib import Path
 from typing import Any
 
-from src.configs import config
+from src.configs import config, get_logger
 from src.modules.shared.domain.entities import ValidationRunEntity
 from src.modules.shared.domain.enums import GenerationMode, LaneStatus
 from src.modules.shared.domain.frontend_spec import iter_sections
@@ -29,6 +30,8 @@ from .frontend_validation import FrontendValidationRequest
 from .integration import package_lane_preview
 from .state import GenerationState, Outcome
 from .validation import write_report
+
+logger = get_logger(__name__)
 
 DIGEST_LIMIT = 30_000
 FRONTEND_PROMPTS = {"generate_frontend_shell": "v1", "generate_frontend_page": "v1", "repair_frontend": "v2"}
@@ -82,6 +85,21 @@ async def scaffold_frontend_node(state: GenerationState, ctx: JobContext) -> Nod
         for asset_id in missing:
             await ctx.emit("frontend.asset.missing", step="scaffold_frontend", id=asset_id, reason="upload deleted")
     await ctx.emit("frontend.scaffold.done", step="scaffold_frontend", **summary)
+    if ctx.sandboxes is not None and config.frontend_shared_modules:
+
+        async def _prewarm():
+            try:
+                sb = ctx.sandboxes.for_job(ctx.generation_id, ctx.workspace.frontend, kind="frontend", part="prewarm")
+                await sb.shared_dependencies()
+            except asyncio.CancelledError:
+                pass
+            except Exception as e:
+                logger.warning(
+                    "prewarm shared modules failed",
+                    extra={"generation_id": ctx.generation_id, "error": str(e)},
+                )
+
+        ctx.background_tasks.append(asyncio.create_task(_prewarm()))
     return {}, summary
 
 
@@ -90,7 +108,10 @@ async def _resolve_components(
 ) -> list[Resolved]:
     spec = _json(Path(state["frontend_ref"]))
     resolved = await CustomComponents(ctx, plan, spec, _contract(ctx)).resolve(names, state["max_repair_attempts"])
-    ctx.frontend_path(PLAN_REF).write_text(dump_frontend_plan(plan))
+    async with ctx.frontend_plan_lock:
+        current_plan = json.loads(ctx.frontend_path(PLAN_REF).read_text())
+        current_plan["customComponents"] = plan["customComponents"]
+        ctx.frontend_path(PLAN_REF).write_text(dump_frontend_plan(current_plan))
     return resolved
 
 

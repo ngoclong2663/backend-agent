@@ -38,13 +38,14 @@ def _claude(root, **overrides):
     return ClaudeCodeEngine(**values, **_limits(root))
 
 
-def _agy(root, auth="gemini_api_key", model=None):
+def _agy(root, auth="gemini_api_key", model=None, purpose_models=None):
     return AntigravityEngine(
         binary=str(BIN / "fake_agy"),
         auth=auth,
         gemini_api_key="gemini-test-key-123" if auth == "gemini_api_key" else None,
         google_application_credentials=None,
         model=model,
+        purpose_models=purpose_models,
         **_limits(root),
     )
 
@@ -95,6 +96,8 @@ def test_claude_invocation_is_isolated_and_restricted(root, monkeypatch):
 
     assert record["prompt"] == "write hello", "prompt goes over stdin"
     assert argv[argv.index("--tools") + 1] == "Read,Write,Edit,Glob,Grep,Skill"
+    assert argv[argv.index("--allowedTools") + 1] == "Write,Edit,Skill"
+    assert not any(t in argv[argv.index("--allowedTools") + 1].split(",") for t in ("Read", "Glob", "Grep"))
     assert "Bash" in argv[argv.index("--disallowedTools") + 1]
     assert argv[argv.index("--permission-mode") + 1] == "acceptEdits"
     assert "--strict-mcp-config" in argv
@@ -211,6 +214,12 @@ def test_antigravity_invocation_uses_stream_stdin_and_api_key_settings(root):
     assert argv[argv.index("--mode") + 1] == "accept-edits"
     assert argv[argv.index("--print-timeout") + 1] == "10s"
     assert record["settings"]["modelProvider"] == "gemini"
+    expected_allow = [
+        f"read_file({(root / 'job' / 'project').resolve()})",
+        f"write_file({(root / 'job' / 'project').resolve()})",
+    ]
+    assert record["settings"]["permissions"]["allow"] == expected_allow
+    assert "read_file(*)" not in record["settings"]["permissions"]["allow"]
     assert "command(*)" in record["settings"]["permissions"]["deny"]
     assert record["env"]["GEMINI_API_KEY"] == "gemini-test-key-123"
 
@@ -269,6 +278,29 @@ def test_antigravity_account_invocation_keeps_the_real_home(root, tmp_path, monk
     assert not (home / ".gemini").exists() and not (tmp_path / "user" / ".gemini").exists()
     assert "GEMINI_API_KEY" not in invocation.env and "modelProvider" not in settings
     assert settings["permissions"]["deny"][0] == "command(*)"
+    expected_allow = [f"read_file({request.workdir.resolve()})", f"write_file({request.workdir.resolve()})"]
+    assert settings["permissions"]["allow"] == expected_allow
+
+
+def test_antigravity_adc_invocation_scopes_allow_rules(root):
+    request = _request(root)
+    request.workdir.mkdir(parents=True, exist_ok=True)
+    home = root / "home_adc"
+
+    engine = AntigravityEngine(
+        binary="agy",
+        auth="adc",
+        gemini_api_key=None,
+        google_application_credentials="/creds.json",
+        model=None,
+        **_limits(root),
+    )
+    invocation = engine.build_invocation(request, home, 5, 60)
+    settings = json.loads((home / ".gemini" / "antigravity-cli" / "settings.json").read_text())
+    expected_allow = [f"read_file({request.workdir.resolve()})", f"write_file({request.workdir.resolve()})"]
+    assert settings["permissions"]["allow"] == expected_allow
+    assert "read_file(*)" not in settings["permissions"]["allow"]
+    assert invocation.env["AGY_ADC_AUTH"] == "true"
 
 
 def test_registry_gives_antigravity_its_own_limits(tmp_path):
@@ -283,6 +315,8 @@ def test_registry_gives_antigravity_its_own_limits(tmp_path):
     assert registry.get("antigravity").default_timeout_s == cfg.antigravity_timeout_seconds
     assert registry.get("claude_code").model == "claude-sonnet-5-5"
     assert registry.get("antigravity").model == "gemini-3.8-flash-medium"
+    assert registry.get("antigravity").purpose_models == {"generate_assets": "gemini-3.8-flash-low"}
+    assert registry.get("claude_code").purpose_models == {}
 
 
 def test_configured_model_is_passed_to_the_cli(root):
@@ -294,6 +328,60 @@ def test_configured_model_is_passed_to_the_cli(root):
 
     assert agy.argv[agy.argv.index("--model") + 1] == "gemini-3.8-flash-medium"
     assert claude.argv[claude.argv.index("--model") + 1] == "claude-sonnet-5-5"
+
+
+def test_purpose_model_selection_and_request_override(root):
+    agy_engine = _agy(
+        root,
+        auth="account",
+        model="gemini-3.8-flash-medium",
+        purpose_models={"generate_assets": "gemini-3.8-flash-low"},
+    )
+    claude_engine = _claude(
+        root,
+        model="claude-sonnet-5-5",
+        purpose_models={"generate_assets": "claude-haiku-4-5"},
+    )
+
+    # 1. generate_assets uses purpose model
+    req_assets = _request(root, purpose="generate_assets")
+    agy_assets = agy_engine.build_invocation(req_assets, root / "h1", 5, 60)
+    claude_assets = claude_engine.build_invocation(req_assets, root / "h2", 5, 60)
+    assert agy_assets.argv[agy_assets.argv.index("--model") + 1] == "gemini-3.8-flash-low"
+    assert agy_assets.parser.model == "gemini-3.8-flash-low"
+    assert claude_assets.argv[claude_assets.argv.index("--model") + 1] == "claude-haiku-4-5"
+    assert claude_assets.parser.model == "claude-haiku-4-5"
+
+    # 2. Other purposes use default model
+    req_custom = _request(root, purpose="generate_custom_component")
+    agy_custom = agy_engine.build_invocation(req_custom, root / "h3", 5, 60)
+    claude_custom = claude_engine.build_invocation(req_custom, root / "h4", 5, 60)
+    assert agy_custom.argv[agy_custom.argv.index("--model") + 1] == "gemini-3.8-flash-medium"
+    assert agy_custom.parser.model == "gemini-3.8-flash-medium"
+    assert claude_custom.argv[claude_custom.argv.index("--model") + 1] == "claude-sonnet-5-5"
+    assert claude_custom.parser.model == "claude-sonnet-5-5"
+
+    # 3. Explicit request.model wins over purpose model and default
+    req_override = _request(root, purpose="generate_assets", model="gemini-explicit-model")
+    agy_override = agy_engine.build_invocation(req_override, root / "h5", 5, 60)
+    assert agy_override.argv[agy_override.argv.index("--model") + 1] == "gemini-explicit-model"
+    assert agy_override.parser.model == "gemini-explicit-model"
+
+
+def test_antigravity_purpose_model_run_records_model_and_usage(root):
+    engine = _agy(
+        root,
+        model="gemini-3.8-flash-medium",
+        purpose_models={"generate_assets": "gemini-3.8-flash-low"},
+    )
+    result, _ = _run(engine, _request(root, purpose="generate_assets"))
+
+    assert result.status == EngineStatus.OK
+    assert result.usage.model == "gemini-3.8-flash-low"
+    assert len(result.model_calls) >= 1
+    assert all(c.model == "gemini-3.8-flash-low" for c in result.model_calls)
+    assert result.usage.cost_source == "estimated"
+    assert result.usage.cost_usd is not None and result.usage.cost_usd > 0
 
 
 # -- model calls and cost (Story 8.4) ---------------------------------------------------------------------------

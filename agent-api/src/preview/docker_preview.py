@@ -175,6 +175,25 @@ class DockerPreviewRuntime(IPreviewRuntime):
                 raise PreviewError("the generated project has no Dockerfile (generateDockerfile=false)")
             lines: list[str] = []
             try:
+                dockerfile_text = Path(directory, "Dockerfile").read_text(errors="replace")
+                req_path = Path(directory, "requirements.txt")
+                if req_path.is_file() and "as deps" in dockerfile_text.lower():
+                    sha12 = hashlib.sha256(req_path.read_bytes()).hexdigest()[:12]
+                    deps_tag = f"bga-be-deps:{sha12}"
+                    try:
+                        self.client.images.get(deps_tag)
+                    except ImageNotFound:
+                        _, deps_stream = self.client.images.build(
+                            path=directory,
+                            target="deps",
+                            tag=deps_tag,
+                            rm=True,
+                            forcerm=True,
+                            labels={LABEL: "deps", INSTANCE_LABEL: instance_id(), ROLE_LABEL: "deps"},
+                            timeout=config.preview_build_timeout_seconds,
+                        )
+                        lines.extend(chunk.get("stream", "") for chunk in deps_stream if isinstance(chunk, dict))
+
                 _, stream = self.client.images.build(
                     path=directory,
                     tag=tag,
@@ -183,7 +202,7 @@ class DockerPreviewRuntime(IPreviewRuntime):
                     labels=_labels(generation_id, "image"),
                     timeout=config.preview_build_timeout_seconds,
                 )
-                lines = [chunk.get("stream", "") for chunk in stream if isinstance(chunk, dict)]
+                lines.extend(chunk.get("stream", "") for chunk in stream if isinstance(chunk, dict))
             except BuildError as exc:
                 log = "".join(chunk.get("stream", "") or chunk.get("error", "") for chunk in exc.build_log)
                 raise PreviewError(f"image build failed: {exc.msg}", log) from exc

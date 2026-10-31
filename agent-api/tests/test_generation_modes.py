@@ -365,8 +365,8 @@ def test_static_generation_renders_the_site_without_the_engine(client, headers, 
         "validate_inputs", "plan_frontend", "scaffold_frontend", "generate_assets", "generate_frontend",
         "validate_frontend", "package_artifacts",
     ]  # fmt: skip
-    # Story 15.2: the hero and work illustrations are drawn in one engine call; the pages need none.
-    assert [call.purpose for call in cli_invocations(generation_id)] == ["generate_assets"]
+    # Story 18.7: one engine call per drawing; LANDING has 2 illustrations (hero and work-1).
+    assert [call.purpose for call in cli_invocations(generation_id)] == ["generate_assets", "generate_assets"]
     assert deployed == [generation_id]
     generate = next(run for run in node_runs(generation_id) if run.node == "generate_frontend")
     assert generate.summary == {"pages": 5, "sections": 11, "rendering": "renderer", "engineCalls": 0}

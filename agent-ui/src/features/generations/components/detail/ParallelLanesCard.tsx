@@ -119,15 +119,26 @@ export function ParallelLanesCard({
               const lastFinish = laneEvents.findLast((e) => e.type === "step.finished");
 
               if (status === "RUNNING" || status === "VALIDATING" || status === "REPAIRING") {
-                // Find currently running node from progress
-                const runningNode = Object.entries(progress).find(
-                  ([node, p]) => p.state === "running" && (lastStart?.step === node || node.includes(lane)),
-                );
-                currentStepName = runningNode ? runningNode[0] : (lastStart?.step ?? "In progress");
+                // Find currently running nodes in this lane from progress
+                const runningNodes = Object.entries(progress)
+                  .filter(([node, p]) => {
+                    if (p.state !== "running") return false;
+                    const eventMatchesLane = events.some((e) => e.step === node && e.lane === lane);
+                    return eventMatchesLane || node.includes(lane);
+                  })
+                  .map(([node]) => node);
+
+                if (runningNodes.length > 1) {
+                  currentStepName = runningNodes.map(formatStep).join(" & ");
+                } else if (runningNodes.length === 1) {
+                  currentStepName = formatStep(runningNodes[0]);
+                } else {
+                  currentStepName = lastStart?.step ? formatStep(lastStart.step) : "In progress";
+                }
               } else if (status === "COMPLETED") {
                 currentStepName = "Lane completed";
               } else if (status === "FAILED") {
-                currentStepName = lastFinish?.step ? `Failed at ${lastFinish.step}` : "Failed";
+                currentStepName = lastFinish?.step ? `Failed at ${formatStep(lastFinish.step)}` : "Failed";
               }
             }
 

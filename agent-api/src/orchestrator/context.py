@@ -113,6 +113,9 @@ class JobContext:
         self._wait_task: asyncio.Task | None = None
         self._state_lock = asyncio.Lock()
         self._commit_lock = asyncio.Lock()
+        self.frontend_plan_lock = asyncio.Lock()
+        self.engine_slots = asyncio.Semaphore(max(1, config.engine_concurrency))
+        self.background_tasks: list[asyncio.Task] = []
         self._status: GenerationStatus | None = None
         self.trace: tracing.GenerationTrace | None = None
 
@@ -489,6 +492,10 @@ class JobContext:
         return self._frontend_sandbox
 
     async def close_sandbox(self) -> None:
+        for task in self.background_tasks:
+            if not task.done():
+                task.cancel()
+        self.background_tasks.clear()
         for lane in ("backend", "frontend"):
             self._deactivate_lane(lane)
         for attribute in ("_sandbox", "_frontend_sandbox"):

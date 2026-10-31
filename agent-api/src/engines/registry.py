@@ -77,6 +77,7 @@ def build_engine_registry(cfg=default_config) -> EngineRegistry:
             api_key=cfg.anthropic_api_key,
             credentials_file=cfg.claude_credentials_file,
             model=cfg.claude_code_model,
+            purpose_models=cfg.claude_code_purpose_models,
             **limits,
         ),
         AntigravityEngine(
@@ -85,6 +86,7 @@ def build_engine_registry(cfg=default_config) -> EngineRegistry:
             gemini_api_key=cfg.gemini_api_key,
             google_application_credentials=cfg.google_application_credentials,
             model=cfg.antigravity_model,
+            purpose_models=cfg.antigravity_purpose_models,
             **{
                 **limits,
                 "default_timeout_s": cfg.antigravity_timeout_seconds,

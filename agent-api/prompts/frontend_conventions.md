@@ -31,6 +31,10 @@ win.
   arbitrary colour classes; layout with `Container`, `Stack`, `Grid`, `Section`. Named React imports only, `type`
   over `interface`, `T`-prefixed standalone types, `<Name>Props` for props. Logic over ~30 lines goes to the
   component's companion `use-*.ts` hook.
+- **React.** Never call `setState` synchronously in a `useEffect` body. Compute derived values during render,
+  initialise state lazily (`useState(() => ...)`), or reset state by giving a child component a `key`. Do not write
+  `useMemo`, `useCallback` or `React.memo`: the React Compiler memoises. If you do write one, its dependency list
+  must list every value the callback reads.
 - **Links.** Internal links use `next/link` and the routes from the plan (`siteConfig.pages`); navigation comes
   from `siteConfig.navigation` and `siteConfig.footer`.
 - **You cannot run commands.** Write code only; a separate system installs, type-checks, lints, builds and runs

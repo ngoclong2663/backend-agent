@@ -137,7 +137,7 @@ def test_backend_draft_from_a_markdown_requirement(client, user_headers, tmp_pat
     assert list(draft["backend_spec"]) == list(example), "the spec keeps the key order the engine wrote"
     assert draft["validation"]["backend"]["valid"] is True and set(draft["validation"]) == {"backend"}
     assert draft["assumptions"][0]["spec"] == "backend" and draft["unresolved"][0]["path"] == "/operations"
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_spec@v2"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_spec@v3"]
     assert draft["usage"]["modelCalls"] == 2 and draft["usage"]["inputTokens"] == 1000
     assert draft["attempts"] == 0 and draft["progress"] is None and draft["finished_at"]
 
@@ -148,7 +148,7 @@ def test_static_draft_writes_only_a_frontend_spec(client, user_headers, tmp_path
     assert draft["status"] == "SUCCEEDED", draft["validation"]
     assert draft["frontend_spec"]["project"]["mode"] == "static" and draft["backend_spec"] is None
     assert draft["unresolved"] == [] and set(draft["validation"]) == {"frontend"}
-    assert draft["usage"]["calls"][0]["prompt"] == "draft_frontend_spec@v3"
+    assert draft["usage"]["calls"][0]["prompt"] == "draft_frontend_spec@v5"
     # Story 12.6: three directions, the first applied (the fake engine names none), its notes after the engine's.
     design = draft["design"]
     assert design["selected"] == 0 and len(design["directions"]) == 3

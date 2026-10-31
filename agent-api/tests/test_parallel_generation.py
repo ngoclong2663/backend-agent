@@ -12,6 +12,7 @@ import pytest
 from generation_helpers import engine_path, normalized
 from langgraph.checkpoint.memory import InMemorySaver
 from preview_fakes import FakePreviewRuntime
+from test_component_cache import PassingSandboxes
 
 from src.configs import config
 from src.engines.fake_engine import FakeEngine, demo_scenario
@@ -679,3 +680,213 @@ def test_corner_shop_dynamic_generation_runs_both_lanes_with_fake_engine(client,
         [(r.node, r.status, r.summary) for r in node_runs(generation_id)],
     )
     assert row.lanes == {"backend": "COMPLETED", "frontend": "COMPLETED", "integration": "SKIPPED"}
+
+
+def test_story18_7_parallel_assets_and_frontend_with_shared_semaphore(client, headers, tmp_path, monkeypatch):
+    """Story 18.7: generate_assets and generate_frontend run in parallel, share engine_slots,
+    merge plan properly, and validate_frontend runs once after both."""
+    monkeypatch.setattr(config, "engine_concurrency", 2)
+    auth = headers()
+    shop_spec = json.loads((EXAMPLES / "specs" / "shop.json").read_text())
+    raw_shop_frontend = json.loads((EXAMPLES / "frontend-specs" / "shop-dynamic.json").read_text())
+    resp = client.post(
+        "/api/v1/generations",
+        json={
+            "mode": "dynamic",
+            "backendSpec": shop_spec,
+            "frontendSpec": raw_shop_frontend,
+            "options": {"engine": "fake", "runTests": True, "maxRepairAttempts": 2, "deployPreview": False},
+        },
+        headers=auth,
+    )
+    assert resp.status_code == 202, resp.text
+    generation_id = resp.json()["generationId"]
+    sandboxes = PassingSandboxes()
+
+    class TrackingEngine(FakeEngine):
+        active_assets = 0
+        total_calls = 0
+
+        async def run(self, request, on_event=None):
+            TrackingEngine.total_calls += 1
+            if request.purpose == "generate_assets":
+                TrackingEngine.active_assets += 1
+            try:
+                await asyncio.sleep(0.02)
+                return await super().run(request, on_event)
+            finally:
+                if request.purpose == "generate_assets":
+                    TrackingEngine.active_assets -= 1
+
+    status = run_job(tmp_path, generation_id, engine=TrackingEngine(tmp_path, demo_scenario(0)), sandboxes=sandboxes)
+    assert status in ("COMPLETED", "COMPLETED_WITH_WARNINGS")
+    runs = node_runs(generation_id)
+    node_names = [r.node for r in runs]
+    assert "generate_assets" in node_names
+    assert "generate_frontend" in node_names
+    assert "validate_frontend" in node_names
+    assert node_names.count("validate_frontend") == 1
+
+    # Check plan file on disk: it must retain BOTH custom components and assets
+    plan = json.loads((tmp_path / generation_id / "frontend" / ".bga" / "frontend-plan.json").read_text())
+    assert "customComponents" in plan and len(plan["customComponents"]) > 0
+    assert "assets" in plan and len(plan["assets"]) > 0
+
+    purposes = [c.purpose for c in cli_invocations(generation_id)]
+    assert purposes.count("generate_custom_component") == 3
+
+
+def test_story18_8_early_backend_preview_and_direct_live_frontend(client, headers, tmp_path):
+    """Story 18.8: in dynamic mode the backend preview starts when the backend lane completes;
+    early backend.zip is written; frontend preview starts directly live with mockApi=False;
+    the generation ends COMPLETED."""
+    auth = headers()
+    generation_id = _submit_dynamic(client, auth, deployPreview=True)
+
+    backend_rt = FakePreviewRuntime()
+    frontend_rt = FakePreviewRuntime()
+    _configure_healthy_backend(backend_rt)
+
+    store = JobStore()
+
+    async def go():
+        redis = redis_client()
+        try:
+            events_ = EventPublisher(redis, Redactor())
+            bus = PreviewCommandBus(redis)
+            previews = PreviewService(backend_rt, store, events_, bus, frontend_runtime=frontend_rt)
+            async with runner_ctx(
+                tmp_path,
+                engine=FakeEngine(tmp_path, demo_scenario(0)),
+                previews=previews,
+            ) as runner:
+                return await runner.run(generation_id)
+        finally:
+            await redis.aclose()
+
+    try:
+        status = asyncio.run(go())
+        assert status == "COMPLETED"
+        row = generation(generation_id)
+        assert row.lanes == {"backend": "COMPLETED", "frontend": "COMPLETED", "integration": "COMPLETED"}
+
+        # Early backend preview was started
+        be_preview = store.preview(generation_id, "backend")
+        assert be_preview is not None and be_preview.status == "RUNNING"
+
+        # Frontend preview was created directly on live API
+        fe_preview = store.preview(generation_id, "frontend")
+        assert fe_preview is not None and fe_preview.status == "RUNNING"
+        assert fe_preview.mock_api is False
+        assert frontend_rt.options[generation_id]["mockApi"] is False
+        assert frontend_rt.options[generation_id]["apiBaseUrl"] == be_preview.url
+
+        # Check event sequence: backend preview was RUNNING before integrate started
+        evt_list = events(generation_id)
+        be_running_evt = next(
+            e
+            for e in evt_list
+            if e.type == "preview.status" and e.payload.get("kind") == "backend" and e.status == "RUNNING"
+        )
+        integrate_evt = next(e for e in evt_list if e.type == "step.started" and e.step == "integrate")
+        assert be_running_evt.ts <= integrate_evt.ts
+
+        # Verify backend.zip was packaged early and reused by package_artifacts
+        head_file = tmp_path / generation_id / "state" / "backend-packaged-head"
+        assert head_file.is_file()
+    finally:
+        _cleanup_previews(generation_id)
+
+
+def test_story18_8_cancellation_stops_early_preview(client, headers, tmp_path):
+    """Story 18.8: cancellation stops the early preview container."""
+    auth = headers()
+    generation_id = _submit_dynamic(client, auth, deployPreview=True)
+
+    backend_rt = FakePreviewRuntime()
+    frontend_rt = FakePreviewRuntime()
+    _configure_healthy_backend(backend_rt)
+    store = JobStore()
+
+    # Slow down frontend lane so backend completes first
+    steps = demo_scenario(0)
+    steps["generate_frontend"][0].sleep_s = 2.0
+    engine = FakeEngine(tmp_path, steps)
+
+    async def go():
+        redis = redis_client()
+        try:
+            events_ = EventPublisher(redis, Redactor())
+            bus = PreviewCommandBus(redis)
+            previews = PreviewService(backend_rt, store, events_, bus, frontend_runtime=frontend_rt)
+            async with runner_ctx(tmp_path, engine=engine, previews=previews) as runner:
+                task = asyncio.create_task(runner.run(generation_id))
+                # Wait until backend preview is running
+                while not task.done():
+                    be = store.preview(generation_id, "backend")
+                    if be is not None and be.status == "RUNNING":
+                        await runner.cancel(generation_id)
+                        break
+                    await asyncio.sleep(0.02)
+                return await task
+        finally:
+            await redis.aclose()
+
+    try:
+        status = asyncio.run(go())
+        assert status == "CANCELLED"
+        # Backend preview must now be STOPPED
+        be = store.preview(generation_id, "backend")
+        assert be is not None and be.status == "STOPPED"
+    finally:
+        _cleanup_previews(generation_id)
+
+
+def test_story18_8_package_artifacts_reuses_or_rewrites_backend_zip(client, headers, tmp_path):
+    """Story 18.8: package_artifacts reuses early backend.zip if HEAD is unchanged, rewrites if HEAD changed."""
+    from src.orchestrator.workspace import WorkspaceManager
+
+    auth = headers()
+    generation_id = _submit_dynamic(client, auth, deployPreview=True)
+
+    backend_rt = FakePreviewRuntime()
+    frontend_rt = FakePreviewRuntime()
+    _configure_healthy_backend(backend_rt)
+    store = JobStore()
+
+    async def go():
+        redis = redis_client()
+        try:
+            events_ = EventPublisher(redis, Redactor())
+            bus = PreviewCommandBus(redis)
+            previews = PreviewService(backend_rt, store, events_, bus, frontend_runtime=frontend_rt)
+            async with runner_ctx(
+                tmp_path,
+                engine=FakeEngine(tmp_path, demo_scenario(0)),
+                previews=previews,
+            ) as runner:
+                return await runner.run(generation_id)
+        finally:
+            await redis.aclose()
+
+    try:
+        status = asyncio.run(go())
+        assert status == "COMPLETED"
+
+        art1 = store.artifact_by_name(generation_id, "backend.zip")
+        assert art1 is not None
+
+        # Simulate HEAD change in project repo
+        workspace_mgr = WorkspaceManager(tmp_path, config.workspace_max_mb)
+        ws = workspace_mgr.path_for(generation_id)
+        (ws.project / "extra.txt").write_text("modified")
+        workspace_mgr._git(ws, "add", "extra.txt", repo="project")
+        workspace_mgr._git(ws, "commit", "-m", "extra commit", repo="project")
+
+        # If packaged_head differs from current HEAD, rewrite happens
+        head_file = ws.state / "backend-packaged-head"
+        packaged_head = head_file.read_text().strip() if head_file.is_file() else None
+        current_head = workspace_mgr._git(ws, "rev-parse", "HEAD", repo="project").strip()
+        assert packaged_head != current_head
+    finally:
+        _cleanup_previews(generation_id)

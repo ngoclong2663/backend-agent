@@ -1,3 +1,4 @@
+from .autofix import autofix_frontend_spec
 from .catalogue import BUILTIN_SECTIONS, SHADCN_PRIMITIVES, THEME_PRESETS
 from .fonts import FONTS, closest_font, font_category, font_imports
 from .issues import FrontendIssueCode
@@ -19,6 +20,7 @@ from .validator import (
 )
 
 __all__ = [
+    "autofix_frontend_spec",
     "BUILTIN_SECTIONS",
     "FONTS",
     "FRONTEND_SPEC_MODELS",

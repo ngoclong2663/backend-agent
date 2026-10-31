@@ -17,6 +17,7 @@ scratch directory holding only the request: only the requested SVG files come ba
 they were drawn from (key below), not by theme colours, which they only reference as variables.
 """
 
+import asyncio
 import hashlib
 import json
 import shutil
@@ -129,16 +130,18 @@ async def generate_assets(state: GenerationState, ctx: JobContext) -> tuple[dict
             await ctx.emit("frontend.asset.ready", step="generate_assets", id=asset["id"], cached=asset["cached"])
         else:
             await ctx.emit("frontend.asset.missing", step="generate_assets", id=asset["id"], file=asset["file"])
-    write_registry(project, plan)
+    async with ctx.frontend_plan_lock:
+        current_plan = json.loads(ctx.frontend_path(PLAN_REF).read_text())
+        current_plan["assets"] = plan["assets"]
+        write_registry(project, current_plan)
     summary = {"assets": len(wanted), "drawn": drawn, "cacheHits": len(cached), "engineCalls": engine_calls}
     await ctx.emit("frontend.assets.done", step="generate_assets", **summary)
     return {}, summary
 
 
-async def _draw(ctx: JobContext, project: Path, misses: list[dict[str, Any]]) -> int:
-    """One engine call in a scratch directory that holds only the request; the requested files come back, the
-    drawings that pass the checks are cached. An engine failure leaves the assets as placeholders."""
-    scratch = ctx.workspace.root / "scratch" / "assets"
+async def _draw_one(ctx: JobContext, project: Path, asset: dict[str, Any]) -> bool:
+    """One engine call in its own scratch directory (scratch/assets-<id>)."""
+    scratch = ctx.workspace.root / "scratch" / f"assets-{asset['id']}"
     shutil.rmtree(scratch, ignore_errors=True)
     (scratch / ".bga").mkdir(parents=True)
     request = [
@@ -152,7 +155,6 @@ async def _draw(ctx: JobContext, project: Path, misses: list[dict[str, Any]]) ->
             "file": asset["file"],
             "decorative": asset["decorative"],
         }
-        for asset in misses
     ]
     (scratch / REQUEST_FILE).write_text(json.dumps({"assets": request}, indent=2) + "\n")
     prompt = ctx.prompts.render(
@@ -163,21 +165,26 @@ async def _draw(ctx: JobContext, project: Path, misses: list[dict[str, Any]]) ->
         request_path=REQUEST_FILE,
         max_kb=30,
     )
-    try:
-        await ctx.run_engine("generate_assets", "generate_assets", prompt, repo="frontend", workdir_override=scratch)
-    except EngineFailure as exc:
-        logger.warning("asset drawing failed", extra={"generation_id": ctx.generation_id, "error": str(exc)})
-        await ctx.emit("frontend.asset.failed", step="generate_assets", error=str(exc)[:500])
-        shutil.rmtree(scratch, ignore_errors=True)
-        return 1
-    requested = {asset["file"] for asset in misses}
+    async with ctx.engine_slots:
+        try:
+            await ctx.run_engine(
+                "generate_assets", "generate_assets", prompt, repo="frontend", workdir_override=scratch
+            )
+        except EngineFailure as exc:
+            logger.warning(
+                "asset drawing failed",
+                extra={"generation_id": ctx.generation_id, "asset_id": asset["id"], "error": str(exc)},
+            )
+            await ctx.emit("frontend.asset.failed", step="generate_assets", id=asset["id"], error=str(exc)[:500])
+            shutil.rmtree(scratch, ignore_errors=True)
+            return False
+
+    requested = {asset["file"]}
     extra = _out_of_scope(scratch, requested)
     if extra:
-        await ctx.emit("frontend.asset.out_of_scope", step="generate_assets", files=extra[:50])
-    for asset in misses:
-        source = scratch / asset["file"]
-        if not source.is_file():
-            continue
+        await ctx.emit("frontend.asset.out_of_scope", step="generate_assets", id=asset["id"], files=extra[:50])
+    source = scratch / asset["file"]
+    if source.is_file():
         target = project / asset["file"]
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
@@ -186,7 +193,20 @@ async def _draw(ctx: JobContext, project: Path, misses: list[dict[str, Any]]) ->
             cache.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, cache)
     shutil.rmtree(scratch, ignore_errors=True)
-    return 1
+    return True
+
+
+async def _draw(ctx: JobContext, project: Path, misses: list[dict[str, Any]]) -> int:
+    """One engine call per missing drawing, running concurrently up to ctx.engine_slots."""
+    tasks = [asyncio.create_task(_draw_one(ctx, project, asset)) for asset in misses]
+    try:
+        await asyncio.gather(*tasks)
+    except BaseException:
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        raise
+    return len(misses)
 
 
 # -- checks and fallback (Story 15.3) ----------------------------------------------------------------------------------

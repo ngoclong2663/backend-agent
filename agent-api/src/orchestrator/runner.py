@@ -10,7 +10,14 @@ from langsmith import tracing_context
 from src.configs import config, get_logger, log_context
 from src.engines import EngineContext, EngineRegistry, PromptLibrary, UnknownEngineError
 from src.modules.generations.infrastructure.adapters import EventPublisher
-from src.modules.shared.domain.enums import TERMINAL_STATUSES, GenerationMode, GenerationStatus, Lane, LaneStatus
+from src.modules.shared.domain.enums import (
+    TERMINAL_STATUSES,
+    GenerationMode,
+    GenerationStatus,
+    Lane,
+    LaneStatus,
+    PreviewStatus,
+)
 from src.modules.shared.domain.generation_modes import (
     UNAVAILABLE_LANES,
     close_lanes,
@@ -271,6 +278,17 @@ class JobRunner:
     ) -> GenerationStatus:
         if status in (GenerationStatus.FAILED, GenerationStatus.CANCELLED):
             await ctx.replace_lanes(close_lanes(ctx.lanes, failed=status == GenerationStatus.FAILED))
+        if status == GenerationStatus.CANCELLED and ctx.previews is not None:
+            for kind in ("backend", "frontend"):
+                preview = self.store.preview(ctx.generation_id, kind)
+                if preview is not None and preview.status in (PreviewStatus.STARTING, PreviewStatus.RUNNING):
+                    try:
+                        await ctx.previews.stop(ctx.generation_id, kind, reason="generation cancelled")
+                    except Exception:
+                        logger.exception(
+                            "stopping preview on cancel failed",
+                            extra={"generation_id": ctx.generation_id, "kind": kind},
+                        )
         if status == GenerationStatus.FAILED:
             try:
                 await write_artifacts(ctx, {}, completed=False, error=error)

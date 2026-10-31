@@ -49,11 +49,13 @@ class Config(BaseSettings):
 
     claude_code_bin: str = "claude"
     claude_code_model: str = "claude-sonnet-5-5"
+    claude_code_purpose_models: dict[str, str] = {}
     anthropic_api_key: str | None = None
     claude_credentials_file: str | None = None
 
     antigravity_bin: str = "agy"
     antigravity_model: str = "gemini-3.8-flash-medium"  # `agy models` lists the choices
+    antigravity_purpose_models: dict[str, str] = {"generate_assets": "gemini-3.8-flash-low"}
     # agy streams one agent response per tool call, so its "turns" are much smaller than Claude's.
     antigravity_max_turns: int = 150
     antigravity_timeout_seconds: int = 2400
@@ -93,6 +95,8 @@ class Config(BaseSettings):
     # Story 17.5: one ready node_modules per dependency set (volume `bga-fe-modules-<key>`), mounted read-only, so
     # a frontend does not copy ~1 GB out of the store on every generation. Off: each project installs its own.
     frontend_shared_modules: bool = True
+    # Story 18.1: isolated component render-test timeout (the whole site's unit tests take ~5 s).
+    frontend_component_test_timeout_seconds: int = 60
 
     generator_version: str = "0.8.0"
     # Shared by worker (writes) and API (downloads); outlives workspaces.
@@ -125,7 +129,7 @@ class Config(BaseSettings):
     preview_command_timeout_seconds: float = 8  # API waiting for the worker (logs); below the Redis socket timeout
     # Dynamic integration (Story 14.2): how long `integrate` waits for the backend lane and its preview before
     # keeping the frontend on its mock API.
-    integration_wait_seconds: float = 900
+    integration_wait_seconds: float = 180
 
     # LangSmith tracing (Epic 8). Off unless LANGSMITH_TRACING=true and a key is set; the local trace (node runs,
     # CLI invocations, model calls, checks) is recorded either way. LANGSMITH_AGENT_ID (beta, enabled per
@@ -168,6 +172,21 @@ class Config(BaseSettings):
     def _blank_model_means_default(cls, value, info):
         # Compose passes `CLAUDE_CODE_MODEL=` when .env leaves it empty; that means "the default", not "none".
         return cls.model_fields[info.field_name].default if value in (None, "") else value
+
+    @field_validator("claude_code_purpose_models", "antigravity_purpose_models", "model_prices", mode="before")
+    @classmethod
+    def _parse_dict_or_default(cls, value, info):
+        if value in (None, ""):
+            return cls.model_fields[info.field_name].default
+        if isinstance(value, str):
+            import json
+
+            try:
+                parsed = json.loads(value)
+                return parsed if isinstance(parsed, dict) else cls.model_fields[info.field_name].default
+            except Exception:
+                return cls.model_fields[info.field_name].default
+        return value
 
     @field_validator("jwt_secret")
     @classmethod

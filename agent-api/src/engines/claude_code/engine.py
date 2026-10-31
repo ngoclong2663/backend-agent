@@ -12,6 +12,8 @@ from .stream import ClaudeStreamParser
 
 # File tools only: generated code is executed in the sandbox (Epic 6), never by the engine.
 TOOLS = ["Read", "Write", "Edit", "Glob", "Grep", "Skill"]
+# Tools pre-approved without confirmation (Story 18.4); Read/Glob/Grep stay scoped to workdir by default.
+ALLOWED_TOOLS = ["Write", "Edit", "Skill"]
 # Belt and braces on top of --tools; the .claude rules stop the engine planting settings or hooks
 # (hooks run shell commands) that a later run in the same workspace would load.
 DISALLOWED_TOOLS = ["Bash", "WebFetch", "WebSearch", "Write(.claude/**)", "Edit(.claude/**)"]
@@ -40,6 +42,7 @@ class ClaudeCodeEngine(CliEngine):
         default_timeout_s: float,
         default_max_turns: int,
         max_output_bytes: int,
+        purpose_models: dict[str, str] | None = None,
         runner: SubprocessRunner | None = None,
     ):
         super().__init__(allowed_root, redactor, default_timeout_s, default_max_turns, max_output_bytes, runner)
@@ -47,6 +50,7 @@ class ClaudeCodeEngine(CliEngine):
         self.api_key = api_key
         self.credentials_file = Path(credentials_file) if credentials_file else None
         self.model = model
+        self.purpose_models = purpose_models or {}
 
     async def health(self) -> EngineHealth:
         if shutil.which(self.binary) is None:
@@ -86,15 +90,16 @@ class ClaudeCodeEngine(CliEngine):
             "--tools",
             ",".join(TOOLS),
             "--allowedTools",
-            ",".join(TOOLS),
+            ",".join(ALLOWED_TOOLS),
             "--disallowedTools",
             ",".join(DISALLOWED_TOOLS),
             "--strict-mcp-config",
             "--append-system-prompt",
             GUARDRAILS,
         ]
-        if self.model:
-            argv += ["--model", self.model]
+        model = request.model or self.purpose_models.get(request.purpose) or self.model
+        if model:
+            argv += ["--model", model]
         env = base_env(
             HOME=str(home),
             CLAUDE_CONFIG_DIR=str(config_dir),
@@ -103,7 +108,7 @@ class ClaudeCodeEngine(CliEngine):
             DISABLE_AUTOUPDATER="1",
         )
         return Invocation(
-            argv=argv, env=env, stdin=request.prompt.encode(), parser=ClaudeStreamParser(max_turns, self.model)
+            argv=argv, env=env, stdin=request.prompt.encode(), parser=ClaudeStreamParser(max_turns, model)
         )
 
     def redact_argv(self, argv: list[str]) -> list[str]:

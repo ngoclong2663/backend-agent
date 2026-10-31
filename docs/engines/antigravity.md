@@ -27,7 +27,9 @@ was run on 2026-10-26 with the account login (see *Real run* below).
 - Per-job `HOME` (`<state>/engine-home/antigravity/`) holding the generated `settings.json`; nothing from the worker's own home is used.
 - `prepare_workspace`: skills → `.agents/skills/`, conventions → managed section in `AGENTS.md` (points at the template's `CLAUDE.md` when present).
 - Before every run `.agents/hooks.json` and `.agents/rules/` are removed from the workspace, so generated content cannot plant hooks or rules.
-- Usage: `input_tokens + cache_read_tokens` → input, `output_tokens + thinking_tokens` → output, cost `null`.
+- Scoped read/write (Story 18.4): `permissions.allow` contains only `read_file(<workdir>)` and `write_file(<workdir>)` for the request's resolved workdir, preventing `agy` from reading files outside its working directory.
+- Model per purpose (Story 18.5): `ANTIGRAVITY_PURPOSE_MODELS` overrides the model for specific calls (default: `generate_assets` runs on `gemini-3.8-flash-low`), while other purposes use `ANTIGRAVITY_MODEL`.
+- Usage: `input_tokens + cache_read_tokens` → input, `output_tokens + thinking_tokens` → output, cost estimated against model pricing.
 
 ## Policy note
 

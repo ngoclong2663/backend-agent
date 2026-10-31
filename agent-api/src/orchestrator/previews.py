@@ -90,7 +90,7 @@ class PreviewService:
             if kind not in self.runtimes:
                 result: Any = {"error": f"no {kind} previews on this worker"}
             elif op in MUTATING:
-                async with self.locks[generation_id]:
+                async with self.locks[f"{generation_id}:{kind}"]:
                     result = await getattr(self, op.replace("-", "_"))(generation_id, kind)
             elif op == "logs":
                 result = {"lines": await self.runtimes[kind].logs(generation_id, int(args.get("tail", 200)))}
@@ -127,6 +127,23 @@ class PreviewService:
         await self._event(generation_id, kind, PreviewStatus.STARTING)
         if not await self._make_room(generation_id, kind):
             return
+
+        # Reserve frontend port first if backend is starting, so backend CORS includes the frontend origin
+        if kind == "backend" and "frontend" in self.runtimes:
+            frontend_opts = generation.options.get("frontend") or {}
+            will_generate_fe = generation.mode == "dynamic" and frontend_opts.get("generatePreview", True)
+            fe_preview = self.store.preview(generation_id, "frontend")
+            if fe_preview is None and (will_generate_fe or "frontend" in self.startable(generation_id)):
+                fe_preview = self.store.upsert_preview(generation_id, "frontend", status=PreviewStatus.STOPPED)
+            if fe_preview is not None and not fe_preview.host_port:
+                fe_ports = await self._ports(generation_id, "frontend", fe_preview)
+                if fe_ports:
+                    self.store.upsert_preview(generation_id, "frontend", host_port=fe_ports[0])
+
+        ports = await self._ports(generation_id, kind, current)
+        if ports and not current.host_port:
+            current = self.store.upsert_preview(generation_id, kind, host_port=ports[0])
+
         seed = self.store.artifact_by_name(generation_id, "seed.json") if kind == "backend" else None
         options = self._options(generation, kind, prior)
         if options_override:
@@ -134,7 +151,7 @@ class PreviewService:
         request = PreviewRequest(
             generation_id=generation_id,
             source_zip=self._file(source),
-            ports=await self._ports(generation_id, kind, current),
+            ports=ports,
             seed=self._file(seed).read_bytes() if seed else None,
             options=options,
         )
@@ -335,7 +352,7 @@ class PreviewService:
         for preview in expired:
             if preview.kind not in self.runtimes:
                 continue
-            async with self.locks[preview.generation_id]:
+            async with self.locks[f"{preview.generation_id}:{preview.kind}"]:
                 await self.stop(preview.generation_id, preview.kind, reason="idle TTL reached")
         return len(expired)
 
@@ -353,7 +370,7 @@ class PreviewService:
             states = await runtime.states()
             rows = rows_by_kind.get(kind, {})
             for generation_id, preview in rows.items():
-                if self.locks[generation_id].locked():
+                if self.locks[f"{generation_id}:{kind}"].locked():
                     continue
                 state = states.get(generation_id)
                 if preview.status == PreviewStatus.RUNNING and (state is None or state.app != "running"):

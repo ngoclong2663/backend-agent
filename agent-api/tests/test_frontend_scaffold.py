@@ -15,9 +15,11 @@ from src.orchestrator.frontend_codegen import generated_files, type_name
 from src.orchestrator.frontend_planner import plan_frontend
 from src.orchestrator.frontend_scaffold import (
     BASE_DIR,
+    OVERLAY_DIR,
     FrontendTemplateDrift,
     changed_owned,
     check_base,
+    load_manifest,
     scaffold_frontend,
 )
 from src.orchestrator.frontend_validation import (
@@ -202,3 +204,15 @@ def test_routes_check_reads_the_build_output(tmp_path):
         (project / "out" / route).mkdir(parents=True, exist_ok=True)
         (project / "out" / route / "index.html").write_text("<html></html>")
     assert routes_check(project, landing).status == "passed"
+
+
+def test_dockerfiles_agree_with_overlay_pnpm_version():
+    manifest = load_manifest()
+    pnpm_version = manifest["baseLock"]["pnpmVersion"]
+    expected_clause = f"pnpm@{pnpm_version}"
+
+    for mode in ("dynamic", "static"):
+        dockerfile = (OVERLAY_DIR / "files" / mode / "Dockerfile").read_text()
+        assert expected_clause in dockerfile, f"{mode}/Dockerfile does not use {expected_clause}"
+        assert "AS deps" in dockerfile
+        assert "pnpm fetch --frozen-lockfile" in dockerfile

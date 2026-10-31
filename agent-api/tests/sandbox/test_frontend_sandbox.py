@@ -302,3 +302,69 @@ def test_drawn_and_uploaded_images_build_and_show_on_their_pages(tmp_path):
         assert 'src="/assets/logo.png"' in home
     finally:
         shutil.rmtree(project.parent, ignore_errors=True)
+
+
+def test_endless_render_loop_component_fails_fast_in_checks_and_render_test():
+    """Story 18.1: A component with an endless render loop is caught by ESLint and skips the render test
+    (< 30 s). When only the render test runs, it fails in < 60 s with the render loop message."""
+    import time
+
+    from src.orchestrator.custom_components import (
+        RENDER_TEST,
+        TSCONFIG,
+        CustomComponents,
+        render_test,
+    )
+    from tests.test_frontend_scaffold import inputs
+
+    spec, contract, plan = inputs("project-tracker-dynamic")
+    root = REPO / ".data" / "test-sandbox" / uuid.uuid4().hex[:10]
+    project = root / "frontend"
+    scaffold_frontend(project, plan, spec, contract)
+
+    relative = "src/components/custom/LoopComponent.tsx"
+    loop_fixture = REPO / "agent-api" / "tests" / "fixtures" / "components" / "loop_component.tsx"
+    target = project / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(loop_fixture.read_text())
+
+    test_file = project / RENDER_TEST
+    test_file.parent.mkdir(parents=True, exist_ok=True)
+    test_file.write_text(render_test(relative, {}, {}, dynamic=True))
+    tsconfig = {
+        "extends": "./tsconfig.json",
+        "compilerOptions": {"incremental": False},
+        "include": ["next-env.d.ts", "src/**/*.d.ts", relative, RENDER_TEST],
+    }
+    (project / TSCONFIG).write_text(json.dumps(tsconfig, indent=2) + "\n")
+
+    async def go():
+        sandbox = DockerSandboxProvider().for_job(f"gen_TESTFE{uuid.uuid4().hex[:8].upper()}", project, "frontend")
+        try:
+            cc = CustomComponents.__new__(CustomComponents)
+            # Test 1: isolated checks run lint, lint fails, render test is skipped; finishes < 30 s
+            t0 = time.monotonic()
+            failures, _ = await cc._checks(project, relative, sandbox, installed=False)
+            elapsed_checks = time.monotonic() - t0
+            assert elapsed_checks < 30, f"_checks took {elapsed_checks:.1f}s, expected < 30s"
+            assert any("lint (ESLint) failed" in f for f in failures), failures
+            assert not any("render test failed" in f for f in failures), "render test should have been skipped"
+
+            # Test 2: render test run directly on the loop component fails < 60 s with loop message
+            t1 = time.monotonic()
+            render = await sandbox.exec(
+                f"pnpm exec vitest run {RENDER_TEST} --testTimeout=20000",
+                timeout_s=60,
+            )
+            elapsed_render = time.monotonic() - t1
+            assert elapsed_render < 60, f"render test took {elapsed_render:.1f}s, expected < 60s"
+            assert not render.ok, "render test should have failed"
+            assert "render loop:" in render.output, f"expected loop message in output:\n{render.output}"
+        finally:
+            await sandbox.stop()
+
+    try:
+        asyncio.run(go())
+    finally:
+        if not os.environ.get("BGA_KEEP_SANDBOX_DIRS"):
+            shutil.rmtree(root, ignore_errors=True)

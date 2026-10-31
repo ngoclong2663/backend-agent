@@ -12,6 +12,7 @@ preview runtime never sees (or removes) them.
 """
 
 import asyncio
+import hashlib
 import tempfile
 import time
 import zipfile
@@ -121,7 +122,37 @@ class DockerFrontendPreviewRuntime(IPreviewRuntime):
                     archive.extract(info, directory)
             if not Path(directory, "Dockerfile").is_file():
                 raise PreviewError("the generated frontend has no Dockerfile")
+            lines: list[str] = []
             try:
+                dockerfile_text = Path(directory, "Dockerfile").read_text(errors="replace")
+                lock_path = Path(directory, "pnpm-lock.yaml")
+                workspace_path = Path(directory, "pnpm-workspace.yaml")
+                if lock_path.is_file() and "as deps" in dockerfile_text.lower():
+                    hasher = hashlib.sha256()
+                    hasher.update(lock_path.read_bytes())
+                    if workspace_path.is_file():
+                        hasher.update(workspace_path.read_bytes())
+                    sha12 = hasher.hexdigest()[:12]
+                    deps_tag = f"bga-fe-deps:{sha12}"
+                    try:
+                        self.client.images.get(deps_tag)
+                    except ImageNotFound:
+                        _, deps_stream = self.client.images.build(
+                            path=directory,
+                            target="deps",
+                            tag=deps_tag,
+                            rm=True,
+                            forcerm=True,
+                            labels={
+                                "bga.preview": "deps",
+                                LABEL: "deps",
+                                INSTANCE_LABEL: instance_id(),
+                                ROLE_LABEL: "deps",
+                            },
+                            timeout=config.preview_build_timeout_seconds,
+                        )
+                        lines.extend(chunk.get("stream", "") for chunk in deps_stream if isinstance(chunk, dict))
+
                 _, stream = self.client.images.build(
                     path=directory,
                     tag=tag,
@@ -130,7 +161,8 @@ class DockerFrontendPreviewRuntime(IPreviewRuntime):
                     labels=_labels(generation_id, "image"),
                     timeout=config.preview_build_timeout_seconds,
                 )
-                return "".join(chunk.get("stream", "") for chunk in stream if isinstance(chunk, dict))
+                lines.extend(chunk.get("stream", "") for chunk in stream if isinstance(chunk, dict))
+                return "".join(lines)
             except BuildError as exc:
                 log = "".join(chunk.get("stream", "") or chunk.get("error", "") for chunk in exc.build_log)
                 raise PreviewError(f"frontend image build failed: {exc.msg}", log) from exc

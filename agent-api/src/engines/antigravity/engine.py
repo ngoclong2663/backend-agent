@@ -12,11 +12,8 @@ from ..workspace import install_skills, remove_path, write_managed_section
 from .stream import AntigravityStreamParser
 
 # Headless agy already soft-denies shell commands; the deny rules make it explicit and also cover
-# network and MCP. Workspace file reads/writes stay allowed (agy's default).
-PERMISSIONS = {
-    "allow": ["read_file(*)", "write_file(*)"],
-    "deny": ["command(*)", "read_url(*)", "execute_url(*)", "mcp(*)", "write_file(.agents/)"],
-}
+# network and MCP. Workspace file reads/writes are scoped strictly to the request's workdir (Story 18.4).
+DENY_PERMISSIONS = ["command(*)", "read_url(*)", "execute_url(*)", "mcp(*)", "write_file(.agents/)"]
 UNTRUSTED_WORKSPACE_CONFIG = [".agents/hooks.json", ".agents/rules"]
 # Marker files of a container runtime: the agy account login lives in the host's OS keyring.
 CONTAINER_MARKERS = (Path("/.dockerenv"), Path("/run/.containerenv"))
@@ -44,6 +41,7 @@ class AntigravityEngine(CliEngine):
         default_timeout_s: float,
         default_max_turns: int,
         max_output_bytes: int,
+        purpose_models: dict[str, str] | None = None,
         runner: SubprocessRunner | None = None,
     ):
         super().__init__(allowed_root, redactor, default_timeout_s, default_max_turns, max_output_bytes, runner)
@@ -52,6 +50,7 @@ class AntigravityEngine(CliEngine):
         self.gemini_api_key = gemini_api_key
         self.google_application_credentials = google_application_credentials
         self.model = model
+        self.purpose_models = purpose_models or {}
 
     async def health(self) -> EngineHealth:
         if shutil.which(self.binary) is None:
@@ -79,7 +78,12 @@ class AntigravityEngine(CliEngine):
     def build_invocation(self, request: EngineRequest, home: Path, max_turns: int, timeout_s: float) -> Invocation:
         for relative in UNTRUSTED_WORKSPACE_CONFIG:
             remove_path(request.workdir / relative)
-        settings: dict = {"permissions": PERMISSIONS, "enableTerminalSandbox": True}
+        workdir = str(request.workdir.resolve())
+        permissions = {
+            "allow": [f"read_file({workdir})", f"write_file({workdir})"],
+            "deny": list(DENY_PERMISSIONS),
+        }
+        settings: dict = {"permissions": permissions, "enableTerminalSandbox": True}
         if self.auth == "gemini_api_key":
             settings["modelProvider"] = "gemini"  # GEMINI_API_KEY alone is ignored without this
 
@@ -94,8 +98,9 @@ class AntigravityEngine(CliEngine):
             "--print-timeout",
             f"{int(timeout_s)}s",
         ]
-        if self.model:
-            argv += ["--model", self.model]
+        model = request.model or self.purpose_models.get(request.purpose) or self.model
+        if model:
+            argv += ["--model", model]
         if self.auth == "account":
             # The account login belongs to the user's real home (on macOS a scratch HOME fails with "authentication
             # required"), so keep HOME and pass the settings for this session only, leaving the user's own alone.
@@ -113,7 +118,7 @@ class AntigravityEngine(CliEngine):
         )
         message = {"event": "user", "message": {"content": request.prompt}}
         stdin = (json.dumps(message) + "\n").encode()  # stdin is closed after this one turn, so agy exits
-        return Invocation(argv=argv, env=env, stdin=stdin, parser=AntigravityStreamParser(max_turns, self.model))
+        return Invocation(argv=argv, env=env, stdin=stdin, parser=AntigravityStreamParser(max_turns, model))
 
     def redact_argv(self, argv: list[str]) -> list[str]:
         return list(argv)

@@ -135,6 +135,16 @@ def test_the_key_is_what_the_component_is_made_from_not_its_name():
     assert component_key(component, "new base", "1") != key and component_key(component, "lock", "2") != key
 
 
+def test_component_cache_key_changes_with_prompt_version(monkeypatch):
+    from src.orchestrator import component_cache
+
+    component = {"name": "ProductGrid", "description": "Cards with prices"}
+    key_v2 = component_key(component, "lock", "1")
+    monkeypatch.setattr(component_cache, "PROMPT_VERSION", "v1")
+    key_v1 = component_key(component, "lock", "1")
+    assert key_v1 != key_v2
+
+
 def test_sample_props_follow_the_schema():
     schema = {
         "type": "object",
@@ -243,7 +253,7 @@ def test_a_failing_component_is_repaired_in_isolation_then_cached(client, login,
     assert purposes(generation_id) == ["generate_custom_component"] * 3 + ["repair_custom_component"] * 3
     assert frontend_summary(generation_id)["engineCalls"] == 6 and len(cache_rows()) == 3
     repair = next(c for c in cli_invocations(generation_id) if c.purpose == "repair_custom_component")
-    assert repair.prompt_ref == "repair_custom_component@v1"
+    assert repair.prompt_ref == "repair_custom_component@v3"
 
 
 def test_a_component_that_cannot_be_generated_falls_back_without_failing_the_job(client, login, tmp_path):
@@ -316,3 +326,74 @@ def test_only_admins_purge_the_cache(client, login, tmp_path):
     assert response.status_code == 200 and response.json() == {"purged": 3}
     assert cache_rows() == [] and not any(cached_file(key).exists() for key in keys)
     assert not Path(config.artifact_root, "cache", "components").exists()
+
+
+# -- Story 18.1: fail-fast component checks & interrupted engine handling ---------------------------------------------
+
+
+class CommandTrackingSandbox(PassingSandbox):
+    def __init__(self, provider: "CommandTrackingSandboxes"):
+        super().__init__(provider)
+        self.provider = provider
+
+    async def exec(self, command, timeout_s=None, env=None, egress=False):
+        self.provider.recorded_execs.append((command, timeout_s))
+        self.provider.commands.append(command)
+        if self.provider.lint_fails and "eslint" in command:
+            return ExecResult(exit_code=1, duration_ms=1, stdout="lint error", stderr="")
+        return ExecResult(exit_code=0, duration_ms=1, stdout="", stderr="")
+
+
+class CommandTrackingSandboxes(PassingSandboxes):
+    def __init__(self, lint_fails: bool = False):
+        super().__init__()
+        self.lint_fails = lint_fails
+        self.recorded_execs: list[tuple[str, int | None]] = []
+
+    def for_job(self, generation_id, project, kind="backend", part=None):
+        self.parts.append(part)
+        return CommandTrackingSandbox(self)
+
+
+def test_lint_failure_skips_render_test(client, login, tmp_path):
+    sandboxes = CommandTrackingSandboxes(lint_fails=True)
+    generation_id = submit_shop(client, login)
+    run_job(tmp_path, generation_id, engine=FakeEngine(tmp_path, demo_scenario(0)), sandboxes=sandboxes)
+    assert any("eslint" in cmd for cmd in sandboxes.commands)
+    assert not any("vitest run" in cmd for cmd in sandboxes.commands)
+
+
+def test_render_test_exec_uses_timeout_and_flag(client, login, tmp_path):
+    sandboxes = CommandTrackingSandboxes(lint_fails=False)
+    generation_id = submit_shop(client, login)
+    run_job(tmp_path, generation_id, engine=FakeEngine(tmp_path, demo_scenario(0)), sandboxes=sandboxes)
+    vitest_execs = [item for item in sandboxes.recorded_execs if "vitest run" in item[0]]
+    assert len(vitest_execs) == 3
+    for cmd, timeout_s in vitest_execs:
+        assert "--testTimeout=20000" in cmd
+        assert timeout_s == config.frontend_component_test_timeout_seconds
+
+
+def test_interrupted_engine_keeps_component_if_file_changed_and_checks_pass(client, login, tmp_path):
+    scenario = demo_scenario(0)
+    scenario["generate_custom_component"] = [FakeStep(custom_component=True, status="cli_error", error_reason="crash")]
+    generation_id = submit_shop(client, login)
+    assert run_job(tmp_path, generation_id, engine=FakeEngine(tmp_path, scenario), sandboxes=PassingSandboxes()) == (
+        "COMPLETED_WITH_WARNINGS"
+    )
+    summary = frontend_summary(generation_id)
+    assert summary["fallbacks"] == 0 and summary["customComponents"] == 3
+    generated_events = [e for e in events(generation_id) if e.type == "component.generated"]
+    assert len(generated_events) == 3
+    assert all("cli_error" in e.payload.get("engineError", "") for e in generated_events)
+
+
+def test_interrupted_engine_falls_back_if_file_unchanged(client, login, tmp_path):
+    scenario = demo_scenario(0)
+    scenario["generate_custom_component"] = [FakeStep(custom_component=False, status="cli_error", error_reason="crash")]
+    generation_id = submit_shop(client, login)
+    assert run_job(tmp_path, generation_id, engine=FakeEngine(tmp_path, scenario), sandboxes=PassingSandboxes()) == (
+        "COMPLETED_WITH_WARNINGS"
+    )
+    summary = frontend_summary(generation_id)
+    assert summary["fallbacks"] == 3 and summary["cacheHits"] == 0

@@ -7,13 +7,13 @@ Adapter: `agent-api/src/engines/claude_code/`. Verified 2026-10-23 with Claude C
 
 ```
 claude -p --output-format stream-json --verbose --max-turns <n> --permission-mode acceptEdits
-       --tools Read,Write,Edit,Glob,Grep,Skill --allowedTools <same>
+       --tools Read,Write,Edit,Glob,Grep,Skill --allowedTools Write,Edit,Skill
        --disallowedTools Bash,WebFetch,WebSearch,Write(.claude/**),Edit(.claude/**)
        --strict-mcp-config --append-system-prompt <guardrails> [--model <m>]
 ```
 
 - The prompt goes over **stdin**. `cwd` is the job's project directory (checked to be under `WORKSPACE_ROOT`).
-- `--tools` is what actually limits the tool set (`--allowedTools` only pre-approves). The real run reported exactly
+- `--tools` is what actually limits the tool set (`--allowedTools` only pre-approves). `--allowedTools` omits `Read`, `Glob`, and `Grep` (Story 18.4) so reads outside the workdir are not pre-approved; workdir reads/edits are permitted by `acceptEdits`. The real run reported exactly
   `["Edit","Glob","Grep","Read","Skill","Write"]`.
 - **No shell**: generated code only ever runs in the sandbox (Epic 6).
 - Writes under `.claude/` are denied, and `.claude/settings*.json`, `.claude/hooks`, `.mcp.json` are deleted before each

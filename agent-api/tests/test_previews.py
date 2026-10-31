@@ -26,7 +26,7 @@ def completed(client, tmp_path_factory):
 @pytest.fixture(autouse=True)
 def no_other_previews():
     for preview in STORE.previews():
-        STORE.delete_preview(preview.generation_id)
+        STORE.delete_preview(preview.generation_id, preview.kind)
     yield
 
 
@@ -196,6 +196,56 @@ def test_seed_artifact_is_handed_to_the_preview(client, user_headers, tmp_path):
     run(runtime, ("start", generation_id))
 
     assert b'"table": "projects"' in runtime.seeds[generation_id]
+
+
+def test_frontend_and_backend_start_concurrently_and_reserve_ports(completed):
+    from pathlib import Path
+
+    from src.orchestrator.packaging import ArtifactWriter
+
+    writer = ArtifactWriter(Path(config.artifact_root), completed)
+    writer.write("frontend.zip", "archive", b"PK\x05\x06" + b"\x00" * 18, "application/zip")
+    STORE.replace_artifacts(completed, STORE.artifacts(completed) + writer.written)
+    STORE.update_generation(
+        completed,
+        lanes={"backend": "COMPLETED", "frontend": "COMPLETED"},
+        options={"deployPreview": True, "frontend": {"generatePreview": True}},
+    )
+
+    backend_rt = FakePreviewRuntime()
+    frontend_rt = FakePreviewRuntime()
+
+    async def go():
+        redis = redis_client()
+        try:
+            service = PreviewService(
+                backend_rt,
+                STORE,
+                EventPublisher(redis, Redactor()),
+                PreviewCommandBus(redis),
+                frontend_runtime=frontend_rt,
+            )
+            await asyncio.gather(
+                service.start(completed, "frontend"),
+                service.start(completed, "backend"),
+            )
+        finally:
+            await redis.aclose()
+
+    asyncio.run(go())
+
+    fe_preview = STORE.preview(completed, "frontend")
+    be_preview = STORE.preview(completed, "backend")
+
+    assert fe_preview.status == PreviewStatus.RUNNING
+    assert be_preview.status == PreviewStatus.RUNNING
+    assert fe_preview.host_port is not None
+    assert be_preview.host_port is not None
+    assert fe_preview.host_port != be_preview.host_port
+    assert str(fe_preview.host_port) in backend_rt.options[completed]["corsOrigins"]
+
+    STORE.delete_preview(completed, "frontend")
+    STORE.delete_preview(completed, "backend")
 
 
 # -- API -----------------------------------------------------------------------------------------------------------

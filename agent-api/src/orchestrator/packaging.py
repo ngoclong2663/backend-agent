@@ -75,6 +75,10 @@ class ArtifactWriter:
     def artifact_id(self, name: str) -> str:
         return self.ids.setdefault(name, new_artifact_id())
 
+    def keep(self, artifact: ArtifactEntity) -> None:
+        self.ids[artifact.name] = artifact.id
+        self.written = [a for a in self.written if a.name != artifact.name] + [artifact]
+
     def write(self, name: str, kind: str, data: bytes, content_type: str) -> ArtifactEntity:
         path = self.directory / name
         path.parent.mkdir(parents=True, exist_ok=True)

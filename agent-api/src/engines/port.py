@@ -111,6 +111,7 @@ class EngineRequest(BaseModel):
     prompt_ref: PromptRef | None = None
     max_turns: int | None = None
     timeout_s: float | None = None
+    model: str | None = None
 
 
 class EngineResult(BaseModel):

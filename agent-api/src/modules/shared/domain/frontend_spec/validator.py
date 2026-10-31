@@ -14,7 +14,7 @@ from .fonts import FONTS, closest_font
 from .issues import FrontendIssueCode
 from .normalizer import normalize_frontend_spec, page_id, route_params, walk_sections
 from .registry import FRONTEND_SPEC_MODELS
-from .schema_v1 import FrontendSpecV1, NavLink, Section
+from .schema_v1 import FrontendSpecV1, NavLink, Page, Section
 from .section_props import LAYOUT_SECTIONS, MAX_DEPTH, SECTION_ITEMS, SECTION_PROPS, Props
 
 C = FrontendIssueCode
@@ -349,7 +349,23 @@ class _SemanticChecker:
                 C.FE_ROUTE_PARAM_UNBOUND,
                 f"{path}/page",
                 f"Page '{link.page}' ({page.route}) needs route parameters a navigation link cannot fill",
+                hint=self._link_param_hint(page),
             )
+
+    def _link_param_hint(self, page: Page) -> str:
+        prefix_pages = [
+            p.id
+            for p in self.spec.pages
+            if not route_params(p.route)
+            and p.route not in ("", "/")
+            and (page.route.rstrip("/") + "/").startswith(p.route.rstrip("/") + "/")
+        ]
+        candidates = prefix_pages or [p.id for p in self.spec.pages if not route_params(p.route)]
+        candidates_str = ", ".join(f"'{cid}'" for cid in candidates) if candidates else "(none)"
+        return (
+            f"Link to a page without route parameters ({candidates_str}), "
+            "or let a data section link each record to it (binding 'link')"
+        )
 
     def _known_pages(self) -> str:
         return f"Known pages: {', '.join(self.page_ids)}"

@@ -94,8 +94,12 @@ async def package_lane_preview(state: GenerationState, ctx: JobContext, kind: st
                     else "1970-01-01T00:00:00+00:00"
                 )
                 writer.write_json("seed.json", "seed", build_seed(spec, plan, ctx.generation_id, ts))
+        head_file = ctx.workspace.state / "backend-packaged-head"
+        head_file.parent.mkdir(parents=True, exist_ok=True)
+        head_sha = ctx.workspaces._git(ctx.workspace, "rev-parse", "HEAD", repo="project").strip()
+        head_file.write_text(head_sha)
     ctx.store.replace_artifacts(ctx.generation_id, writer.written)
-    async with ctx.previews.locks[ctx.generation_id]:
+    async with ctx.previews.locks[f"{ctx.generation_id}:{kind}"]:
         existing = ctx.store.preview(ctx.generation_id, kind)
         if existing is None or existing.status not in (PreviewStatus.STARTING, PreviewStatus.RUNNING):
             await ctx.previews.start(ctx.generation_id, kind)
@@ -179,12 +183,12 @@ async def check_backend_ready(
             return False, "backend preview is not running", None
 
         preview = store.preview(generation_id, "backend")
-        if preview is None:
-            return False, "backend preview is not running", None
-        if preview.status == PreviewStatus.STARTING:
-            last_reason = "backend preview did not become ready in time"
+        if preview is None or preview.status == PreviewStatus.STARTING:
+            last_reason = (
+                "backend preview did not become ready in time" if preview else "backend preview is not running"
+            )
             if time.monotonic() < deadline:
-                await asyncio.sleep(min(0.1, max(0.01, deadline - time.monotonic())))
+                await asyncio.sleep(min(0.2, max(0.01, deadline - time.monotonic())))
                 continue
             return False, last_reason, None
         if preview.status != PreviewStatus.RUNNING or not preview.url:
@@ -575,10 +579,11 @@ async def integrate(state: GenerationState, ctx: JobContext) -> NodeResult:
     contract, contract_sha256 = _enforce_canonical_contract(ctx)
     plan = _optional_json(ctx.workspace.project / ".bga" / "plan.json")
 
-    if ctx.previews is not None:
-        if ctx.lanes.get("frontend") == LaneStatus.COMPLETED.value:
-            await package_lane_preview(state, ctx, "frontend")
-        if ctx.lanes.get("backend") == LaneStatus.COMPLETED.value:
+    # In dynamic mode, backend preview was started early when backend lane completed.
+    # If it wasn't started (e.g. preview worker delayed or retry), package and start it now.
+    if ctx.previews is not None and ctx.lanes.get("backend") == LaneStatus.COMPLETED.value:
+        existing_be = ctx.store.preview(ctx.generation_id, "backend")
+        if existing_be is None or existing_be.status not in (PreviewStatus.STARTING, PreviewStatus.RUNNING):
             await package_lane_preview(state, ctx, "backend")
 
     wait_s = float(state["options"].get("integrationWaitSeconds", config.integration_wait_seconds))
@@ -601,9 +606,20 @@ async def integrate(state: GenerationState, ctx: JobContext) -> NodeResult:
     if not ok or not backend_url:
         reason = reason or "backend preview is not running"
         if ctx.previews is not None and "frontend" in ctx.previews.runtimes:
+            writer = ArtifactWriter(
+                Path(config.artifact_root),
+                ctx.generation_id,
+                {a.name: a.id for a in ctx.store.artifacts(ctx.generation_id)},
+            )
+            writer.write("frontend.zip", "frontend", build_source_zip(ctx.workspace.frontend), "application/zip")
+            ctx.store.replace_artifacts(ctx.generation_id, writer.written)
             fe_preview = ctx.store.preview(ctx.generation_id, "frontend")
-            if fe_preview is not None and fe_preview.mock_api is not True:
-                async with ctx.previews.locks[ctx.generation_id]:
+            if fe_preview is None or fe_preview.status not in (PreviewStatus.STARTING, PreviewStatus.RUNNING):
+                await ctx.previews.start(
+                    ctx.generation_id, "frontend", options_override={"mockApi": True, "apiBaseUrl": ""}
+                )
+            elif fe_preview.mock_api is not True:
+                async with ctx.previews.locks[f"{ctx.generation_id}:frontend"]:
                     await ctx.previews.switch_frontend(ctx.generation_id, mock_api=True, api_base_url="")
         await ctx.emit("integration.kept_mocks", step="integrate", reason=reason, mockApi=True)
         await ctx.set_lane("integration", LaneStatus.SKIPPED, reason=reason)
@@ -615,8 +631,21 @@ async def integrate(state: GenerationState, ctx: JobContext) -> NodeResult:
         }
 
     assert ctx.previews is not None
-    async with ctx.previews.locks[ctx.generation_id]:
-        fe_preview = await ctx.previews.switch_frontend(ctx.generation_id, mock_api=False, api_base_url=backend_url)
+    # Package frontend and start directly on live API (Story 18.8: created once, directly live).
+    writer = ArtifactWriter(
+        Path(config.artifact_root), ctx.generation_id, {a.name: a.id for a in ctx.store.artifacts(ctx.generation_id)}
+    )
+    writer.write("frontend.zip", "frontend", build_source_zip(ctx.workspace.frontend), "application/zip")
+    ctx.store.replace_artifacts(ctx.generation_id, writer.written)
+    async with ctx.previews.locks[f"{ctx.generation_id}:frontend"]:
+        fe_preview = ctx.store.preview(ctx.generation_id, "frontend")
+        if fe_preview is None or fe_preview.status not in (PreviewStatus.STARTING, PreviewStatus.RUNNING):
+            await ctx.previews.start(
+                ctx.generation_id, "frontend", options_override={"mockApi": False, "apiBaseUrl": backend_url}
+            )
+            fe_preview = ctx.store.preview(ctx.generation_id, "frontend")
+        elif fe_preview.mock_api is not False:
+            fe_preview = await ctx.previews.switch_frontend(ctx.generation_id, mock_api=False, api_base_url=backend_url)
     be_preview = ctx.store.preview(ctx.generation_id, "backend")
     frontend_url = fe_preview.url if fe_preview and fe_preview.url else f"http://{config.preview_public_host}:3000"
     await ctx.emit(

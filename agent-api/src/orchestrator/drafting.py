@@ -38,10 +38,12 @@ from src.modules.shared.domain.frontend_spec import (
     BUILTIN_SECTIONS,
     LAYOUT_SECTIONS,
     SECTION_PROPS,
+    autofix_frontend_spec,
     frontend_spec_json_schema,
     validate_frontend_spec_data,
 )
 from src.modules.shared.domain.frontend_spec.assets import MAX_GENERATED_ASSETS, SVG_KINDS, source_kind
+from src.modules.shared.domain.schema_digest import schema_digest
 
 from . import tracing
 from .checks.consistency import check_spec_pair
@@ -134,21 +136,26 @@ def write_inputs(
         context |= {"requirement_text": draft.requirement_text, "requirement_format": draft.requirement_format}
     if mode in (GenerationMode.BACKEND, GenerationMode.DYNAMIC):
         _write_json(inputs / "backend-spec.schema.json", spec_json_schema())
+        (inputs / "backend-spec.schema.md").write_text(schema_digest(spec_json_schema(), "BackendSpec"))
         _copy_example(examples_dir, EXAMPLES["backend"], inputs / "examples" / "backend-spec.json")
         context |= {
             "schema_path": f"{INPUTS}/backend-spec.schema.json",
+            "schema_digest_path": f"{INPUTS}/backend-spec.schema.md",
             "example_path": f"{INPUTS}/examples/backend-spec.json",
             "backend_schema_path": f"{INPUTS}/backend-spec.schema.json",
+            "backend_schema_digest_path": f"{INPUTS}/backend-spec.schema.md",
             "backend_example_path": f"{INPUTS}/examples/backend-spec.json",
             "output_spec_path": BACKEND_FILE,
             "output_backend_path": BACKEND_FILE,
         }
     if mode in (GenerationMode.STATIC, GenerationMode.DYNAMIC):
         _write_json(inputs / "frontend-spec.schema.json", frontend_spec_json_schema())
+        (inputs / "frontend-spec.schema.md").write_text(schema_digest(frontend_spec_json_schema(), "FrontendSpec"))
         _copy_example(examples_dir, EXAMPLES[str(mode)], inputs / "examples" / "frontend-spec.json")
         (inputs / "sections.md").write_text(section_catalogue())
         context |= {
             "frontend_schema_path": f"{INPUTS}/frontend-spec.schema.json",
+            "frontend_schema_digest_path": f"{INPUTS}/frontend-spec.schema.md",
             "frontend_example_path": f"{INPUTS}/examples/frontend-spec.json",
             "sections_path": f"{INPUTS}/sections.md",
             "output_frontend_path": FRONTEND_FILE,
@@ -178,17 +185,63 @@ class DraftCheck:
         return all(report.valid for report in self.reports.values())
 
     def repair_errors(self) -> list[dict[str, Any]]:
-        """The errors to hand to `repair_spec`, each with the file it is in."""
+        """The errors to hand to `repair_spec`, each with the file it is in and a focused excerpt."""
         files = {"backend": BACKEND_FILE, "frontend": FRONTEND_FILE, "pair": FRONTEND_FILE}
-        errors = [
-            {"file": files[key], **issue.model_dump(mode="json", exclude={"severity"}, exclude_none=True)}
-            for key, report in self.reports.items()
-            for issue in report.errors
-        ]
+        specs = {
+            BACKEND_FILE: self.backend_spec,
+            FRONTEND_FILE: self.frontend_spec,
+        }
+        errors = []
+        for key, report in self.reports.items():
+            filename = files[key]
+            doc = specs.get(filename)
+            for issue in report.errors:
+                item = {"file": filename, **issue.model_dump(mode="json", exclude={"severity"}, exclude_none=True)}
+                if doc is not None:
+                    item["excerpt"] = build_excerpt(doc, issue.path)
+                errors.append(item)
         return errors[:MAX_REPAIR_ERRORS]
 
     def validation(self) -> dict[str, Any]:
         return {key: report.model_dump(mode="json") for key, report in self.reports.items()}
+
+
+def build_excerpt(doc: Any, path: str, max_chars: int = 1500) -> str:
+    """Returns a JSON string containing the value at `path` and its parent, trimmed to ~max_chars."""
+    if doc is None:
+        return ""
+    tokens = [t.replace("~1", "/").replace("~0", "~") for t in path.strip("/").split("/") if t]
+    current = doc
+    parent = None
+    matched_tokens: list[str] = []
+    for token in tokens:
+        if isinstance(current, dict) and token in current:
+            parent = current
+            current = current[token]
+            matched_tokens.append(token)
+        elif isinstance(current, list) and token.isdigit() and int(token) < len(current):
+            parent = current
+            current = current[int(token)]
+            matched_tokens.append(token)
+        else:
+            parent = current
+            current = None
+            break
+    data: dict[str, Any] = {}
+    if parent is not None:
+        if current is None:
+            parent_path = "/" + "/".join(matched_tokens) if matched_tokens else "/"
+        else:
+            parent_path = "/" + "/".join(matched_tokens[:-1]) if len(matched_tokens) > 1 else "/"
+        data[f"parent ({parent_path})"] = parent
+    if current is not None:
+        data[f"target ({path or '/'})"] = current
+    if not data and doc is not None:
+        data["root"] = doc
+    text = json.dumps(data, indent=2, ensure_ascii=False)
+    if len(text) > max_chars:
+        return text[:max_chars] + "... [truncated]"
+    return text
 
 
 def _load(path: Path) -> tuple[Any, SpecIssue | None]:
@@ -332,6 +385,17 @@ def draw_images(work: Path, chosen: dict[str, Any] | None) -> list[dict[str, Any
     return notes
 
 
+def autofix_draft(work: Path) -> list[dict[str, Any]]:
+    """Applies deterministic spec fixes (Story 18.3) to FRONTEND_FILE before validation; returns assumption notes."""
+    spec, issue = _load(work / FRONTEND_FILE)
+    if issue is not None or not isinstance(spec, dict) or not isinstance(spec.get("pages"), list):
+        return []
+    fixed_spec, notes = autofix_frontend_spec(spec)
+    if notes:
+        _write_json(work / FRONTEND_FILE, fixed_spec)
+    return notes
+
+
 # -- usage ---------------------------------------------------------------------------------------------------------
 
 
@@ -441,7 +505,7 @@ class DraftRunner:
         found = draft_directions(draft)
         context = write_inputs(work, draft, self.examples_dir, found)
         frontend = mode != GenerationMode.BACKEND
-        purpose, version = ("draft_frontend_spec", "v3") if frontend else ("draft_spec", "v2")
+        purpose, version = ("draft_frontend_spec", "v5") if frontend else ("draft_spec", "v3")
         max_repairs = config.draft_repair_attempts_frontend if frontend else config.draft_repair_attempts_backend
         calls: list[dict[str, Any]] = []
         trace = tracing.GenerationTrace.open(
@@ -488,6 +552,7 @@ class DraftRunner:
             design = apply_design(work, found) if found else None
             chosen = design["directions"][design["selected"]] if design else None
             image_notes = draw_images(work, chosen) if frontend else []
+            autofix_notes = autofix_draft(work) if frontend else []
             self.store.update_draft(draft.id, progress="validating")
             check = check_draft(work, mode)
             attempts = 0
@@ -496,10 +561,12 @@ class DraftRunner:
                 self.store.update_draft(draft.id, progress=f"repairing ({attempts}/{max_repairs})", attempts=attempts)
                 errors = check.repair_errors()
                 files = sorted({error["file"] for error in errors})
-                result = await call("repair", self.prompts.render("repair_spec", files=files, errors=errors))
+                result = await call("repair", self.prompts.render("repair_spec", "v2", files=files, errors=errors))
                 if result.status != EngineStatus.OK:
-                    error = f"Repair {attempts} stopped: {result.error_message or result.status}"
-                    break
+                    check = check_draft(work, mode)
+                    if not check.ok:
+                        error = f"Repair {attempts} stopped: {result.error_message or result.status}"
+                        break
                 check = check_draft(work, mode)
         except BaseException as exc:
             trace.close({"status": "failed"}, error=f"{type(exc).__name__}: {exc}"[:500])
@@ -511,6 +578,7 @@ class DraftRunner:
         if design is not None:
             assumptions += design_notes(design["directions"][design["selected"]])
         assumptions += image_notes
+        assumptions += autofix_notes
         status = SpecDraftStatus.SUCCEEDED if check.ok else SpecDraftStatus.NEEDS_REVIEW
         self.store.update_draft(
             draft.id,

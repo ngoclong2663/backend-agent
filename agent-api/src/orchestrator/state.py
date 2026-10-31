@@ -1,4 +1,4 @@
-from typing import Any, TypedDict
+from typing import Annotated, Any, TypedDict
 
 from src.modules.shared.domain.enums import GenerationMode, GenerationStatus, Lane, LaneStatus
 
@@ -82,6 +82,10 @@ class Outcome:
     REPAIR_LIMIT = "repair_limit"
 
 
+def _latest_commit(current: str | None, update: str | None) -> str | None:
+    return update or current
+
+
 class GenerationState(TypedDict, total=False):
     """Checkpointed graph state: identifiers and references only — files live in the workspace."""
 
@@ -114,7 +118,7 @@ class GenerationState(TypedDict, total=False):
     frontend_failed_checks: list[str]
     frontend_digest_ref: str | None
     frontend_implicated_files: list[str]
-    frontend_last_commit: str | None
+    frontend_last_commit: Annotated[str | None, _latest_commit]
     cached_components: list[str]  # Story 17.3: cache keys this job took from the component cache
     evicted_components: list[str]  # … and the ones it evicted because they broke the site
     asset_fallbacks: list[dict[str, str]]  # Story 15.3: drawings shown as placeholders (id, reason)
@@ -146,7 +150,7 @@ class FrontendLaneOutput(TypedDict, total=False):
     frontend_failed_checks: list[str]
     frontend_digest_ref: str | None
     frontend_implicated_files: list[str]
-    frontend_last_commit: str | None
+    frontend_last_commit: Annotated[str | None, _latest_commit]
     cached_components: list[str]
     evicted_components: list[str]
     asset_fallbacks: list[dict[str, str]]

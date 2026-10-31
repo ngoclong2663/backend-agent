@@ -14,6 +14,7 @@ and points the registry at the result. The site-level checks (build, routes, smo
 
 import asyncio
 import contextlib
+import hashlib
 import json
 import re
 import shutil
@@ -37,6 +38,7 @@ from .component_cache import (
     store_file,
 )
 from .context import EngineFailure, JobContext, RecordingSandbox
+from .context_pack import component_context
 from .contract import contract_operations
 from .frontend_renderer import REGISTRY_FILE, custom_declarations, registry_ts, section_props
 from .frontend_scaffold import update_owned
@@ -44,12 +46,19 @@ from .frontend_scaffold import update_owned
 logger = get_logger(__name__)
 
 SPEC_FILE = ".bga/component.json"
+CONTEXT_PACK_FILE = ".bga/context.md"
 RENDER_TEST = "tests/unit/custom-component.test.tsx"
 TSCONFIG = "tsconfig.component.json"
 DEFAULT_EXPORT = re.compile(r"^export default function [A-Z]", re.MULTILINE)
 SCRATCH_IGNORE = shutil.ignore_patterns(
     ".git", "node_modules", ".next", "out", "test-results", "playwright-report", ".claude", ".agents", "*.tsbuildinfo"
 )
+
+
+def _file_sha256(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 @dataclass
@@ -75,7 +84,7 @@ class CustomComponents:
         self.contract = contract
         self.declared = custom_declarations(spec)
         self.lock_sha256, self.overlay_version = overlay_metadata()
-        self.slots = asyncio.Semaphore(max(1, config.engine_concurrency))
+        self.slots = ctx.engine_slots if ctx is not None else asyncio.Semaphore(max(1, config.engine_concurrency))
 
     async def resolve(self, names: list[str] | None = None, max_repairs: int = 2) -> list[Resolved]:
         """Resolves the plan's custom components (or only `names`), records the result in the plan and the registry
@@ -140,10 +149,15 @@ class CustomComponents:
         shutil.copytree(self.ctx.workspace.frontend, scratch, ignore=SCRATCH_IGNORE)
         self._write_check_files(scratch, name, component, relative)
         sandbox: ISandbox | None = None
+        fill_task: asyncio.Task | None = None
         if self.ctx.sandboxes is not None:
             inner = self.ctx.sandboxes.for_job(self.ctx.generation_id, scratch, kind="frontend", part=f"c-{key[:10]}")
             sandbox = RecordingSandbox(inner, self.ctx)
+            fill_task = asyncio.create_task(sandbox.shared_dependencies())
         result = Resolved(names, key, "generated")
+        component_path = scratch / relative
+        engine_error: str | None = None
+        installed = False
         try:
             prompt = self.ctx.prompts.render(
                 "generate_custom_component",
@@ -156,15 +170,25 @@ class CustomComponents:
                 spec_path=SPEC_FILE,
                 test_path=RENDER_TEST,
             )
-            await self._engine("generate_custom_component", prompt, scratch, result)
-            installed = False
+            sha_before = _file_sha256(component_path)
+            try:
+                await self._engine("generate_custom_component", prompt, scratch, result)
+            except EngineFailure as exc:
+                sha_after = _file_sha256(component_path)
+                if sha_after is None or sha_after == sha_before:
+                    return await self._fall_back(result, f"engine failed: {exc}")
+                engine_error = str(exc)
+
             for attempt in range(1, max_repairs + 2):
-                failures, installed = await self._checks(scratch, relative, sandbox, installed)
+                failures, installed = await self._checks(scratch, relative, sandbox, installed, fill_task=fill_task)
                 if not failures:
                     break
                 result.failures = failures
                 if attempt > max_repairs:
-                    return await self._fall_back(result, f"isolated checks still failing after {max_repairs} repairs")
+                    reason = f"isolated checks still failing after {max_repairs} repairs"
+                    if engine_error:
+                        reason += f" (engine failed: {engine_error})"
+                    return await self._fall_back(result, reason)
                 prompt = self.ctx.prompts.render(
                     "repair_custom_component",
                     PROMPT_VERSION,
@@ -175,7 +199,14 @@ class CustomComponents:
                     failures="\n\n".join(failures)[:20_000],
                     test_path=RENDER_TEST,
                 )
-                await self._engine("repair_custom_component", prompt, scratch, result)
+                sha_before = _file_sha256(component_path)
+                try:
+                    await self._engine("repair_custom_component", prompt, scratch, result)
+                except EngineFailure as exc:
+                    sha_after = _file_sha256(component_path)
+                    if sha_after is None or sha_after == sha_before:
+                        return await self._fall_back(result, f"engine failed: {exc}")
+                    engine_error = str(exc)
             target = self.ctx.workspace.frontend / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(scratch / relative, target)
@@ -192,18 +223,22 @@ class CustomComponents:
                         saved_seconds=result.engine_ms / 1000,
                     )
                 )
-            await self.ctx.emit(
-                "component.generated",
-                step="generate_frontend",
-                components=names,
-                key=key,
-                engineCalls=result.engine_calls,
-                cached=cached,
-            )
+            event_kwargs = {
+                "step": "generate_frontend",
+                "components": names,
+                "key": key,
+                "engineCalls": result.engine_calls,
+                "cached": cached,
+            }
+            if engine_error is not None:
+                event_kwargs["engineError"] = engine_error
+            await self.ctx.emit("component.generated", **event_kwargs)
             return result
         except EngineFailure as exc:
             return await self._fall_back(result, f"engine failed: {exc}")
         finally:
+            if fill_task is not None and not fill_task.done():
+                fill_task.cancel()
             if sandbox is not None:
                 await sandbox.stop()
             shutil.rmtree(scratch, ignore_errors=True)
@@ -262,6 +297,9 @@ class CustomComponents:
         test = scratch / RENDER_TEST
         test.parent.mkdir(parents=True, exist_ok=True)
         test.write_text(render_test(relative, props, self._route_params(props.get("binding")), self._dynamic))
+        context_doc = scratch / CONTEXT_PACK_FILE
+        context_doc.parent.mkdir(parents=True, exist_ok=True)
+        context_doc.write_text(component_context(scratch, component, props))
         tsconfig = {
             "extends": "./tsconfig.json",
             "compilerOptions": {"incremental": False},
@@ -290,7 +328,12 @@ class CustomComponents:
         return str(records[0].get("id", "1"))
 
     async def _checks(
-        self, scratch: Path, relative: str, sandbox: ISandbox | None, installed: bool
+        self,
+        scratch: Path,
+        relative: str,
+        sandbox: ISandbox | None,
+        installed: bool,
+        fill_task: asyncio.Task | None = None,
     ) -> tuple[list[str], bool]:
         """Failures of the component's isolated checks (empty: it passed). Without a sandbox only the static ones
         run (tests with the fake validator), and the component is not cached."""
@@ -306,20 +349,43 @@ class CustomComponents:
         ]
         if failures or sandbox is None:
             return failures, installed
-        if not installed and await sandbox.shared_dependencies() is None:
-            run = await sandbox.exec("pnpm install --frozen-lockfile --offline", timeout_s=600)
-            if not run.ok:
-                return [f"pnpm install failed:\n{run.output[-3000:]}"], installed
+        if not installed:
+            shared = None
+            if fill_task is not None:
+                try:
+                    shared = await fill_task
+                except Exception as exc:
+                    logger.warning(
+                        "shared dependencies prewarm failed: %s",
+                        exc,
+                        extra={"generation_id": self.ctx.generation_id},
+                    )
+            else:
+                shared = await sandbox.shared_dependencies()
+            if shared is None:
+                run = await sandbox.exec("pnpm install --frozen-lockfile --offline", timeout_s=600)
+                if not run.ok:
+                    return [f"pnpm install failed:\n{run.output[-3000:]}"], installed
         typecheck = await sandbox.exec(f"pnpm exec tsc -p {TSCONFIG} --pretty false", timeout_s=300)
         if not typecheck.ok:
             failures.append(f"typecheck (tsc) failed:\n{typecheck.output[-4000:]}")
         lint = await sandbox.exec(f"pnpm exec eslint {relative} {RENDER_TEST}", timeout_s=300)
         if not lint.ok:
             failures.append(f"lint (ESLint) failed:\n{lint.output[-4000:]}")
-        if typecheck.ok:
-            render = await sandbox.exec(f"pnpm exec vitest run {RENDER_TEST}", timeout_s=300)
+        if typecheck.ok and lint.ok:
+            render = await sandbox.exec(
+                f"pnpm exec vitest run {RENDER_TEST} --testTimeout=20000",
+                timeout_s=config.frontend_component_test_timeout_seconds,
+            )
             if not render.ok:
-                failures.append(f"render test failed:\n{render.output[-4000:]}")
+                output = render.output
+                if render.timed_out:
+                    hint = (
+                        "render test timed out: most likely an endless render loop "
+                        "(state set in an effect on every render)"
+                    )
+                    output = f"{output}\n{hint}" if output else hint
+                failures.append(f"render test failed:\n{output[-4000:]}")
         return failures, True
 
 
@@ -340,7 +406,7 @@ def render_test(relative: str, props: dict[str, Any], route_params: dict[str, st
         "// Generated by the Fullstack Generation Agent: the isolated render test of one custom component.\n"
         'import { act, render } from "@testing-library/react";\n'
         'import { QueryClient, QueryClientProvider } from "@tanstack/react-query";\n'
-        'import type { ComponentType } from "react";\n'
+        'import { Profiler, type ComponentType } from "react";\n'
         f'import {{ {hooks}expect, it, vi }} from "vitest";\n'
         + mocks
         + f'import Component from "@/{module}";\n\n'
@@ -354,11 +420,37 @@ def render_test(relative: str, props: dict[str, Any], route_params: dict[str, st
         + "const Rendered = Component as unknown as ComponentType<Record<string, unknown>>;\n\n"
         + server
         + 'it("renders with sample props", async () => {\n'
-        + '  const errors = vi.spyOn(console, "error");\n'
+        + "  let commits = 0;\n"
+        + '  const errors = vi.spyOn(console, "error").mockImplementation((...args) => {\n'
+        + '    const text = args.map(String).join(" ");\n'
+        + '    if (text.includes("Maximum update depth exceeded")) {\n'
+        + "      throw new Error(\n"
+        + '        "render loop: the component re-rendered more than 50 times; " +\n'
+        + '        "do not set state from an effect on every render",\n'
+        + "      );\n"
+        + "    }\n"
+        + "  });\n"
         + "  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });\n"
-        + "  render(\n    <QueryClientProvider client={client}>\n      <Rendered {...props} />\n"
-        + "    </QueryClientProvider>,\n  );\n"
-        + "  await act(async () => {\n    await new Promise((resolve) => setTimeout(resolve, 200));\n  });\n"
+        + "  render(\n"
+        + "    <Profiler\n"
+        + '      id="loop-guard"\n'
+        + "      onRender={() => {\n"
+        + "        if (++commits > 50) {\n"
+        + "          throw new Error(\n"
+        + '            "render loop: the component re-rendered more than 50 times; " +\n'
+        + '            "do not set state from an effect on every render",\n'
+        + "          );\n"
+        + "        }\n"
+        + "      }}\n"
+        + "    >\n"
+        + "      <QueryClientProvider client={client}>\n"
+        + "        <Rendered {...props} />\n"
+        + "      </QueryClientProvider>\n"
+        + "    </Profiler>,\n"
+        + "  );\n"
+        + "  await act(async () => {\n"
+        + "    await new Promise((resolve) => setTimeout(resolve, 200));\n"
+        + "  });\n"
         + "  expect(errors).not.toHaveBeenCalled();\n"
         + "});\n"
     )
