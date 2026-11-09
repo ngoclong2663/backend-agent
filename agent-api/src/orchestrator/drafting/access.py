@@ -217,20 +217,52 @@ def _creators(spec: dict[str, Any], entity: str) -> list[str]:
     return []
 
 
-def secure_access(spec: dict[str, Any]) -> list[dict[str, Any]]:
+def contributions(spec: dict[str, Any], owned: dict[str, Owned]) -> set[str]:
+    """Epic 32 (Story 32.4): the person-tied entities that are a person's text on a parent record (a comment, a
+    review, a reply): a child of another entity (not the user entity) with a required text of its own."""
+    auth = spec.get("auth") or {}
+    user_entity = auth.get("userEntity") or "User"
+    parents = {
+        rel["to"]: rel.get("foreignKey")
+        for rel in spec.get("relationships") or []
+        if isinstance(rel, dict)
+        and rel.get("type") == "one-to-many"
+        and rel.get("from") not in (user_entity, rel.get("to"))
+    }
+    out = set()
+    for entity in spec.get("entities") or []:
+        name = entity.get("name") if isinstance(entity, dict) else None
+        item = owned.get(name or "")
+        if item is None or name not in parents:
+            continue
+        people = {item.field, *item.workers.values()}
+        for field_ in entity.get("fields") or []:
+            if field_.get("name") in people or field_.get("name") == parents[name] or field_.get("primary"):
+                continue
+            if field_.get("required") and field_.get("type") in ("string", "text") and not field_.get("values"):
+                out.add(name)
+                break
+    return out
+
+
+def secure_access(spec: dict[str, Any], public: frozenset[str] | set[str] = frozenset()) -> list[dict[str, Any]]:
+    """`public`: the child shapes the app's product patterns make readable on their record (Epic 32: a feed's
+    comments); empty for a back-office app, which keeps every person's record private."""
     notes: list[dict[str, Any]] = []
     infer_entities(spec)
     try:
         owned = find_owned(spec)
         if owned:
-            notes += _secure(spec, owned)
+            notes += _secure(spec, owned, contributions(spec, owned) if "contribution" in public else set())
     finally:
         for op in spec.get("operations") or []:
             op.pop("_entity", None)
     return notes
 
 
-def _secure(spec: dict[str, Any], owned: dict[str, Owned]) -> list[dict[str, Any]]:
+def _secure(spec: dict[str, Any], owned: dict[str, Owned], public: set[str] | None = None) -> list[dict[str, Any]]:
+    """`public`: entities whose reads stay open (a feed's comments, readable by everyone who reads their record)."""
+    public = public or set()
     notes: list[dict[str, Any]] = []
 
     def note(index: int, message: str) -> None:
@@ -288,6 +320,10 @@ def _secure(spec: dict[str, Any], owned: dict[str, Owned]) -> list[dict[str, Any
         op_id = op.get("operationId")
         if policy is None and action in ("get", "list") and item.entity in visible:
             note(index, f"{op_id}: who sees a record follows the visibility policy {visible[item.entity]}")
+            continue
+        if policy is None and action in ("get", "list") and item.entity in public:
+            # Epic 32 (32.4): what a person writes on a shared record is read with it; writes stay the author's
+            note(index, f"{op_id}: readable by everyone who can read the record it is written on")
             continue
         # 25.2: reads, edits and record actions without a policy get the owner's (an assigned worker opens a record
         # by its id: the worker's roles bypass the read, not the lists)

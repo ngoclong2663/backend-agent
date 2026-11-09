@@ -236,6 +236,8 @@ Agent-specific notes:
   own top-level records and one Mine page (`pattern_menu`; `reach_every_page` is a back-office's); a child whose shape
   the pattern places on the record is an action there (one click, or its form in a dialog: `on_parent`); no edit page,
   delete or owner's action on records these people never create (`others`); no dashboard; tables become cards.
+  The access rules take the patterns' public shapes (`secure_access(spec, public)`, `drafting/app.public_shapes`): a
+  person's text on a record (a comment, a review) keeps the record's readers, writes stay the author's.
   `frontend/app/ux_checks.py` judges a planned app per area
   (`make app-design-report ARGS="--ux-only [--baseline]"`; `tests/fixtures/app-golden/ux-baseline.json`).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`

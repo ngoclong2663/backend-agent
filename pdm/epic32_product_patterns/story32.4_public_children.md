@@ -35,8 +35,8 @@ on my posts, so that a conversation is visible to the people it is about.
 
 ## Acceptance criteria
 
-- [ ] Under `feed`, comments are readable by every reader of their post and changed by their author alone.
-- [ ] Under `back-office` and for every person's record that is not a public shape, the access rules behave as today.
+- [x] Under `feed`, comments are readable by every reader of their post and changed by their author alone.
+- [x] Under `back-office` and for every person's record that is not a public shape, the access rules behave as today.
 
 ## Verify
 
@@ -45,3 +45,22 @@ on my posts, so that a conversation is visible to the people it is about.
 ## Status
 
 Proposed 2026-11-09.
+
+**Done 2026-11-09 (with a deviation).** `drafting/access.secure_access(spec, public)` takes the child shapes the app's
+patterns make public; `contributions` finds a person's text on a parent record in the BackendSpec (a person-tied child
+of another entity, the user entity left out, with a required text field of its own); their `get` and `list` keep the
+parent's readers (one note per operation), while updates, deletes and actions keep the author's policy. A read policy
+the draft wrote itself stays (D8: the requirement said so). `drafting/app.public_shapes` reads the drafted outline's
+archetype per area (else the app's, else code's hint) and counts only ready patterns, so nothing changes until `feed`
+or `storefront` is ready; the hint is now computed before the access rules. Tests: `test_access_rules.py` (comments
+public, likes and deletes the author's, the draft's own policy kept, no pattern no change) and
+`test_planner_patterns.py` (a feed drafted end to end passes every feed check, `contributions-readable` included).
+
+Found on the way, fixed in `patterns.manages`: an area's roles manage the main entity when they change or remove other
+people's records (a role policy or an ownership bypass on its update or delete). Reading every record (the bypass
+Epic 25 gives the roles a creator makes records for) and a role's own actions on a record (view, like) are not
+managing; counted as such, a feed's viewers were taken for staff. The baseline is unchanged but for the TikTok-like
+creators' studio (`workspace` → `back-office`: they update and delete videos).
+
+Deviation: step 3 (an interaction's count on its parent's cards and record) needs a count per parent the contract does
+not offer yet; it moves to 32.5 with the feed's cards.

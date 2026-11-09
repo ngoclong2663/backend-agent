@@ -4,8 +4,8 @@
   nothing required to fill in (a like, a bookmark, a view), a `contribution` when it asks for a person's text (a
   comment, a review), a `part` otherwise (an order's item, a lesson); `owned` when its owner comes from the session.
 - **The area's kind** (`area_kind`): its archetype, unless every role of the area manages the main entity's records
-  (a role policy on its update or delete, or a bypass that reads every record): staff, so `back-office` whatever the
-  requirement's words made the look (Story 32.1's finding: the front desk's area was `booking`).
+  (it changes or removes other people's: a role policy or an ownership bypass on its update or delete): staff, so
+  `back-office` whatever the requirement's words made the look (Story 32.1's finding: the front desk was `booking`).
 - **The area's pattern** (`area_pattern`): the ready pattern plugin of that kind, else `back-office`, which is the
   planner as it always was.
 """
@@ -90,19 +90,20 @@ def children_of(shapes: dict[str, dict[str, Any]], entity: str | None) -> dict[s
 
 
 def manages(contract: dict[str, Any], entity: str | None, roles: list[str]) -> bool:
-    """Every one of these roles manages the entity's records: a role policy naming it on the entity's update or
-    delete, or an ownership bypass on its reads (it reads every record)."""
+    """Every one of these roles manages the entity's records: it changes or removes other people's (a role policy
+    naming it on the entity's update or delete, or an ownership bypass there: the front desk edits any appointment).
+    Reading every record is not managing it, nor is an action people take on a record (view, like, watch)."""
     if not entity or not roles:
         return False
     managers: set[str] = set()
     for found in contract_operations(contract).values():
         meta = _meta(found)
-        if meta.get("entity") != entity:
+        if meta.get("entity") != entity or meta.get("action") not in ("update", "delete"):
             continue
         policy = meta.get("policy") or {}
-        if policy.get("type") == "role" and meta.get("action") in ("update", "delete"):
+        if policy.get("type") == "role":
             managers |= set(policy.get("roles") or [])
-        if policy.get("type") == "ownership" and meta.get("action") in ("get", "list"):
+        elif policy.get("type") == "ownership":
             managers |= set(policy.get("bypassRoles") or [])
     return set(roles) <= managers
 

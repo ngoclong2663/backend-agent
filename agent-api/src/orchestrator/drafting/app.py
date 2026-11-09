@@ -125,7 +125,23 @@ MEDIA_WORDS = {
 }
 
 
-def apply_access_rules(work: Path, backend_file: str) -> list[dict[str, Any]]:
+def public_shapes(drafted: Any, hint: str | None) -> frozenset[str]:
+    """Epic 32 (Story 32.4): the child shapes the app's product patterns make public on their record, from the
+    drafted outline's archetype per area (else the app's, else code's hint); only ready patterns count."""
+    from ..frontend.app.patterns import area_pattern
+
+    outline = drafted if isinstance(drafted, dict) else {}
+    design = outline.get("design") if isinstance(outline.get("design"), dict) else {}
+    areas = [area for area in outline.get("areas") or [] if isinstance(area, dict)]
+    archetypes = [((area.get("design") or {}).get("archetype")) for area in areas] or [design.get("archetype")]
+    found: set[str] = set()
+    for archetype in archetypes:
+        if archetype or hint:
+            found |= set(area_pattern(str(archetype or hint)).public or [])
+    return frozenset(found)
+
+
+def apply_access_rules(work: Path, backend_file: str, public: frozenset[str] = frozenset()) -> list[dict[str, Any]]:
     """Epic 25 (`drafting/access.py`): records tied to a person private, actions guarded by their role, a status with
     a flow changed only by its actions, records staff create for someone owned by that someone. Applied only when the
     BackendSpec stays valid; else the draft keeps its own policies, with a note saying why."""
@@ -133,7 +149,7 @@ def apply_access_rules(work: Path, backend_file: str) -> list[dict[str, Any]]:
     if not isinstance(data, dict):
         return []
     secured = copy.deepcopy(data)
-    notes = secure_access(secured)
+    notes = secure_access(secured, public)
     if not notes:
         return []
     report = validate_spec_data(secured).report
@@ -373,8 +389,11 @@ async def draft_app(
         if repaired.status != EngineStatus.OK and not check.ok:
             error = f"Repair {attempts} stopped: {repaired.error_message or repaired.status}"
             break
+    # Epic 23: code's archetype for a brief that names none (the requirement's words, then the direction's product)
+    hint = archetype_for(requirement, [*product_types, (chosen or {}).get("productType") or ""])
     if check.ok:  # Epic 25: who may see and do what, correct by default (general rules, no model call)
-        notes += apply_access_rules(work, backend_file)
+        # Epic 32: what the app's product patterns make public (a feed's comments) stays readable
+        notes += apply_access_rules(work, backend_file, public_shapes(_load(work / OUTLINE_FILE), hint))
         check = check_draft(work, GenerationMode.BACKEND)
     await progress("validating")
     backend = validate_spec_data(_load(work / backend_file)).normalized if check.ok else None
@@ -384,8 +403,6 @@ async def draft_app(
     if not isinstance(drafted, dict):
         message = "The draft came without an app outline; every name and list comes from the BackendSpec"
         notes.append({"spec": "frontend", "path": "/app", "message": message, "suggestion": None})
-    # Epic 23: code's archetype for a brief that names none (the requirement's words, then the direction's product)
-    hint = archetype_for(requirement, [*product_types, (chosen or {}).get("productType") or ""])
     # Story 30.7 (D9): the requirement's hash seeds the axes the brief left open (the same requirement, the same design)
     if isinstance(drafted, dict) and not drafted.get("locale") and locale_of(requirement):
         drafted["locale"] = locale_of(requirement)  # Story 30.6: a Japanese app takes a pairing that sets Japanese

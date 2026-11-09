@@ -402,3 +402,46 @@ def test_a_role_making_its_own_record_owns_it_whatever_the_field_is_called():
         assert roles[("Comment", "creatorId")] == ["Viewer"] and roles[("Like", "creatorId")] == ["Viewer"]
         assert roles[("Video", "creatorId")] == ["Creator"]
         assert not any(r["from"] == "User" for r in data.get("relationships") or []), "no person picked in a form"
+
+
+def test_comments_on_a_feed_are_read_by_everyone_and_changed_by_their_author():
+    """Epic 32 (Story 32.4): under a pattern whose comments are public (`public: ["contribution"]`), a comment's reads
+    keep the video's readers (another viewer and the video's creator read it); its delete stays the author's; a like
+    stays the viewer's own. Without it (a back-office app), every person's record stays private as before; a read
+    policy the draft wrote itself (the requirement said so) is kept."""
+    from src.orchestrator.drafting.access import contributions
+
+    for comment_policy in (True, False):
+        data = _feed_spec(comment_policy)
+        notes = secure_access(data, frozenset({"contribution"}))
+        assert validate_spec_data(data).report.valid
+        ops = _ops(data)
+        assert "policy" not in ops["comment.list"], "every reader of the video reads its comments"
+        assert any("comment.list: readable by everyone" in n["message"] for n in notes)
+        assert _policy(data, "like.list")["ownerField"] == "creatorId", "a like stays the viewer's own"
+        if comment_policy:
+            assert _policy(data, "comment.delete")["name"] == "ownComments", "the author alone deletes it"
+    private = _feed_spec(comment_policy=False)
+    secure_access(private)
+    assert _policy(private, "comment.list")["type"] == "ownership", "no pattern: private as before"
+    stated = _feed_spec(comment_policy=True)
+    stated["policies"].append({"name": "ownCommentsRead", "type": "ownership", "ownerField": "creatorId"})
+    next(op for op in stated["operations"] if op["operationId"] == "comment.list")["policy"] = "ownCommentsRead"
+    secure_access(stated, frozenset({"contribution"}))
+    assert _policy(stated, "comment.list")["name"] == "ownCommentsRead", "the draft's own read policy stays"
+    data = _feed_spec(comment_policy=True)
+    from src.orchestrator.drafting.access import find_owned, infer_entities
+
+    infer_entities(data)
+    assert contributions(data, find_owned(data, create=False)) == {"Comment"}, "a like has no text of its own"
+
+
+def test_the_public_shapes_come_from_the_ready_patterns_of_the_drafted_areas(monkeypatch):
+    from src.orchestrator.drafting.app import public_shapes
+
+    outline = {"areas": [{"id": "viewers", "design": {"archetype": "feed"}}, {"id": "studio", "design": {}}]}
+    assert public_shapes(outline, None) == frozenset(), "the feed pattern is a draft: nothing changes"
+    monkeypatch.setenv("BGA_DESIGN_INCLUDE_DRAFTS", "1")
+    assert public_shapes(outline, None) == frozenset({"contribution"})
+    assert public_shapes({}, "feed") == frozenset({"contribution"}), "a single area takes code's hint"
+    assert public_shapes({"design": {"archetype": "back-office"}}, "feed") == frozenset()

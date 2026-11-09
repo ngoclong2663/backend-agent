@@ -91,3 +91,23 @@ def test_a_staff_area_next_to_a_consumer_one_is_unchanged(monkeypatch):
     monkeypatch.setenv("BGA_DESIGN_INCLUDE_DRAFTS", "1")
     spec, *_ = golden_app("plant-shop")
     assert [page for page in spec["pages"] if page["route"].startswith("/management")] == before
+
+
+def test_a_feed_drafted_end_to_end_reads_everyones_comments(drafts):
+    """Stories 32.3 and 32.4 together: the access rules keep a feed's comments readable, the planner puts the like
+    and the comment on the video; the area passes every feed check, `contributions-readable` included."""
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.drafting.access import secure_access
+    from src.orchestrator.drafting.app import public_shapes
+    from tests.test_access_rules import _feed_spec
+    from tests.test_app_screens import _plan
+
+    outline = {"design": {"archetype": "feed", "mainEntity": "Video"}}
+    raw = _feed_spec(comment_policy=True)
+    secure_access(raw, public_shapes(outline, None))
+    backend = validate_spec_data(raw).normalized
+    extended, _, contract, screens = _plan(backend, outline)
+    _valid(screens.spec, extended, contract)
+    area = ux_checks(screens.spec, extended, contract)[0]
+    assert area["kind"] == "feed" and area["failed"] == [], area["failed"]
+    assert area["task"] == {"operationId": "like.create", "clicks": 1}

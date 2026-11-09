@@ -174,7 +174,7 @@
     },
     "tiktok-viewer-ids/creators": {
       "archetype": "workspace",
-      "kind": "workspace",
+      "kind": "back-office",
       "failed": [],
       "task": null
     },
