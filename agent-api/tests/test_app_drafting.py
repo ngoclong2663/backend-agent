@@ -440,3 +440,10 @@ def test_a_relationship_through_a_persons_field_is_dropped():
     assert next(u["id"] for u in fixtures["User"] if u["email"] == runs_as) == owner, "it edits its own recipe"
     plain = {"auth": {"roles": ["member"]}, "relationships": [{"from": "Deck", "to": "Card", "foreignKey": "deckId"}]}
     assert fix_person_relationships(plain) == [], "a parent named after no role stays"
+    # the same mistake in another real draft (Thread & Needle, gen_01M6ZRH6TF4067V1T7DN6SZNS4): Order → Order through
+    # `shopperId`; the generated models could not configure (every call a 500, the smoke calls could not run)
+    shop = json.loads(
+        (Path(__file__).parent / "fixtures" / "specs" / "thread-and-needle-shopper-relation.json").read_text()
+    )
+    assert [n["path"] for n in fix_person_relationships(shop)] == ["/relationships/1"]
+    assert all(rel["from"] != rel["to"] for rel in shop["relationships"])
