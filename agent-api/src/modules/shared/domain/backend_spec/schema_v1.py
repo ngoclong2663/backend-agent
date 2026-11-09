@@ -24,6 +24,9 @@ FieldType = Literal[
     "json",
     "file",
     "image",  # Story 10.5: an uploaded object; the column holds its key
+    "video",  # Epic 29: media files browsers play as they are (`media.py`); stored like `file`
+    "audio",
+    "subtitles",
 ]
 HttpMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE"]
 CrudAction = Literal["create", "get", "list", "update", "delete"]
@@ -70,7 +73,8 @@ class FieldDef(SpecModel):
     min: float | None = None
     max: float | None = None
     description: str | None = None
-    # Story 10.5, `file` and `image`: allowed MIME types (`image/*` allowed) and the largest size in bytes
+    # Story 10.5, `file` and `image` (Epic 29: `video`, `audio`, `subtitles` too): allowed MIME types (`image/*`
+    # allowed; a media kind only narrows its playable set) and the largest size in bytes
     accept: list[str] | None = None
     max_size: int | None = Field(default=None, ge=1)
 

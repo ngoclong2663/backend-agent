@@ -9,7 +9,8 @@ import { FieldValue } from "./FieldValue";
 import { LoadError } from "./AppList";
 import { entityDesign, useLayout } from "./layout";
 import { ActionButtons } from "./RecordActions";
-import { Media } from "./views";
+import { FileValue } from "./plugins";
+import { Media, mediaKind } from "./views";
 import { t } from "./messages";
 
 function SummaryValue({ value }: { value: unknown }) {
@@ -74,13 +75,21 @@ export function AppDetail({ section }: { section: TAppSection }) {
 
   const fields = section.data?.fields?.length ? section.data.fields : (entity?.detailFields ?? []);
   const title = recordTitle(entity, record);
-  // Epic 23 (Story 23.3): a media record opens on its image, a profile on its picture beside the name
+  // Epic 23 (Story 23.3): a media record opens on its image, a profile on its picture beside the name; Epic 29: a
+  // video opens on its player, an audio record's player sits under the title
   const media = design.detailView === "media" ? design.roles.media : undefined;
   const picture = design.detailView === "profile" ? (design.roles.avatar ?? design.roles.media) : undefined;
-  const shown = fields.filter((field) => field !== media && field !== picture);
+  const kind = mediaKind(entity, media);
+  const audioField = kind === "audio" ? media : Object.keys(entity?.fields ?? {}).find((name) => entity?.fields?.[name]?.type === "audio");
+  const shown = fields.filter((field) => field !== media && field !== picture && field !== audioField);
   return (
     <div className="flex flex-col gap-6">
-      {media && <Media entity={entity} record={record} field={media} title={title} className="aspect-[21/9] w-full rounded-xl" />}
+      {media && kind === "video" && (
+        <div data-bga-detail-media="video">
+          <FileValue entity={entity} field={media} record={record} />
+        </div>
+      )}
+      {media && !kind && <Media entity={entity} record={record} field={media} title={title} className="aspect-[21/9] w-full rounded-xl" />}
       <div className="flex flex-wrap items-start justify-between gap-3">
         {picture && <Media entity={entity} record={record} field={picture} title={title} className="size-20 shrink-0 rounded-full" />}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -89,6 +98,11 @@ export function AppDetail({ section }: { section: TAppSection }) {
         </div>
         <ActionButtons actions={section.content?.actions ?? []} record={record} />
       </div>
+      {audioField && (
+        <div data-bga-detail-media="audio">
+          <FileValue entity={entity} field={audioField} record={record} />
+        </div>
+      )}
       <Card>
         <CardContent>
           <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">

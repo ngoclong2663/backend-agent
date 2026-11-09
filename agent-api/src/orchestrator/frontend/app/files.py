@@ -135,6 +135,12 @@ def app_entities(spec: dict[str, Any], contract: dict[str, Any] | None, pages: d
             fields[reference["apiName"]] = {"type": "summary"}
         for file in (info.get(name) or {}).get("fileFields") or []:  # Story 22.7: shown through its signed URL
             fields[file["field"]] = {"type": file.get("kind") or "file", "urlField": file["urlField"]}
+        # Epic 29 (D3): the subtitle tracks of each media field (a same-record field, or a child entity's records)
+        tracks = {
+            key.split(".", 1)[1]: items
+            for key, items in (((contract.get("x-bga") or {}).get("storage") or {}).get("tracks") or {}).items()
+            if key.split(".", 1)[0] == name
+        }
         list_op = next(
             (
                 op_id
@@ -149,6 +155,7 @@ def app_entities(spec: dict[str, Any], contract: dict[str, Any] | None, pages: d
             **shown,
             "listOperation": list_op,
             "fields": fields,
+            **({"tracks": _kit_tracks(tracks, operations)} if tracks else {}),
             "references": references,
             "detail": pages.get(f"{slug}-id"),
             "list": pages.get(slug),
@@ -158,6 +165,40 @@ def app_entities(spec: dict[str, Any], contract: dict[str, Any] | None, pages: d
             ),
         }
     return out
+
+
+def _kit_tracks(tracks: dict[str, list[dict[str, Any]]], operations: dict[str, Any]) -> dict[str, Any]:
+    """A media field's tracks as the players read them: a child track names its list operation (filtered by the
+    parent's key) and the fields that give each track its language and label."""
+    out: dict[str, list[dict[str, Any]]] = {}
+    for field, items in tracks.items():
+        entries = []
+        for track in items:
+            keys = ("shape", "entity", "field", "parent", "language", "label")
+            entry = {key: track[key] for key in keys if key in track}
+            if track["shape"] == "child":
+                entry["listOperation"] = next(
+                    (
+                        op_id
+                        for op_id, found in operations.items()
+                        if (found["operation"].get("x-bga") or {}).get("entity") == track["entity"]
+                        and (found["operation"].get("x-bga") or {}).get("action") == "list"
+                    ),
+                    None,
+                )
+            entries.append(entry)
+        out[field] = entries
+    return out
+
+
+def app_media(contract: dict[str, Any] | None) -> dict[str, bool]:
+    """Epic 29: which media kinds the app has (the shell adds the listening bar for audio; samples ship for any)."""
+    kinds = {
+        file.get("kind")
+        for info in (((contract or {}).get("x-bga") or {}).get("entities") or {}).values()
+        for file in info.get("fileFields") or []
+    }
+    return {"video": "video" in kinds, "audio": "audio" in kinds, "subtitles": "subtitles" in kinds}
 
 
 def app_data(plan: dict[str, Any], spec: dict[str, Any], contract: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -192,6 +233,7 @@ def app_data(plan: dict[str, Any], spec: dict[str, Any], contract: dict[str, Any
         "auth": app_auth(contract, pages),
         "access": app_access(contract),
         "entities": app_entities(spec, contract, pages),
+        "media": app_media(contract),
         "forms": {form["id"]: _form(form, contract) for form in spec.get("forms") or []},
         # Epic 27: the seeded records' stock photos (by URL) and who took them, shown where the photo shows
         "photoCredits": {
@@ -268,7 +310,7 @@ def frontend_plugins(contract: dict[str, Any] | None) -> list[str]:
 # an app without the plugin gets the kit's stubs (`plugin-stubs.tsx`) under the same names.
 PLUGIN_SLOTS = {
     "auth-jwt": ("AppAuth", "UserMenu", "useSession", "signInDemo"),
-    "storage": ("UploadField", "FileValue"),
+    "storage": ("UploadField", "FileValue", "ListeningBar"),
     "payments": ("PayAction", "AppPayment"),
     "relations": ("AppLinks",),
 }

@@ -10,5 +10,8 @@ export type TUseSession = () => TSession;
 export type TSignInDemo = (login: string, queryClient: QueryClient) => Promise<boolean>;
 export type TUserMenu = () => React.ReactNode;
 export type TUploadField = (props: TFieldProps) => React.ReactNode;
-export type TFileValue = (props: { entity: TAppEntity | undefined; field: string; record: TRecord; compact?: boolean }) => React.ReactNode;
+/** `compact`: a cell or a card (Epic 29: a media field's compact player); `fill`: take the parent's whole box. */
+export type TFileValue = (props: { entity: TAppEntity | undefined; field: string; record: TRecord; compact?: boolean; fill?: boolean }) => React.ReactNode;
 export type TPayAction = (props: { action: TAppAction; record: TRecord | undefined; variant?: TAppAction["variant"] }) => React.ReactNode;
+/** Epic 29 (Story 29.4): the bar that keeps the current audio playing across pages (apps with audio fields). */
+export type TListeningBar = (props: { bottomTabs: boolean }) => React.ReactNode;

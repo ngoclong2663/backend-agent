@@ -1,0 +1,37 @@
+{
+  "name": "Lesson Library",
+  "tagline": "Watch the lessons, listen to the show",
+  "icon": "Clapperboard",
+  "home": "Lesson",
+  "nav": [
+    { "entity": "Lesson", "label": "Lessons", "icon": "PlaySquare" },
+    { "entity": "Course", "label": "Courses", "icon": "BookOpen" },
+    { "entity": "Episode", "label": "Podcast", "icon": "Podcast" }
+  ],
+  "entities": {
+    "Course": { "label": "Course", "plural": "Courses", "displayField": "title", "listFields": ["title", "level", "createdAt"], "listStyle": "cards" },
+    "Lesson": { "label": "Lesson", "plural": "Lessons", "displayField": "title", "listFields": ["title", "courseId", "topic", "durationSeconds", "publishedAt"], "listStyle": "cards", "help": { "video": "MP4 or WebM, up to 200 MB", "durationSeconds": "Filled from the video when you upload it" } },
+    "Caption": { "label": "Caption track", "plural": "Caption tracks", "displayField": "label", "listFields": ["language", "label", "createdAt"], "listStyle": "table" },
+    "Episode": { "label": "Episode", "plural": "Episodes", "displayField": "title", "listFields": ["title", "series", "durationMinutes", "publishedAt"], "listStyle": "cards" }
+  },
+  "design": {
+    "archetype": "catalogue",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "wide",
+    "homeView": "catalogue",
+    "mainEntity": "Lesson",
+    "entities": {
+      "Lesson": { "view": "media-grid", "detailView": "media", "filtersStyle": "chips", "roles": { "media": "video", "title": "title", "subtitle": "courseId", "badge": "topic", "duration": "durationSeconds", "meta": ["publishedAt"] } },
+      "Course": { "view": "cards", "roles": { "media": "cover", "title": "title", "subtitle": "summary", "badge": "level" } },
+      "Episode": { "view": "feed", "detailView": "media", "roles": { "media": "audio", "title": "title", "subtitle": "notes", "badge": "series", "duration": "durationMinutes", "meta": ["publishedAt"] } },
+      "Caption": { "view": "table", "roles": { "title": "label", "badge": "language" } }
+    },
+    "looks": [
+      { "recipe": "minimal", "reason": "Lets the video and its captions lead" },
+      { "recipe": "editorial", "reason": "Lesson titles set like a magazine" },
+      { "recipe": "aurora", "reason": "A bolder option" }
+    ],
+    "reason": "People browse lessons by their picture and watch them; the podcast reads newest first."
+  }
+}

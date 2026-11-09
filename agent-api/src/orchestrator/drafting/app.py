@@ -17,6 +17,7 @@ from src.configs import config
 from src.engines.port import EngineResult, EngineStatus
 from src.engines.prompts import PromptLibrary
 from src.modules.shared.domain.backend_spec import validate_spec_data
+from src.modules.shared.domain.backend_spec.media import PLAYABLE
 from src.modules.shared.domain.entities import SpecDraftEntity
 from src.modules.shared.domain.enums import GenerationMode
 from src.modules.shared.domain.frontend_spec.app import outline_schema
@@ -24,7 +25,7 @@ from src.modules.shared.domain.schema_digest import schema_digest
 
 from ..backend.planner import build_plan
 from ..frontend.app.design import archetype_candidates, archetype_for, design_notes
-from ..frontend.app.outline import complete_outline
+from ..frontend.app.outline import complete_outline, humanize
 from ..frontend.app.recipes import complete_looks, recommended_looks, style_words
 from ..frontend.app.requested import follow_requested
 from ..frontend.app.screens import app_frontend_spec, ensure_aggregates, without_references
@@ -33,9 +34,9 @@ from ..integration.contract import build_contract
 from .access import secure_access
 from .answer_schema import app_answer_schema
 
-# v5: the requirement's own look (`design.requested`); v4 (Epic 25): the access rules; v3 (Story 23.6): the design
-# brief and areas; v2 (22.8): sign-in, roles, plugins
-PROMPT = ("draft_app", "v5")
+# v6 (Epic 29): the media field types; v5: the requirement's own look (`design.requested`); v4 (Epic 25): the access
+# rules; v3 (Story 23.6): the design brief and areas; v2 (22.8): sign-in, roles, plugins
+PROMPT = ("draft_app", "v6")
 OUTLINE_FILE = "app-outline.json"  # what the model drafts next to the BackendSpec (code folds it into the FrontendSpec)
 # Outline examples shown in the prompt, relative to EXAMPLES_DIR; they fit `specs/flashcards.json`,
 # `specs/two-entity.json` and `specs/workshop-bookings.json` (the fake engine drafts from them too).
@@ -108,6 +109,12 @@ NOW_WORDS = frozenset({"today", "current_date", "current_timestamp", "now()", "c
 # Story 22.8: `"scope": "pitchId"`, which the validator then read letter by letter).
 RULE_LISTS = {"noOverlap": ("scope",), "uniqueTogether": ("fields",), "immutableAfter": ("states",)}
 OPERATION_LISTS = ("filters", "sort", "search", "rules")
+# Epic 29 (Story 29.5): a `file` field that is really a media file, by its accepted types or its name
+MEDIA_WORDS = {
+    "video": ("video", "clip", "trailer", "movie", "film", "footage"),
+    "audio": ("audio", "recording", "podcast", "episode", "sound", "voice"),
+    "subtitles": ("subtitles", "subtitle", "captions", "caption", "transcript"),
+}
 
 
 def apply_access_rules(work: Path, backend_file: str) -> list[dict[str, Any]]:
@@ -179,6 +186,7 @@ def fix_backend_defaults(work: Path, backend_file: str) -> list[dict[str, Any]]:
             if isinstance(operation, dict) and isinstance(operation.get(key), str):
                 operation[key] = [operation[key]]
                 note(f"/operations/{o_index}/{key}", f"{operation.get('operationId')}: '{key}' is a list of names")
+    notes += fix_media_fields(data)
     entities = {e.get("name") for e in data.get("entities") or [] if isinstance(e, dict)}
     for o_index, operation in enumerate(data.get("operations") or []):
         if not isinstance(operation, dict) or operation.get("type") != "custom" or operation.get("response"):
@@ -199,6 +207,57 @@ def fix_backend_defaults(work: Path, backend_file: str) -> list[dict[str, Any]]:
     if notes:
         (work / backend_file).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
     return notes
+
+
+def media_kind_of(field: dict[str, Any]) -> str | None:
+    """Epic 29 (Story 29.5): the media kind a drafted `file` field really is: every accepted type in one kind's
+    playable set, else the field's name (video, clip, recording, episode, subtitles, captions, …); None to keep it."""
+    accept = [m for m in field.get("accept") or [] if isinstance(m, str)]
+    if accept:
+        for kind, types in PLAYABLE.items():
+            if all(mime in types or mime == f"{kind}/*" for mime in accept):
+                return kind
+        return None  # an accept list outside the playable sets stays a file (a ZIP, a PDF)
+    words = humanize(str(field.get("name") or "")).lower().split()
+    for kind, names in MEDIA_WORDS.items():
+        if any(word in names for word in words):
+            return kind
+    return None
+
+
+def fix_media_fields(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """A `file` field that is a media file becomes `video`, `audio` or `subtitles` (one note each; an `accept` of
+    `<kind>/*` is dropped, the kind's playable set applies); a media entity without an image field gets a note (no
+    poster: the player shows the first frame)."""
+    notes: list[dict[str, Any]] = []
+    for e_index, entity in enumerate(data.get("entities") or []):
+        if not isinstance(entity, dict) or not isinstance(entity.get("fields"), list):
+            continue
+        fields = [f for f in entity["fields"] if isinstance(f, dict)]
+        for f_index, item in enumerate(entity["fields"]):
+            if not isinstance(item, dict) or item.get("type") != "file":
+                continue
+            kind = media_kind_of(item)
+            if kind is None:
+                continue
+            item["type"] = kind
+            if item.get("accept") and any(str(m).endswith("/*") for m in item["accept"]):
+                item.pop("accept")
+            message = f"{entity.get('name')}.{item.get('name')}: a file people {MEDIA_VERBS[kind]} is `{kind}`"
+            notes.append({"spec": "backend", "path": f"/entities/{e_index}/fields/{f_index}/type", "message": message,
+                          "suggestion": None})  # fmt: skip
+        has_video = any(f.get("type") == "video" for f in fields)
+        if has_video and not any(f.get("type") == "image" for f in fields):
+            message = (
+                f"{entity.get('name')} has a video but no image field: its player shows the first frame as the poster"
+            )
+            notes.append(
+                {"spec": "backend", "path": f"/entities/{e_index}/fields", "message": message, "suggestion": None}
+            )
+    return notes
+
+
+MEDIA_VERBS = {"video": "watch", "audio": "listen to", "subtitles": "read along"}
 
 
 def _load(path: Path) -> Any:

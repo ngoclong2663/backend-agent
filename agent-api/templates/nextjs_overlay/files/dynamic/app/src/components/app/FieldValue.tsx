@@ -47,6 +47,9 @@ export function FieldValue({ entity, field, record, link = true }: FieldValuePro
   switch (type) {
     case "image":
     case "file":
+    case "video":
+    case "audio":
+    case "subtitles":
       return <FileValue entity={entity} field={field} record={record} compact={!link} />;
     case "boolean":
       return <span>{value ? t("yes") : t("no")}</span>;

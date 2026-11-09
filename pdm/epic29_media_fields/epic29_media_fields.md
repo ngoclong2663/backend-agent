@@ -74,4 +74,8 @@ than one request, waveform rendering, playlists as a backend concept.
 
 ## Status
 
-Proposed 2026-11-08, for review.
+Proposed 2026-11-08, for review. **Stories 29.1–29.5 done 2026-11-09** (see each story's Status): the three field
+types through the schema, the validator, the planner, the storage plugin, the contract's fixtures and tracks, the
+seeds' sample objects (also in previews), the kit's players, uploads and listening bar, the design brief's `duration`
+role and video media, and the v6 drafting prompt with code fixes. 29.6 (real drafts, uploads on the live backend)
+runs with the other epics' final checks.

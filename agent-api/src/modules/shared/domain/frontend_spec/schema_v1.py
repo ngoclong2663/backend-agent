@@ -260,7 +260,7 @@ class FormFieldUpload(SpecModel):
     presign: str = Field(pattern=OPERATION_ID)
     entity: str = Field(max_length=63)
     field: str = Field(max_length=63)
-    kind: Literal["file", "image"] = "file"
+    kind: Literal["file", "image", "video", "audio", "subtitles"] = "file"  # Epic 29: the media kinds
     accept: list[str] = []
     max_size: int | None = Field(default=None, ge=1)
 

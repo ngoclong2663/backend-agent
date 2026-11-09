@@ -459,14 +459,19 @@ def mock_plugins(contract: dict[str, Any]) -> dict[str, Any]:
         fields: dict[str, Any] = {}
         for entity, info in (meta.get("entities") or {}).items():
             for file in info.get("fileFields") or []:
-                fields[f"{entity}.{file['field']}"] = {"accept": [], "maxSize": None, "urlField": file["urlField"]}
+                fields[f"{entity}.{file['field']}"] = {
+                    "accept": [],
+                    "maxSize": None,
+                    "urlField": file["urlField"],
+                    "kind": file.get("kind") or "file",  # Epic 29: the mocks play the kind's sample
+                }
         for schema in schemas.values():
             for prop in (schema.get("properties") or {}).values():
                 upload = (prop.get("x-bga") or {}).get("upload")
                 key = f"{(upload or {}).get('entity')}.{(upload or {}).get('field')}"
                 if upload and key in fields:
                     fields[key] |= {"accept": upload.get("accept") or [], "maxSize": upload.get("maxSize")}
-        out["storage"] = {"presign": storage.get("presign"), "fields": fields}
+        out["storage"] = {"presign": storage.get("presign"), "fields": fields, "tracks": storage.get("tracks") or {}}
     payments = meta.get("payments")
     if payments:
         checkout = (operations.get(payments.get("checkout")) or {}).get("operation") or {}

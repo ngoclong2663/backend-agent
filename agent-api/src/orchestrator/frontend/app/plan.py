@@ -7,6 +7,7 @@ from typing import Any
 from src.modules.shared.domain.backend_spec.naming import pluralize, to_kebab
 from src.modules.shared.domain.frontend_spec.app import APP_SECTIONS
 
+from ...samples import has_media
 from ..planner import _UI_IMPORT, FRONTEND_PLAN_VERSION, _Planner, primitive_closure
 from ..theme import build_theme
 from .files import frontend_plugins
@@ -86,7 +87,13 @@ def plan_app(spec: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]:
         "rendering": "app",
         "rendererGaps": [],
         "trees": False,
-        "app": {"sections": sections, "outline": outline, "nav": app_nav(spec), "plugins": frontend_plugins(contract)},
+        "app": {
+            "sections": sections,
+            "outline": outline,
+            "nav": app_nav(spec),
+            "plugins": frontend_plugins(contract),
+            "media": has_media(contract),  # Epic 29: the sample media ship with the app
+        },
         "routes": routes,
         "components": [],
         "shadcn": kit_primitives(plugins=frontend_plugins(contract)),

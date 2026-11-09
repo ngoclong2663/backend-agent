@@ -405,6 +405,7 @@ class SandboxValidationRunner(IValidationRunner):
         """Story 18.11 (2026-11-06: one call per endpoint): every endpoint called once against the seeded database;
         a 5xx or no answer fails it, any 2xx / 4xx passes. A seed that cannot be inserted fails. None: no calls."""
         from ..packaging import build_contract_seed
+        from ..samples import storage_objects
 
         contract = request.smoke_contract
         calls, skipped = smoke_calls(contract, request.plan)
@@ -417,7 +418,7 @@ class SandboxValidationRunner(IValidationRunner):
                     "seed": build_contract_seed(contract, request.plan),
                     "calls": calls,
                     "login": smoke_login(contract),
-                    "objects": ((contract.get("x-bga") or {}).get("storage") or {}).get("objects", []),
+                    "objects": storage_objects(contract),  # Epic 29: with the sample bytes per content type
                 }
             )
         )

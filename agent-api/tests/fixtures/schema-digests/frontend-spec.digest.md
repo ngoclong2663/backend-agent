@@ -237,7 +237,7 @@ type FormFieldUpload = {
   presign: string;
   entity: string;
   field: string;
-  kind?: "file" | "image";
+  kind?: "file" | "image" | "video" | "audio" | "subtitles";
   accept?: string[];
   maxSize?: number | null;
 };

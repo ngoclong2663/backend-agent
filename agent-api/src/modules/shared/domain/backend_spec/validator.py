@@ -9,6 +9,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from .issues import Severity, SpecIssue, SpecIssueCode, ValidationReport
+from .media import PLAYABLE, is_file_kind, is_media_kind, playable_problem
 from .naming import table_name, to_snake
 from .normalizer import default_foreign_key, normalize_spec, owning_entity
 from .registry import SPEC_MODELS
@@ -83,7 +84,7 @@ def _norm_route(path: str) -> str:
 def value_matches_type(value: Any, field: FieldDef) -> bool:
     """Shared by defaults and seed rows; `None` is handled by callers (nullability)."""
     kind = field.type
-    if kind in ("string", "text", "file", "image"):
+    if kind in ("string", "text") or is_file_kind(kind):
         return isinstance(value, str) and (field.max_length is None or len(value) <= field.max_length)
     if kind == "uuid":
         return isinstance(value, str) and _parses(uuid.UUID, value)
@@ -191,14 +192,24 @@ class _SemanticChecker:
                 columns.setdefault(column, f_index)
                 if field.type == "enum" and not field.values:
                     self._add(C.ENUM_VALUES_MISSING, f"{f_path}/values", f"Enum field '{field.name}' needs 'values'")
-                if field.type not in ("file", "image") and (field.accept is not None or field.max_size is not None):
+                if not is_file_kind(field.type) and (field.accept is not None or field.max_size is not None):
                     key = "accept" if field.accept is not None else "maxSize"
                     self._add(
-                        C.SCHEMA_VIOLATION, f"{f_path}/{key}", "'accept' and 'maxSize' are for file and image fields"
+                        C.SCHEMA_VIOLATION,
+                        f"{f_path}/{key}",
+                        "'accept' and 'maxSize' are for file, image, video, audio and subtitles fields",
                     )
                 for a_index, mime in enumerate(field.accept or []):
                     if not re.fullmatch(r"[a-z]+/([a-z0-9.+-]+|\*)", mime):
                         self._add(C.SCHEMA_VIOLATION, f"{f_path}/accept/{a_index}", f"'{mime}' is not a MIME type")
+                    elif is_media_kind(field.type) and (problem := playable_problem(field.type, mime)):
+                        # Epic 29 D2: a media field only narrows what browsers play, never asks for transcoding
+                        self._add(
+                            C.SCHEMA_VIOLATION,
+                            f"{f_path}/accept/{a_index}",
+                            f"Field '{field.name}': {problem}",
+                            hint=f"Use one of: {', '.join(PLAYABLE[field.type])}",
+                        )
                 if field.default is not None and not value_matches_type(field.default, field):
                     self._add(
                         C.TYPE_DEFAULT_MISMATCH,

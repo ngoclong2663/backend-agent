@@ -35,7 +35,11 @@ type TLink = { kind: "list" | "add" | "remove"; parent: string; child: string; f
 type TPlugins = {
   auth?: { login: string; register: string; me: string; loginField: string; userEntity: string; roles: string[]; demoUsers: { login: string; password: string; role: string }[] } | null;
   rules?: TRule[];
-  storage?: { presign: string; fields: Record<string, { accept: string[]; maxSize: number | null; urlField: string }> } | null;
+  storage?: {
+    presign: string;
+    fields: Record<string, { accept: string[]; maxSize: number | null; urlField: string; kind?: string }>;
+    tracks?: Record<string, unknown>;
+  } | null;
   payments?: { checkout: string; status: string; entity: string; statusField: string; paid: string; amountField: string | null } | null;
   links?: Record<string, TLink>;
 };
@@ -294,8 +298,21 @@ const objects = new Map<string, string>(); // object key → a blob URL in this 
 const OBJECTS = "__objects"; // a small file as a data URL in the mock store, so it shows after a reload
 const KEEP_BYTES = 1_500_000;
 
+// Epic 29 (Story 29.2): a seeded media key without an upload of its own plays the kit's sample of its kind
+const SAMPLE_BY_KIND: Record<string, string> = { video: "/samples/sample.mp4", audio: "/samples/sample.mp3", subtitles: "/samples/sample.en.vtt" };
+
+/** The sample a seeded media key stands for: a subtitle track's language from its key (`…/1.ja.vtt`). */
+export function sampleUrl(kind: string | undefined, key: string): string | null {
+  if (!kind || !(kind in SAMPLE_BY_KIND)) return null;
+  if (kind === "subtitles") {
+    const language = /\.([a-z]{2,3})\.(vtt|srt)$/i.exec(key)?.[1];
+    return language ? `/samples/sample.${language}.vtt` : SAMPLE_BY_KIND.subtitles;
+  }
+  return SAMPLE_BY_KIND[kind];
+}
+
 /** A file field's read URL (`<field>Url`): the uploaded file, else the fixture's own; a seed's outside URL (a demo
- *  photo) as it is, as the API reads it. */
+ *  photo) as it is, as the API reads it; a seeded media key the kind's sample. */
 export function fileUrls(entity: string | null, record: TRecord, out: TRecord, records: TRecords) {
   for (const [name, spec] of Object.entries(plugins.storage?.fields ?? {})) {
     const [owner, field] = name.split(".");
@@ -306,7 +323,8 @@ export function fileUrls(entity: string | null, record: TRecord, out: TRecord, r
       continue;
     }
     const kept = records(OBJECTS).find((row) => row.key === key)?.url;
-    out[spec.urlField] = typeof key === "string" && key ? (objects.get(key) ?? kept ?? record[spec.urlField] ?? null) : null;
+    const seeded = typeof key === "string" && key.includes("/seed/") ? sampleUrl(spec.kind, key) : null;
+    out[spec.urlField] = typeof key === "string" && key ? (objects.get(key) ?? kept ?? seeded ?? record[spec.urlField] ?? null) : null;
   }
 }
 

@@ -186,6 +186,21 @@ Agent-specific notes:
   checklist `tour/Checklist.tsx`; "Continue as <role>" through the auth plugin's `signInDemo` slot). The evaluation
   plays each role's tour on the mocks (`evaluation/tour.py`, `walk.mjs` `tour`; the kit's `bga-mock-api` switch forces
   MSW in that browser) into `report.tour`. `make kit-test` type-checks the kit and runs its vitest files in the sandbox.
+- Media fields (Epic 29): `video`, `audio` and `subtitles` are file fields (`backend_spec/media.py`: the playable
+  types per kind (D2), the default sizes, the sample files; the validator refuses an `accept` outside the kind's set);
+  the planner's `MEDIA_KINDS` table fills `column.file`, the storage plugin speaks each kind's type (scenarios, tests,
+  `x-bga.storage.objects`) and writes the subtitle tracks (`media_tracks`: a same-record `subtitles` field, or a child
+  entity with a language field) as `x-bga.storage.tracks`; read URLs carry `ResponseContentType`. Samples
+  (`templates/samples/`, CC0, `make sample-media`): the fixtures' keys end in the kind's sample, a track entity gets one
+  row per sample language, `orchestrator/samples.storage_objects` adds the bytes the smoke check and `seed.json`
+  (`seed_artifact`: `{rows, objects}`, uploaded by the generated `scripts/seed.py`) put in the store, and the scaffold
+  copies them to `public/samples/` for apps with media (`plan.app.media`; the mocks' `fileUrls` plays them). Kit: the
+  storage plugin's `VideoPlayer` / `AudioPlayer` (native, tracks by language, SubRip converted in `subtitles.ts`, an
+  expired URL refetched once and resumed), `UploadField` (XHR progress, cancel, preview, the duration field filled),
+  `ListeningBar` (the `listening.ts` store; apps with `app.json` `media.audio`); `app.json` entities carry `tracks`
+  and `media`; the design brief has a `duration` role and takes a video or audio field as `media` (a video record's
+  detail defaults to `media`); `draft_app@v6` names the types and `drafting/app.fix_media_fields` turns a media-like
+  `file` into its kind. `examples/specs/media-library.json` is the synthetic media app (also in the design report).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

@@ -40,8 +40,8 @@ subtitles in my language, so that media in the app work like in any product I us
 
 - [ ] On mocks, a media record plays its video or audio with its subtitle tracks, light and dark, at 375 and 1440 px.
 - [ ] Uploading a media file shows progress, can be cancelled, and the record plays it after saving.
-- [ ] `.srt` and `.vtt` subtitles both show as captions.
-- [ ] Apps without media fields get no new code in their bundle.
+- [x] `.srt` and `.vtt` subtitles both show as captions.
+- [x] Apps without media fields get no new code in their bundle.
 
 ## Verify
 
@@ -50,3 +50,20 @@ The kit's vitest and `tsc`, `make design-check-app` on the synthetic media app, 
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** Storage plugin frontend: `VideoPlayer` (native `<video controls playsinline preload=metadata>`,
+the record's poster (its first image field) or the first frame, the tracks of the field with the user's language on by
+default, a compact mode with the poster, a play badge and the duration that plays in place), `AudioPlayer` (native
+controls in records with "Keep playing" to the listening bar; a compact play / pause in lists that plays through the
+bar, one at a time), `subtitles.ts` (`srtToVtt`, blob URLs for SubRip tracks, `defaultTrack`, `formatDuration`),
+`FileValue` dispatches image / video / audio / subtitles (a track record shows its language and a download link) and
+reads the tracks (`useTracks`: a same-record field, or the child list filtered by the parent). Expired URLs (D8): on a
+media error the player asks the record's queries again once and resumes at the same time. `UploadField`: XHR with
+progress and a Cancel, a local preview that plays before saving, the file's type from its name when the browser gives
+none (`.srt`, `.vtt`), the duration read from the file's metadata (with a 2.5 s cap) filling the form's empty
+`duration` / `runtime` / `length` field (minutes when the name or unit says so). Accessibility: native players, no
+autoplay with sound, the compact badge is a button. The plugin's files are copied only for apps with the storage
+plugin, and the players render only for media kinds, so other bundles are unchanged. Tests (vitest, `make kit-test
+--app media-library:media-library`): the converter, the default track by language, durations, upload progress and
+cancel on a fake XHR, the duration fill. Light / dark at 375 / 1440: `make design-check-app` on the media app (below,
+29.4).

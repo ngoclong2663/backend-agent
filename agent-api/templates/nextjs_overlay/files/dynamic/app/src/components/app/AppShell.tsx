@@ -29,7 +29,7 @@ import { icons } from "./icons";
 import { useLayout } from "./layout";
 import { slots } from "./slots";
 import { TourMount } from "./tour/TourMount";
-import { UserMenu, useSession } from "./plugins";
+import { ListeningBar, UserMenu, useSession } from "./plugins";
 import { inSentence, t } from "./messages";
 
 type AppShellProps = {
@@ -293,9 +293,13 @@ function SidebarShell({ children, design, nav }: { children: ReactNode; design: 
 /** The app's shell (Epic 23): the layout's shell (sidebar, rail, top bar, top bar with tabs) over the same
  *  navigation, filtered by role and by the current area. */
 export function AppShell({ children }: AppShellProps) {
+  const design = useLayout();
+  const nav = useNav();
+  const bottom = design.mobileNav === "bottom-tabs" && nav.length <= BOTTOM_TABS_MAX && nav.length > 1;
   return (
     <>
       <ShellLayout>{children}</ShellLayout>
+      {app.media?.audio && <ListeningBar bottomTabs={bottom} />}
       <TourMount />
     </>
   );

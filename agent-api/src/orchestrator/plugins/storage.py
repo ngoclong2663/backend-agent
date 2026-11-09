@@ -11,6 +11,13 @@ Locally every sandbox and preview reaches one shared store (`src/sandbox/object_
 
 from typing import Any
 
+from src.modules.shared.domain.backend_spec.media import (
+    SAMPLE_EXTENSION,
+    is_file_kind,
+    media_tracks,
+    sample_content_type,
+)
+
 from .base import AppStartup, CaseContext, Code, Plugin, ResponseField, RouterParam, Setting
 
 MODULE = "src/modules/files"
@@ -60,8 +67,19 @@ def _stand_in(plan: dict[str, Any], fixtures: dict[str, Any], found: dict[str, A
     rows = fixtures.get(found["entity"]) or []
     index = next((i for i, row in enumerate(rows) if row.get(found["field"]) == url), 0)
     folder = (rows[index].get(owner) if owner and rows else None) or "shared"
-    extension = ".png" if found["kind"] == "image" else ".pdf"
-    return f"{found['prefix']}/{folder}/seed/{index + 1}{extension}"
+    extension = SAMPLE_EXTENSION.get(found["kind"], "pdf")  # Epic 29: the kind's sample
+    return f"{found['prefix']}/{folder}/seed/{index + 1}.{extension}"
+
+
+def _object_type(found: dict[str, Any], key: str) -> str:
+    """The content type a seeded object is uploaded with: the key's own extension when a sample has it (a `.ja.vtt`
+    track), else the kind's sample type."""
+    content = sample_content_type(found["kind"], found["accept"])
+    if key.endswith(".vtt"):
+        return "text/vtt"
+    if key.endswith(".srt"):
+        return "application/x-subrip"
+    return content
 
 
 def _owned(op: dict[str, Any]) -> bool:
@@ -74,9 +92,7 @@ class StoragePlugin(Plugin):
         super().__init__(name="storage")
 
     def applies(self, spec: dict[str, Any]) -> bool:
-        return any(
-            field.get("type") in ("file", "image") for entity in spec.get("entities", []) for field in entity["fields"]
-        )
+        return any(is_file_kind(field.get("type")) for entity in spec.get("entities", []) for field in entity["fields"])
 
     # -- the plan -------------------------------------------------------------------------------------------------
 
@@ -213,10 +229,10 @@ class StoragePlugin(Plugin):
         for (entity, name), found in fields.items():  # what the smoke check uploads first, so the keys exist
             for row in meta["fixtures"].get(entity) or []:
                 if row.get(name):
-                    content = "image/png" if found["kind"] == "image" else (found["accept"] or ["application/pdf"])[0]
                     key = _stand_in(plan, meta["fixtures"], found, row[name]) if outside_url(row[name]) else row[name]
-                    objects.append({"key": key, "contentType": content.replace("/*", "/png")})
-        meta["storage"] = {"presign": "files.presign", "objects": objects}
+                    objects.append({"key": key, "contentType": _object_type(found, key)})
+        # Epic 29 (D3): the subtitle tracks of each media field, in both shapes, so the players find them
+        meta["storage"] = {"presign": "files.presign", "objects": objects, "tracks": media_tracks(spec)}
 
     @staticmethod
     def _presign_operation(contract: dict[str, Any], plan: dict[str, Any]) -> None:
@@ -245,8 +261,7 @@ class StoragePlugin(Plugin):
         }
         error = {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
         first = plan["storage"]["fields"][0]
-        content = "image/png" if first["kind"] == "image" else (first["accept"] or ["application/pdf"])[0]
-        content = content.replace("/*", "/png")
+        content = sample_content_type(first["kind"], first["accept"])
         good = {
             "entity": first["entity"],
             "field": first["field"],
@@ -591,8 +606,7 @@ PNG_HEX = (
 def _test_files(plan: dict[str, Any]) -> dict[str, str]:
     first = plan["storage"]["fields"][0]
     auth = any(m["name"] == "auth" for m in plan["modules"])
-    content = "image/png" if first["kind"] == "image" else (first["accept"] or ["application/pdf"])[0]
-    content = content.replace("/*", "/png")
+    content = sample_content_type(first["kind"], first["accept"])
     signed_in = (
         "@pytest.fixture(autouse=True)\n"
         "def _signed_in(client):\n"

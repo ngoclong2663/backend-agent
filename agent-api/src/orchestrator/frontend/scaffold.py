@@ -23,6 +23,7 @@ from .renderer import library_files
 TEMPLATES = Path(__file__).resolve().parents[3] / "templates"
 BASE_DIR = TEMPLATES / "nextjs_base"
 OVERLAY_DIR = TEMPLATES / "nextjs_overlay"
+SAMPLES_DIR = TEMPLATES / "samples"  # Epic 29: the sample media (`public/samples/`) of apps with media fields
 SCAFFOLD_INFO = ".bga/scaffold.json"
 OWNED_INFO = ".bga/owned.json"
 SKIP = {
@@ -152,6 +153,14 @@ def scaffold_frontend(
             for source in _files(root) if root.is_dir() else []:
                 target = source.relative_to(root).as_posix()
                 _copy(source, project / target, replacements)
+                overlay_files.append(target)
+        if (plan.get("app") or {}).get("media") and SAMPLES_DIR.is_dir():
+            # Story 29.2: the sample media the mocks play (`/samples/…`), only for apps with media fields
+            for source in _files(SAMPLES_DIR):
+                if source.name == "README.md":
+                    continue
+                target = f"public/samples/{source.name}"
+                _copy(source, project / target, {})
                 overlay_files.append(target)
 
     package_path = project / "package.json"

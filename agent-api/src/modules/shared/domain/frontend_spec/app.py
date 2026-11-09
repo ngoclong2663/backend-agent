@@ -105,7 +105,7 @@ MAX_META = 3  # short fields on a card's meta line
 class AppFieldRoles(SpecModel):
     """Which field plays which part on a card or a row (Story 23.3); code checks each against the field's type."""
 
-    media: FieldName | None = None  # an image
+    media: FieldName | None = None  # an image, or (Epic 29) a video or audio field played by the kit
     title: FieldName | None = None
     subtitle: FieldName | None = None
     meta: list[FieldName] = Field(default=[], max_length=MAX_META)  # a date, a duration, a source
@@ -113,6 +113,7 @@ class AppFieldRoles(SpecModel):
     stat: FieldName | None = None  # a count: views, upvotes
     price: FieldName | None = None
     avatar: FieldName | None = None  # a small image of who or what the record is from
+    duration: FieldName | None = None  # Epic 29: a number of seconds (or minutes), shown as m:ss on cards
 
 
 class AppEntityDesign(SpecModel):

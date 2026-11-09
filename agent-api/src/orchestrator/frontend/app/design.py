@@ -52,10 +52,13 @@ ARCHETYPE_WORDS: dict[str, tuple[str, ...]] = {
 SHELLS = ("sidebar", "topbar", "topbar-tabs", "rail")
 VIEWS = ("table", "cards", "media-grid", "feed", "board", "calendar")
 IMAGE_WORDS = ("image", "thumbnail", "cover", "logo", "banner", "avatar", "photo", "picture", "poster")
+MEDIA_TYPES = frozenset({"video", "audio"})  # Epic 29: a `media` role may be a player, not only an image
+DURATION_WORDS = ("duration", "length", "runtime")
 NUMERIC = frozenset({"integer", "float", "decimal"})
 DATES = frozenset({"date", "datetime"})
 HIDDEN = frozenset({"id", "allowedActions", "passwordHash", "password"})
-ROLE_ORDER = ("title", "media", "avatar", "price", "stat", "badge", "subtitle", "meta")  # who keeps a shared field
+# who keeps a shared field
+ROLE_ORDER = ("title", "media", "avatar", "price", "stat", "duration", "badge", "subtitle", "meta")
 CHIPS_MAX = 12  # values a row of chips shows
 _WORD = re.compile(r"[a-z][a-z-]*")
 
@@ -118,6 +121,17 @@ class _Data:
             field.get("type") == "string" and any(word in name.lower() for word in IMAGE_WORDS)
         )
 
+    def media(self, entity: str, name: str) -> bool:
+        """Epic 29: what may play the `media` role: an image, or a video / audio file (shown by the kit's players)."""
+        return self.image(entity, name) or self.kind(entity, name) in MEDIA_TYPES
+
+    def duration(self, entity: str, name: str) -> bool:
+        kind = self.kind(entity, name)
+        return kind in MEDIA_TYPES or (kind in NUMERIC and any(w in name.lower() for w in DURATION_WORDS))
+
+    def first_duration(self, entity: str, skip: set[str]) -> str | None:
+        return next((n for n in self.fields[entity] if n not in skip and self.duration(entity, n)), None)
+
     def kind(self, entity: str, name: str | None) -> str | None:
         return (self.fields[entity].get(name or "") or {}).get("type")
 
@@ -126,6 +140,11 @@ class _Data:
             (n for n in self.fields[entity] if n not in skip and "avatar" not in n.lower() and self.image(entity, n)),
             None,
         )
+
+    def first_media(self, entity: str, skip: set[str]) -> str | None:
+        """Epic 29: a video or audio field comes first (the record is the media), else the first image."""
+        played = next((n for n in self.fields[entity] if n not in skip and self.kind(entity, n) in MEDIA_TYPES), None)
+        return played or self.first_image(entity, skip)
 
     def status(self, entity: str, wanted: str | None) -> str | None:
         """A board's column field: the named enum, else one with a status flow, else one called status."""
@@ -161,8 +180,12 @@ class _Data:
         if name not in self.fields[entity] or name in HIDDEN:
             return "no such field"
         kind = self.kind(entity, name)
-        if role in ("media", "avatar") and not self.image(entity, name):
+        if role == "media" and not self.media(entity, name):
+            return f"a {kind} field is not an image, a video or an audio file"
+        if role == "avatar" and not self.image(entity, name):
             return f"a {kind} field is not an image"
+        if role == "duration" and not self.duration(entity, name):
+            return f"a {kind} field is not a duration"
         if role in ("stat", "price") and kind not in NUMERIC:
             return f"a {kind} field is not a number"
         if role == "title" and kind not in ("string", "text") and name not in self.references.get(entity, {}):
@@ -226,9 +249,14 @@ class _Completion:
             if kept:
                 out[role] = kept[:MAX_META] if role == "meta" else kept[0]
         if "media" not in out:
-            image = self.data.first_image(entity, set(used))
+            image = self.data.first_media(entity, set(used))
             if image:
                 out["media"] = image
+                used[image] = "media"
+        if "duration" not in out and self.data.kind(entity, out.get("media")) in MEDIA_TYPES:
+            duration = self.data.first_duration(entity, set(used) | {out["media"]})
+            if duration and self.data.kind(entity, duration) in NUMERIC:
+                out["duration"] = duration
         return out
 
     def entity(self, entity: str, raw: dict[str, Any], default_view: str) -> dict[str, Any]:
@@ -263,6 +291,8 @@ class _Completion:
         if detail == "media" and "media" not in roles:
             self.note(f"{entity}: a media detail needs an image field; the record detail used")
             detail = "record"
+        if detail is None and self.data.kind(entity, roles.get("media")) == "video":
+            detail = "media"  # Epic 29 (Story 29.5): a video record opens on its player
         if detail == "profile" and "avatar" not in roles and "media" not in roles:
             self.note(f"{entity}: a profile needs an image field; the record detail used")
             detail = "record"
@@ -283,7 +313,7 @@ class _Completion:
     def default_view(self, entity: str, main: str | None, archetype: str) -> str:
         if entity == main:
             return ARCHETYPES[archetype]["view"]
-        if self.data.first_image(entity, set()):
+        if self.data.first_media(entity, set()):
             return "cards"
         return "table"
 

@@ -336,7 +336,10 @@
             "enum",
             "json",
             "file",
-            "image"
+            "image",
+            "video",
+            "audio",
+            "subtitles"
           ],
           "title": "Type",
           "type": "string"

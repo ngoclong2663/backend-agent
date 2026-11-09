@@ -67,7 +67,7 @@ type Entity = {
 
 type FieldDef = {
   name: string;
-  type: "uuid" | "string" | "text" | "integer" | "float" | "decimal" | "boolean" | "date" | "datetime" | "enum" | "json" | "file" | "image";
+  type: "uuid" | "string" | "text" | "integer" | "float" | "decimal" | "boolean" | "date" | "datetime" | "enum" | "json" | "file" | "image" | "video" | "audio" | "subtitles";
   primary?: boolean;
   required?: boolean;
   nullable?: boolean | null;

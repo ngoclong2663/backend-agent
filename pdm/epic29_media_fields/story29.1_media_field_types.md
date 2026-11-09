@@ -36,10 +36,10 @@ images, with sensible types and sizes, so that uploads of media work without me 
 
 ## Acceptance criteria
 
-- [ ] A BackendSpec with `video`, `audio` and `subtitles` fields validates, generates and passes the smoke check.
-- [ ] Uploads of a refused type or a too-large file get the plugin's 422 codes, per kind.
-- [ ] The contract lists the subtitle tracks of each media field in both shapes.
-- [ ] Specs without the new types generate byte-identical code (backend golden tests).
+- [x] A BackendSpec with `video`, `audio` and `subtitles` fields validates, generates and passes the smoke check.
+- [x] Uploads of a refused type or a too-large file get the plugin's 422 codes, per kind.
+- [x] The contract lists the subtitle tracks of each media field in both shapes.
+- [x] Specs without the new types generate byte-identical code (backend golden tests).
 
 ## Verify
 
@@ -48,3 +48,17 @@ images, with sensible types and sizes, so that uploads of media work without me 
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `backend_spec/media.py` holds the kinds (`FILE_KINDS`, `MEDIA_KINDS`), the playable types per
+kind (D2: MP4 / WebM; MPEG, MP4, OGG, WAV, WebM audio; WebVTT and SubRip), the default sizes (D7: 200 MB video, 50 MB
+audio, 1 MB subtitles), the samples' names and `media_tracks` (D3). `FieldType` gains the three types; the validator
+lets `accept` / `maxSize` on every file kind and refuses an `accept` entry outside the kind's playable set with the
+allowed list as the hint. The planner's `MEDIA_KINDS` table gives `column.file` its kind, types and size. The storage
+plugin applies to every file kind, uses the kind's sample type for the presign scenarios, the smoke objects and the
+generated tests (`sample_content_type`), stands in `.mp4` / `.mp3` / `.vtt` keys for outside links, and writes
+`x-bga.storage.tracks` (`Entity.field` → tracks, `shape: field` or `shape: child` with the foreign key, language and
+label fields). The S3 adapter's read URLs carry `ResponseContentType` from the key's extension (range requests are
+S3's own; checked on the live preview in 29.6 rather than by a sandbox test). The committed schema and digests were
+regenerated. Tests: `tests/test_media_fields.py` (validation and defaults, the refused type, the plugin's types per
+kind, tracks in both shapes and a child without a language); the storage, contract, planner and golden suites pass
+unchanged. The smoke check on a generated media backend is part of 29.6's real run.

@@ -35,7 +35,10 @@ APPS = [
     "plant-shop",
     "event-tickets",
     "workshop-bookings",
+    "media-library",  # Epic 29: the synthetic media app (video lessons, caption tracks, a podcast)
 ]
+# Hand-written examples (no recorded draft, no cost): Epic 22's every-plugin app and Epic 29's media app
+HAND_WRITTEN = ("workshop-bookings", "media-library")
 
 
 def golden_app(name: str, locale: str | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:

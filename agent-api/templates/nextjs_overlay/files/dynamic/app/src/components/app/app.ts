@@ -82,7 +82,10 @@ export type TFieldType =
   | "list"
   | "object"
   | "image"
-  | "file";
+  | "file"
+  | "video"
+  | "audio"
+  | "subtitles";
 
 export type TAppEntity = {
   label: string;
@@ -94,6 +97,8 @@ export type TAppEntity = {
   fieldLabels: Record<string, string>;
   help: Record<string, string>;
   fields: Record<string, { type: TFieldType; values?: string[]; urlField?: string }>;
+  /** Epic 29 (D3): a media field's subtitle tracks: the record's own `subtitles` fields, or a child entity's records. */
+  tracks?: Record<string, TTrackSpec[]>;
   references: Record<string, { summary: string; entity: string; href?: string | null }>;
   detail?: string | null;
   list?: string | null;
@@ -101,6 +106,16 @@ export type TAppEntity = {
   listOperation?: string | null;
   /** Story 23.9: `roles` (and signed-out callers) see only the records where `where` holds; the backend decides. */
   visibility?: { roles: string[]; where: Record<string, unknown> };
+};
+
+export type TTrackSpec = {
+  shape: "field" | "child";
+  entity: string;
+  field: string;
+  parent?: string;
+  language?: string | null;
+  label?: string | null;
+  listOperation?: string | null;
 };
 
 export type TFormField = {
@@ -131,7 +146,7 @@ export type TFormField = {
     pageSize?: number;
   };
   /** Story 22.7: a file or image uploaded through the storage plugin's presigned URL; the form sends its key. */
-  upload?: { presign: string; entity: string; field: string; kind?: "file" | "image"; accept?: string[]; maxSize?: number };
+  upload?: { presign: string; entity: string; field: string; kind?: "file" | "image" | "video" | "audio" | "subtitles"; accept?: string[]; maxSize?: number };
   /** Story 22.7: an enum limited to the states the record may move to (`transition:<STATE>` in `allowedActions`). */
   transition?: boolean;
 };
@@ -174,6 +189,8 @@ export type TFieldRoles = {
   stat?: string;
   price?: string;
   avatar?: string;
+  /** Epic 29: a number of seconds (or a `video` / `audio` field's own length), shown as m:ss on cards. */
+  duration?: string;
 };
 
 export type TListView = "table" | "cards" | "media-grid" | "feed" | "board" | "calendar";
@@ -234,6 +251,8 @@ export type TApp = {
   workflows?: TWorkflows | null;
   /** Epic 27: seeded stock photos by URL and who took them (shown with the photo). */
   photoCredits?: Record<string, TPhotoCredit>;
+  /** Epic 29: which media kinds the app has (the shell adds the listening bar for audio). */
+  media?: { video: boolean; audio: boolean; subtitles: boolean };
 };
 
 /** Story 26.4: one step of a workflow tour: who does it, where, and the action that performs it. Epic 28: its

@@ -158,6 +158,7 @@ type AppFieldRoles = {
   stat?: string | null;
   price?: string | null;
   avatar?: string | null;
+  duration?: string | null;
 };
 
 type AppHighlight = {

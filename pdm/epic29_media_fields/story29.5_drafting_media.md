@@ -28,7 +28,7 @@ become media fields with the right roles, so that I never have to name field typ
 
 - [ ] Drafts of requirements that mention recordings, videos or captions get media field types, roles and views,
       without the user naming them.
-- [ ] Drafts without media are unchanged.
+- [x] Drafts without media are unchanged.
 
 ## Verify
 
@@ -37,3 +37,14 @@ become media fields with the right roles, so that I never have to name field typ
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** The answer schema lists the three types by itself (it is built from `FieldType`); `draft_app@v6`
+adds one bullet: a file people watch is `video`, listen to `audio`, read along `subtitles`, the playable types, a child
+entity with a `language` field for several languages, a poster image and a `durationSeconds` the upload fills.
+`drafting/app.fix_media_fields` (in `fix_backend_defaults`, no model call): a `file` field whose `accept` entries all
+fall in one kind's playable set, or whose name says so (video, clip, trailer; audio, recording, podcast, episode;
+subtitles, captions, transcript), becomes that type with one note; a `<kind>/*` accept is dropped (the kind's set
+applies); a video entity without an image field gets a note (the first frame is the poster). The design brief's
+defaults (29.4) give a video `media` role the `media` detail view and the same card views images get. Tests:
+`tests/test_media_drafting.py`; the prompt snapshots (`draft_app.v6*.md`, and v3–v5 refreshed for the outline
+digest's new `duration` role). The first acceptance criterion (real drafts) is checked in 29.6.

@@ -5,6 +5,26 @@ from botocore.exceptions import ClientError
 
 from .object_storage import IObjectStorage, StoredObject
 
+# Epic 29 (Story 29.1): the type a read URL answers with, by the key's extension, so players and subtitle tracks load
+CONTENT_TYPES = {
+    "mp4": "video/mp4",
+    "m4v": "video/mp4",
+    "webm": "video/webm",
+    "mp3": "audio/mpeg",
+    "m4a": "audio/mp4",
+    "ogg": "audio/ogg",
+    "oga": "audio/ogg",
+    "wav": "audio/wav",
+    "vtt": "text/vtt",
+    "srt": "application/x-subrip",
+    "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "webp": "image/webp",
+    "gif": "image/gif",
+    "pdf": "application/pdf",
+}
+
 
 class S3ObjectStorage(IObjectStorage):
     """boto3 against S3, or any S3-compatible server (`STORAGE_ENDPOINT`; empty: AWS). URLs for a browser are signed
@@ -39,7 +59,11 @@ class S3ObjectStorage(IObjectStorage):
         return self.public.generate_presigned_url("put_object", Params=params, ExpiresIn=expires_in)
 
     def signed_url(self, key: str, expires_in: int) -> str:
-        params = {"Bucket": self.bucket, "Key": key}
+        params: dict[str, str] = {"Bucket": self.bucket, "Key": key}
+        # Epic 29: a player needs the file's own type (and range requests, which S3 answers for GETs)
+        content_type = CONTENT_TYPES.get(key.rsplit(".", 1)[-1].lower()) if "." in key else None
+        if content_type:
+            params["ResponseContentType"] = content_type
         return self.public.generate_presigned_url("get_object", Params=params, ExpiresIn=expires_in)
 
     def stat(self, key: str) -> StoredObject | None:

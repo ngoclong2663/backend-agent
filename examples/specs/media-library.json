@@ -1,0 +1,580 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "Lesson Library",
+    "description": "Epic 29: a synthetic media app: courses of video lessons with subtitle tracks in two languages, and a podcast of audio episodes. Hand-written (no recorded draft); the media design checks and the kit's tests build it."
+  },
+  "stack": {
+    "framework": "fastapi",
+    "database": "postgresql",
+    "orm": "sqlalchemy",
+    "migration": "alembic"
+  },
+  "entities": [
+    {
+      "name": "Course",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "maxLength": 120
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "maxLength": 1000
+        },
+        {
+          "name": "cover",
+          "type": "image"
+        },
+        {
+          "name": "level",
+          "type": "enum",
+          "values": [
+            "BEGINNER",
+            "INTERMEDIATE",
+            "ADVANCED"
+          ],
+          "default": "BEGINNER"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "Lesson",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "courseId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "maxLength": 120
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "maxLength": 2000
+        },
+        {
+          "name": "video",
+          "type": "video",
+          "required": true
+        },
+        {
+          "name": "poster",
+          "type": "image"
+        },
+        {
+          "name": "durationSeconds",
+          "type": "integer",
+          "min": 1
+        },
+        {
+          "name": "topic",
+          "type": "enum",
+          "values": [
+            "BASICS",
+            "TECHNIQUE",
+            "PRACTICE",
+            "THEORY"
+          ],
+          "default": "BASICS"
+        },
+        {
+          "name": "publishedAt",
+          "type": "datetime"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "Caption",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "lessonId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "language",
+          "type": "enum",
+          "values": [
+            "en",
+            "ja"
+          ],
+          "required": true
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "maxLength": 60
+        },
+        {
+          "name": "file",
+          "type": "subtitles",
+          "required": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "Episode",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "maxLength": 120
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "maxLength": 2000
+        },
+        {
+          "name": "audio",
+          "type": "audio",
+          "required": true
+        },
+        {
+          "name": "transcript",
+          "type": "subtitles"
+        },
+        {
+          "name": "durationMinutes",
+          "type": "integer",
+          "min": 1
+        },
+        {
+          "name": "series",
+          "type": "enum",
+          "values": [
+            "INTERVIEWS",
+            "LESSONS",
+            "NEWS"
+          ],
+          "default": "LESSONS"
+        },
+        {
+          "name": "publishedAt",
+          "type": "datetime"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "name": "courseLessons",
+      "type": "one-to-many",
+      "from": "Course",
+      "to": "Lesson",
+      "foreignKey": "courseId",
+      "onDelete": "CASCADE"
+    },
+    {
+      "name": "lessonCaptions",
+      "type": "one-to-many",
+      "from": "Lesson",
+      "to": "Caption",
+      "foreignKey": "lessonId",
+      "onDelete": "CASCADE"
+    }
+  ],
+  "operations": [
+    {
+      "operationId": "course.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "Course",
+      "method": "GET",
+      "path": "/courses",
+      "pagination": true,
+      "sort": [
+        "title",
+        "createdAt"
+      ],
+      "search": [
+        "title",
+        "summary"
+      ],
+      "filters": [
+        "level"
+      ]
+    },
+    {
+      "operationId": "course.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "Course",
+      "method": "GET",
+      "path": "/courses/{id}"
+    },
+    {
+      "operationId": "course.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "Course",
+      "method": "POST",
+      "path": "/courses",
+      "request": {
+        "entity": "Course",
+        "fields": [
+          "title",
+          "summary",
+          "cover",
+          "level"
+        ]
+      }
+    },
+    {
+      "operationId": "course.update",
+      "type": "crud",
+      "action": "update",
+      "entity": "Course",
+      "method": "PATCH",
+      "path": "/courses/{id}",
+      "request": {
+        "entity": "Course",
+        "fields": [
+          "title",
+          "summary",
+          "cover",
+          "level"
+        ]
+      }
+    },
+    {
+      "operationId": "course.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "Course",
+      "method": "DELETE",
+      "path": "/courses/{id}"
+    },
+    {
+      "operationId": "lesson.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "Lesson",
+      "method": "GET",
+      "path": "/lessons",
+      "pagination": true,
+      "sort": [
+        "title",
+        "publishedAt",
+        "durationSeconds"
+      ],
+      "search": [
+        "title",
+        "description"
+      ],
+      "filters": [
+        "courseId",
+        "topic"
+      ]
+    },
+    {
+      "operationId": "lesson.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "Lesson",
+      "method": "GET",
+      "path": "/lessons/{id}"
+    },
+    {
+      "operationId": "lesson.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "Lesson",
+      "method": "POST",
+      "path": "/lessons",
+      "request": {
+        "entity": "Lesson",
+        "fields": [
+          "courseId",
+          "title",
+          "description",
+          "video",
+          "poster",
+          "durationSeconds",
+          "topic",
+          "publishedAt"
+        ]
+      }
+    },
+    {
+      "operationId": "lesson.update",
+      "type": "crud",
+      "action": "update",
+      "entity": "Lesson",
+      "method": "PATCH",
+      "path": "/lessons/{id}",
+      "request": {
+        "entity": "Lesson",
+        "fields": [
+          "title",
+          "description",
+          "video",
+          "poster",
+          "durationSeconds",
+          "topic",
+          "publishedAt"
+        ]
+      }
+    },
+    {
+      "operationId": "lesson.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "Lesson",
+      "method": "DELETE",
+      "path": "/lessons/{id}"
+    },
+    {
+      "operationId": "caption.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "Caption",
+      "method": "GET",
+      "path": "/captions",
+      "pagination": true,
+      "filters": [
+        "lessonId",
+        "language"
+      ]
+    },
+    {
+      "operationId": "caption.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "Caption",
+      "method": "GET",
+      "path": "/captions/{id}"
+    },
+    {
+      "operationId": "caption.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "Caption",
+      "method": "POST",
+      "path": "/captions",
+      "request": {
+        "entity": "Caption",
+        "fields": [
+          "lessonId",
+          "language",
+          "label",
+          "file"
+        ]
+      }
+    },
+    {
+      "operationId": "caption.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "Caption",
+      "method": "DELETE",
+      "path": "/captions/{id}"
+    },
+    {
+      "operationId": "episode.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "Episode",
+      "method": "GET",
+      "path": "/episodes",
+      "pagination": true,
+      "sort": [
+        "title",
+        "publishedAt"
+      ],
+      "search": [
+        "title",
+        "notes"
+      ],
+      "filters": [
+        "series"
+      ]
+    },
+    {
+      "operationId": "episode.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "Episode",
+      "method": "GET",
+      "path": "/episodes/{id}"
+    },
+    {
+      "operationId": "episode.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "Episode",
+      "method": "POST",
+      "path": "/episodes",
+      "request": {
+        "entity": "Episode",
+        "fields": [
+          "title",
+          "notes",
+          "audio",
+          "transcript",
+          "durationMinutes",
+          "series",
+          "publishedAt"
+        ]
+      }
+    },
+    {
+      "operationId": "episode.update",
+      "type": "crud",
+      "action": "update",
+      "entity": "Episode",
+      "method": "PATCH",
+      "path": "/episodes/{id}",
+      "request": {
+        "entity": "Episode",
+        "fields": [
+          "title",
+          "notes",
+          "audio",
+          "transcript",
+          "durationMinutes",
+          "series",
+          "publishedAt"
+        ]
+      }
+    },
+    {
+      "operationId": "episode.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "Episode",
+      "method": "DELETE",
+      "path": "/episodes/{id}"
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Course",
+      "records": [
+        {
+          "id": "11111111-1111-4111-8111-111111111111",
+          "title": "Watercolour foundations",
+          "summary": "Twelve short lessons on washes, brushes and paper.",
+          "level": "BEGINNER"
+        },
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "title": "Portraits in ink",
+          "summary": "Line, value and likeness.",
+          "level": "INTERMEDIATE"
+        }
+      ]
+    },
+    {
+      "entity": "Lesson",
+      "records": [
+        {
+          "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "courseId": "11111111-1111-4111-8111-111111111111",
+          "title": "Flat washes",
+          "description": "Mixing enough paint and keeping the bead moving.",
+          "durationSeconds": 372,
+          "topic": "TECHNIQUE",
+          "publishedAt": "2026-01-10T09:00:00Z",
+          "video": "lesson/video/shared/seed/1.mp4"
+        },
+        {
+          "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+          "courseId": "11111111-1111-4111-8111-111111111111",
+          "title": "Choosing paper",
+          "description": "Cold press, hot press and weight.",
+          "durationSeconds": 215,
+          "topic": "BASICS",
+          "publishedAt": "2026-01-12T09:00:00Z",
+          "video": "lesson/video/shared/seed/2.mp4"
+        },
+        {
+          "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+          "courseId": "22222222-2222-4222-8222-222222222222",
+          "title": "Seeing values",
+          "description": "Squinting, three values, then five.",
+          "durationSeconds": 540,
+          "topic": "THEORY",
+          "publishedAt": "2026-01-20T09:00:00Z",
+          "video": "lesson/video/shared/seed/3.mp4"
+        }
+      ]
+    },
+    {
+      "entity": "Episode",
+      "records": [
+        {
+          "title": "Why paper matters",
+          "notes": "A conversation with a paper maker.",
+          "durationMinutes": 34,
+          "series": "INTERVIEWS",
+          "publishedAt": "2026-02-01T08:00:00Z",
+          "audio": "episode/audio/shared/seed/1.mp3"
+        },
+        {
+          "title": "Studio habits",
+          "notes": "Five habits that keep you painting.",
+          "durationMinutes": 21,
+          "series": "LESSONS",
+          "publishedAt": "2026-02-08T08:00:00Z",
+          "audio": "episode/audio/shared/seed/2.mp3"
+        }
+      ]
+    }
+  ]
+}

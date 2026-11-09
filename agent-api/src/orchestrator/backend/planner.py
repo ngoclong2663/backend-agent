@@ -11,6 +11,7 @@ import json
 import re
 from typing import Any
 
+from src.modules.shared.domain.backend_spec import media
 from src.modules.shared.domain.backend_spec.naming import pluralize, py_name, to_pascal, to_snake
 
 from ..plugins import active_plugins, extended_spec
@@ -36,13 +37,19 @@ TYPE_MAP: dict[str, tuple[str, str]] = {
     "datetime": ("datetime.datetime", "DateTime(timezone=True)"),
     "enum": ("<enum>", "Enum"),
     "json": ("Any", "JSONB"),
-    # Story 10.5: an uploaded object's key (the planner makes these `string` columns that carry `file`)
+    # Story 10.5: an uploaded object's key (the planner makes these `string` columns that carry `file`); Epic 29:
+    # the media kinds are file fields too
     "file": ("str", "VARCHAR(512)"),
     "image": ("str", "VARCHAR(512)"),
+    "video": ("str", "VARCHAR(512)"),
+    "audio": ("str", "VARCHAR(512)"),
+    "subtitles": ("str", "VARCHAR(512)"),
 }
-IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"]
-MAX_FILE_SIZE = 10 * 1024 * 1024
-MAX_IMAGE_SIZE = 5 * 1024 * 1024
+IMAGE_TYPES = media.IMAGE_TYPES
+MAX_FILE_SIZE = media.DEFAULT_MAX_SIZE["file"]
+MAX_IMAGE_SIZE = media.DEFAULT_MAX_SIZE["image"]
+# Epic 29 (Story 29.1): one table of defaults per file kind: the types browsers play and the largest size
+MEDIA_KINDS = {kind: (media.default_accept(kind), media.default_max_size(kind)) for kind in media.FILE_KINDS}
 
 
 def handler_name(operation_id: str, list_action: bool = False) -> str:
@@ -87,13 +94,13 @@ def _column(entity: dict[str, Any], field: dict[str, Any]) -> dict[str, Any]:
             "values": list(field.get("values") or []),
             "module": f"{ENTITIES_PKG}/{to_snake(entity['name'])}_entity.py",
         }
-    if field["type"] in ("file", "image"):  # Story 10.5: a string column holding the object key
-        image = field["type"] == "image"
+    if field["type"] in MEDIA_KINDS:  # Story 10.5: a string column holding the object key (Epic 29: media too)
+        accept, max_size = MEDIA_KINDS[field["type"]]
         column |= {"type": "string", "maxLength": 512, "columnType": "VARCHAR(512)"}
         column["file"] = {
             "kind": field["type"],
-            "accept": list(field.get("accept") or (IMAGE_TYPES if image else [])),
-            "maxSize": field.get("maxSize") or (MAX_IMAGE_SIZE if image else MAX_FILE_SIZE),
+            "accept": list(field.get("accept") or accept),
+            "maxSize": field.get("maxSize") or max_size,
             "prefix": f"{to_snake(entity['name'])}/{attr}",  # every key of the field starts with it
         }
     if field.get("maxLength") is not None and "file" not in column:

@@ -43,3 +43,23 @@ audio to keep playing while I move around the app, so that media feel at home in
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `design.py`: the `media` role takes a video or audio field (`_Data.media`), a new `duration` role
+(a number of seconds or minutes, or the media field itself) in `ROLE_ORDER`, filled by code for media entities
+(`first_duration`), a video record's `detailView` defaults to `media`; `AppFieldRoles.duration`. Views: `Media` shows a
+video field as the compact player (poster, play badge, duration) and an audio field as a compact play button;
+`MediaGrid`, `RoleCards` and `Feed` show the `duration` role as m:ss (`durationText`). Records: the `media` detail puts
+the video player at the top; an audio field's player sits under the title. The listening bar (`ListeningBar`, a storage
+plugin slot; `listening.ts` is the one store) is mounted by `AppShell` for apps with audio (`app.json` `media.audio`),
+above the bottom tabs on phones; compact players hand their file to it, so audio keeps playing across pages. The
+synthetic media app (`examples/specs/media-library.json`, outline and requirement) joins `make app-design-report`'s
+set as a hand-written example. Tests: `test_media_fields.py` (roles and defaults on the media app and a brief with
+wrong roles, `app.json`'s tracks and media). Design check: `make design-check-app ARGS="--app
+media-library:media-library"` (result below).
+
+**Design check (2026-11-09):** `make design-check-app ARGS="--app media-library:media-library"`: 64 views (16 screens,
+375 / 1440 px, light / dark), no sideways scroll, two font families, no clipped or unlabelled form control; the media
+grid shows each lesson's first frame with the play badge and the duration, the lesson page opens on the player with
+its caption tracks under it, the podcast feed shows the compact play button. The first compact video collapsed to a
+line before the players took their card's whole box (`fill`), fixed the same day. Screenshots under
+`agent-api/.data/shots/epic29/media-library/`.

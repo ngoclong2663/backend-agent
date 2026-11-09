@@ -491,6 +491,16 @@ def _parents_first(blocks: list[dict[str, Any]], plan: dict[str, Any]) -> list[d
     return ordered
 
 
+def seed_artifact(contract: dict[str, Any], plan: dict[str, Any]) -> list[dict[str, Any]] | dict[str, Any]:
+    """`seed.json` (Epic 29): the rows, and, for an app with file fields, the seeded objects with their sample bytes,
+    so a preview's media fields play (`scripts/seed.py` uploads them). Without objects, the rows alone, as before."""
+    from .samples import storage_objects
+
+    rows = build_contract_seed(contract, plan)
+    objects = storage_objects(contract)
+    return {"rows": rows, "objects": objects} if objects else rows
+
+
 def build_contract_seed(contract: dict[str, Any], plan: dict[str, Any]) -> list[dict[str, Any]]:
     """In dynamic mode, seeds the backend preview database with `x-bga.fixtures` from the contract so the live API
     serves the exact records the frontend and its Playwright smoke tests expect."""

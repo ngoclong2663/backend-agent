@@ -31,6 +31,7 @@ import {
 import { useOperationQuery } from "./bindings";
 import { PhotoCredit } from "./PhotoCredit";
 import { FieldValue } from "./FieldValue";
+import { FileValue } from "./plugins";
 import { RowActions } from "./RecordActions";
 import { slots } from "./slots";
 import { inSentence, t } from "./messages";
@@ -62,10 +63,48 @@ function imageUrl(entity: TAppEntity | undefined, record: TRecord, field: string
   return typeof value === "string" && /^(https?:|data:|blob:|\/)/.test(value) ? value : null;
 }
 
-/** A record's image, or a placeholder in the title's colour with its initial (never a broken image). */
+/** Epic 29: `m:ss` of a record's duration role (seconds, or minutes when the field's name says so). */
+export function durationText(entity: TAppEntity | undefined, record: TRecord, roles: TFieldRoles): string {
+  const field = roles.duration;
+  if (!field) return "";
+  const kind = entity?.fields?.[field]?.type;
+  if (kind === "video" || kind === "audio") return ""; // the player reads the file's own length
+  const value = record[field];
+  if (typeof value !== "number" || !Number.isFinite(value)) return "";
+  const seconds = /min/i.test(field) ? value * 60 : value;
+  const whole = Math.max(0, Math.round(seconds));
+  const h = Math.floor(whole / 3600);
+  const m = Math.floor((whole % 3600) / 60);
+  const sec = whole % 60;
+  return h ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}` : `${m}:${String(sec).padStart(2, "0")}`;
+}
+
+/** Epic 29: whether the media role is a video or an audio field (shown through the kit's players, not as an image). */
+export function mediaKind(entity: TAppEntity | undefined, field: string | undefined): "video" | "audio" | null {
+  const kind = field ? entity?.fields?.[field]?.type : undefined;
+  return kind === "video" || kind === "audio" ? kind : null;
+}
+
+/** A record's image, or a placeholder in the title's colour with its initial (never a broken image). A video field
+ *  (Epic 29) shows its poster with a play badge and plays in place; an audio field a compact play button. */
 export function Media({ entity, record, field, title, className }: { entity?: TAppEntity; record: TRecord; field?: string; title: string; className?: string }) {
   const url = imageUrl(entity, record, field);
   const [failed, setFailed] = useState(false);
+  const kind = mediaKind(entity, field);
+  if (kind === "video" && field) {
+    return (
+      <div className={cn("relative overflow-hidden", className)} data-bga-media-card="video">
+        <FileValue entity={entity} field={field} record={record} compact fill />
+      </div>
+    );
+  }
+  if (kind === "audio" && field) {
+    return (
+      <div className={cn("relative flex items-center justify-center bg-muted", className)} data-bga-media-card="audio">
+        <FileValue entity={entity} field={field} record={record} compact fill />
+      </div>
+    );
+  }
   if (url && !failed) {
     const credit = photoCredit(url);
     if (credit) {
@@ -191,7 +230,12 @@ export function MediaGrid({ section, entity, records, design }: TViewProps) {
                   {badge}
                 </Badge>
               )}
-              {href && <Link href={href} className="absolute inset-0" aria-label={title} tabIndex={-1} />}
+              {durationText(entity, record, roles) && (
+                <span className="absolute right-2 bottom-2 rounded bg-black/70 px-1.5 py-0.5 text-xs tabular-nums text-white" data-bga-duration>
+                  {durationText(entity, record, roles)}
+                </span>
+              )}
+              {href && !mediaKind(entity, roles.media) && <Link href={href} className="absolute inset-0" aria-label={title} tabIndex={-1} />}
             </Card>
             <div className="flex gap-3">
               {roles.avatar && <Avatar entity={entity} record={record} field={roles.avatar} label={subtitle || title} />}
@@ -240,7 +284,10 @@ export function Feed({ section, entity, records, design }: TViewProps) {
               {summary && <p className="line-clamp-2 text-sm text-muted-foreground">{summary}</p>}
               {roles.media && <Media entity={entity} record={record} field={roles.media} title={title} className="aspect-[2.4/1] w-full rounded-lg" />}
               <div className="flex items-center justify-between gap-2">
-                <Figure entity={entity} record={record} field={roles.stat} />
+                <span className="flex items-center gap-3">
+                  <Figure entity={entity} record={record} field={roles.stat} />
+                  {durationText(entity, record, roles) && <span className="text-xs tabular-nums text-muted-foreground" data-bga-duration>{durationText(entity, record, roles)}</span>}
+                </span>
                 {badge && <Badge variant="outline">{badge}</Badge>}
               </div>
             </Card>
@@ -277,7 +324,10 @@ export function RoleCards({ section, entity, records, design }: TViewProps) {
                 <Meta entity={entity} record={record} roles={roles} />
                 <div className="mt-auto flex items-center justify-between gap-2 pt-2">
                   {badge ? <Badge variant="secondary">{badge}</Badge> : <span />}
-                  <Figure entity={entity} record={record} field={roles.price ?? roles.stat} />
+                  <span className="flex items-center gap-3">
+                    {durationText(entity, record, roles) && <span className="text-xs tabular-nums text-muted-foreground" data-bga-duration>{durationText(entity, record, roles)}</span>}
+                    <Figure entity={entity} record={record} field={roles.price ?? roles.stat} />
+                  </span>
                 </div>
               </div>
             </Card>

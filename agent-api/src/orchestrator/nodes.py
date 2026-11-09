@@ -20,13 +20,13 @@ from .integration.nodes import INTEGRATION_NODE_FUNCTIONS
 from .packaging import (
     MANIFEST_VERSION,
     ArtifactWriter,
-    build_contract_seed,
     build_logs_zip,
     build_manifest,
     build_report,
     build_seed,
     build_source_zip,
     report_markdown,
+    seed_artifact,
     write_frontend,
 )
 from .state import GenerationState, NodeResult, Outcome
@@ -145,7 +145,7 @@ async def write_artifacts(ctx: JobContext, state: dict[str, Any], completed: boo
                 writer.write_json("openapi.json", "openapi", openapi)
             if contract_copy(ctx).is_file():
                 contract = json.loads(contract_copy(ctx).read_text())
-                writer.write_json("seed.json", "seed", build_contract_seed(contract, plan))
+                writer.write_json("seed.json", "seed", seed_artifact(contract, plan))
             else:  # the spec's seed, and what plugins add to it (Story 10.2: demo users)
                 timestamp = generation.created_at.isoformat() if generation.created_at else "1970-01-01T00:00:00+00:00"
                 seed = build_seed(spec, plan, ctx.generation_id, timestamp)

@@ -65,12 +65,15 @@ while time.monotonic() < deadline and proc.poll() is None:
     except Exception:
         time.sleep(0.5)
 if plan.get("objects"):  # Story 10.5: the fixtures' files, so their keys exist (through the app's own storage)
+    import base64
+
     sys.path.insert(0, ".")
     from src.libs.storage import ensure_bucket, get_storage
 
     ensure_bucket()
-    for item in plan["objects"]:
-        get_storage().put(item["key"], bytes.fromhex(PNG_HEX), item["contentType"])
+    for item in plan["objects"]:  # Epic 29: a media field's sample file, else the PNG
+        data = base64.b64decode(item["data"]) if item.get("data") else bytes.fromhex(PNG_HEX)
+        get_storage().put(item["key"], data, item["contentType"])
 tokens = {}
 
 

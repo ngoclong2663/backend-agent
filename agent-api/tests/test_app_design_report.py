@@ -8,6 +8,7 @@ import pytest
 from scripts.app_design_report import (
     APPS,
     GOLDEN,
+    HAND_WRITTEN,
     app_failures,
     draft_cost,
     frame,
@@ -76,12 +77,14 @@ def test_every_golden_app_plans_from_its_recorded_draft(name):
 
 
 def test_golden_apps_have_a_requirement_a_recorded_draft_and_a_brief():
-    for name in APPS[:-1]:  # workshop bookings is Epic 22's hand-written example
+    for name in APPS:
+        if name in HAND_WRITTEN:  # Epic 22's every-plugin app, Epic 29's media app: no recorded draft
+            assert draft_cost(name) == {}
+            continue
         assert (EXAMPLES / "requirements" / f"{name}.md").read_text().startswith("# ")
         draft = draft_cost(name)
         assert draft["calls"] >= 1 and draft["costUsd"] > 0
         assert json.loads((GOLDEN / name / "design-brief.json").read_text())["mainEntity"]
-    assert draft_cost("workshop-bookings") == {}
 
 
 def test_the_markdown_lists_every_app():

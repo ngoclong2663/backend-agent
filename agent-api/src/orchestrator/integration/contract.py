@@ -20,6 +20,7 @@ import re
 import uuid
 from typing import Any
 
+from src.modules.shared.domain.backend_spec.media import SAMPLE_EXTENSION, SAMPLE_LANGUAGES, track_children
 from src.modules.shared.domain.backend_spec.naming import to_snake
 
 from ..backend.planner import build_plan
@@ -208,9 +209,12 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
         seeds.setdefault(seed["entity"], []).extend(seed["records"])
 
     records: dict[str, list[dict[str, Any]]] = {}
+    tracks = track_children(spec)  # Epic 29 (Story 29.2): a subtitle track entity gets one row per sample language
     for model in models:  # pass 1: own values and primary keys
         entity = model["entity"]
         rows = [dict(row) for row in seeds.get(entity, [])] or [{} for _ in range(SYNTHESIZED_RECORDS)]
+        if entity not in seeds and entity in tracks:
+            rows = _track_rows(model, tracks[entity])
         seeded = entity in seeds
         for index, row in enumerate(rows):
             for column in model["columns"]:
@@ -260,25 +264,44 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
                     if str(value) not in mapped:
                         mapped[str(value)] = parent_rows[len(mapped) % len(parent_rows)][pk]
                     row[name] = mapped[str(value)]
+                elif parent_rows and model["entity"] in tracks and tracks[model["entity"]].get("parent") == name:
+                    row[name] = parent_rows[0][pk]  # Epic 29: every sample track on the first media record
                 elif parent_rows:
                     row[name] = parent_rows[index % len(parent_rows)][pk]
                 else:
                     row[name] = None
     for model in models:  # Story 10.5: a file field holds an object key under its prefix, per owner when there is one
         owner = next((c["apiName"] for c in model["columns"] if c.get("source") == "currentUser"), None)
+        language = (tracks.get(model["entity"]) or {}).get("language")
         for column in (c for c in model["columns"] if c.get("file")):
-            extension = ".png" if column["file"]["kind"] == "image" else ".pdf"
+            extension = SAMPLE_EXTENSION.get(column["file"]["kind"], "pdf")  # Epic 29: the kind's sample
             for index, row in enumerate(records[model["entity"]]):
                 if column["apiName"] in seeds_given(seeds, model["entity"], index):
                     continue
                 folder = row.get(owner) if owner else "shared"
-                row[column["apiName"]] = f"{column['file']['prefix']}/{folder}/seed/{index + 1}{extension}"
+                # a subtitle track's key names its language, so the seed uploads that language's sample
+                lang = ""
+                if column["file"]["kind"] == "subtitles":
+                    lang = f".{row.get(language) if language and row.get(language) else SAMPLE_LANGUAGES[0]}"
+                row[column["apiName"]] = f"{column['file']['prefix']}/{folder}/seed/{index + 1}{lang}.{extension}"
     for model in models:  # column order, so documents diff cleanly
         order = [column["apiName"] for column in model["columns"]]
         records[model["entity"]] = [
             {name: row[name] for name in order if name in row} for row in records[model["entity"]]
         ]
     return records, set(seeds)
+
+
+def _track_rows(model: dict[str, Any], track: dict[str, Any]) -> list[dict[str, Any]]:
+    """Epic 29: the synthesized rows of a subtitle track entity: one per sample language (the language field's own
+    enum values when it has them, else the samples' languages), parents filled in pass 2."""
+    language = track.get("language")
+    column = next((c for c in model["columns"] if c["apiName"] == language), None) if language else None
+    values = list(((column or {}).get("enum") or {}).get("values") or []) if column else []
+    languages = [v for v in values if str(v).lower()[:2] in SAMPLE_LANGUAGES] or list(SAMPLE_LANGUAGES)
+    if values and not any(str(v).lower()[:2] in SAMPLE_LANGUAGES for v in values):
+        languages = values[: len(SAMPLE_LANGUAGES)]
+    return [({language: value} if language else {}) for value in languages[: len(SAMPLE_LANGUAGES)]]
 
 
 def seeds_given(seeds: dict[str, list[dict[str, Any]]], entity: str, index: int) -> set[str]:
