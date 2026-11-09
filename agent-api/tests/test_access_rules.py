@@ -439,9 +439,11 @@ def test_comments_on_a_feed_are_read_by_everyone_and_changed_by_their_author():
 def test_the_public_shapes_come_from_the_ready_patterns_of_the_drafted_areas(monkeypatch):
     from src.orchestrator.drafting.app import public_shapes
 
-    outline = {"areas": [{"id": "viewers", "design": {"archetype": "feed"}}, {"id": "studio", "design": {}}]}
-    assert public_shapes(outline, None) == frozenset(), "the feed pattern is a draft: nothing changes"
+    feed = {"areas": [{"id": "viewers", "design": {"archetype": "feed"}}, {"id": "studio", "design": {}}]}
+    assert public_shapes(feed, None) == frozenset({"contribution"}), "the feed pattern is ready (Story 32.5)"
+    shop = {"areas": [{"id": "shoppers", "design": {"archetype": "storefront"}}]}
+    assert public_shapes(shop, None) == frozenset(), "the storefront pattern is a draft: nothing changes"
     monkeypatch.setenv("BGA_DESIGN_INCLUDE_DRAFTS", "1")
-    assert public_shapes(outline, None) == frozenset({"contribution"})
+    assert public_shapes(shop, None) == frozenset({"contribution"})
     assert public_shapes({}, "feed") == frozenset({"contribution"}), "a single area takes code's hint"
     assert public_shapes({"design": {"archetype": "back-office"}}, "feed") == frozenset()

@@ -1,10 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { app, fieldLabel, recordTitle, resolveParams, type TAppSection, type TRecord, type TRouteParams } from "./app";
-import { useOperationQuery } from "./bindings";
+import { useOperationMutation, useOperationQuery } from "./bindings";
 import { designRegistry } from "./design-registry";
 import { RecordDetail } from "./details";
 import { LoadError } from "./AppList";
@@ -54,11 +55,26 @@ function Summary({ section, record }: { section: TAppSection; record: TRecord })
 /** One record (Story 22.4): its name as the page heading, its actions (only those it allows), its fields; the
  *  layout's detail-view plugin arranges them (Epic 30: `design-registry.ts`); `variant: "summary"` shows a custom
  *  operation's figures instead. */
+/** Epic 32 (Story 32.5): the section's `onOpen` operation, called once per record when it has loaded (a view counted);
+ *  a failure is silent, as a view that was not counted is no error for the person looking. */
+function useOnOpen(section: TAppSection, route: TRouteParams, record: TRecord | undefined) {
+  const onOpen = section.content?.onOpen;
+  const mutation = useOperationMutation(onOpen?.operationId);
+  const done = useRef<string | null>(null);
+  const id = record ? String(record.id ?? "") : "";
+  useEffect(() => {
+    if (!onOpen || !id || done.current === id) return;
+    done.current = id;
+    mutation.mutate({ params: resolveParams(onOpen.params, route, record), body: resolveParams(onOpen.body, route, record) });
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
 export function AppDetail({ section }: { section: TAppSection }) {
   const route = (useParams() ?? {}) as TRouteParams;
   const entity = app.entities[section.content?.entity ?? ""];
   const query = useOperationQuery(section.data?.operationId, resolveParams(section.data?.params, route));
   const record = query.data as TRecord | undefined;
+  useOnOpen(section, route, record);
   const summary = section.content?.variant === "summary";
   const design = entityDesign(useLayout(), section.content?.entity);
 

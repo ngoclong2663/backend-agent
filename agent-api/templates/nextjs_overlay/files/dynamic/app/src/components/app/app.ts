@@ -47,6 +47,8 @@ export type TAppContent = {
   groupBy?: string;
   fn?: string;
   field?: string;
+  /** Epic 32 (Story 32.5): an operation run once when the record opens (a view counted), never a button. */
+  onOpen?: { operationId: string; params?: Record<string, unknown>; body?: Record<string, unknown> };
 };
 
 /** One app section as the screen planner wrote it (Epic 22): its binding is in `data`, `form` and `content`. */

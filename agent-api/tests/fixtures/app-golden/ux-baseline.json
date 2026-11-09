@@ -1,14 +1,12 @@
 {
   "date": "2026-11-09",
   "summary": {
-    "failures": 41,
+    "failures": 29,
     "byCheck": {
       "add-to-cart-on-product": 1,
-      "contribution-on-record": 3,
       "contributions-readable": 1,
-      "no-dashboard": 10,
-      "no-edit-others": 3,
-      "no-own-interaction-menu": 4,
+      "no-dashboard": 7,
+      "no-own-interaction-menu": 1,
       "no-table": 19
     }
   },
@@ -141,12 +139,7 @@
     "tiktok-likes/viewers": {
       "archetype": "feed",
       "kind": "feed",
-      "failed": [
-        "contribution-on-record",
-        "no-dashboard",
-        "no-edit-others",
-        "no-own-interaction-menu"
-      ],
+      "failed": [],
       "task": {
         "operationId": "like.create",
         "clicks": 1
@@ -155,12 +148,7 @@
     "tiktok-feed-sessions/viewer-area": {
       "archetype": "feed",
       "kind": "feed",
-      "failed": [
-        "contribution-on-record",
-        "no-dashboard",
-        "no-edit-others",
-        "no-own-interaction-menu"
-      ],
+      "failed": [],
       "task": {
         "operationId": "interaction.create",
         "clicks": 1
@@ -182,11 +170,7 @@
       "archetype": "feed",
       "kind": "feed",
       "failed": [
-        "contribution-on-record",
-        "contributions-readable",
-        "no-dashboard",
-        "no-edit-others",
-        "no-own-interaction-menu"
+        "contributions-readable"
       ],
       "task": {
         "operationId": "interaction.like",

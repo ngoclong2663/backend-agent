@@ -47,13 +47,14 @@ def test_a_pattern_descriptor_places_every_shape_and_serves_one_archetype():
         )
 
 
-def test_the_registry_ships_back_office_ready_and_the_first_patterns_as_drafts():
+def test_the_registry_ships_back_office_and_feed_ready_and_storefront_as_a_draft():
     patterns = registry().plugins["pattern"]
     assert patterns["back-office"].status == "ready"
     assert patterns["back-office"].menu == ["every"] and set(patterns["back-office"].children.values()) == {"tab"}
-    for name in ("feed", "storefront"):  # ready in Stories 32.5 and 32.6
-        assert patterns[name].status == "draft"
-    assert area_pattern("feed").name == "back-office", "a draft pattern is never followed"
+    assert patterns["feed"].status == "ready", "Story 32.5"
+    assert patterns["storefront"].status == "draft", "ready in Story 32.6"
+    assert area_pattern("feed").name == "feed"
+    assert area_pattern("storefront").name == "back-office", "a draft pattern is never followed"
     assert area_pattern("workspace").name == "back-office", "an archetype without a pattern"
 
 
@@ -67,7 +68,7 @@ def test_staff_who_manage_the_main_entity_are_a_back_office_whatever_the_look():
     assert {v["kind"] for v in area_patterns(spec, contract).values()} == {"back-office"}
     spec, _, contract = golden_app("news-feed")  # members and editors in one area: members do not manage posts
     assert manages(contract, "Post", ["editor"]) and not manages(contract, "Post", ["member", "editor"])
-    assert area_patterns(spec, contract) == {"app": {"kind": "feed", "pattern": "back-office"}}
+    assert area_patterns(spec, contract) == {"app": {"kind": "feed", "pattern": "back-office"}}, "a mixed area"
 
 
 def test_an_area_without_an_archetype_or_a_main_entity_is_a_back_office():

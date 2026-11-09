@@ -1,7 +1,7 @@
 {
   "kind": "pattern",
   "name": "feed",
-  "status": "draft",
+  "status": "ready",
   "label": "Feed",
   "choose": "People scroll posts or clips, react and comment on what they look at, open who posted it, and find their own activity under one entry.",
   "archetypes": ["feed"],

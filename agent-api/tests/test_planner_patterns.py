@@ -3,6 +3,7 @@ switch for the checks (`BGA_DESIGN_INCLUDE_DRAFTS=1`, listed in docs/development
 and mixed areas (consumers and staff in one area) plan exactly as without it."""
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -111,3 +112,34 @@ def test_a_feed_drafted_end_to_end_reads_everyones_comments(drafts):
     area = ux_checks(screens.spec, extended, contract)[0]
     assert area["kind"] == "feed" and area["failed"] == [], area["failed"]
     assert area["task"] == {"operationId": "like.create", "clicks": 1}
+
+
+def test_a_view_is_counted_when_the_record_opens_not_by_a_button(drafts):
+    """Story 32.5: the recorded draft's `video.view` (a record action with nothing to fill in, named like a view) runs
+    once when the video opens (`onOpen`, covered); it is no button on the cards or the page."""
+    spec, backend, contract = recorded_app("tiktok-likes")
+    _valid(spec, backend, contract)
+    record = next(page for page in spec["pages"] if page["route"] == "/viewers/videos/[id]")
+    detail = next(s for s in record["sections"] if s["component"] == "AppDetail")
+    assert detail["content"]["onOpen"] == {"operationId": "video.view", "params": {"id": "$route.id"}}
+    every = [a.get("operationId") for page in _area(spec, "/viewers") for a in _actions(page)]
+    assert "video.view" not in every
+
+
+def test_a_back_office_keeps_a_view_action_as_a_button():
+    """The same recorded draft with its viewers' area drafted as a back-office: `video.view` stays a button."""
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.frontend.app.screens import _name_words
+    from tests.test_app_screens import _plan
+
+    assert _name_words("VideoView") == {"video", "view"}
+    folder = Path(__file__).parent / "fixtures" / "drafts" / "tiktok-likes"
+    backend = validate_spec_data(json.loads((folder / "backend-spec.json").read_text())).normalized
+    outline = json.loads((folder / "app-outline.json").read_text())
+    for area in outline["areas"]:
+        area.setdefault("design", {})["archetype"] = "back-office"
+    _, _, _, screens = _plan(backend, outline)
+    assert not [s for page in screens.spec["pages"] for s in page["sections"] if (s.get("content") or {}).get("onOpen")]
+    assert any(a.get("operationId") == "video.view" for page in screens.spec["pages"] for a in _actions(page)), (
+        "a button in a back-office"
+    )

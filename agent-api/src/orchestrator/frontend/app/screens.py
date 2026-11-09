@@ -35,6 +35,18 @@ from .outline import humanize
 
 SPEC_VERSION = "1.0"
 # The planner's own words (Story 23.8): (English, Japanese); `{x}` is a label, lowercased in English.
+# Epic 32 (Story 32.5): actions that record a person opening a record (a view counted, a watch logged); in a consumer
+# pattern they run once when the record opens, never as a button
+OPEN_WORDS = frozenset(
+    {"view", "views", "watch", "watched", "play", "plays", "open", "opened", "read", "visit", "visited"}
+)
+
+
+def _name_words(name: str) -> set[str]:
+    """`VideoView` → {"video", "view"}."""
+    return {word.lower() for word in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])", name)}
+
+
 WORDS = {
     "view": ("View", "表示"),
     "edit": ("Edit", "編集"),
@@ -461,6 +473,24 @@ class _Screens:
             return False
         return (self.pattern.children or {}).get(shape) in ("inline", "sheet")
 
+    def on_open(self, entity: str) -> dict[str, Any] | None:
+        """In a consumer area, what runs once when a record of the entity opens: its own action named like a view
+        (`video.view`, `video.watch`) with nothing to fill in, else a child view created with nothing to fill in
+        (`VideoView`); None in a back-office, where such an action stays a button."""
+        if not self.consumer:
+            return None
+        for op_id in self.custom[entity]:
+            found = self.operations[op_id]
+            verb = op_id.split(".", 1)[-1].lower()
+            if found["method"] == "GET" or self.path_params(op_id) != ["id"] or verb not in OPEN_WORDS:
+                continue
+            if not self.request(op_id)[0]:
+                return {"operationId": op_id, "params": {"id": "$route.id"}}
+        for child, found in self.on_parent_children(entity):
+            if found["form"] is None and _name_words(child) & OPEN_WORDS:
+                return {"operationId": self.crud[child]["create"], "body": {found["parent"]["field"]: "$route.id"}}
+        return None
+
     def others(self, entity: str) -> bool:
         """Records these people never create, in an area that never edits other people's records (`edit-others`)."""
         return self.never("edit-others") and "create" not in self.crud[entity]
@@ -833,8 +863,12 @@ class _Screens:
                     "params": {"id": record},
                 }
             )
+        opened = (self.on_open(entity) or {}).get("operationId")
         for child, found in self.on_parent_children(entity):  # a like with one click; a comment in a dialog (Epic 32)
             op_id, parent = self.crud[child]["create"], found["parent"]
+            if op_id == opened:
+                self.place(op_id)
+                continue  # a view is counted when the record opens
             done = {"toast": self.w("created", self.label(child), lower=False)}
             if found["form"] is None:
                 actions.append(
@@ -874,6 +908,9 @@ class _Screens:
             found = self.operations[op_id]
             if found["method"] == "GET" or self.path_params(op_id) != ["id"] or self.required_query(op_id):
                 continue
+            if op_id == opened:
+                self.place(op_id)
+                continue  # Epic 32: run when the record opens, not a button
             if (
                 self.others(entity)
                 and ((found["operation"].get("x-bga") or {}).get("policy") or {}).get("type") == "ownership"
@@ -1144,6 +1181,7 @@ class _Screens:
                     "entity": entity,
                     "title": label,
                     "actions": self.record_actions(entity, "$route.id", detail=True),
+                    **({"onOpen": opened} if (opened := self.on_open(entity)) else {}),
                 },
             }
         ]

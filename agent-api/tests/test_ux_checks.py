@@ -90,22 +90,27 @@ def test_the_click_count_of_the_main_task():
 
 
 def test_back_office_areas_pass_and_the_recorded_viewers_met_what_the_user_reported():
-    """The checks find what the user met on 2026-11-09 in the recorded TikTok-like drafts (a dashboard, an edit route
-    for other people's videos, a table of their own likes, comments written on a page of their own and readable by
-    their author alone), and nothing in any back-office area."""
-    results = ux_report(APPS, RECORDED_APPS)["areas"]
-    for key, area in results.items():
-        if area["archetype"] == "back-office":
-            assert area["failed"] == [], (key, area["failed"])
-    viewers = {f["check"] for f in results["tiktok-viewer-ids/viewers"]["failed"]}
-    assert viewers >= {
+    """Before the patterns (`ux-before.json`, Story 32.1), the checks found what the user met on 2026-11-09 in the
+    recorded TikTok-like drafts (a dashboard, an edit route for other people's videos, a table of their own likes,
+    comments on a page of their own and readable by their author alone) and nothing in any back-office area. With
+    the feed pattern ready (Story 32.5) those viewers pass; one draft was secured before 32.4, so its comments are
+    still private in the recorded spec."""
+    before = json.loads((GOLDEN / "ux-before.json").read_text())["areas"]
+    assert set(before["tiktok-viewer-ids/viewers"]["failed"]) >= {
         "no-dashboard",
         "no-edit-others",
         "no-own-interaction-menu",
         "contribution-on-record",
         "contributions-readable",
     }
-    assert results["plant-shop/storefront"]["task"] == {"operationId": "cartItem.create", "clicks": 3}
+    results = ux_report(APPS, RECORDED_APPS)["areas"]
+    for key, area in results.items():
+        if area["kind"] == "back-office":
+            assert area["failed"] == [], (key, area["failed"])
+    assert results["tiktok-likes/viewers"]["failed"] == []
+    assert results["tiktok-feed-sessions/viewer-area"]["failed"] == []
+    assert {f["check"] for f in results["tiktok-viewer-ids/viewers"]["failed"]} == {"contributions-readable"}
+    assert results["plant-shop/storefront"]["task"] == {"operationId": "cartItem.create", "clicks": 3}, "a draft"
 
 
 def test_the_committed_baseline_is_the_reports_output():

@@ -1,0 +1,197 @@
+{
+  "date": "2026-11-09",
+  "summary": {
+    "failures": 41,
+    "byCheck": {
+      "add-to-cart-on-product": 1,
+      "contribution-on-record": 3,
+      "contributions-readable": 1,
+      "no-dashboard": 10,
+      "no-edit-others": 3,
+      "no-own-interaction-menu": 4,
+      "no-table": 19
+    }
+  },
+  "areas": {
+    "news-feed/app": {
+      "archetype": "feed",
+      "kind": "feed",
+      "failed": [
+        "no-own-interaction-menu",
+        "no-table"
+      ],
+      "task": {
+        "operationId": "bookmark.create",
+        "clicks": 1
+      }
+    },
+    "video-library/app": {
+      "archetype": "catalogue",
+      "kind": "catalogue",
+      "failed": [
+        "no-dashboard",
+        "no-table"
+      ],
+      "task": null
+    },
+    "learning-platform/app": {
+      "archetype": "learning",
+      "kind": "learning",
+      "failed": [
+        "no-dashboard",
+        "no-table"
+      ],
+      "task": null
+    },
+    "agency-projects/app": {
+      "archetype": "back-office",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "clinic-bookings/patient": {
+      "archetype": "booking",
+      "kind": "booking",
+      "failed": [
+        "no-dashboard",
+        "no-table"
+      ],
+      "task": null
+    },
+    "clinic-bookings/front-desk": {
+      "archetype": "booking",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "plant-shop/storefront": {
+      "archetype": "storefront",
+      "kind": "storefront",
+      "failed": [
+        "add-to-cart-on-product",
+        "no-dashboard",
+        "no-table"
+      ],
+      "task": {
+        "operationId": "cartItem.create",
+        "clicks": 3
+      }
+    },
+    "plant-shop/management": {
+      "archetype": "back-office",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "event-tickets/attendees": {
+      "archetype": "booking",
+      "kind": "booking",
+      "failed": [
+        "no-dashboard"
+      ],
+      "task": null
+    },
+    "event-tickets/organizers": {
+      "archetype": "back-office",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "workshop-bookings/app": {
+      "archetype": "back-office",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "media-library/app": {
+      "archetype": "catalogue",
+      "kind": "catalogue",
+      "failed": [
+        "no-table"
+      ],
+      "task": null
+    },
+    "ember-kitchen/learners": {
+      "archetype": "learning",
+      "kind": "learning",
+      "failed": [
+        "no-dashboard",
+        "no-table"
+      ],
+      "task": null
+    },
+    "ember-kitchen/instructors": {
+      "archetype": "back-office",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "lantern-audio/app": {
+      "archetype": "catalogue",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "tiktok-likes/creators": {
+      "archetype": "workspace",
+      "kind": "workspace",
+      "failed": [],
+      "task": null
+    },
+    "tiktok-likes/viewers": {
+      "archetype": "feed",
+      "kind": "feed",
+      "failed": [
+        "contribution-on-record",
+        "no-dashboard",
+        "no-edit-others",
+        "no-own-interaction-menu"
+      ],
+      "task": {
+        "operationId": "like.create",
+        "clicks": 1
+      }
+    },
+    "tiktok-feed-sessions/viewer-area": {
+      "archetype": "feed",
+      "kind": "feed",
+      "failed": [
+        "contribution-on-record",
+        "no-dashboard",
+        "no-edit-others",
+        "no-own-interaction-menu"
+      ],
+      "task": {
+        "operationId": "interaction.create",
+        "clicks": 1
+      }
+    },
+    "tiktok-feed-sessions/creator-area": {
+      "archetype": "workspace",
+      "kind": "workspace",
+      "failed": [],
+      "task": null
+    },
+    "tiktok-viewer-ids/creators": {
+      "archetype": "workspace",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
+    },
+    "tiktok-viewer-ids/viewers": {
+      "archetype": "feed",
+      "kind": "feed",
+      "failed": [
+        "contribution-on-record",
+        "contributions-readable",
+        "no-dashboard",
+        "no-edit-others",
+        "no-own-interaction-menu"
+      ],
+      "task": {
+        "operationId": "interaction.like",
+        "clicks": 1
+      }
+    }
+  }
+}
