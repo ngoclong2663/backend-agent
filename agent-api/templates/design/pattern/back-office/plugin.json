@@ -1,0 +1,15 @@
+{
+  "kind": "pattern",
+  "name": "back-office",
+  "status": "ready",
+  "label": "Back-office",
+  "choose": "Staff manage records: every entity in the menu as a list, a form page per create and edit, a tab per child, a dashboard of figures.",
+  "archetypes": ["back-office"],
+  "menu": ["every"],
+  "children": {"interaction": "tab", "contribution": "tab", "part": "tab"},
+  "public": [],
+  "home": "dashboard",
+  "never": [],
+  "checks": ["no-unusable-page", "every-create-reachable"],
+  "order": 10
+}

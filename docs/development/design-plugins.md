@@ -43,6 +43,7 @@ them.** No model-written layout or CSS ever reaches an app.
 | `card` | the anatomy of one record in grid views (30.4) | `TCardProps` (record, roles, size) | `stacked` (today's) |
 | `recipe` | surfaces, borders, shadows, radius, headings, motion (CSS only) | none: CSS over `data-slot` | the 12 of Story 23.7 |
 | `font-pairing` | heading / body / mono fonts and the type scale (30.6) | none: the theme writes it | |
+| `pattern` | how an area's screens behave for its people: menu, where children go, public children, home, what they never get (Epic 32) | none: the screen planner reads it | |
 
 Pick the smallest kind that does the job. A new card anatomy is a `card`, not a new `list-view`; a new shadow style
 is a `recipe`, not a new card.
@@ -91,6 +92,7 @@ agent-api/templates/design/<kind>/<name>/
 | `order`, `tags` | the position in the literal and the prompt; free words other code selects by (`cards`: a list view of cards, for Story 23.11's slots) |
 | `css`, `family`, `guards`, `prefers` | recipes: the CSS file; `quiet` / `soft` / `bold`; words of products it must never be used for (health, finance, …); the card and density it looks best with (a tie-breaker, Story 30.7) |
 | `heading`, `body`, `mono`, `headingWeight`, `headingCase`, `tracking`, `ratio`, `scripts`, `recipes` | font pairings (Story 30.6): bundled fonts only (`frontend_spec/fonts.py`), the scripts it covers, the recipes it suits |
+| `menu`, `children`, `public`, `home`, `never`, `checks` | product patterns (Epic 32): the menu entries (`every`, `main`, `mine`, `cart`); a placement (`inline`, `sheet`, `tab`, `page`) for each child shape (`interaction`, `contribution`, `part`, `frontend/app/patterns.child_shapes`); the shapes public on their record; the home flow; what the area's people never get (`dashboard`, `edit-others`, `own-interaction-tables`); the UX checks it must pass (`frontend/app/ux_checks.py`). Named after its one archetype; `back-office` is the planner as it always was |
 
 ### `fixture.json`
 

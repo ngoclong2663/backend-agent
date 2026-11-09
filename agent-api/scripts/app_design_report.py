@@ -134,14 +134,14 @@ def ux_markdown(results: dict[str, Any]) -> str:
         f"{results['summary']['failures']} failures: "
         + ", ".join(f"{check} {n}" for check, n in results["summary"]["byCheck"].items()),
         "",
-        "| Area | Archetype | Main task (clicks) | Failed |",
-        "|---|---|---|---|",
+        "| Area | Archetype | Kind | Main task (clicks) | Failed |",
+        "|---|---|---|---|---|",
     ]
     for key, area in results["areas"].items():
         task = area.get("task") or {}
         clicks = f"{task.get('operationId')} ({task.get('clicks')})" if task else "—"
         failed = sorted({f["check"] for f in area["failed"]})
-        lines.append(f"| {key} | {area['archetype']} | {clicks} | {', '.join(failed) or '—'} |")
+        lines.append(f"| {key} | {area['archetype']} | {area['kind']} | {clicks} | {', '.join(failed) or '—'} |")
     return "\n".join(lines) + "\n"
 
 
@@ -153,6 +153,7 @@ def ux_baseline(results: dict[str, Any]) -> dict[str, Any]:
         "areas": {
             key: {
                 "archetype": area["archetype"],
+                "kind": area["kind"],
                 "failed": sorted({f["check"] for f in area["failed"]}),
                 "task": area.get("task"),
             }

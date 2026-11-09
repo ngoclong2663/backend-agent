@@ -14,6 +14,7 @@ from ..planner import _UI_IMPORT, FRONTEND_PLAN_VERSION, _Planner, primitive_clo
 from ..theme import _readable, build_theme, mix
 from .design import kit_design
 from .files import design_plugins_used, frontend_plugins
+from .patterns import area_patterns
 from .recipes import first_recipe
 
 KIT_ROOT = Path(__file__).resolve().parents[4] / "templates" / "nextjs_overlay" / "files" / "dynamic" / "app"
@@ -226,6 +227,7 @@ def plan_app(spec: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]:
             "plugins": frontend_plugins(contract),
             "media": has_media(contract),  # Epic 29: the sample media ship with the app
             "designPlugins": design_plugins(outline),  # Epic 30: folder design plugins to copy (D4)
+            "patterns": area_patterns(spec, contract),  # Epic 32: each area's kind and the pattern it follows
         },
         "routes": routes,
         "components": [],

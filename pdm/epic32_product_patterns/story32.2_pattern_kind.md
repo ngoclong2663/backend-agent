@@ -40,9 +40,9 @@ pattern is a folder, not edits across the planner, and today's apps stay exactly
 
 ## Acceptance criteria
 
-- [ ] `pattern` is a registry kind; `back-office`, `feed` and `storefront` descriptors exist (`feed` and `storefront`
+- [x] `pattern` is a registry kind; `back-office`, `feed` and `storefront` descriptors exist (`feed` and `storefront`
       as `draft` until 32.5 and 32.6).
-- [ ] Every golden app's screens are unchanged.
+- [x] Every golden app's screens are unchanged.
 
 ## Verify
 
@@ -51,3 +51,23 @@ pattern is a folder, not edits across the planner, and today's apps stay exactly
 ## Status
 
 Proposed 2026-11-09.
+
+**Done 2026-11-09 (with deviations).** The registry's ninth kind, `pattern` (`design_registry.py`: `MENU_ENTRIES`,
+`SHAPES`, `PLACEMENTS`, `NEVER`, `UX_CHECKS`, the descriptor's `menu` / `children` / `public` / `home` / `never` /
+`checks`, validated: every shape placed, one archetype named after the pattern, the fields refused on other kinds);
+`templates/design/pattern/back-office` (ready), `feed` and `storefront` (drafts). `frontend/app/patterns.py`: the child
+shapes from the contract alone (the parents from `x-bga.entities[].references`, the user entity left out; a child can
+have several parents), `manages`, `area_kind`, `area_pattern`, `area_patterns`; `plan.app.patterns` records each
+area's kind and pattern. The UX checks now judge each area by its kind. Every screens snapshot is unchanged; tests in
+`tests/test_product_patterns.py`.
+
+Story 32.1's finding (1) is fixed here: an area whose every role manages the main entity's records (a role policy on
+its update or delete, or a bypass that reads every record) is `back-office`. Two areas changed: the clinic's front
+desk, and Lantern Audio's only signed-in area (its one role is the producer; listeners use it signed out). The UX
+baseline went from 49 failures to 41 (`ux-baseline.json` rewritten; each area records its `kind`).
+
+Deviations: the report's fingerprint does not gain `pattern` (every area plans as `back-office` until 32.5, and the
+Epic 30 baseline's fingerprints stay comparable); the UX report shows the kind instead. `make design-plugin-check` does
+not know the `pattern` kind (a pattern has no kit file to render; its gate is the UX checks it names, run by the
+report). The child shapes live in `patterns.py`, not in `screens.py`, so the UX checks and the planner share them
+without a cycle.

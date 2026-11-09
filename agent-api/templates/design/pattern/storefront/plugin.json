@@ -1,0 +1,23 @@
+{
+  "kind": "pattern",
+  "name": "storefront",
+  "status": "draft",
+  "label": "Storefront",
+  "choose": "Shoppers browse products, add to the cart from the product, check out from the cart and read their orders.",
+  "archetypes": ["storefront"],
+  "menu": ["main", "cart", "mine"],
+  "children": {"interaction": "inline", "contribution": "inline", "part": "tab"},
+  "public": ["contribution"],
+  "home": "catalogue",
+  "never": ["dashboard", "edit-others"],
+  "checks": [
+    "no-unusable-page",
+    "no-dashboard",
+    "no-table",
+    "no-own-interaction-menu",
+    "no-edit-others",
+    "add-to-cart-on-product",
+    "cart-in-menu"
+  ],
+  "order": 30
+}

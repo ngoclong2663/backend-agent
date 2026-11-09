@@ -226,6 +226,13 @@ Agent-specific notes:
   `make design-plugin-check` (the gates: recipes, states, keyboard, contrast; `docs/development/design-plugins.md`);
   `tests/test_design_registry.py` refuses a hand-written list of plugin names. The app design report signs in per
   area and fingerprints the screens (Story 30.1; baseline `tests/fixtures/app-golden/baseline.json`).
+- Product patterns (Epic 32): how each area's screens behave, a design plugin kind `pattern`
+  (`templates/design/pattern/<archetype>/plugin.json`: menu, child placement by shape, public children, home, what the
+  area's people never get, its UX checks). `frontend/app/patterns.py`: the child shapes from the contract
+  (`interaction` / `contribution` / `part`, `owned`), the area's kind (its archetype, or `back-office` when every role
+  manages the main entity) and its pattern (`plan.app.patterns`; a draft pattern falls back to `back-office`, which is
+  the planner as it always was). `frontend/app/ux_checks.py` judges a planned app per area
+  (`make app-design-report ARGS="--ux-only [--baseline]"`; `tests/fixtures/app-golden/ux-baseline.json`).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

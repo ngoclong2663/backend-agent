@@ -10,7 +10,8 @@ from scripts.app_design_report import APPS, GOLDEN, RECORDED_APPS, golden_app, u
 from src.modules.shared.domain.backend_spec import validate_spec_data
 from src.orchestrator.backend.planner import build_plan
 from src.orchestrator.drafting.access import secure_access
-from src.orchestrator.frontend.app.ux_checks import child_shapes, ux_checks
+from src.orchestrator.frontend.app.patterns import child_shapes
+from src.orchestrator.frontend.app.ux_checks import ux_checks
 from src.orchestrator.integration.contract import build_contract
 from tests.test_access_rules import _feed_spec
 
@@ -44,11 +45,11 @@ def test_the_shapes_of_a_records_children():
     """A like has nothing to fill in (an interaction), a comment is a person's text (a contribution); both are the
     signed-in person's own; a shop's order item is a part, a cart item an interaction owned by the shopper."""
     backend, contract = _feed()
-    shapes = child_shapes(backend, contract)
+    shapes = child_shapes(contract)
     assert (shapes["Like"]["shape"], shapes["Like"]["owned"]) == ("interaction", True)
-    assert (shapes["Comment"]["shape"], shapes["Comment"]["parent"]) == ("contribution", "Video")
-    _, shop, shop_contract = golden_app("plant-shop")
-    shop_shapes = child_shapes(shop, shop_contract)
+    assert (shapes["Comment"]["shape"], shapes["Comment"]["parents"][0]["entity"]) == ("contribution", "Video")
+    _, _, shop_contract = golden_app("plant-shop")
+    shop_shapes = child_shapes(shop_contract)
     assert shop_shapes["OrderItem"]["shape"] == "part"
     assert (shop_shapes["CartItem"]["shape"], shop_shapes["CartItem"]["owned"]) == ("interaction", True)
 

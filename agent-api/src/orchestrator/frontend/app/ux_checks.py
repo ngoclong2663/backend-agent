@@ -1,9 +1,10 @@
-"""UX checks per archetype (Epic 32, Story 32.1): how a planned app behaves for the people of each area.
+"""UX checks per kind of product (Epic 32, Story 32.1): how a planned app behaves for the people of each area.
 
 Pure functions over a planned app (the FrontendSpec of `app_frontend_spec`, its BackendSpec and contract); no
-browser. Each area is judged by its archetype (`app.areas[].design.archetype`, else the app's): shared checks for
-every area, the consumer checks for areas whose people use the product rather than manage it, and the archetype's
-own checks (`feed`, `storefront`, `back-office`). Each finding names the check, the page's route and why.
+browser. Each area is judged by its kind (`patterns.area_kind`: its archetype, or `back-office` for staff who manage
+the main entity's records): shared checks for every area, the consumer checks for areas whose people use the product
+rather than manage it, and the kind's own checks (`feed`, `storefront`, `back-office`). Each finding names the
+check, the page's route and why.
 
 The main task of a consumer area is counted in clicks from the area's home on the planned screens (`task_clicks`):
 an action on the home's cards is one click, on the record's page two (open it, act), a form page three (open the
@@ -15,34 +16,11 @@ from typing import Any
 
 from src.orchestrator.integration.contract import contract_operations
 
-from .screens import _callable, resolve
+from .patterns import app_areas, area_kind, child_shapes, children_of
+from .screens import _callable
 
 CONSUMER = frozenset({"feed", "storefront", "catalogue", "booking", "learning"})  # people use it, staff do not run it
 PLUGIN_SECTIONS = frozenset({"AppAuth", "AppPayment"})  # shared by every area: never judged as an area's screen
-SERVER_SOURCES = frozenset({"currentUser", "server"})
-QUANTITY_WORDS = ("quantity", "qty", "count", "amount")
-
-
-def ux_areas(spec: dict[str, Any], roles: list[str] | None = None) -> list[dict[str, Any]]:
-    """Each area with its prefix, roles, archetype and main entity; an app without areas is one area at `/` for
-    every role (`roles`: the BackendSpec's)."""
-    app = spec.get("app") or {}
-    design = app.get("design") or {}
-    roles = list(roles or [])
-    found = app.get("areas") or [{"id": "app", "prefix": "/", "roles": [], "design": {}}]
-    out = []
-    for area in found:
-        own = {**design, **(area.get("design") or {})}
-        out.append(
-            {
-                "id": area["id"],
-                "prefix": area.get("prefix") or "/",
-                "roles": list(area.get("roles") or []) or roles,
-                "archetype": own.get("archetype") or "back-office",
-                "main": own.get("mainEntity") or (app.get("home") if app.get("home") != "dashboard" else None),
-            }
-        )
-    return out
 
 
 def _area_of(route: str, areas: list[dict[str, Any]]) -> str:
@@ -73,61 +51,9 @@ def _actions(page: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
     ]
 
 
-def child_shapes(backend: dict[str, Any], contract: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Child entity → its parent, the foreign key and its shape, from its create request (Story 32.2's shapes):
-    `interaction` (nothing required to fill in: a like, a bookmark, a view), `contribution` (a person's text on the
-    parent: a comment, a review), `part` (anything else: an order's item, a lesson)."""
-    ops = contract_operations(contract)
-    creates = {
-        (found["operation"].get("x-bga") or {}).get("entity"): found
-        for found in ops.values()
-        if (found["operation"].get("x-bga") or {}).get("action") == "create"
-    }
-    out: dict[str, dict[str, Any]] = {}
-    for rel in backend.get("relationships") or []:
-        if rel.get("type") != "one-to-many" or rel["to"] in out:
-            continue
-        child, fk = rel["to"], rel.get("foreignKey")
-        found = creates.get(child)
-        shape, owned = "part", False
-        if found is not None:
-            body = (found["operation"].get("requestBody") or {}).get("content", {}).get("application/json", {})
-            schema = resolve(contract, body.get("schema") or {})
-            props, required = schema.get("properties") or {}, set(schema.get("required") or [])
-            visible = {
-                name: resolve(contract, prop)
-                for name, prop in props.items()
-                if name != fk and (prop.get("x-bga") or {}).get("source") not in SERVER_SOURCES
-            }
-            owned = any((prop.get("x-bga") or {}).get("source") == "currentUser" for prop in props.values())
-            wanted = {name: prop for name, prop in visible.items() if name in required}
-            if not wanted:
-                shape = "interaction"
-            elif any(prop.get("type") == "string" and not prop.get("enum") for prop in wanted.values()):
-                shape = "contribution"
-        out[child] = {
-            "parent": rel["from"],
-            "field": fk,
-            "shape": shape,
-            "owned": found is not None and owned,  # the signed-in person's own record (the owner from the session)
-            "create": _op_id(found, ops),
-        }
-    return out
-
-
-def _op_id(found: dict[str, Any] | None, ops: dict[str, dict[str, Any]]) -> str | None:
-    if found is None:
-        return None
-    return next((op_id for op_id, item in ops.items() if item is found), None)
-
-
-def _cart(backend: dict[str, Any], shapes: dict[str, dict[str, Any]], main: str | None) -> str | None:
-    """A shopper's cart: a child of the main entity with a quantity field."""
-    fields = {e["name"]: [f["name"].lower() for f in e.get("fields") or []] for e in backend.get("entities") or []}
-    for child, info in shapes.items():
-        if info["parent"] == main and any(w in name for name in fields.get(child, []) for w in QUANTITY_WORDS):
-            return child
-    return None
+def _cart(children: dict[str, dict[str, Any]]) -> str | None:
+    """A shopper's cart: an owned child of the main entity with a quantity."""
+    return next((child for child, info in children.items() if info["owned"] and info["quantity"]), None)
 
 
 def _clicks(op_id: str | None, pages: list[dict[str, Any]], home: dict[str, Any] | None, forms: dict) -> int | None:
@@ -145,10 +71,12 @@ def _clicks(op_id: str | None, pages: list[dict[str, Any]], home: dict[str, Any]
 
 def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str, Any]) -> list[dict[str, Any]]:
     """Per area: its archetype, the checks it passes and fails (with the route and why), and its main task's clicks."""
-    areas = ux_areas(spec, list((backend.get("auth") or {}).get("roles") or []))
+    areas = app_areas(spec, list((backend.get("auth") or {}).get("roles") or []))
+    for area in areas:  # judged by what the area is for its people (Story 32.2: staff areas are back-office)
+        area["kind"] = area_kind(area["archetype"], area["roles"], area["main"], contract)
     forms = {form["id"]: form for form in spec.get("forms") or []}
     ops = contract_operations(contract)
-    shapes = child_shapes(backend, contract)
+    shapes = child_shapes(contract)
     pages_of: dict[str, list[dict[str, Any]]] = {area["id"]: [] for area in areas}
     for page in spec.get("pages") or []:
         if any(section.get("component") in PLUGIN_SECTIONS for section in page.get("sections") or []):
@@ -166,7 +94,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
         area_menu = [by_id[i["page"]] for i in menu if i.get("page") in by_id and by_id[i["page"]] in pages]
         home = next((p for p in pages if p["route"] == (area["prefix"].rstrip("/") or "/")), None)
         main = area["main"]
-        children = {c: info for c, info in shapes.items() if info["parent"] == main}
+        children = children_of(shapes, main)
         # every area: no page its roles cannot use
         check(
             "no-unusable-page",
@@ -176,7 +104,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
                 if (op := _page_operation(page, forms)) and op in ops and op not in callable_
             ],
         )
-        if area["archetype"] in CONSUMER:
+        if area["kind"] in CONSUMER:
             listed = {
                 (s.get("content") or {}).get("entity")
                 for page in area_menu
@@ -200,7 +128,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
                     if s.get("component") == "AppList" and (s.get("content") or {}).get("style") == "table"
                 ],
             )
-            cart = _cart(backend, shapes, main) if area["archetype"] == "storefront" else None
+            cart = _cart(children) if area["kind"] == "storefront" else None
             check(
                 "no-own-interaction-menu",
                 [
@@ -236,7 +164,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
                 ],
             )
         task, clicks = None, None
-        if area["archetype"] == "feed":
+        if area["kind"] == "feed":
             check(
                 "home-is-feed", [] if home and _lists(home, main) else [(area["prefix"], f"the home lists no {main}")]
             )
@@ -273,9 +201,9 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
             )
             first = next(iter(interactions.values()), None)
             task, clicks = (first["create"], _clicks(first["create"], pages, home, forms)) if first else (None, None)
-        elif area["archetype"] == "storefront":
-            cart = _cart(backend, shapes, main)
-            cart_create = shapes[cart]["create"] if cart else None
+        elif area["kind"] == "storefront":
+            cart = _cart(children)
+            cart_create = children[cart]["create"] if cart else None
             on_product = any(a.get("operationId") == cart_create for p in pages for _, a in _actions(p))
             check(
                 "add-to-cart-on-product",
@@ -288,7 +216,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
                 [] if cart and any(_lists(page, cart) for page in area_menu) else [("menu", "no cart in the menu")],
             )
             task, clicks = cart_create, _clicks(cart_create, pages, home, forms)
-        elif area["archetype"] == "back-office":
+        elif area["kind"] == "back-office":
             check(
                 "every-create-reachable",
                 [
@@ -304,6 +232,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
             {
                 "area": area["id"],
                 "archetype": area["archetype"],
+                "kind": area["kind"],
                 "roles": area["roles"],
                 "main": main,
                 "failed": failures,

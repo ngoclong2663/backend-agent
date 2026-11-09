@@ -1,20 +1,21 @@
 {
   "date": "2026-11-09",
   "summary": {
-    "failures": 49,
+    "failures": 41,
     "byCheck": {
       "add-to-cart-on-product": 1,
       "contribution-on-record": 3,
       "contributions-readable": 1,
-      "no-dashboard": 12,
+      "no-dashboard": 10,
       "no-edit-others": 3,
       "no-own-interaction-menu": 4,
-      "no-table": 25
+      "no-table": 19
     }
   },
   "areas": {
     "news-feed/app": {
       "archetype": "feed",
+      "kind": "feed",
       "failed": [
         "no-own-interaction-menu",
         "no-table"
@@ -26,6 +27,7 @@
     },
     "video-library/app": {
       "archetype": "catalogue",
+      "kind": "catalogue",
       "failed": [
         "no-dashboard",
         "no-table"
@@ -34,6 +36,7 @@
     },
     "learning-platform/app": {
       "archetype": "learning",
+      "kind": "learning",
       "failed": [
         "no-dashboard",
         "no-table"
@@ -42,11 +45,13 @@
     },
     "agency-projects/app": {
       "archetype": "back-office",
+      "kind": "back-office",
       "failed": [],
       "task": null
     },
     "clinic-bookings/patient": {
       "archetype": "booking",
+      "kind": "booking",
       "failed": [
         "no-dashboard",
         "no-table"
@@ -55,14 +60,13 @@
     },
     "clinic-bookings/front-desk": {
       "archetype": "booking",
-      "failed": [
-        "no-dashboard",
-        "no-table"
-      ],
+      "kind": "back-office",
+      "failed": [],
       "task": null
     },
     "plant-shop/storefront": {
       "archetype": "storefront",
+      "kind": "storefront",
       "failed": [
         "add-to-cart-on-product",
         "no-dashboard",
@@ -75,11 +79,13 @@
     },
     "plant-shop/management": {
       "archetype": "back-office",
+      "kind": "back-office",
       "failed": [],
       "task": null
     },
     "event-tickets/attendees": {
       "archetype": "booking",
+      "kind": "booking",
       "failed": [
         "no-dashboard"
       ],
@@ -87,16 +93,19 @@
     },
     "event-tickets/organizers": {
       "archetype": "back-office",
+      "kind": "back-office",
       "failed": [],
       "task": null
     },
     "workshop-bookings/app": {
       "archetype": "back-office",
+      "kind": "back-office",
       "failed": [],
       "task": null
     },
     "media-library/app": {
       "archetype": "catalogue",
+      "kind": "catalogue",
       "failed": [
         "no-table"
       ],
@@ -104,6 +113,7 @@
     },
     "ember-kitchen/learners": {
       "archetype": "learning",
+      "kind": "learning",
       "failed": [
         "no-dashboard",
         "no-table"
@@ -112,24 +122,25 @@
     },
     "ember-kitchen/instructors": {
       "archetype": "back-office",
+      "kind": "back-office",
       "failed": [],
       "task": null
     },
     "lantern-audio/app": {
       "archetype": "catalogue",
-      "failed": [
-        "no-dashboard",
-        "no-table"
-      ],
+      "kind": "back-office",
+      "failed": [],
       "task": null
     },
     "tiktok-likes/creators": {
       "archetype": "workspace",
+      "kind": "workspace",
       "failed": [],
       "task": null
     },
     "tiktok-likes/viewers": {
       "archetype": "feed",
+      "kind": "feed",
       "failed": [
         "contribution-on-record",
         "no-dashboard",
@@ -143,6 +154,7 @@
     },
     "tiktok-feed-sessions/viewer-area": {
       "archetype": "feed",
+      "kind": "feed",
       "failed": [
         "contribution-on-record",
         "no-dashboard",
@@ -156,16 +168,19 @@
     },
     "tiktok-feed-sessions/creator-area": {
       "archetype": "workspace",
+      "kind": "workspace",
       "failed": [],
       "task": null
     },
     "tiktok-viewer-ids/creators": {
       "archetype": "workspace",
+      "kind": "workspace",
       "failed": [],
       "task": null
     },
     "tiktok-viewer-ids/viewers": {
       "archetype": "feed",
+      "kind": "feed",
       "failed": [
         "contribution-on-record",
         "contributions-readable",

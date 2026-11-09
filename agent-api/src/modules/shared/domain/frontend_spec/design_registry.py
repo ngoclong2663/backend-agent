@@ -21,8 +21,18 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 DESIGN_DIR = Path(__file__).resolve().parents[5] / "templates" / "design"
 STARTER_DIR = DESIGN_DIR / "_starter"
-Kind = Literal["shell", "list-view", "detail-view", "home", "filters", "card", "recipe", "font-pairing"]
-KINDS: tuple[str, ...] = ("shell", "list-view", "detail-view", "home", "filters", "card", "recipe", "font-pairing")
+Kind = Literal["shell", "list-view", "detail-view", "home", "filters", "card", "recipe", "font-pairing", "pattern"]
+KINDS: tuple[str, ...] = (
+    "shell",
+    "list-view",
+    "detail-view",
+    "home",
+    "filters",
+    "card",
+    "recipe",
+    "font-pairing",
+    "pattern",
+)
 KIT_KINDS: tuple[str, ...] = ("shell", "list-view", "detail-view", "home", "filters", "card")  # rendered by the kit
 # What a plugin may need from the contract (one check each in `frontend/app/design.py`, D5).
 NEEDS: tuple[str, ...] = (
@@ -41,6 +51,43 @@ NEEDS: tuple[str, ...] = (
     "featured",  # a date sort or a boolean field to choose the featured record by
 )
 Scripts = ("latin", "japanese")
+# Product patterns (Epic 32, Story 32.2): how an area's screens behave for its people; no kit file, the planner reads it
+MENU_ENTRIES: tuple[str, ...] = (
+    "every",  # every entity with a list (a back-office's menu)
+    "main",  # the area's main entity
+    "mine",  # one entry for the role's own records, grouped on one page
+    "cart",  # a shopper's cart
+)
+SHAPES: tuple[str, ...] = (
+    "interaction",  # a person's one-row reaction to a record, nothing to fill in (a like, a bookmark, a view)
+    "contribution",  # a person's text on a record (a comment, a review, a reply)
+    "part",  # a line of the record (an order's item, a course's lesson)
+)
+PLACEMENTS: tuple[str, ...] = (
+    "inline",  # an action and a short list on the parent's record
+    "sheet",  # a sheet opened from the parent's record
+    "tab",  # a tab of the parent's page (a back-office's)
+    "page",  # a page of its own
+)
+NEVER: tuple[str, ...] = (
+    "dashboard",  # a page of figures
+    "edit-others",  # edit pages for records these roles do not create
+    "own-interaction-tables",  # a menu table of the person's own reactions
+)
+UX_CHECKS: tuple[str, ...] = (  # `frontend/app/ux_checks.py` (Story 32.1); a pattern names the ones it must pass
+    "no-unusable-page",
+    "no-dashboard",
+    "no-table",
+    "no-own-interaction-menu",
+    "no-edit-others",
+    "home-is-feed",
+    "interaction-on-record",
+    "contribution-on-record",
+    "contributions-readable",
+    "add-to-cart-on-product",
+    "cart-in-menu",
+    "every-create-reachable",
+)
 NAME = re.compile(r"^[a-z][a-z0-9-]*$")
 
 
@@ -83,6 +130,14 @@ class DesignPluginDescriptor(BaseModel):
     ratio: Literal["tight", "default", "dramatic"] | None = None  # the theme's type-scale ratio (Epic 20)
     scripts: list[str] = ["latin"]
     recipes: list[str] = []  # the recipes a pairing suits (empty: any)
+    # product patterns (Epic 32): the area's menu, where a record's children go by shape, which shapes are public on
+    # their record, the home flow, what these people never get, the UX checks the pattern must pass
+    menu: list[str] = []
+    children: dict[str, str] = {}
+    public: list[str] = []
+    home: str | None = None
+    never: list[str] = []
+    checks: list[str] = []
 
     @model_validator(mode="after")
     def _shape(self):
@@ -101,7 +156,26 @@ class DesignPluginDescriptor(BaseModel):
             raise ValueError("a font pairing names its heading and body fonts")
         if any(script not in Scripts for script in self.scripts):
             raise ValueError(f"scripts are {Scripts}")
+        if self.kind == "pattern":
+            self._pattern_shape()
+        elif self.menu or self.children or self.public or self.home or self.never or self.checks:
+            raise ValueError("menu, children, public, home, never and checks are a pattern's")
         return self
+
+    def _pattern_shape(self) -> None:
+        bad = [m for m in self.menu if m not in MENU_ENTRIES]
+        if not self.menu or bad:
+            raise ValueError(f"a pattern's menu is a list of {MENU_ENTRIES}")
+        if set(self.children) != set(SHAPES) or any(p not in PLACEMENTS for p in self.children.values()):
+            raise ValueError(f"a pattern places every shape {SHAPES} as one of {PLACEMENTS}")
+        if any(shape not in SHAPES for shape in self.public):
+            raise ValueError(f"a pattern's public shapes are among {SHAPES}")
+        if any(item not in NEVER for item in self.never):
+            raise ValueError(f"a pattern's never list is among {NEVER}")
+        if any(check not in UX_CHECKS for check in self.checks):
+            raise ValueError(f"a pattern's checks are among {UX_CHECKS}")
+        if len(self.archetypes) != 1 or self.archetypes[0] != self.name:
+            raise ValueError("a pattern is named after the one archetype it serves")
 
     @property
     def folder(self) -> Path:
