@@ -405,3 +405,38 @@ def test_an_app_draft_reads_the_example_of_every_plugin(tmp_path):
     backend = SpecDraftEntity(**{**draft.model_dump(), "mode": GenerationMode.BACKEND})
     write_inputs(tmp_path / "backend", backend, EXAMPLES)
     assert "auth" not in json.loads((tmp_path / "backend/.bga/examples/backend-spec.json").read_text())
+
+
+def test_a_relationship_through_a_persons_field_is_dropped():
+    """Story 32.8 (Pocket Chefs, gen_01M6ZRH1XQZZHC6RXSM5BFTJ21): the draft related `Recipe` to `Recipe` through
+    `cookId`; the seed filled each recipe's cook with recipe ids, no demo cook owned one, and the update's success
+    scenario answered 404 on the mocks. A foreign key named after a role points at a person: the relationship is
+    dropped (a note), the field becomes the person field it names and the cook's recipes are a demo cook's."""
+    import copy
+
+    from src.orchestrator.backend.planner import build_plan
+    from src.orchestrator.drafting.access import secure_access
+    from src.orchestrator.drafting.app import fix_person_relationships
+    from src.orchestrator.integration.contract import build_contract, contract_operations
+
+    raw = json.loads((Path(__file__).parent / "fixtures" / "specs" / "pocket-chefs-cook-relation.json").read_text())
+    data = copy.deepcopy(raw)
+    notes = fix_person_relationships(data)
+    assert [n["message"] for n in notes] == [
+        "Recipe.cookId names a cook (a person), not a Recipe: the relationship Recipe → Recipe was dropped"
+    ]
+    assert all(rel["to"] != rel["from"] for rel in data["relationships"]), "the parent relationships stay"
+    assert len(data["relationships"]) == len(raw["relationships"]) - 1
+    secure_access(data)
+    spec = validate_spec_data(data).normalized
+    contract = build_contract(spec, build_plan(spec))
+    fixtures = contract["x-bga"]["fixtures"]
+    cooks = {u["id"] for u in fixtures["User"] if u.get("role") == "cook"}
+    assert all(row["cookId"] in cooks for row in fixtures["Recipe"]), "each recipe is a demo cook's"
+    update = contract_operations(contract)["recipe.update"]["operation"]["x-bga"]
+    success = next(s for s in update["scenarios"] if s["name"] == "success")
+    runs_as = success.get("user") or contract["x-bga"]["auth"]["login"]["body"]["email"]  # else the default login
+    owner = next(r["cookId"] for r in fixtures["Recipe"] if r["id"] == success["params"]["id"])
+    assert next(u["id"] for u in fixtures["User"] if u["email"] == runs_as) == owner, "it edits its own recipe"
+    plain = {"auth": {"roles": ["member"]}, "relationships": [{"from": "Deck", "to": "Card", "foreignKey": "deckId"}]}
+    assert fix_person_relationships(plain) == [], "a parent named after no role stays"

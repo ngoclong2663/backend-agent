@@ -211,6 +211,7 @@ def fix_backend_defaults(work: Path, backend_file: str) -> list[dict[str, Any]]:
                 operation[key] = [operation[key]]
                 note(f"/operations/{o_index}/{key}", f"{operation.get('operationId')}: '{key}' is a list of names")
     notes += fix_media_fields(data)
+    notes += fix_person_relationships(data)
     entities = {e.get("name") for e in data.get("entities") or [] if isinstance(e, dict)}
     for o_index, operation in enumerate(data.get("operations") or []):
         if not isinstance(operation, dict) or operation.get("type") != "custom" or operation.get("response"):
@@ -247,6 +248,36 @@ def media_kind_of(field: dict[str, Any]) -> str | None:
         if any(word in names for word in words):
             return kind
     return None
+
+
+def fix_person_relationships(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """A relationship whose foreign key is named after one of the app's roles (`cookId`, `memberUserId`) and whose
+    parent is not the user entity points at a person, not at a record: it is dropped, so the field is the person field
+    it names (Story 32.8: a draft related `Recipe` to `Recipe` through `cookId`; the seed then filled each recipe's
+    cook with recipe ids, no demo cook owned one, and the update's success scenario answered 404)."""
+    from .access import _role_of_field
+
+    auth = data.get("auth") if isinstance(data.get("auth"), dict) else {}
+    roles = [str(role) for role in auth.get("roles") or []]
+    user_entity = auth.get("userEntity") or "User"
+    relationships = data.get("relationships")
+    if not roles or not isinstance(relationships, list):
+        return []
+    notes, kept = [], []
+    for index, rel in enumerate(relationships):
+        fk = rel.get("foreignKey") if isinstance(rel, dict) else None
+        role = _role_of_field(str(fk), roles) if fk else None
+        if role is not None and rel.get("from") != user_entity:
+            message = (
+                f"{rel.get('to')}.{fk} names a {role} (a person), not a {rel.get('from')}: the relationship "
+                f"{rel.get('from')} → {rel.get('to')} was dropped"
+            )
+            notes.append({"spec": "backend", "path": f"/relationships/{index}", "message": message, "suggestion": None})
+            continue
+        kept.append(rel)
+    if notes:
+        data["relationships"] = kept
+    return notes
 
 
 def fix_media_fields(data: dict[str, Any]) -> list[dict[str, Any]]:
