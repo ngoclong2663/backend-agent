@@ -191,8 +191,12 @@ def _lines(path: Path):
 
 
 def test_no_hand_written_list_of_plugin_names_remains():
+    # Epic 32: a pattern is named after its one archetype (the descriptor checks it), so the archetype vocabulary
+    # (`frontend_spec/app.Archetype`, `design.ARCHETYPES`) is the source its names follow, not a copy of them
     quoted = {
-        kind: [re.compile(rf"[\"'`]{re.escape(name)}[\"'`]") for name in registry().names(kind)] for kind in KINDS
+        kind: [re.compile(rf"[\"'`]{re.escape(name)}[\"'`]") for name in registry().names(kind)]
+        for kind in KINDS
+        if kind != "pattern"
     }
     found = []
     for root in SCANNED:

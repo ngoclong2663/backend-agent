@@ -4,12 +4,30 @@
   "status": "ready",
   "label": "Feed",
   "choose": "People scroll posts or clips, react and comment on what they look at, open who posted it, and find their own activity under one entry.",
-  "archetypes": ["feed"],
-  "menu": ["main", "mine"],
-  "children": {"interaction": "inline", "contribution": "sheet", "part": "tab"},
-  "public": ["contribution"],
+  "archetypes": [
+    "feed"
+  ],
+  "needs": [
+    "signIn"
+  ],
+  "menu": [
+    "main",
+    "mine"
+  ],
+  "children": {
+    "interaction": "inline",
+    "contribution": "sheet",
+    "part": "tab"
+  },
+  "public": [
+    "contribution"
+  ],
   "home": "feed",
-  "never": ["dashboard", "edit-others", "own-interaction-tables"],
+  "never": [
+    "dashboard",
+    "edit-others",
+    "own-interaction-tables"
+  ],
   "checks": [
     "no-unusable-page",
     "no-dashboard",

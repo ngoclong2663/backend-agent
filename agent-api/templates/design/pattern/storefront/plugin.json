@@ -1,15 +1,34 @@
 {
   "kind": "pattern",
   "name": "storefront",
-  "status": "draft",
+  "status": "ready",
   "label": "Storefront",
   "choose": "Shoppers browse products, add to the cart from the product, check out from the cart and read their orders.",
-  "archetypes": ["storefront"],
-  "menu": ["main", "cart", "mine"],
-  "children": {"interaction": "inline", "contribution": "inline", "part": "tab"},
-  "public": ["contribution"],
+  "archetypes": [
+    "storefront"
+  ],
+  "needs": [
+    "signIn",
+    "purchase"
+  ],
+  "menu": [
+    "main",
+    "cart",
+    "mine"
+  ],
+  "children": {
+    "interaction": "inline",
+    "contribution": "inline",
+    "part": "tab"
+  },
+  "public": [
+    "contribution"
+  ],
   "home": "catalogue",
-  "never": ["dashboard", "edit-others"],
+  "never": [
+    "dashboard",
+    "edit-others"
+  ],
   "checks": [
     "no-unusable-page",
     "no-dashboard",

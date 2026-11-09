@@ -60,6 +60,7 @@ WORDS = {
     "recent": ("Recent {x}", "最近の{x}"),
     "dashboard": ("Dashboard", "ダッシュボード"),
     "mine": ("Mine", "マイページ"),
+    "addToCart": ("Add to cart", "カートに追加"),
     "created": ("{x} created", "{x}を作成しました"),
     "signIn": ("Sign in", "ログイン"),
     "createAccount": ("Create an account", "アカウントを作成"),
@@ -896,7 +897,8 @@ class _Screens:
                     actions.append(
                         {
                             "id": f"add-{self.slug(child)}",
-                            "label": self.w("add", self.label(child)),
+                            # a storefront's cart reads as the shop's verb
+                            "label": self.w("addToCart") if child == self.cart() else self.w("add", self.label(child)),
                             "kind": "mutation",
                             "operationId": op_id,
                             "form": form_id,

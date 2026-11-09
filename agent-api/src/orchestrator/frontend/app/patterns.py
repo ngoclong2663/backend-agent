@@ -108,9 +108,28 @@ def manages(contract: dict[str, Any], entity: str | None, roles: list[str]) -> b
     return set(roles) <= managers
 
 
+def pattern_fits(pattern: DesignPluginDescriptor, contract: dict[str, Any], main: str | None) -> bool:
+    """A pattern's `needs` against the contract: `signIn` (people sign in), `purchase` (a person's cart of the main
+    entity, or a payment)."""
+    meta = contract.get("x-bga") or {}
+    for need in pattern.needs:
+        if need == "signIn" and not meta.get("auth"):
+            return False
+        if need == "purchase" and not meta.get("payments"):
+            own = {c: info for c, info in child_shapes(contract).items() if info["owned"]}
+            if not any(info["quantity"] for info in children_of(own, main).values()):
+                return False
+    return True
+
+
 def area_kind(archetype: str | None, roles: list[str], main: str | None, contract: dict[str, Any]) -> str:
-    """What the area is for its people: staff who manage the main entity get `back-office`."""
+    """What the area is for its people: staff who manage the main entity get `back-office`, and so does an area whose
+    archetype's pattern needs what the contract lacks (a "plant shop" look for one person's watering log has no one
+    signing in and nothing to buy)."""
     if manages(contract, main, roles):
+        return DEFAULT_PATTERN
+    found = next((p for p in registry().ready("pattern") if p.name == archetype), None)
+    if found is not None and not pattern_fits(found, contract, main):
         return DEFAULT_PATTERN
     return archetype or DEFAULT_PATTERN
 

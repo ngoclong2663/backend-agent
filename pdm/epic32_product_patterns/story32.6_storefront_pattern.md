@@ -32,8 +32,8 @@ and see my orders, so that buying works the way shops do, while the owner keeps 
 
 ## Acceptance criteria
 
-- [ ] `storefront` is `ready` and passes its gates; `plant-shop`'s shopper area passes the storefront checks.
-- [ ] The owner's area plans exactly as before.
+- [x] `storefront` is `ready` and passes its gates; `plant-shop`'s shopper area passes the storefront checks.
+- [x] The owner's area plans exactly as before.
 
 ## Verify
 
@@ -42,3 +42,27 @@ and see my orders, so that buying works the way shops do, while the owner keeps 
 ## Status
 
 Proposed 2026-11-09.
+
+**Done 2026-11-09 (with deviations).** `templates/design/pattern/storefront` is `ready`. `plant-shop`'s shopper area
+(its screens snapshot updated on purpose): the menu is Plants, Cart and My Orders; the product page carries **Add to
+cart** (the cart's create with its quantity in the kit's dialog, the product from the route: two clicks from the home);
+no shopper dashboard, no cart form page, no edit page or owner's action on products; orders read-only with `pay` until
+paid; reviews would be public (`contribution`, 32.4). The owner's `management` area is byte-identical
+(`test_planner_patterns.py`). The shopper area passes every storefront check; the UX baseline went from 29 failures to
+24, all of them in areas still planned as `back-office` (mixed areas, and the archetypes without a pattern:
+`catalogue`, `booking`, `learning`).
+
+The registry's name scan (`test_no_hand_written_list_of_plugin_names_remains`) leaves the `pattern` kind out: a
+pattern is named after its one archetype (the descriptor checks it), so the archetype vocabulary is the source its
+names follow.
+
+Found by the suite after promoting the pattern: a recorded draft, "a watering log for my houseplants" (no logins),
+takes a `storefront` look from its words (a "plant shop" product row); as a look that was harmless, as behaviour it
+dropped the owner's own dashboard. A pattern now names its `needs` (`signIn`: people sign in; `purchase`: a person's
+cart of the main entity, or a payment; `patterns.pattern_fits`), and an area whose archetype's pattern needs what the
+contract lacks is `back-office` (`feed` needs `signIn`, `storefront` both).
+
+Deviations: the cart is the cart entity's own list page (lines with edit and remove), not a new cart page with
+quantity steppers and a total (step 2's kit parts are not built); checkout stays the orders page's collection action,
+as the contract places it. Collections leave the shopper's menu (the menu is the main entity, the cart and the
+person's own records); they remain the plant list's filter and the catalogue home's groups.

@@ -98,76 +98,6 @@
         ]
       }
     ],
-    "/dashboard": [
-      {
-        "id": "figure-1",
-        "component": "AppDashboard",
-        "data": {
-          "operationId": "plant.count"
-        },
-        "actions": []
-      },
-      {
-        "id": "figure-2",
-        "component": "AppDashboard",
-        "data": {
-          "operationId": "order.countWhereStatusPaid"
-        },
-        "actions": []
-      },
-      {
-        "id": "figure-3",
-        "component": "AppDashboard",
-        "data": {
-          "operationId": "order.countByStatus"
-        },
-        "actions": []
-      },
-      {
-        "id": "figure-4",
-        "component": "AppDashboard",
-        "data": {
-          "operationId": "plant.countByLightNeed"
-        },
-        "actions": []
-      },
-      {
-        "id": "recent-plants",
-        "component": "AppList",
-        "data": {
-          "operationId": "plant.list",
-          "params": {
-            "limit": 5,
-            "sort": "-createdAt"
-          },
-          "fields": [
-            "name",
-            "collectionId",
-            "price"
-          ]
-        },
-        "actions": [
-          "view"
-        ]
-      },
-      {
-        "id": "recent-collections",
-        "component": "AppList",
-        "data": {
-          "operationId": "collection.list",
-          "params": {
-            "limit": 5
-          },
-          "fields": [
-            "name",
-            "description"
-          ]
-        },
-        "actions": [
-          "view"
-        ]
-      }
-    ],
     "/login": [
       {
         "id": "login",
@@ -680,14 +610,6 @@
         ]
       }
     ],
-    "/plants/[id]/cart-items/new": [
-      {
-        "id": "cart-item-create-in-plant-form",
-        "component": "AppForm",
-        "form": "cartItem_create_in_plant",
-        "actions": []
-      }
-    ],
     "/register": [
       {
         "id": "register",
@@ -698,7 +620,7 @@
     ]
   },
   "forms": {
-    "cartItem_create_in_plant": {
+    "cartItem_create_on_plant": {
       "operationId": "cartItem.create",
       "fields": [
         "plantId=$route.id",
@@ -797,20 +719,12 @@
       "page": "plants"
     },
     {
-      "label": "Collections",
-      "page": "collections"
-    },
-    {
       "label": "Cart",
       "page": "cart-items"
     },
     {
       "label": "My Orders",
       "page": "orders"
-    },
-    {
-      "label": "Dashboard",
-      "page": "dashboard"
     },
     {
       "label": "Dashboard",

@@ -110,7 +110,8 @@ def test_back_office_areas_pass_and_the_recorded_viewers_met_what_the_user_repor
     assert results["tiktok-likes/viewers"]["failed"] == []
     assert results["tiktok-feed-sessions/viewer-area"]["failed"] == []
     assert {f["check"] for f in results["tiktok-viewer-ids/viewers"]["failed"]} == {"contributions-readable"}
-    assert results["plant-shop/storefront"]["task"] == {"operationId": "cartItem.create", "clicks": 3}, "a draft"
+    assert results["plant-shop/storefront"]["failed"] == [], "Story 32.6"
+    assert results["plant-shop/storefront"]["task"] == {"operationId": "cartItem.create", "clicks": 2}
 
 
 def test_the_committed_baseline_is_the_reports_output():

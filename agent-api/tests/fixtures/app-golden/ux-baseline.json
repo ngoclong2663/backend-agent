@@ -1,13 +1,12 @@
 {
   "date": "2026-11-09",
   "summary": {
-    "failures": 29,
+    "failures": 24,
     "byCheck": {
-      "add-to-cart-on-product": 1,
       "contributions-readable": 1,
-      "no-dashboard": 7,
+      "no-dashboard": 6,
       "no-own-interaction-menu": 1,
-      "no-table": 19
+      "no-table": 16
     }
   },
   "areas": {
@@ -65,14 +64,10 @@
     "plant-shop/storefront": {
       "archetype": "storefront",
       "kind": "storefront",
-      "failed": [
-        "add-to-cart-on-product",
-        "no-dashboard",
-        "no-table"
-      ],
+      "failed": [],
       "task": {
         "operationId": "cartItem.create",
-        "clicks": 3
+        "clicks": 2
       }
     },
     "plant-shop/management": {

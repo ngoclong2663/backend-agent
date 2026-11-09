@@ -236,6 +236,7 @@ Agent-specific notes:
   own top-level records and one Mine page (`pattern_menu`; `reach_every_page` is a back-office's); a child whose shape
   the pattern places on the record is an action there (one click, or its form in a dialog: `on_parent`); no edit page,
   delete or owner's action on records these people never create (`others`); no dashboard; tables become cards.
+  `storefront` is ready (Story 32.6: Plants, Cart, My Orders; Add to cart on the product).
   `feed` is ready (Story 32.5): a view-like record action with nothing to fill in (or a view child) is the record
   page's `onOpen`, run once by `AppDetail` (`useOnOpen`), never a button. `ux-before.json` keeps the pre-pattern measure.
   The access rules take the patterns' public shapes (`secure_access(spec, public)`, `drafting/app.public_shapes`): a

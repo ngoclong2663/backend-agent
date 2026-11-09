@@ -436,14 +436,13 @@ def test_comments_on_a_feed_are_read_by_everyone_and_changed_by_their_author():
     assert contributions(data, find_owned(data, create=False)) == {"Comment"}, "a like has no text of its own"
 
 
-def test_the_public_shapes_come_from_the_ready_patterns_of_the_drafted_areas(monkeypatch):
+def test_the_public_shapes_come_from_the_ready_patterns_of_the_drafted_areas():
     from src.orchestrator.drafting.app import public_shapes
 
     feed = {"areas": [{"id": "viewers", "design": {"archetype": "feed"}}, {"id": "studio", "design": {}}]}
-    assert public_shapes(feed, None) == frozenset({"contribution"}), "the feed pattern is ready (Story 32.5)"
+    assert public_shapes(feed, None) == frozenset({"contribution"}), "a feed's comments (Story 32.5)"
     shop = {"areas": [{"id": "shoppers", "design": {"archetype": "storefront"}}]}
-    assert public_shapes(shop, None) == frozenset(), "the storefront pattern is a draft: nothing changes"
-    monkeypatch.setenv("BGA_DESIGN_INCLUDE_DRAFTS", "1")
-    assert public_shapes(shop, None) == frozenset({"contribution"})
+    assert public_shapes(shop, None) == frozenset({"contribution"}), "a shop's reviews (Story 32.6)"
     assert public_shapes({}, "feed") == frozenset({"contribution"}), "a single area takes code's hint"
     assert public_shapes({"design": {"archetype": "back-office"}}, "feed") == frozenset()
+    assert public_shapes({"design": {"archetype": "booking"}}, None) == frozenset(), "no booking pattern yet"

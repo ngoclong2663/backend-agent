@@ -236,7 +236,8 @@ def test_the_app_plan_has_a_route_per_page_and_a_sidebar(name):
         assert plan["app"]["nav"][0] == {"label": "Dashboard", "page": "home", "icon": "LayoutDashboard"}
     else:  # an app that opens on a list (Story 23.1): that list first; its figures on a dashboard page of their own
         assert plan["app"]["nav"][0]["label"] != "Dashboard"
-        if raw.get("dashboard"):
+        first = next(iter(plan["app"]["patterns"].values()))
+        if raw.get("dashboard") and first["pattern"] == "back-office":  # Epic 32: a consumer area has none
             assert {"label": "Dashboard", "page": "dashboard", "icon": "LayoutDashboard"} in plan["app"]["nav"]
 
 

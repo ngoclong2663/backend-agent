@@ -49,6 +49,9 @@ NEEDS: tuple[str, ...] = (
     "parentOrChildren",  # the record has a parent or children to show beside it (a split panel)
     "longTextField",  # a text field people read (a reader)
     "featured",  # a date sort or a boolean field to choose the featured record by
+    # product patterns (Epic 32), checked in `frontend/app/patterns.py` (`pattern_fits`), not by the design checks
+    "signIn",  # people sign in (the auth plugin): a consumer pattern is for people, not one person's tool
+    "purchase",  # something to buy: a person's cart of the main entity, or a payment
 )
 Scripts = ("latin", "japanese")
 # Product patterns (Epic 32, Story 32.2): how an area's screens behave for its people; no kit file, the planner reads it
