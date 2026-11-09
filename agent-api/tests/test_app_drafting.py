@@ -86,7 +86,7 @@ def _prompt(inline: bool) -> str:
     return PromptLibrary().render("draft_app", "v2", **context).text
 
 
-def _prompt_v3(inline: bool, requirement: str, version: str = "v3") -> str:
+def _prompt_v3(inline: bool, requirement: str, version: str = "v3", **extra: object) -> str:
     from src.orchestrator.drafting.app import product_rows
     from src.orchestrator.frontend.app.design import archetype_candidates
     from src.orchestrator.frontend.app.recipes import recommended_looks, style_words
@@ -105,10 +105,29 @@ def _prompt_v3(inline: bool, requirement: str, version: str = "v3") -> str:
         "recommended_looks": recommended_looks(rows),
         "style_words": style_words(requirement),
         **app_inputs(EXAMPLES, design=True),
+        **extra,
     }
     if inline:
         context |= {"backend_schema_digest": "<BackendSpec digest>", "backend_example": "{}"}
     return PromptLibrary().render("draft_app", version, **context).text
+
+
+def test_draft_app_v7_prompt_lists_the_registry_choices():
+    """Epic 30 (Story 30.2): the design brief's choice lists come from the design plugin registry, only the candidates
+    for the ranked archetypes; a new plugin folder is offered without a prompt change."""
+    from src.modules.shared.domain.frontend_spec.design_registry import registry
+    from src.orchestrator.frontend.app.design import design_choices
+
+    requirement = "A plant shop: customers browse plants by collection and order them; the owner manages stock."
+    for inline in (False, True):
+        text = _prompt_v3(inline, requirement, version="v7", design_choices=design_choices(["storefront", "catalogue"]))
+        _snapshot(f"draft_app.v7{'.inline' if inline else ''}.md", text)
+        for kind in ("shell", "list-view", "detail-view", "filters", "home", "recipe"):
+            for plugin in registry().candidates(kind, "storefront"):
+                assert f"`{plugin.name}` (" in text, (kind, plugin.name)
+        assert "`rail`" not in text, "a workspace-only shell is not offered to a storefront"
+        v6 = _prompt_v3(inline, requirement, version="v6")
+        assert len(text) <= len(v6) * 1.10, "Story 30.7: the prompt stays within 10% of v6 whatever the registry's size"
 
 
 def test_draft_app_v6_prompt_names_the_media_fields():
@@ -269,7 +288,7 @@ def test_an_app_draft_is_one_call_and_bad_outlines_cost_no_repair(
     }
     draft = _draft(client, user_headers, tmp_path, "Vocabulary decks to learn new words", scenario)
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v6"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7"]
     messages = {note["path"]: note["message"] for note in draft["assumptions"]}
     assert messages["/app/nav"] == "Decks first", "the model's own notes point into the FrontendSpec"
     assert "names no entity" in messages["/app/nav/0"] and "/app/entities/Card/listStyle" in messages
@@ -286,7 +305,7 @@ def test_an_invalid_backend_spec_gets_one_repair(client, user_headers, tmp_path,
     }
     draft = _draft(client, user_headers, tmp_path, "A team's projects and their tasks", scenario)
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v6", "repair_spec@v3"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7", "repair_spec@v3"]
     assert draft["frontend_spec"]["app"]["tagline"] == "Projects and their tasks, in one place"
 
 
@@ -319,7 +338,7 @@ def test_a_real_antigravity_draft_becomes_an_app(client, user_headers, tmp_path,
         {"draft_app": [FakeStep(write=files)]},
     )
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v6"], "no repair round"
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7"], "no repair round"
     assert any("default 'today' is written 'now'" in note["message"] for note in draft["assumptions"])
     assert draft["validation"]["pair"]["errors"] == [] and draft["validation"]["pair"]["warnings"] == []
     spec = draft["frontend_spec"]

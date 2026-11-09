@@ -1,0 +1,2 @@
+@root { --radius: 0.5rem; }
+@root [data-slot="card"] { box-shadow: none; border: 1px solid var(--border); }

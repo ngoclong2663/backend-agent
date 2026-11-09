@@ -1,0 +1,32 @@
+{
+  "kind": "font-pairing",
+  "name": "workshop",
+  "status": "ready",
+  "label": "Workshop",
+  "choose": "A sturdy grotesk with character over a humanist body: studios, makers, agencies and workshops.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "recipes": [
+    "brutalist",
+    "swiss",
+    "minimal"
+  ],
+  "heading": "Bricolage Grotesque",
+  "body": "DM Sans",
+  "mono": null,
+  "headingWeight": 700,
+  "headingCase": "normal",
+  "tracking": "tight",
+  "ratio": "default",
+  "scripts": [
+    "latin"
+  ],
+  "order": 50
+}

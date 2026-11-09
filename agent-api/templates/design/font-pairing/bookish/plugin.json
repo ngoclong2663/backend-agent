@@ -1,0 +1,27 @@
+{
+  "kind": "font-pairing",
+  "name": "bookish",
+  "status": "ready",
+  "label": "Bookish",
+  "choose": "Serif headings and a serif body: long reading, notes, journals and courses set like a book.",
+  "archetypes": [
+    "feed",
+    "learning",
+    "catalogue"
+  ],
+  "recipes": [
+    "paper",
+    "editorial"
+  ],
+  "heading": "Fraunces",
+  "body": "Source Serif 4",
+  "mono": null,
+  "headingWeight": 500,
+  "headingCase": "normal",
+  "tracking": "normal",
+  "ratio": "default",
+  "scripts": [
+    "latin"
+  ],
+  "order": 40
+}

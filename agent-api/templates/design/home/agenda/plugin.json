@@ -1,0 +1,21 @@
+{
+  "kind": "home",
+  "name": "agenda",
+  "status": "ready",
+  "label": "Agenda",
+  "choose": "The coming records by day; needs a date on the main entity.",
+  "archetypes": [
+    "booking",
+    "workspace"
+  ],
+  "needs": [
+    "mainList",
+    "dateField"
+  ],
+  "fallback": "dashboard",
+  "exports": [],
+  "marker": "agenda",
+  "builtin": true,
+  "order": 40,
+  "dispatch": false
+}

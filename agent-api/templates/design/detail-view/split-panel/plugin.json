@@ -1,0 +1,25 @@
+{
+  "kind": "detail-view",
+  "name": "split-panel",
+  "status": "ready",
+  "label": "Split panel",
+  "choose": "The fields on the left and a side panel with the record's parent, status, dates and figures on the right: back-office records with context.",
+  "archetypes": [
+    "back-office",
+    "workspace",
+    "booking",
+    "learning"
+  ],
+  "needs": [
+    "parentOrChildren"
+  ],
+  "fallback": "record",
+  "exports": [
+    "SplitPanelDetail"
+  ],
+  "files": [
+    "SplitPanelDetail.tsx"
+  ],
+  "marker": "split-panel",
+  "order": 50
+}

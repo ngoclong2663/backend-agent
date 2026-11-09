@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "soft",
+  "status": "ready",
+  "label": "Soft",
+  "choose": "Neumorphism: soft raised surfaces, low contrast edges; calm consumer apps.",
+  "family": "soft",
+  "css": "recipe.css",
+  "order": 50
+}

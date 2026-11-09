@@ -104,8 +104,30 @@ export function resetMockStore() {
   }
 }
 
+/** Story 30.3: the design plugin check's state switch (`localStorage["bga-mock-state"]`): `empty` answers reads with
+ *  no records, `error` with a 500, `slow` after a delay (the loading state). Dev tool only; unset in real use. */
+function mockState(): "empty" | "error" | "slow" | null {
+  try {
+    const value = typeof localStorage === "undefined" ? null : localStorage.getItem("bga-mock-state");
+    return value === "empty" || value === "error" || value === "slow" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+async function staged(request: Request): Promise<Response | null> {
+  const state = mockState();
+  if (!state || request.method !== "GET") return null;
+  if (state === "slow") await new Promise((resolve) => setTimeout(resolve, 4000));
+  if (state === "error") {
+    return HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "The mock API is set to fail", details: null } }, { status: 500 });
+  }
+  return null;
+}
+
 function records(entity: string | null): TRecord[] {
   if (!entity) return [];
+  if (mockState() === "empty") return [];
   store[entity] ??= [];
   return store[entity];
 }
@@ -281,6 +303,8 @@ function handler(op: TMockOperation): HttpHandler {
     const user = currentUser(request, records);
     const blocked = gate(op, user);
     if (blocked) return blocked;
+    const stagedResponse = await staged(request);
+    if (stagedResponse) return stagedResponse;
     const own = await pluginOperation(op, request, params as Record<string, unknown>, records);
     if (own) return own;
     if (op.mock === "aggregate" && op.aggregate) return HttpResponse.json(aggregate(op.aggregate, records(op.entity)));

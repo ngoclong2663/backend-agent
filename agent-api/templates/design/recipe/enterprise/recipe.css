@@ -1,0 +1,4 @@
+@root { --radius: 0.25rem; }
+@root body { background: color-mix(in oklab, var(--muted) 70%, var(--background)); }
+@root [data-slot="card"] { box-shadow: none; border: 1px solid var(--border); background: var(--card); }
+@root [data-slot="table-cell"] { padding-block: 0.375rem; }

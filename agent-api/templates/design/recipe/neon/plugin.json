@@ -1,0 +1,30 @@
+{
+  "kind": "recipe",
+  "name": "neon",
+  "status": "ready",
+  "label": "Neon",
+  "choose": "Dark, cyberpunk, glowing accents; never for health, finance or legal products.",
+  "family": "bold",
+  "css": "recipe.css",
+  "order": 100,
+  "guards": [
+    "health",
+    "medical",
+    "clinic",
+    "dental",
+    "dentist",
+    "hospital",
+    "patient",
+    "pharmacy",
+    "therapy",
+    "bank",
+    "banking",
+    "finance",
+    "financial",
+    "accounting",
+    "insurance",
+    "legal",
+    "law",
+    "tax"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "kind": "list-view",
+  "name": "cards",
+  "status": "ready",
+  "label": "Cards",
+  "choose": "A few fields a person reads, one card per record; the card's anatomy comes from the entity's card plugin.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "fallback": "table",
+  "exports": [
+    "RoleCards"
+  ],
+  "marker": "cards",
+  "builtin": true,
+  "order": 20,
+  "module": "./views",
+  "tags": [
+    "cards"
+  ]
+}

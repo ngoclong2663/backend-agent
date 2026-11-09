@@ -43,7 +43,7 @@ DEV_ENV := DB_URL=postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@loc
            VIDEO_PROVIDERS=$(VIDEO_PROVIDERS) YOUTUBE_API_KEY=$(YOUTUBE_API_KEY) PIXABAY_API_KEY=$(PIXABAY_API_KEY)
 
 .PHONY: env up down down-all ps logs dev dev-down dev-api dev-worker dev-ui setup venv migrate test lint template runner runner-node frontend-base icon-index \
-        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app app-design-report app-design-proto kit-test sample-media video-keys
+        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app design-plugin-new design-plugin-check app-design-report app-design-proto kit-test sample-media video-keys
 
 env:
 	@test -f .env && echo ".env already exists" || ( \
@@ -125,7 +125,16 @@ sample-media:
 kit-test:
 	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none LANGSMITH_TRACING=false $(PY)/python -m scripts.kit_tests $(ARGS)
 
-# The app design report (Story 23.1): the golden apps' similarity, frames and design checks, no model call.
+# Design plugins (Epic 30, Story 30.3): start one from its kind's starter; run the gates on one (Docker, runner-node).
+#   make design-plugin-new KIND=card NAME=try
+#   make design-plugin-check NAME=try [KIND=card] [ARGS="--fast"]
+design-plugin-new:
+	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none $(PY)/python -m scripts.design_plugin new $(KIND) $(NAME)
+
+design-plugin-check:
+	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none LANGSMITH_TRACING=false $(PY)/python -m scripts.design_plugin check $(NAME) $(if $(KIND),--kind $(KIND),) $(ARGS)
+
+# The app design report (Story 23.1; Story 30.1: signed in, fingerprints, edge similarity): the golden apps, no model call.
 app-design-report:
 	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none LANGSMITH_TRACING=false $(PY)/python -m scripts.app_design_report $(ARGS)
 

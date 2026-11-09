@@ -12,6 +12,8 @@ from pydantic import Field
 
 from src.modules.shared.domain.backend_spec.schema_v1 import ENTITY_NAME, IDENTIFIER, SpecModel
 
+from .design_registry import names as plugin_names
+
 ICON = r"^[A-Z][A-Za-z0-9]*$"  # a Lucide icon name, e.g. "BookOpen"
 
 # The app kit's sections (`templates/nextjs_overlay/files/dynamic/app/`), by FrontendSpec component name.
@@ -86,18 +88,20 @@ class AppLanding(SpecModel):
 # -- Epic 23: the design space (how the app is presented; code checks every choice against the contract) -----------
 
 Archetype = Literal["back-office", "catalogue", "feed", "workspace", "booking", "learning", "storefront"]
-Shell = Literal["sidebar", "topbar", "topbar-tabs", "rail"]
+# Epic 30 (Story 30.2): the values of these axes are the ready design plugins (`templates/design/<kind>/`), read once
+# through the registry; adding a plugin folder adds its name here, in the answer schema and in the prompt.
+Shell = Literal[plugin_names("shell")]  # type: ignore[valid-type]
 MobileNav = Literal["drawer", "bottom-tabs"]
 Frame = Literal["narrow", "standard", "wide", "full"]
 Density = Literal["compact", "comfortable", "spacious"]
-HomeView = Literal["dashboard", "feed", "catalogue", "agenda", "bento"]
-ListView = Literal["table", "cards", "media-grid", "feed", "board", "calendar"]
-DetailView = Literal["record", "media", "profile"]
-FiltersStyle = Literal["toolbar", "chips", "facets", "search-first"]
-Recipe = Literal[
-    "minimal", "swiss", "material", "enterprise", "soft", "clay",
-    "glass", "aurora", "brutalist", "neon", "playful", "editorial",
-]  # fmt: skip
+HomeView = Literal[plugin_names("home")]  # type: ignore[valid-type]
+ListView = Literal[plugin_names("list-view")]  # type: ignore[valid-type]
+DetailView = Literal[plugin_names("detail-view")]  # type: ignore[valid-type]
+FiltersStyle = Literal[plugin_names("filters")]  # type: ignore[valid-type]
+Recipe = Literal[plugin_names("recipe")]  # type: ignore[valid-type]
+Card = Literal[plugin_names("card")]  # type: ignore[valid-type]  # Story 30.4: the anatomy of one record in a grid
+CardAspect = Literal["wide", "portrait", "square", "auto"]
+FontPairing = Literal[plugin_names("font-pairing")]  # type: ignore[valid-type]  # Story 30.6: the type (theme fonts)
 FieldName = Annotated[str, Field(pattern=IDENTIFIER, max_length=63)]
 MAX_META = 3  # short fields on a card's meta line
 
@@ -123,16 +127,23 @@ class AppEntityDesign(SpecModel):
     detail_view: DetailView | None = None
     roles: AppFieldRoles = AppFieldRoles()
     filters_style: FiltersStyle | None = None
+    # Story 30.4: the card anatomy in grid views, its media's aspect (a poster is portrait, a cover square) and the
+    # grid's columns on wide screens; code fills them from the fields when the brief leaves them out
+    card: Card | None = None
+    aspect: CardAspect | None = None
+    columns: Annotated[int, Field(ge=2, le=6)] | None = None
     group_by: FieldName | None = None  # a board's column field (a status)
     date_field: FieldName | None = None  # a calendar's or an agenda's date
     end_field: FieldName | None = None  # a calendar's end
 
 
 class AppLook(SpecModel):
-    """One look the user can pick (Story 23.7): a style recipe and why it fits."""
+    """One look the user can pick (Story 23.7): a style recipe and why it fits. Story 30.6: the font pairing that
+    goes with it (code picks one suited to the recipe; the three looks use at least two pairings)."""
 
     recipe: Recipe
     reason: str | None = Field(default=None, max_length=200)
+    font_pairing: FontPairing | None = None
 
 
 HexColor = Annotated[str, Field(pattern=r"^#[0-9a-fA-F]{6}$")]
@@ -167,6 +178,12 @@ class AppDesign(SpecModel):
     looks: list[AppLook] = Field(default=[], max_length=3)
     requested: AppRequestedStyle | None = None  # what the requirement says about the look (2026-11-07)
     recipe: Recipe | None = None  # the look the user picked in the review (Story 23.7); none: the first look
+    # Story 30.6: the type of the app (a `font-pairing` plugin: heading and body fonts, weight, case, tracking, scale);
+    # none: the look's own pairing, else the design direction's fonts
+    font_pairing: FontPairing | None = None
+    # Story 30.7 (D9): what picked among equal candidates for the axes the brief left open; the same seed gives the
+    # same design, a new one another layout. Written by code (the requirement's hash), never by the model.
+    seed: int | None = None
     reason: str | None = Field(default=None, max_length=300)
     replaced: list[str] = []
 
@@ -233,12 +250,20 @@ DESIGN_PARTS = ("design", "areas")
 
 
 CODE_PARTS = ("workflows",)  # Story 26.4: outline parts only code writes; no drafting prompt or schema shows them
+DESIGN_CODE_FIELDS = ("seed", "replaced")  # Story 30.7: design fields only code writes
 
 
 def outline_schema(design: bool = True) -> dict[str, Any]:
     """The AppOutline JSON schema (camelCase), without the design parts unless asked."""
     schema = AppOutline.model_json_schema(by_alias=True)
     schema = {**schema, "properties": {k: v for k, v in schema["properties"].items() if k not in CODE_PARTS}}
+    defs = dict(schema.get("$defs") or {})
+    if "AppDesign" in defs:
+        design_def = {**defs["AppDesign"], "properties": dict(defs["AppDesign"].get("properties") or {})}
+        for name in DESIGN_CODE_FIELDS:
+            design_def["properties"].pop(name, None)
+        defs["AppDesign"] = design_def
+        schema = {**schema, "$defs": defs}
     if design:
         return schema
     out = {**schema, "properties": {k: v for k, v in schema["properties"].items() if k not in DESIGN_PARTS}}

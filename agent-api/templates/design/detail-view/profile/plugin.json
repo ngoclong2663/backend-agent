@@ -1,0 +1,27 @@
+{
+  "kind": "detail-view",
+  "name": "profile",
+  "status": "ready",
+  "label": "Profile",
+  "choose": "A picture beside the name, for people and organisations.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [
+    "imageField"
+  ],
+  "fallback": "record",
+  "exports": [
+    "ProfileDetail"
+  ],
+  "marker": "profile",
+  "builtin": true,
+  "order": 30,
+  "module": "./details"
+}

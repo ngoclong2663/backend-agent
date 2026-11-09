@@ -1,0 +1,22 @@
+{
+  "kind": "list-view",
+  "name": "calendar",
+  "status": "ready",
+  "label": "Calendar",
+  "choose": "Records happen at a date or time: a month, the agenda on phones.",
+  "archetypes": [
+    "booking",
+    "workspace"
+  ],
+  "needs": [
+    "dateField"
+  ],
+  "fallback": "table",
+  "exports": [
+    "Calendar"
+  ],
+  "marker": "calendar",
+  "builtin": true,
+  "order": 60,
+  "dispatch": false
+}

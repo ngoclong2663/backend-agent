@@ -1,0 +1,20 @@
+{
+  "kind": "shell",
+  "name": "rail",
+  "status": "ready",
+  "label": "Icon rail",
+  "choose": "Icons only, a workspace: the sections as an icon rail that opens on hover.",
+  "archetypes": [
+    "workspace",
+    "back-office"
+  ],
+  "needs": [],
+  "fallback": "sidebar",
+  "exports": [
+    "SidebarShell"
+  ],
+  "marker": "rail",
+  "builtin": true,
+  "order": 40,
+  "module": "./shells"
+}

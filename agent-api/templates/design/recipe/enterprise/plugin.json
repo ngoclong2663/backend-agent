@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "enterprise",
+  "status": "ready",
+  "label": "Enterprise",
+  "choose": "Dense, trustworthy, corporate; back offices and data tools.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 40
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "filters",
+  "name": "chips",
+  "status": "ready",
+  "label": "Chips",
+  "choose": "A status or a category with a few values, as a row of chips.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [
+    "enumOrReferenceFilter"
+  ],
+  "fallback": "toolbar",
+  "exports": [],
+  "marker": "chips",
+  "builtin": true,
+  "order": 20,
+  "dispatch": false
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "card",
+  "name": "stacked",
+  "status": "ready",
+  "label": "Stacked",
+  "choose": "The media on top, then the title, subtitle, meta and badge: the plain card for most records.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [
+    "StackedCard"
+  ],
+  "files": [
+    "StackedCard.tsx"
+  ],
+  "marker": "stacked",
+  "order": 10
+}

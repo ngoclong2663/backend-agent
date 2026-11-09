@@ -21,6 +21,17 @@ const list = (value, fallback) => (value ? value.split(",").map((item) => item.t
 const WIDTHS = list(process.env.DESIGN_CHECK_WIDTHS, ["390", "768", "1440"]).map(Number);
 const SCHEMES = list(process.env.DESIGN_CHECK_SCHEMES, ["light", "dark"]);
 const PORT = 3199;
+// Story 30.1: DESIGN_CHECK_LOGIN=<email>:<password> signs in on the app's sign-in page (DESIGN_CHECK_SIGN_IN, default
+// /login) before the routes are shot, so the measurements are what a signed-in user sees.
+const LOGIN = process.env.DESIGN_CHECK_LOGIN ? process.env.DESIGN_CHECK_LOGIN.split(":") : null;
+const SIGN_IN = process.env.DESIGN_CHECK_SIGN_IN || "/login";
+// Story 30.3 (the design plugin gates): DESIGN_CHECK_RECIPES=a,b shoots every view once per recipe (the build carries
+// each recipe's CSS under `:root[data-recipe=<name>]`, `recipe_css(..., scope=)`); DESIGN_CHECK_STATES=empty,error,loading
+// adds the mock API's states (`bga-mock-state`) per view; DESIGN_CHECK_A11Y=1 adds the keyboard pass (focus rings) and
+// the contrast of every text element against its backdrop.
+const RECIPES = list(process.env.DESIGN_CHECK_RECIPES, [null]);
+const STATES = list(process.env.DESIGN_CHECK_STATES, []);
+const A11Y = process.env.DESIGN_CHECK_A11Y === "1";
 mkdirSync(shots, { recursive: true });
 
 const exported = existsSync("out");
@@ -81,7 +92,71 @@ function measure() {
   const labelled = (el) =>
     (el.labels && el.labels.length > 0) || el.getAttribute("aria-label") || el.getAttribute("aria-labelledby") || el.closest("label");
   const fields = form ? [...form.querySelectorAll('[data-slot="field"]')].filter(visible) : [];
+  // Story 30.1: the kit's structural markers (shell, views, details, cards, filters, figures), for the fingerprints
+  const markers = {};
+  for (const key of ["shell", "view", "detail", "card", "filters", "figures", "home"]) {
+    const values = [...new Set([...document.querySelectorAll(`[data-bga-${key}]`)].map((el) => el.getAttribute(`data-bga-${key}`)))];
+    if (values.length) markers[key] = values;
+  }
+  // Story 30.3: the contrast of text against the backdrop behind it (the nearest painted background colour up the
+  // tree; text over an image or a gradient is skipped: the check cannot see the pixels), WCAG 2.x AA
+  const parseColor = (value) => {
+    const m = /rgba?\(([^)]+)\)/.exec(value || "");
+    if (!m) return null;
+    const parts = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);
+    return { r: parts[0], g: parts[1], b: parts[2], a: parts.length > 3 ? parts[3] : 1 };
+  };
+  const luminance = ({ r, g, b }) => {
+    const channel = (c) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  };
+  const blend = (top, under) => ({
+    r: top.r * top.a + under.r * (1 - top.a),
+    g: top.g * top.a + under.g * (1 - top.a),
+    b: top.b * top.a + under.b * (1 - top.a),
+    a: 1,
+  });
+  const backdrop = (el) => {
+    const layers = [];
+    for (let node = el; node; node = node.parentElement) {
+      const style = getComputedStyle(node);
+      if (style.backgroundImage && style.backgroundImage !== "none") return null;
+      const color = parseColor(style.backgroundColor);
+      if (color && color.a > 0) {
+        layers.unshift(color);
+        if (color.a >= 1) break;
+      }
+      if (node === document.documentElement) break;
+    }
+    if (!layers.length || layers[0].a < 1) layers.unshift({ r: 255, g: 255, b: 255, a: 1 });
+    return layers.reduce((under, top) => blend(top, under));
+  };
+  const contrastFailures = [];
+  let contrastChecked = 0;
+  for (const el of textElements) {
+    if (el.closest("[data-bga-media], video, canvas, svg, [aria-hidden='true']")) continue;
+    const style = getComputedStyle(el);
+    const color = parseColor(style.color);
+    const under = backdrop(el);
+    if (!color || !under || color.a === 0) continue;
+    const fore = color.a < 1 ? blend(color, under) : color;
+    const l1 = luminance(fore);
+    const l2 = luminance(under);
+    const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    const size = parseFloat(style.fontSize);
+    const large = size >= 24 || (size >= 18.66 && parseInt(style.fontWeight, 10) >= 700);
+    contrastChecked += 1;
+    if (ratio < (large ? 3 : 4.5) && contrastFailures.length < 12) {
+      const text = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(" ").slice(0, 40);
+      contrastFailures.push({ text, ratio: Math.round(ratio * 100) / 100, color: style.color, size: Math.round(size) });
+    }
+  }
   return {
+    markers,
+    contrast: { checked: contrastChecked, failing: contrastFailures },
     h1Lines: h1 ? lines(h1) : null,
     navHeight: header ? Math.round(header.getBoundingClientRect().height) : null,
     ctaAboveFold: cta ? cta.getBoundingClientRect().bottom <= window.innerHeight : null,
@@ -165,24 +240,76 @@ async function motionPass(browser, route) {
   return { motionOn, ctaVisibleMs, ctaDelayMs, hidden, noJsHidden };
 }
 
+async function signIn(page) {
+  await page.goto(`http://127.0.0.1:${PORT}${SIGN_IN}`, { waitUntil: "networkidle" });
+  await page.locator('input[name="email"], input[type="email"]').first().fill(LOGIN[0], { timeout: 15_000 });
+  await page.locator('input[type="password"]').first().fill(LOGIN.slice(1).join(":"));
+  await page.locator('form button[type="submit"]').first().click();
+  await page.waitForURL((url) => !url.pathname.startsWith(SIGN_IN), { timeout: 20_000 }).catch(() => {});
+  await page.waitForLoadState("networkidle");
+}
+
+/** Story 30.3: Tab through the page: every focused element should show a ring (an outline or a box shadow). */
+async function keyboardPass(page) {
+  const seen = new Set();
+  const withoutRing = [];
+  let tabbed = 0;
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.keyboard.press("Tab");
+  for (let step = 0; step < 40; step += 1) {
+    const focused = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el === document.body) return null;
+      const style = getComputedStyle(el);
+      const ring =
+        (style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0) ||
+        (style.boxShadow && style.boxShadow !== "none") ||
+        el.matches(":focus-visible") === false; // the browser decided no ring is due (a pointer-style control)
+      const label = `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}${el.getAttribute("aria-label") ? "[" + el.getAttribute("aria-label") + "]" : ""}`;
+      return { label, ring, key: label + "@" + Math.round(el.getBoundingClientRect().top) };
+    });
+    if (!focused || seen.has(focused.key)) break;
+    seen.add(focused.key);
+    tabbed += 1;
+    if (!focused.ring && withoutRing.length < 10) withoutRing.push(focused.label);
+    await page.keyboard.press("Tab");
+  }
+  return { tabbed, withoutRing };
+}
+
 const browser = await chromium.launch();
 const report = {};
 try {
   for (const scheme of SCHEMES) {
     for (const width of WIDTHS) {
-      const page = await browser.newPage({
-        viewport: { width, height: 900 },
-        colorScheme: scheme,
-        reducedMotion: "reduce",
-      });
-      for (const route of routes) {
-        await page.goto(`http://127.0.0.1:${PORT}${route}`, { waitUntil: "networkidle" });
-        await page.evaluate(() => document.fonts.ready);
-        const name = `${route === "/" ? "home" : route.slice(1).replaceAll("/", "-")}-${width}-${scheme}`;
-        await page.screenshot({ path: `${shots}/${name}.png`, fullPage: true });
-        report[name] = await page.evaluate(measure);
+      for (const recipe of RECIPES) {
+        const page = await browser.newPage({
+          viewport: { width, height: 900 },
+          colorScheme: scheme,
+          reducedMotion: "reduce",
+        });
+        if (recipe) await page.addInitScript((name) => { document.documentElement.dataset.recipe = name; }, recipe);
+        if (LOGIN) await signIn(page);
+        const suffix = recipe ? `-${recipe}` : "";
+        for (const route of routes) {
+          await page.goto(`http://127.0.0.1:${PORT}${route}`, { waitUntil: "networkidle" });
+          await page.evaluate(() => document.fonts.ready);
+          const name = `${route === "/" ? "home" : route.slice(1).replaceAll("/", "-")}-${width}-${scheme}${suffix}`;
+          await page.screenshot({ path: `${shots}/${name}.png`, fullPage: true });
+          report[name] = await page.evaluate(measure);
+          if (A11Y) report[name].keyboard = await keyboardPass(page);
+          for (const state of STATES) {
+            // the mock API's state for the next load only (the key is read per request)
+            await page.evaluate((value) => localStorage.setItem("bga-mock-state", value), state === "loading" ? "slow" : state);
+            await page.goto(`http://127.0.0.1:${PORT}${route}`, { waitUntil: state === "loading" ? "domcontentloaded" : "networkidle" });
+            if (state === "loading") await page.waitForTimeout(600);
+            await page.screenshot({ path: `${shots}/${name}-${state}.png`, fullPage: true });
+            report[`${name}-${state}`] = await page.evaluate(measure);
+            await page.evaluate(() => localStorage.removeItem("bga-mock-state"));
+          }
+        }
+        await page.close();
       }
-      await page.close();
     }
   }
   if (process.env.DESIGN_CHECK_MOTION === "1") {

@@ -1,11 +1,12 @@
 import { apiClient } from "@/lib/api-client";
 import type {
   TCreateSpecDraftPayload,
+  TDesignRegistry,
   TEngineList,
   TExampleIndex,
   TFrontendImportResult,
-  TSpecKind,
   TSpecDraft,
+  TSpecKind,
   TSpecPairReport,
   TValidationReport,
 } from "../types";
@@ -47,6 +48,11 @@ export function fetchSpecDraft(draftId: string) {
 
 export function fetchEngines() {
   return apiClient.get<TEngineList>("/engines");
+}
+
+/** Epic 30: the ready design plugins by kind (the registry), for the Design panel's choices. */
+export function fetchDesignPlugins() {
+  return apiClient.get<TDesignRegistry>("/design-plugins");
 }
 
 async function fetchStatic<TData>(path: string): Promise<TData> {

@@ -32,8 +32,8 @@ when I arrive, and watch or listen on a page that shows what comes next, so that
 
 ## Acceptance criteria
 
-- [ ] Media apps can be drafted with shelves, a featured home and a watch page, and pass their gates.
-- [ ] Without the data a plugin needs, the app falls back with one note and still renders.
+- [x] Media apps can be drafted with shelves, a featured home and a watch page, and pass their gates.
+- [x] Without the data a plugin needs, the app falls back with one note and still renders.
 
 ## Verify
 
@@ -42,3 +42,19 @@ when I arrive, and watch or listen on a page that shows what comes next, so that
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `shelves` (list view; needs `mediaField`, `groupField`: rows by the group (`groupBy`: the
+badge's enum, else the first enum without a flow, else a parent), a snap-scrolling strip with arrow buttons on wide
+screens and arrow-key scrolling, "See all" to the list filtered to the group, cards from the entity's card plugin;
+tagged `whole` so the list loads at once like a board), `featured` (home; needs `mainList`, `mediaField`, `featured`:
+the first record flagged `featured`, else the newest (the list sorts newest first: `list_features` adds the date sort
+for a featured home as for a feed), across the top with its title, subtitle, meta and the main action, then shelves
+or the grid), `watch` (detail; needs `playableField`: the player left, title, meta and actions under it, an "Up next"
+list of the same group, else the same parent, else the newest, from the entity's list operation; a video record now
+opens on it by default when the entity has a list, else on `media`). Fallbacks with one note each (no group →
+media-grid; no media or date → catalogue; image only → media). Tests in `test_app_design.py` (30.5 block);
+`make kit-test` clean on an outline using all three.
+
+Deviations: chips with counts (step 4) are not done: the list aggregate the counts would need is not planned for
+every filter, and the chips stay as they were (plugin backlog). The shelves group client-side over the loaded list
+(up to the list's `maxLimit`), as the catalogue home does, rather than adding a group feature to the API.

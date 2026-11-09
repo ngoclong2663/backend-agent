@@ -1,0 +1,22 @@
+{
+  "kind": "home",
+  "name": "dashboard",
+  "status": "ready",
+  "label": "Dashboard",
+  "choose": "Figures and charts answer the first question when the app opens.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [],
+  "marker": "dashboard",
+  "builtin": true,
+  "order": 10,
+  "dispatch": false
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "list-view",
+  "name": "board",
+  "status": "ready",
+  "label": "Board",
+  "choose": "Records move through the statuses of a transition rule: a column per status.",
+  "archetypes": [
+    "workspace",
+    "back-office"
+  ],
+  "needs": [
+    "statusFlow"
+  ],
+  "fallback": "cards",
+  "exports": [
+    "Board"
+  ],
+  "marker": "board",
+  "builtin": true,
+  "order": 50,
+  "module": "./views",
+  "tags": [
+    "whole"
+  ]
+}

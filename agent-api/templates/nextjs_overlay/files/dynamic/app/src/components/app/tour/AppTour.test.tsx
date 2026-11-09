@@ -23,9 +23,14 @@ beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-/** The first create form with an example and no required upload or picker (every generated app has one). */
+/** The first create form with an example and no required upload, picker or parent from the route (the test mocks an
+ *  empty route); every generated app has one. */
 const formId = Object.entries(app.forms).find(
-  ([, form]) => form.example && !form.load && !form.fields.some((field) => field.required && (field.upload || field.reference)),
+  ([, form]) =>
+    form.example &&
+    !form.load &&
+    form.operationId.endsWith(".create") &&
+    !form.fields.some((field) => field.hidden || (field.required && (field.upload || field.reference))),
 )?.[0];
 
 /** Story 22.7: an app with sign-in answers its writes to a signed-in demo user whose role the operation allows. */

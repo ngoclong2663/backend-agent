@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "swiss",
+  "status": "ready",
+  "label": "Swiss",
+  "choose": "Grid, strong type, flat colour; information-dense products.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 20
+}

@@ -1,0 +1,20 @@
+{
+  "kind": "home",
+  "name": "feed",
+  "status": "ready",
+  "label": "Feed home",
+  "choose": "The main entity's newest records, read one after another.",
+  "archetypes": [
+    "feed",
+    "learning"
+  ],
+  "needs": [
+    "mainList"
+  ],
+  "fallback": "dashboard",
+  "exports": [],
+  "marker": "feed",
+  "builtin": true,
+  "order": 20,
+  "dispatch": false
+}

@@ -1,0 +1,24 @@
+{
+  "kind": "list-view",
+  "name": "table",
+  "status": "ready",
+  "label": "Table",
+  "choose": "Many fields to compare, staff work: one row per record.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [
+    "TableRows"
+  ],
+  "marker": "table",
+  "builtin": true,
+  "order": 10,
+  "module": "./views"
+}

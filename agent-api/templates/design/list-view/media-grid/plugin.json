@@ -1,0 +1,27 @@
+{
+  "kind": "list-view",
+  "name": "media-grid",
+  "status": "ready",
+  "label": "Media grid",
+  "choose": "The record has an image or a video and people pick by looking: a grid of pictures first.",
+  "archetypes": [
+    "catalogue",
+    "learning",
+    "storefront",
+    "feed"
+  ],
+  "needs": [
+    "mediaField"
+  ],
+  "fallback": "cards",
+  "exports": [
+    "MediaGrid"
+  ],
+  "marker": "media-grid",
+  "builtin": true,
+  "order": 30,
+  "module": "./views",
+  "tags": [
+    "cards"
+  ]
+}

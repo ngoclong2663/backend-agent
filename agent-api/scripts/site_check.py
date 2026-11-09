@@ -61,10 +61,17 @@ async def check_site(
     backend: dict[str, Any] | None = None,
     motion: bool = False,
     prepare: Any = None,
+    login: str | None = None,
+    sign_in: str | None = None,
+    passes: list[dict[str, Any]] | None = None,
+    extra_env: dict[str, str] | None = None,
 ) -> dict[str, Any] | None:
     """Builds `spec` (dynamic: against `backend`'s contract) and runs the design check on `routes` (default:
     `default_routes`). The screenshots and `report.json` land in `shots`; returns the report, or None when the spec
-    or the build failed (the reason is printed). `motion` adds the motion and no-JavaScript passes (Story 20.6)."""
+    or the build failed (the reason is printed). `motion` adds the motion and no-JavaScript passes (Story 20.6).
+    `login` (`email:password`, Story 30.1) signs in on `sign_in` (default `/login`) before the shots. `passes` (Story
+    30.1: one per area, `{"name", "routes", "login"}`) runs the check once per pass on the same build, into
+    `shots/<name>/`, and returns the reports by name."""
     from src.modules.shared.domain.frontend_spec import validate_frontend_spec_data
     from src.orchestrator.frontend.planner import plan_frontend
     from src.orchestrator.frontend.scaffold import scaffold_frontend
@@ -98,16 +105,29 @@ async def check_site(
             print(f"  {shots.name}: build {outcome.summary}\n{outcome.digest[-3000:]}")
             return None
         shutil.copy(DESIGN_CHECK, project / "design-check.mjs")
-        options = (("DESIGN_CHECK_WIDTHS", widths), ("DESIGN_CHECK_SCHEMES", schemes), ("DESIGN_CHECK_MOTION", "1"))
-        env = {key: value for key, value in options if value and (key != "DESIGN_CHECK_MOTION" or motion)}
-        run = await sandbox.exec(f"node design-check.mjs shots {' '.join(routes)}", timeout_s=900, env=env)
-        report = project / "shots" / "report.json"
-        if not run.ok or not report.is_file():
-            print(f"  {shots.name}: design check failed\n{run.output[-3000:]}")
-            return None
+        reports: dict[str, Any] = {}
+        for item in passes or [{"name": "", "routes": routes, "login": login}]:
+            options = (
+                ("DESIGN_CHECK_WIDTHS", widths),
+                ("DESIGN_CHECK_SCHEMES", schemes),
+                ("DESIGN_CHECK_MOTION", "1"),
+                ("DESIGN_CHECK_LOGIN", item.get("login")),
+                ("DESIGN_CHECK_SIGN_IN", sign_in),
+            )
+            env = {key: value for key, value in options if value and (key != "DESIGN_CHECK_MOTION" or motion)}
+            env |= extra_env or {}  # Story 30.3: the plugin gates (recipes, states, a11y)
+            folder = f"shots/{item['name']}" if item.get("name") else "shots"
+            run = await sandbox.exec(
+                f"node design-check.mjs {folder} {' '.join(item['routes'])}", timeout_s=1800, env=env
+            )
+            report = project / folder / "report.json"
+            if not run.ok or not report.is_file():
+                print(f"  {shots.name}: design check failed\n{run.output[-3000:]}")
+                return None
+            reports[item.get("name") or ""] = json.loads(report.read_text())
         shutil.rmtree(shots, ignore_errors=True)
         shutil.copytree(project / "shots", shots)
-        return json.loads((shots / "report.json").read_text())
+        return reports if passes else reports[""]
     finally:
         await sandbox.stop()
         shutil.rmtree(target, ignore_errors=True)

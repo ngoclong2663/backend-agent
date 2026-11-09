@@ -1,0 +1,34 @@
+{
+  "kind": "font-pairing",
+  "name": "neutral",
+  "status": "ready",
+  "label": "Neutral",
+  "choose": "One quiet grotesk for everything: tools and back offices that should not have a voice of their own.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "recipes": [
+    "minimal",
+    "swiss",
+    "enterprise",
+    "material",
+    "terminal"
+  ],
+  "heading": "Inter",
+  "body": "Inter",
+  "mono": "JetBrains Mono",
+  "headingWeight": 600,
+  "headingCase": "normal",
+  "tracking": "tight",
+  "ratio": "default",
+  "scripts": [
+    "latin"
+  ],
+  "order": 10
+}

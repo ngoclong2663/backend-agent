@@ -1,0 +1,6 @@
+{
+  "app": "media-library",
+  "design": {
+    "fontPairing": "{{name}}"
+  }
+}

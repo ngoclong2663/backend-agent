@@ -85,6 +85,20 @@ export type TEngineList = {
 
 export type TSpecKind = "backend" | "frontend";
 
+/** Epic 30: one ready design plugin as the registry describes it. */
+export type TDesignPlugin = {
+  name: string;
+  label: string;
+  choose: string;
+  archetypes: string[];
+  needs: string[];
+  fallback: string | null;
+  family?: "quiet" | "soft" | "bold";
+  preview?: string;
+};
+/** Epic 30: the registry by kind (`shell`, `list-view`, `detail-view`, `home`, `filters`, `card`, `recipe`, `font-pairing`). */
+export type TDesignRegistry = Record<string, TDesignPlugin[]>;
+
 export type TSpecTab = "requirement" | "import" | "json" | "frontend" | "contract";
 
 // -- Requirement drafting (Stories 2.4, 12.4) ---------------------------------------------------------------------

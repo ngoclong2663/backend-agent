@@ -154,6 +154,12 @@ def scaffold_frontend(
                 target = source.relative_to(root).as_posix()
                 _copy(source, project / target, replacements)
                 overlay_files.append(target)
+        from src.modules.shared.domain.frontend_spec.design_registry import registry
+
+        for item in (plan.get("app") or {}).get("designPlugins") or []:  # Epic 30 (D4): only the plugins it uses
+            for source, target in registry().copied(item["kind"], item["name"]):
+                _copy(source, project / target, replacements)
+                overlay_files.append(target)
         if (plan.get("app") or {}).get("media") and SAMPLES_DIR.is_dir():
             # Story 29.2: the sample media the mocks play (`/samples/…`), only for apps with media fields
             for source in _files(SAMPLES_DIR):

@@ -12,11 +12,12 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from src.configs import config
+from src.modules.shared.domain.frontend_spec.design_registry import registry
 
 SLOTS_DIR = "src/components/app/slots"
 REGISTRY = "src/components/app/slots.ts"
 SLOT_INPUT = ".bga/slot.json"  # what the slot's engine call is asked to write (the fake engine reads it too)
-CARD_VIEWS = ("media-grid", "cards", "feed")
+CARD_VIEWS = registry().tagged("list-view", "cards")  # Epic 30: the list views laid out as cards
 MAX_CARDS = 3  # the main entity's card and up to two more
 # Things a slot may not do: the kit's data layer, forms and the network belong to tested code (Story 23.11).
 FORBIDDEN = (

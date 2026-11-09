@@ -25,8 +25,8 @@ command that checks it the way the gates require, so that each new plugin is qui
 
 ## Acceptance criteria
 
-- [ ] A new plugin of any kind can be started, built, checked and promoted with the two commands and the guide.
-- [ ] A plugin with a failing gate cannot be `ready` (the registry test refuses it).
+- [x] A new plugin of any kind can be started, built, checked and promoted with the two commands and the guide.
+- [x] A plugin with a failing gate cannot be `ready` (the registry test refuses it).
 
 ## Verify
 
@@ -35,3 +35,21 @@ command that checks it the way the gates require, so that each new plugin is qui
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `scripts/design_plugin.py` (`make design-plugin-new KIND= NAME=`: copies
+`templates/design/_starter/<kind>/` with the placeholders filled; `make design-plugin-check NAME= [KIND=] [ARGS=--fast]`:
+the fast part (descriptor loads strictly, files, exports, marker, `fixture.json`), then the fixture app built once on
+the mocks with every ready recipe scoped under `:root[data-recipe=…]` (`recipe_css(..., scope=)`), signed in per area,
+375 / 1440 px, light / dark, `DESIGN_CHECK_RECIPES`, the mock API's `empty` / `error` / `loading` states
+(`bga-mock-state`, `DESIGN_CHECK_STATES`), the keyboard pass and the contrast of every text element against its backdrop
+(`DESIGN_CHECK_A11Y`; text over images is skipped); a pass / fail table, `check.json`, `preview.png` in the folder).
+Starters for all eight kinds; a `fixture.json` for every existing plugin (the media library meets every `needs` key
+but `statusFlow`, the board's fixture is agency-projects). Promotion is by hand (`status: "ready"`);
+`test_every_plugin_passes_the_fast_checks` runs the fast part for every plugin in `make test`. The guide
+(`docs/development/design-plugins.md`) describes the folder, the descriptor, the fixture, what the registry generates
+and the kit contracts.
+
+Deviations: reduced transparency is not emulated (Playwright has no switch for it; the recipes use tokens, not
+transparency, except glass, which is checked by eye); the "fixture builds" part is not in CI's fast checks (it needs
+Docker) — the full check does it. `make design-plugin-check` was run on the Story 30.4 and 30.5 plugins (their
+Status notes).

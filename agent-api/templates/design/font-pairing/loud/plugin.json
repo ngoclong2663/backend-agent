@@ -1,0 +1,30 @@
+{
+  "kind": "font-pairing",
+  "name": "loud",
+  "status": "ready",
+  "label": "Loud",
+  "choose": "Wide display capitals over a plain body: events, music and brands that shout; headings short.",
+  "archetypes": [
+    "catalogue",
+    "feed",
+    "storefront",
+    "booking"
+  ],
+  "recipes": [
+    "brutalist",
+    "neon",
+    "aurora",
+    "playful"
+  ],
+  "heading": "Unbounded",
+  "body": "Archivo",
+  "mono": null,
+  "headingWeight": 700,
+  "headingCase": "upper",
+  "tracking": "wide",
+  "ratio": "dramatic",
+  "scripts": [
+    "latin"
+  ],
+  "order": 60
+}

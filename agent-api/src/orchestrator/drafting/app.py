@@ -24,7 +24,14 @@ from src.modules.shared.domain.frontend_spec.app import outline_schema
 from src.modules.shared.domain.schema_digest import schema_digest
 
 from ..backend.planner import build_plan
-from ..frontend.app.design import archetype_candidates, archetype_for, design_notes
+from ..frontend.app.design import (
+    archetype_candidates,
+    archetype_for,
+    assign_pairings,
+    design_choices,
+    design_notes,
+    design_seed,
+)
 from ..frontend.app.outline import complete_outline, humanize
 from ..frontend.app.recipes import complete_looks, recommended_looks, style_words
 from ..frontend.app.requested import follow_requested
@@ -34,9 +41,10 @@ from ..integration.contract import build_contract
 from .access import secure_access
 from .answer_schema import app_answer_schema
 
-# v6 (Epic 29): the media field types; v5: the requirement's own look (`design.requested`); v4 (Epic 25): the access
-# rules; v3 (Story 23.6): the design brief and areas; v2 (22.8): sign-in, roles, plugins
-PROMPT = ("draft_app", "v6")
+# v7 (Epic 30): the design choices from the plugin registry; v6 (Epic 29): the media field types; v5: the
+# requirement's own look (`design.requested`); v4 (Epic 25): the access rules; v3 (Story 23.6): the design brief and
+# areas; v2 (22.8): sign-in, roles, plugins
+PROMPT = ("draft_app", "v7")
 OUTLINE_FILE = "app-outline.json"  # what the model drafts next to the BackendSpec (code folds it into the FrontendSpec)
 # Outline examples shown in the prompt, relative to EXAMPLES_DIR; they fit `specs/flashcards.json`,
 # `specs/two-entity.json` and `specs/workshop-bookings.json` (the fake engine drafts from them too).
@@ -334,11 +342,13 @@ async def draft_app(
     requirement = context.get("requirement_text") or ""
     products = product_rows(requirement)
     product_types = [row.get("Product Type", "") for row in products]
+    candidates = archetype_candidates(requirement, product_types)
     context = {  # Story 23.6: code's candidates for the brief, the data's looks, the requirement's style words
         **context,
-        "archetype_candidates": ", ".join(archetype_candidates(requirement, product_types)),
+        "archetype_candidates": ", ".join(candidates),
         "recommended_looks": recommended_looks(products),
         "style_words": style_words(requirement),
+        "design_choices": design_choices(candidates),  # Epic 30: the plugins offered for these archetypes
     }
     result = await call("draft", prompts.render(*PROMPT, **context), response_schema=schema)
     if result.status != EngineStatus.OK:
@@ -376,7 +386,12 @@ async def draft_app(
         notes.append({"spec": "frontend", "path": "/app", "message": message, "suggestion": None})
     # Epic 23: code's archetype for a brief that names none (the requirement's words, then the direction's product)
     hint = archetype_for(requirement, [*product_types, (chosen or {}).get("productType") or ""])
-    outline, outline_fixes = complete_outline(drafted, backend, build_contract(backend, build_plan(backend)), hint)
+    # Story 30.7 (D9): the requirement's hash seeds the axes the brief left open (the same requirement, the same design)
+    if isinstance(drafted, dict) and not drafted.get("locale") and locale_of(requirement):
+        drafted["locale"] = locale_of(requirement)  # Story 30.6: a Japanese app takes a pairing that sets Japanese
+    outline, outline_fixes = complete_outline(
+        drafted, backend, build_contract(backend, build_plan(backend)), hint, seed=design_seed(requirement)
+    )
     outline_fixes += finish_looks(outline, requirement, products)
     if not outline.get("locale") and locale_of(requirement):  # Story 23.8: a Japanese requirement, a Japanese app
         outline["locale"] = locale_of(requirement)
@@ -415,5 +430,6 @@ def finish_looks(outline: dict[str, Any], requirement: str, products: list[dict[
     design = outline.setdefault("design", {})
     looks, notes = complete_looks(design.get("looks") or [], requirement, recommended_looks(products), types)
     design["looks"] = looks
+    notes += assign_pairings(design, outline.get("locale"), design.get("seed"))  # Story 30.6: a pairing per look
     design["replaced"] = [*design.get("replaced", []), *notes]
     return design_notes(notes)

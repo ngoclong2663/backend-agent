@@ -8,13 +8,15 @@ import { useParams, usePathname, useRouter, useSearchParams } from "next/navigat
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import {
   app,
   enumLabel,
+  fieldLabel,
   listOf,
   pageHref,
   photoCredit,
@@ -23,12 +25,15 @@ import {
   type TAppAction,
   type TAppEntity,
   type TAppSection,
+  type TCardAspect,
   type TEntityDesign,
   type TFieldRoles,
   type TRecord,
   type TRouteParams,
 } from "./app";
 import { useOperationQuery } from "./bindings";
+import { designRegistry } from "./design-registry";
+import type { TCardProps, TViewProps } from "./design-types";
 import { PhotoCredit } from "./PhotoCredit";
 import { FieldValue } from "./FieldValue";
 import { FileValue } from "./plugins";
@@ -36,7 +41,7 @@ import { RowActions } from "./RecordActions";
 import { slots } from "./slots";
 import { inSentence, t } from "./messages";
 
-export type TViewProps = { section: TAppSection; entity?: TAppEntity; records: TRecord[]; design: TEntityDesign };
+export type { TViewProps } from "./design-types";
 
 const dateFormat = new Intl.DateTimeFormat(app.locale, { weekday: "long", day: "numeric", month: "long" });
 const monthFormat = new Intl.DateTimeFormat(app.locale, { month: "long", year: "numeric" });
@@ -44,6 +49,36 @@ const timeFormat = new Intl.DateTimeFormat(app.locale, { hour: "numeric", minute
 const weekdays = Array.from({ length: 7 }, (_, i) =>
   new Intl.DateTimeFormat(app.locale, { weekday: "short" }).format(new Date(2024, 0, 1 + i)),
 ); // 2024-01-01 is a Monday
+
+/** Story 30.4: a card's media aspect (the entity design's, else the view's own default). Static class names: Tailwind
+ *  only ships what it can read. */
+const ASPECT_CLASS: Record<TCardAspect, string> = {
+  wide: "aspect-video",
+  portrait: "aspect-[2/3]",
+  square: "aspect-square",
+  auto: "aspect-video",
+};
+export function aspectClass(design: TEntityDesign, fallback: TCardAspect = "wide"): string {
+  return ASPECT_CLASS[design.aspect ?? fallback];
+}
+
+/** Story 30.4: the grid's columns on wide screens (the entity design's, else the view's own). */
+const GRID_COLUMNS: Record<number, string> = {
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-2 lg:grid-cols-3",
+  4: "sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4",
+  5: "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5",
+  6: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6",
+};
+export function gridColumns(design: TEntityDesign, fallback: number): string {
+  return GRID_COLUMNS[design.columns ?? fallback] ?? GRID_COLUMNS[fallback];
+}
+
+/** Story 30.4: one record drawn by the entity's card plugin (`design-registry.ts`), or null for the view's own card. */
+export function CardOf({ design, ...props }: Omit<TCardProps, "design"> & { design: TEntityDesign }) {
+  const Plugin = designRegistry.cards[design.card ?? ""];
+  return Plugin ? <Plugin design={design} {...props} /> : null;
+}
 
 export function viewHref(actions: TAppAction[], record: TRecord, route: TRouteParams): string | undefined {
   const view = actions.find((action) => action.id === "view" && action.page);
@@ -56,7 +91,7 @@ function hue(value: unknown): number {
   return hash;
 }
 
-function imageUrl(entity: TAppEntity | undefined, record: TRecord, field: string | undefined): string | null {
+export function imageUrl(entity: TAppEntity | undefined, record: TRecord, field: string | undefined): string | null {
   if (!field) return null;
   const urlField = entity?.fields?.[field]?.urlField;
   const value = (urlField ? record[urlField] : null) ?? record[field];
@@ -136,7 +171,7 @@ export function Media({ entity, record, field, title, className }: { entity?: TA
   );
 }
 
-function Avatar({ entity, record, field, label }: { entity?: TAppEntity; record: TRecord; field?: string; label: string }) {
+export function Avatar({ entity, record, field, label }: { entity?: TAppEntity; record: TRecord; field?: string; label: string }) {
   const url = imageUrl(entity, record, field);
   if (url) {
     // eslint-disable-next-line @next/next/no-img-element
@@ -154,7 +189,7 @@ function Avatar({ entity, record, field, label }: { entity?: TAppEntity; record:
 }
 
 /** A field as plain text: a parent by its name, an enum by its label (for badges, headers and colours). */
-function plain(entity: TAppEntity | undefined, record: TRecord, field: string | undefined): string {
+export function plain(entity: TAppEntity | undefined, record: TRecord, field: string | undefined): string {
   if (!field) return "";
   const reference = entity?.references?.[field];
   if (reference) {
@@ -166,11 +201,11 @@ function plain(entity: TAppEntity | undefined, record: TRecord, field: string | 
   return entity?.fields?.[field]?.type === "enum" ? enumLabel(String(value)) : String(value);
 }
 
-function titleOf(entity: TAppEntity | undefined, record: TRecord, roles: TFieldRoles): string {
+export function titleOf(entity: TAppEntity | undefined, record: TRecord, roles: TFieldRoles): string {
   return (roles.title && plain(entity, record, roles.title)) || recordTitle(entity, record);
 }
 
-function Meta({ entity, record, roles, skip }: { entity?: TAppEntity; record: TRecord; roles: TFieldRoles; skip?: string }) {
+export function Meta({ entity, record, roles, skip }: { entity?: TAppEntity; record: TRecord; roles: TFieldRoles; skip?: string }) {
   const fields = (roles.meta ?? []).filter((f) => f !== skip && record[f] !== null && record[f] !== undefined && record[f] !== "");
   if (fields.length === 0) return null;
   return (
@@ -185,7 +220,7 @@ function Meta({ entity, record, roles, skip }: { entity?: TAppEntity; record: TR
   );
 }
 
-function Figure({ entity, record, field }: { entity?: TAppEntity; record: TRecord; field?: string }) {
+export function Figure({ entity, record, field }: { entity?: TAppEntity; record: TRecord; field?: string }) {
   if (!field || record[field] === null || record[field] === undefined) return null;
   return (
     <span className="text-sm font-medium tabular-nums">
@@ -195,7 +230,7 @@ function Figure({ entity, record, field }: { entity?: TAppEntity; record: TRecor
   );
 }
 
-function Title({ href, title, className }: { href?: string; title: string; className?: string }) {
+export function Title({ href, title, className }: { href?: string; title: string; className?: string }) {
   return (
     <h3 className={cn("font-semibold leading-snug", className)}>
       {href ? (
@@ -214,13 +249,21 @@ export function MediaGrid({ section, entity, records, design }: TViewProps) {
   const route = (useParams() ?? {}) as TRouteParams;
   const actions = section.content?.actions ?? [];
   const roles = design.roles;
+  const plugin = Boolean(designRegistry.cards[design.card ?? ""]);
   return (
-    <ul className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4" data-bga-view="media-grid">
+    <ul className={cn("grid gap-x-5 gap-y-8", gridColumns(design, 4))} data-bga-view="media-grid">
       {records.map((record) => {
         const title = titleOf(entity, record, roles);
         const href = viewHref(actions, record, route);
         const badge = plain(entity, record, roles.badge);
         const subtitle = plain(entity, record, roles.subtitle);
+        if (plugin) {
+          return (
+            <li key={String(record.id)}>
+              <CardOf design={design} entity={entity} record={record} roles={roles} title={title} href={href} actions={actions} boxed={false} size="md" />
+            </li>
+          );
+        }
         return (
           <li key={String(record.id)} className="group flex flex-col gap-3">
             <Card className="relative gap-0 overflow-hidden p-0" data-bga-media>
@@ -298,19 +341,131 @@ export function Feed({ section, entity, records, design }: TViewProps) {
   );
 }
 
+/** The rows of a table (Story 22.4): the list's fields as columns, the first a link, the actions in a menu. */
+export function TableRows({ section, entity, records }: TViewProps) {
+  const route = (useParams() ?? {}) as TRouteParams;
+  const router = useRouter();
+  const fields = section.data?.fields ?? [];
+  const actions = section.content?.actions ?? [];
+  const compact = app.density === "compact";
+  return (
+    <div className="overflow-x-auto rounded-lg border" data-bga-view="table">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {fields.map((field) => (
+              <TableHead key={field}>{fieldLabel(entity, field)}</TableHead>
+            ))}
+            {actions.length > 0 && <TableHead className="w-12 text-right"><span className="sr-only">Actions</span></TableHead>}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {records.map((record) => {
+            const href = viewHref(actions, record, route);
+            return (
+              <TableRow
+                key={String(record.id)}
+                className={cn(href && "cursor-pointer", compact && "[&_td]:py-1.5")}
+                onClick={(event) => {
+                  if (!href || (event.target as HTMLElement).closest("a,button,[role=menuitem]")) return;
+                  router.push(href);
+                }}
+              >
+                {fields.map((field, index) => (
+                  <TableCell key={field} className={cn(index === 0 && "font-medium")}>
+                    {index === 0 && href && !entity?.references?.[field] ? (
+                      <Link href={href} className="underline-offset-4 hover:underline">
+                        <FieldValue entity={entity} field={field} record={record} link={false} />
+                      </Link>
+                    ) : (
+                      <FieldValue entity={entity} field={field} record={record} />
+                    )}
+                  </TableCell>
+                ))}
+                {actions.length > 0 && (
+                  <TableCell className="text-right">
+                    <RowActions actions={actions} record={record} label={recordTitle(entity, record)} />
+                  </TableCell>
+                )}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+/** Plain cards (Story 22.4): the record's name and its list fields as a description list, for an entity without
+ *  field roles (an outline's `listStyle: "cards"`). */
+export function PlainCards({ section, entity, records }: TViewProps) {
+  const route = (useParams() ?? {}) as TRouteParams;
+  const fields = section.data?.fields ?? [];
+  const actions = section.content?.actions ?? [];
+  return (
+    <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-bga-view="cards">
+      {records.map((record) => {
+        const href = viewHref(actions, record, route);
+        const title = recordTitle(entity, record);
+        return (
+          <li key={String(record.id)}>
+            <Card size="sm" className="h-full">
+              <CardHeader className="flex flex-row items-start justify-between gap-2">
+                <CardTitle className="min-w-0 truncate">
+                  {href ? (
+                    <Link href={href} className="underline-offset-4 hover:underline">
+                      {title}
+                    </Link>
+                  ) : (
+                    title
+                  )}
+                </CardTitle>
+                <RowActions actions={actions} record={record} label={title} />
+              </CardHeader>
+              <CardContent>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                  {fields
+                    .filter((field) => field !== entity?.displayField)
+                    .map((field) => (
+                      <div key={field} className="contents">
+                        <dt className="text-muted-foreground">{fieldLabel(entity, field)}</dt>
+                        <dd className="min-w-0 truncate">
+                          <FieldValue entity={entity} field={field} record={record} />
+                        </dd>
+                      </div>
+                    ))}
+                </dl>
+              </CardContent>
+            </Card>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 /** Cards laid out by role: an image on top when there is one, the title, a subtitle, the meta line, a badge and a
  *  price or a figure. */
 export function RoleCards({ section, entity, records, design }: TViewProps) {
   const route = (useParams() ?? {}) as TRouteParams;
   const actions = section.content?.actions ?? [];
   const roles = design.roles;
+  if (!roles?.title && !roles?.media) return <PlainCards section={section} entity={entity} records={records} design={design} />;
+  const plugin = Boolean(designRegistry.cards[design.card ?? ""]);
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-bga-view="cards">
+    <ul className={cn("grid gap-4", gridColumns(design, 3))} data-bga-view="cards">
       {records.map((record) => {
         const title = titleOf(entity, record, roles);
         const href = viewHref(actions, record, route);
         const badge = plain(entity, record, roles.badge);
         const subtitle = plain(entity, record, roles.subtitle);
+        if (plugin) {
+          return (
+            <li key={String(record.id)}>
+              <CardOf design={design} entity={entity} record={record} roles={roles} title={title} href={href} actions={actions} boxed size="md" />
+            </li>
+          );
+        }
         return (
           <li key={String(record.id)}>
             <Card className="h-full gap-0 overflow-hidden p-0">
@@ -338,7 +493,7 @@ export function RoleCards({ section, entity, records, design }: TViewProps) {
   );
 }
 
-function CardBody({ entity, record, roles, href, actions, skip }: { entity?: TAppEntity; record: TRecord; roles: TFieldRoles; href?: string; actions: TAppAction[]; skip?: string }) {
+export function CardBody({ entity, record, roles, href, actions, skip }: { entity?: TAppEntity; record: TRecord; roles: TFieldRoles; href?: string; actions: TAppAction[]; skip?: string }) {
   const title = titleOf(entity, record, roles);
   const subtitle = plain(entity, record, roles.subtitle);
   const badge = roles.badge === skip ? "" : plain(entity, record, roles.badge);
@@ -633,12 +788,13 @@ function SlotCards({ section, entity, records, design }: TViewProps) {
   );
 }
 
-/** The records in the entity's view (tables and plain cards are the AppList's own). */
-export function RecordsView(props: TViewProps & { home?: boolean; listHref?: string }) {
+/** The records in the entity's list-view plugin (Epic 30: `design-registry.ts` holds the ones this app uses); on the
+ *  home page a home plugin may take the main list over (a catalogue's rows, a featured record). */
+export function RecordsView(props: TViewProps & { home?: boolean; homeView?: string; listHref?: string }) {
   const { design } = props;
-  if (slots.cards[props.section.content?.entity ?? ""] && design.view !== "board") return <SlotCards {...props} />;
-  if (design.view === "media-grid") return props.home ? <CatalogueRows {...props} /> : <MediaGrid {...props} />;
-  if (design.view === "feed") return <Feed {...props} />;
-  if (design.view === "board" && design.groupBy) return <Board {...props} />;
-  return <RoleCards {...props} />;
+  if (slots.cards[props.section.content?.entity ?? ""] && !designRegistry.whole.includes(design.view)) return <SlotCards {...props} />;
+  const Home = props.home ? designRegistry.homes[props.homeView ?? ""] : undefined;
+  if (Home) return <Home {...props} />;
+  const View = designRegistry.listViews[design.view] ?? TableRows;
+  return <View {...props} />;
 }

@@ -1,19 +1,24 @@
-"""The app design report (Story 23.1): how alike the golden apps look, and whether they still pass the quality floor.
-Dev tool, no model call: each golden app is planned from its recorded draft (`examples/specs/<name>.json` +
-`examples/app-outlines/<name>.json`), built on the app kit in the Node sandbox and screenshotted on its mock API.
+"""The app design report (Story 23.1; Story 30.1: signed in): how alike the golden apps look, as their users see them,
+and whether they still pass the quality floor. Dev tool, no model call: each golden app is planned from its recorded
+draft (`examples/specs/<name>.json` + `examples/app-outlines/<name>.json`), built on the app kit in the Node sandbox
+and screenshotted on its mock API, signed in as one demo user per area (the auth plugin's demo accounts).
 
     make app-design-report                       # every golden app → .data/reports/app-design/<date>/
     make app-design-report ARGS="--app news-feed --app plant-shop"
     make app-design-report ARGS="--baseline"     # also writes tests/fixtures/app-golden/baseline.json
 
-Measures (the epic's table): greyscale first-screen similarity between every pair of home pages and of main lists
-(Epic 20's thumbnails), the distinct (shell, home, main list view) frames, the design-check failures at 1440 px light,
-the brief's choices code replaced, and each draft's recorded time, calls and cost.
+Measures: per area the home, the main list and one record at 1440 and 375 px, light; the structural fingerprint of
+each area (shell, home, main view, detail, card, filters, from `app.json` and the DOM markers `data-bga-*`), the
+distinct fingerprints and the pairs that share one; the screens' similarity on edge maps (layout lines) and the
+greyscale squint (Epic 20's thumbnails, kept for comparison); which registry values the golden set uses (and which
+plugins none uses); the design-check failures; the brief's choices code replaced; each draft's recorded time, calls
+and cost.
 """
 
 import argparse
 import asyncio
 import json
+import re
 from datetime import date
 from itertools import combinations
 from pathlib import Path
@@ -39,6 +44,21 @@ APPS = [
 ]
 # Hand-written examples (no recorded draft, no cost): Epic 22's every-plugin app and Epic 29's media app
 HAND_WRITTEN = ("workshop-bookings", "media-library")
+SCREENS = ("home", "list", "record")
+# The axes of a fingerprint and where each comes from: the design, else the DOM marker (Story 30.1)
+AXES = ("shell", "home", "view", "detail", "card", "filters")
+ENTITY_DEFAULTS = {"detailView": "record", "filtersStyle": "toolbar"}  # what an entity design leaves unsaid
+# A kind of the registry → the design's keys that name one of its plugins
+KIND_KEYS = {
+    "shell": ("shell",),
+    "home": ("homeView",),
+    "list-view": ("view",),
+    "detail-view": ("detailView",),
+    "filters": ("filtersStyle",),
+    "card": ("card",),
+    "recipe": ("recipe",),
+    "font-pairing": ("fontPairing",),
+}
 
 
 def golden_app(name: str, locale: str | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -69,32 +89,101 @@ def golden_app(name: str, locale: str | None = None) -> tuple[dict[str, Any], di
     return spec, backend, contract
 
 
-def main_list(spec: dict[str, Any]) -> str | None:
-    """The route of the app's main list: the design's main entity, else the first navigation item with a list."""
+def areas(spec: dict[str, Any]) -> list[dict[str, Any]]:
+    """The app's areas (Story 23.10), or the app itself as one area at `/`, each with its layout."""
     app = spec.get("app") or {}
-    main = (app.get("design") or {}).get("mainEntity")
-    candidates = []
-    prefixes = [area["prefix"] for area in app.get("areas") or [] if area.get("prefix", "/") != "/"]
+    design = app.get("design") or {}
+    found = app.get("areas") or []
+    if not found:
+        return [{"id": "app", "prefix": "/", "roles": [], "design": design}]
+    out = []
+    for area in found:
+        own = area.get("design") or {}
+        layout = {**design, **own, "entities": {**(design.get("entities") or {}), **(own.get("entities") or {})}}
+        out.append(
+            {"id": area["id"], "prefix": area.get("prefix") or "/", "roles": area.get("roles") or [], "design": layout}
+        )
+    return out
+
+
+def demo_login(contract: dict[str, Any], area: dict[str, Any]) -> str | None:
+    """`email:password` of one demo user of the area's roles (the auth plugin's), or None for an open app."""
+    users = ((contract.get("x-bga") or {}).get("auth") or {}).get("demoUsers") or []
+    for user in users:
+        if not area["roles"] or user.get("role") in area["roles"]:
+            return f"{user['login']}:{user.get('password') or 'demo12345'}"
+    return None
+
+
+def _list_pages(spec: dict[str, Any], prefix: str) -> list[tuple[str | None, str]]:
+    others = [area["prefix"] for area in (spec.get("app") or {}).get("areas") or [] if area.get("prefix", "/") != "/"]
+    out = []
     for page in spec["pages"]:
-        if "[" in page["route"] or page["route"] == "/" or any(page["route"].startswith(p) for p in prefixes):
-            continue  # the first area's lists (Story 23.10)
+        route = page["route"]
+        if "[" in route or route == prefix:
+            continue
+        inside = route == prefix or route.startswith(prefix.rstrip("/") + "/") if prefix != "/" else True
+        if not inside or (prefix == "/" and any(route == p or route.startswith(p + "/") for p in others)):
+            continue
         for section in page.get("sections") or []:
             content = section.get("content") or {}
             if section.get("component") == "AppList" and not content.get("tab") and content.get("variant") != "recent":
-                candidates.append(((section.get("content") or {}).get("entity"), page["route"]))
+                out.append((content.get("entity"), route))
+    return out
+
+
+def main_list(spec: dict[str, Any], prefix: str = "/") -> str | None:
+    """The route of the area's main list: the layout's main entity, else the first navigation item with a list."""
+    app = spec.get("app") or {}
+    layout = next((a["design"] for a in areas(spec) if a["prefix"] == prefix), app.get("design") or {})
+    candidates = _list_pages(spec, prefix)
     for entity, route in candidates:
-        if entity == main:
+        if entity == layout.get("mainEntity"):
             return route
-    nav = [item.get("entity") for item in app.get("nav") or []]
-    for entity in nav:
+    for entity in [item.get("entity") for item in app.get("nav") or []]:
         for candidate, route in candidates:
             if candidate == entity:
                 return route
     return candidates[0][1] if candidates else None
 
 
+def record_route(spec: dict[str, Any], contract: dict[str, Any], list_route: str | None) -> str | None:
+    """The record page under the main list, `[id]` filled with the first fixture of its entity."""
+    if not list_route:
+        return None
+    fixtures = (contract.get("x-bga") or {}).get("fixtures") or {}
+    for page in spec["pages"]:
+        if page["route"] != f"{list_route}/[id]":
+            continue
+        entity = next(
+            (s["content"]["entity"] for s in page.get("sections") or []
+             if s.get("component") == "AppDetail" and (s.get("content") or {}).get("entity")),
+            None,
+        )  # fmt: skip
+        rows = fixtures.get(entity or "") or []
+        if rows:
+            return re.sub(r"\[id\]", str(rows[0].get("id")), page["route"])
+    return None
+
+
+def area_routes(spec: dict[str, Any], contract: dict[str, Any], area: dict[str, Any]) -> dict[str, str]:
+    """The area's screens by name: home, the main list, one record (those that exist)."""
+    listed = main_list(spec, area["prefix"])
+    out = {"home": area["prefix"]}
+    if listed:
+        out["list"] = listed
+    record = record_route(spec, contract, listed)
+    if record:
+        out["record"] = record
+    return out
+
+
+def shot_name(route: str, width: int = 1440, scheme: str = "light") -> str:
+    return f"{'home' if route == '/' else route.strip('/').replace('/', '-')}-{width}-{scheme}"
+
+
 def frame(spec: dict[str, Any]) -> tuple[str, str, str]:
-    """(shell, home, main list view): what tells two apps' frames apart at a glance."""
+    """(shell, home, main list view): what tells two apps' frames apart at a glance (Story 23.1, kept)."""
     app = spec.get("app") or {}
     design = app.get("design") or {}
     home = design.get("homeView") or ("dashboard" if (app.get("home") or "dashboard") == "dashboard" else "list")
@@ -102,6 +191,57 @@ def frame(spec: dict[str, Any]) -> tuple[str, str, str]:
     entity = (app.get("entities") or {}).get(main or "") or {}
     view = ((design.get("entities") or {}).get(main or "") or {}).get("view") or entity.get("listStyle") or "table"
     return design.get("shell") or "sidebar", home, view
+
+
+def fingerprint(area: dict[str, Any], markers: dict[str, dict[str, list[str]]] | None = None) -> dict[str, str]:
+    """The structure of an area's screens (Story 30.1): the layout's choices, the DOM markers filling what the design
+    leaves open (the card anatomy, the detail view). `markers`: screen name → the design check's `markers`."""
+    design = area["design"]
+    main = design.get("mainEntity")
+    entity = (design.get("entities") or {}).get(main or "") or {}
+    markers = markers or {}
+
+    def marker(screen: str, key: str) -> str | None:
+        values = (markers.get(screen) or {}).get(key) or []
+        return values[0] if values else None
+
+    return {
+        "shell": design.get("shell") or marker("home", "shell") or "sidebar",
+        "home": design.get("homeView") or marker("home", "view") or "dashboard",
+        "view": entity.get("view") or marker("list", "view") or "table",
+        "detail": entity.get("detailView") or marker("record", "detail") or "record",
+        "card": entity.get("card") or marker("list", "card") or "-",
+        "filters": entity.get("filtersStyle") or marker("list", "filters") or "toolbar",
+    }
+
+
+def fingerprint_key(print_: dict[str, str]) -> str:
+    return "|".join(f"{axis}={print_[axis]}" for axis in AXES)
+
+
+def coverage(prints: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Which registry values the golden set uses, per kind, and the ready plugins none of them uses."""
+    from src.modules.shared.domain.frontend_spec.design_registry import KINDS, registry
+
+    used: dict[str, set[str]] = {kind: set() for kind in KINDS}
+    for area in prints.values():
+        design = area["design"]
+        for kind, keys in KIND_KEYS.items():
+            for key in keys:
+                if design.get(key):
+                    used[kind].add(design[key])
+            for entity in (design.get("entities") or {}).values():
+                for key in keys:
+                    value = entity.get(key) or ENTITY_DEFAULTS.get(key)
+                    if value:
+                        used[kind].add(value)
+        for look in design.get("looks") or []:
+            used["recipe"].add(look.get("recipe"))
+    ready = {kind: set(registry().names(kind)) for kind in KINDS}
+    return {
+        "used": {kind: sorted(values & ready[kind]) for kind, values in used.items()},
+        "unused": {kind: sorted(ready[kind] - values) for kind, values in used.items()},
+    }
 
 
 def app_failures(view: str, measured: dict[str, Any]) -> list[str]:
@@ -126,11 +266,12 @@ def app_failures(view: str, measured: dict[str, Any]) -> list[str]:
     return found
 
 
-def similarity(thumbs: dict[str, list[int]]) -> dict[str, Any]:
+def similarity(thumbs: dict[str, list[int]], measure: Any = None) -> dict[str, Any]:
     """Mean and max similarity over every pair, and the most alike pair."""
     from src.orchestrator.drafting.design_diversity import image_similarity
 
-    pairs = {f"{a} / {b}": image_similarity(thumbs[a], thumbs[b]) for a, b in combinations(sorted(thumbs), 2)}
+    measure = measure or image_similarity
+    pairs = {f"{a} / {b}": measure(thumbs[a], thumbs[b]) for a, b in combinations(sorted(thumbs), 2)}
     if not pairs:
         return {"mean": None, "max": None, "pairs": {}}
     worst = max(pairs, key=lambda key: pairs[key])
@@ -161,12 +302,12 @@ def draft_cost(name: str) -> dict[str, Any]:
 
 
 def contact_sheet(images: dict[str, Path], target: Path, columns: int = 4) -> None:
-    """The home pages side by side, scaled to a third, with the app's name under each."""
+    """The home pages side by side, scaled to a third, with the area's name under each."""
     from PIL import Image, ImageDraw
 
     width, height, label = 480, 300, 24
     rows = (len(images) + columns - 1) // columns
-    sheet = Image.new("RGB", (columns * width, rows * (height + label)), "white")
+    sheet = Image.new("RGB", (columns * width, max(rows, 1) * (height + label)), "white")
     draw = ImageDraw.Draw(sheet)
     for index, (name, path) in enumerate(sorted(images.items())):
         x, y = (index % columns) * width, (index // columns) * (height + label)
@@ -177,24 +318,44 @@ def contact_sheet(images: dict[str, Path], target: Path, columns: int = 4) -> No
     sheet.save(target)
 
 
+def shared_fingerprints(prints: dict[str, dict[str, Any]]) -> list[list[str]]:
+    groups: dict[str, list[str]] = {}
+    for name, area in prints.items():
+        groups.setdefault(fingerprint_key(area["fingerprint"]), []).append(name)
+    return [sorted(names) for names in groups.values() if len(names) > 1]
+
+
 def markdown(results: dict[str, Any]) -> str:
+    edges = results["edges"]
     lines = [
         f"# App design report ({results['date']})",
         "",
-        f"Apps: {len(results['apps'])}. Home similarity mean {results['home']['mean']}, max {results['home']['max']} "
-        f"({results['home'].get('mostAlike')}). Main list similarity mean {results['list']['mean']}, max "
-        f"{results['list']['max']}. Distinct frames: {results['distinctFrames']} of {len(results['apps'])}.",
+        f"Apps: {len(results['apps'])}, areas: {len(results['areas'])}, signed in. Distinct fingerprints: "
+        f"{results['distinctFingerprints']} of {len(results['areas'])} (frames: {results['distinctFrames']} of "
+        f"{len(results['apps'])}). Edge similarity (signed-in, 1440 px): home mean {edges['home']['mean']}, max "
+        f"{edges['home']['max']}; list mean {edges['list']['mean']}, max {edges['list']['max']}; record mean "
+        f"{edges['record']['mean']}, max {edges['record']['max']}. Greyscale (kept for comparison): home mean "
+        f"{results['home']['mean']}, max {results['home']['max']}; list mean {results['list']['mean']}, max "
+        f"{results['list']['max']}.",
         "",
-        "| App | Frame (shell, home, main view) | Failures | Replaced | Draft |",
-        "|---|---|---|---|---|",
+        "| Area | Fingerprint (shell, home, view, detail, card, filters) | Signed in as | Failures | Replaced | Draft |",  # noqa: E501
+        "|---|---|---|---|---|---|",
     ]
-    for name, app in sorted(results["apps"].items()):
-        cost = app.get("draft") or {}
+    for name, area in sorted(results["areas"].items()):
+        cost = results["apps"].get(area["app"], {}).get("draft") or {}
         draft = f"{cost.get('seconds')} s, {cost.get('calls')} call(s), ${cost.get('costUsd')}" if cost else "—"
+        print_ = ", ".join(area["fingerprint"][axis] for axis in AXES)
         lines.append(
-            f"| {name} | {', '.join(app['frame'])} | {len(app['failures'])} | {len(app['replaced'])} | {draft} |"
+            f"| {name} | {print_} | {area.get('login') or 'nobody (open app)'} | {len(area['failures'])} | "
+            f"{len(results['apps'].get(area['app'], {}).get('replaced') or [])} | {draft} |"
         )
-    failures = [line for app in results["apps"].values() for line in app["failures"]]
+    shared = results.get("sharedFingerprints") or []
+    if shared:
+        lines += ["", "## Areas that share a fingerprint", "", *[f"- {', '.join(group)}" for group in shared]]
+    unused = {kind: names for kind, names in (results.get("coverage") or {}).get("unused", {}).items() if names}
+    if unused:
+        lines += ["", "## Plugins no golden app uses", "", *[f"- {kind}: {', '.join(n)}" for kind, n in unused.items()]]
+    failures = [line for area in results["areas"].values() for line in area["failures"]]
     if failures:
         lines += ["", "## Failures", "", *[f"- {line}" for line in failures]]
     return "\n".join(lines) + "\n"
@@ -224,47 +385,94 @@ def fake_slots(project: Path, spec: dict[str, Any]) -> None:
 
 
 async def report(names: list[str], out: Path, locale: str | None = None, slots: bool = False) -> dict[str, Any]:
-    from src.orchestrator.drafting.design_diversity import first_screen
+    from src.orchestrator.drafting.design_diversity import edge_signature, edge_similarity, first_screen
 
     apps: dict[str, Any] = {}
+    prints: dict[str, Any] = {}
     homes: dict[str, list[int]] = {}
     lists: dict[str, list[int]] = {}
+    edges: dict[str, dict[str, list[int]]] = {screen: {} for screen in SCREENS}
     home_shots: dict[str, Path] = {}
     for name in names:
-        spec, backend, _ = golden_app(name, locale)
-        listed = main_list(spec)
-        routes = ["/", *([listed] if listed else [])]
-        print(f"building {name} ({', '.join(routes)})")
+        spec, backend, contract = golden_app(name, locale)
+        passes = []
+        for area in areas(spec):
+            routes = area_routes(spec, contract, area)
+            passes.append({"name": area["id"], "routes": list(routes.values()), "login": demo_login(contract, area),
+                           "screens": routes, "area": area})  # fmt: skip
+        print(f"building {name} ({', '.join(p['name'] + ': ' + ' '.join(p['routes']) for p in passes)})")
         measured = await check_site(
-            spec, out / name, routes=routes, widths="1440", schemes="light", backend=backend,
+            spec, out / name, widths="1440,375", schemes="light", backend=backend,
             prepare=fake_slots if slots else None,
+            passes=[{k: v for k, v in p.items() if k in ("name", "routes", "login")} for p in passes],
         )  # fmt: skip
+        apps[name] = {"frame": list(frame(spec)), "replaced": replaced(spec), "draft": draft_cost(name)}
         if measured is None:
-            apps[name] = {"frame": list(frame(spec)), "failures": ["build failed"], "replaced": replaced(spec)}
+            apps[name]["failures"] = ["build failed"]
+            for item in passes:
+                prints[f"{name}/{item['name']}"] = {
+                    "app": name,
+                    "design": item["area"]["design"],
+                    "login": item["login"],
+                    "fingerprint": fingerprint(item["area"]),
+                    "failures": ["build failed"],
+                }
             continue
-        home = out / name / "home-1440-light.png"
-        homes[name], home_shots[name] = first_screen(home), home
-        if listed:
-            lists[name] = first_screen(out / name / f"{listed.strip('/').replace('/', '-')}-1440-light.png")
-        apps[name] = {
-            "frame": list(frame(spec)),
-            "routes": routes,
-            "failures": [line for view, values in measured.items() for line in app_failures(view, values)],
-            "replaced": replaced(spec),
-            "draft": draft_cost(name),
-        }
+        for item in passes:
+            key = f"{name}/{item['name']}"
+            views = measured.get(item["name"]) or {}
+            markers = {
+                screen: (views.get(shot_name(route)) or {}).get("markers") or {}
+                for screen, route in item["screens"].items()
+            }
+            folder = out / name / item["name"]
+            for screen, route in item["screens"].items():
+                shot = folder / f"{shot_name(route)}.png"
+                if shot.is_file():
+                    edges[screen][key] = edge_signature(shot)
+                    if screen == "home":
+                        homes[key], home_shots[key] = first_screen(shot), shot
+                    if screen == "list":
+                        lists[key] = first_screen(shot)
+            prints[key] = {
+                "app": name,
+                "design": item["area"]["design"],
+                "login": item["login"],
+                "routes": item["screens"],
+                "fingerprint": fingerprint(item["area"], markers),
+                "markers": markers,
+                "failures": [line for view, values in views.items() for line in app_failures(view, values)],
+            }
     results = {
         "date": str(date.today()),
         "apps": apps,
+        "areas": {key: {k: v for k, v in area.items() if k != "design"} for key, area in prints.items()},
         "home": similarity(homes),
         "list": similarity(lists),
+        "edges": {screen: similarity(edges[screen], edge_similarity) for screen in SCREENS},
         "distinctFrames": len({tuple(app["frame"]) for app in apps.values()}),
+        "distinctFingerprints": len({fingerprint_key(area["fingerprint"]) for area in prints.values()}),
+        "sharedFingerprints": shared_fingerprints(prints),
+        "coverage": coverage(prints),
     }
     if home_shots:
-        contact_sheet(home_shots, out / "contact-sheet.png")
+        contact_sheet({key.replace("/", " · "): path for key, path in home_shots.items()}, out / "contact-sheet.png")
     (out / "report.json").write_text(json.dumps(results, indent=2) + "\n")
     (out / "report.md").write_text(markdown(results))
     return results
+
+
+def baseline(results: dict[str, Any]) -> dict[str, Any]:
+    """What the next report is compared against (Story 30.1 step 5)."""
+    keep: dict[str, Any] = {
+        key: results[key] for key in ("date", "distinctFrames", "distinctFingerprints", "sharedFingerprints")
+    }
+    keep |= {key: {k: results[key][k] for k in ("mean", "max")} for key in ("home", "list")}
+    keep["edges"] = {screen: {k: results["edges"][screen][k] for k in ("mean", "max")} for screen in SCREENS}
+    keep["frames"] = {name: app["frame"] for name, app in results["apps"].items()}
+    keep["fingerprints"] = {name: area["fingerprint"] for name, area in results["areas"].items()}
+    keep["coverage"] = results["coverage"]
+    return keep
 
 
 async def main(args: argparse.Namespace) -> None:
@@ -276,10 +484,7 @@ async def main(args: argparse.Namespace) -> None:
     results = await report(args.app or APPS, out, args.locale, args.slots)
     print(markdown(results))
     if args.baseline:
-        keep = {key: results[key] for key in ("date", "distinctFrames")}
-        keep |= {key: {k: results[key][k] for k in ("mean", "max")} for key in ("home", "list")}
-        keep["frames"] = {name: app["frame"] for name, app in results["apps"].items()}
-        (GOLDEN / "baseline.json").write_text(json.dumps(keep, indent=2) + "\n")
+        (GOLDEN / "baseline.json").write_text(json.dumps(baseline(results), indent=2) + "\n")
         print(f"baseline → {GOLDEN / 'baseline.json'}")
     print(f"report → {out / 'report.md'}")
 

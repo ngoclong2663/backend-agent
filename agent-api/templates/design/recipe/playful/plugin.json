@@ -1,0 +1,30 @@
+{
+  "kind": "recipe",
+  "name": "playful",
+  "status": "ready",
+  "label": "Playful",
+  "choose": "Y2K, Frutiger Aero: bright, rounded, toy-like; never for health, finance or legal products.",
+  "family": "soft",
+  "css": "recipe.css",
+  "order": 110,
+  "guards": [
+    "health",
+    "medical",
+    "clinic",
+    "dental",
+    "dentist",
+    "hospital",
+    "patient",
+    "pharmacy",
+    "therapy",
+    "bank",
+    "banking",
+    "finance",
+    "financial",
+    "accounting",
+    "insurance",
+    "legal",
+    "law",
+    "tax"
+  ]
+}

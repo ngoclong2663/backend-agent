@@ -1,0 +1,11 @@
+{
+  "app": "media-library",
+  "design": {
+    "looks": [
+      {
+        "recipe": "{{name}}"
+      }
+    ],
+    "recipe": "{{name}}"
+  }
+}

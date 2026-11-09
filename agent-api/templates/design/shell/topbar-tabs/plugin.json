@@ -1,0 +1,25 @@
+{
+  "kind": "shell",
+  "name": "topbar-tabs",
+  "status": "ready",
+  "label": "Top bar with tabs",
+  "choose": "A top bar with the sections as tabs under it: a few areas of equal weight.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "fallback": "topbar",
+  "exports": [
+    "TopBarShell"
+  ],
+  "marker": "topbar-tabs",
+  "builtin": true,
+  "order": 30,
+  "module": "./shells"
+}

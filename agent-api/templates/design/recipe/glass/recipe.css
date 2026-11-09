@@ -1,0 +1,25 @@
+@root { --radius: 1.25rem; }
+@root body {
+  background:
+    radial-gradient(45rem 35rem at 5% 0%, color-mix(in oklab, var(--primary) 70%, transparent), transparent 65%),
+    radial-gradient(45rem 35rem at 95% 15%, oklch(0.7 0.17 280 / 0.6), transparent 65%),
+    radial-gradient(40rem 30rem at 60% 100%, oklch(0.78 0.14 190 / 0.55), transparent 65%),
+    var(--background);
+  background-attachment: fixed;
+}
+@root [data-slot="card"], @root [data-bga-header], @root [data-bga-bottom-tabs], @root [data-slot="sidebar-inner"] {
+  background: color-mix(in oklab, var(--card) 55%, transparent);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid rgb(255 255 255 / 0.45);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 10px 30px -12px rgb(0 0 0 / 0.25);
+}
+@dark [data-slot="card"], @dark [data-bga-header], @dark [data-bga-bottom-tabs], @dark [data-slot="sidebar-inner"] {
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 10px 30px -12px rgb(0 0 0 / 0.6);
+}
+@root [data-slot="sidebar-inset"] { background: transparent; }
+@root [data-slot="input"] { background: color-mix(in oklab, var(--background) 60%, transparent); }
+@media (prefers-reduced-transparency: reduce) {
+  @root [data-slot="card"], @root [data-bga-header], @root [data-bga-bottom-tabs], @root [data-slot="sidebar-inner"] { background: var(--card); backdrop-filter: none; }
+}

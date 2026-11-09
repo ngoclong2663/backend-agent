@@ -193,14 +193,20 @@ export type TFieldRoles = {
   duration?: string;
 };
 
-export type TListView = "table" | "cards" | "media-grid" | "feed" | "board" | "calendar";
+/** Epic 30: a list-view plugin's name (`templates/design/list-view/*`); the generated `design-registry.ts` maps it. */
+export type TListView = string;
+export type TCardAspect = "wide" | "portrait" | "square" | "auto";
 
-/** Epic 23: how one entity's records are shown. */
+/** Epic 23: how one entity's records are shown. Epic 30: every value names a design plugin of its kind. */
 export type TEntityDesign = {
   view: TListView;
   roles: TFieldRoles;
-  detailView?: "record" | "media" | "profile";
-  filtersStyle?: "toolbar" | "chips" | "facets" | "search-first";
+  detailView?: string;
+  filtersStyle?: string;
+  /** Story 30.4: the anatomy of one record in grid views, its media's aspect and the grid's columns on wide screens. */
+  card?: string;
+  aspect?: TCardAspect;
+  columns?: number;
   groupBy?: string;
   dateField?: string;
   endField?: string;
@@ -209,15 +215,17 @@ export type TEntityDesign = {
 /** Epic 23: one layout (the app's, or an area's): the frame, the home and the entities' views. */
 export type TDesign = {
   archetype: string;
-  shell: "sidebar" | "topbar" | "topbar-tabs" | "rail";
+  shell: string;
   mobileNav: "drawer" | "bottom-tabs";
   frame: "narrow" | "standard" | "wide" | "full";
   density?: "compact" | "comfortable" | "spacious";
-  homeView: "dashboard" | "feed" | "catalogue" | "agenda" | "bento";
+  homeView: string;
   mainEntity: string | null;
   entities: Record<string, TEntityDesign>;
   looks: { recipe: string; reason?: string }[];
   recipe?: string;
+  /** Story 30.6: the font pairing plugin the theme was set with (informative; the CSS already carries it). */
+  fontPairing?: string;
 };
 
 /** Story 23.10: a group of roles with its own routes (`prefix`) and layout. */

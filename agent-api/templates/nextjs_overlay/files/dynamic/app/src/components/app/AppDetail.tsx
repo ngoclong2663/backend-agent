@@ -5,12 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { app, fieldLabel, recordTitle, resolveParams, type TAppSection, type TRecord, type TRouteParams } from "./app";
 import { useOperationQuery } from "./bindings";
-import { FieldValue } from "./FieldValue";
+import { designRegistry } from "./design-registry";
+import { RecordDetail } from "./details";
 import { LoadError } from "./AppList";
 import { entityDesign, useLayout } from "./layout";
 import { ActionButtons } from "./RecordActions";
-import { FileValue } from "./plugins";
-import { Media, mediaKind } from "./views";
 import { t } from "./messages";
 
 function SummaryValue({ value }: { value: unknown }) {
@@ -52,8 +51,9 @@ function Summary({ section, record }: { section: TAppSection; record: TRecord })
   );
 }
 
-/** One record (Story 22.4): its name as the page heading, its actions (only those it allows), its fields in a
- *  description grid; `variant: "summary"` shows a custom operation's figures instead. */
+/** One record (Story 22.4): its name as the page heading, its actions (only those it allows), its fields; the
+ *  layout's detail-view plugin arranges them (Epic 30: `design-registry.ts`); `variant: "summary"` shows a custom
+ *  operation's figures instead. */
 export function AppDetail({ section }: { section: TAppSection }) {
   const route = (useParams() ?? {}) as TRouteParams;
   const entity = app.entities[section.content?.entity ?? ""];
@@ -74,51 +74,16 @@ export function AppDetail({ section }: { section: TAppSection }) {
   if (summary) return <Summary section={section} record={record} />;
 
   const fields = section.data?.fields?.length ? section.data.fields : (entity?.detailFields ?? []);
-  const title = recordTitle(entity, record);
-  // Epic 23 (Story 23.3): a media record opens on its image, a profile on its picture beside the name; Epic 29: a
-  // video opens on its player, an audio record's player sits under the title
-  const media = design.detailView === "media" ? design.roles.media : undefined;
-  const picture = design.detailView === "profile" ? (design.roles.avatar ?? design.roles.media) : undefined;
-  const kind = mediaKind(entity, media);
-  const audioField = kind === "audio" ? media : Object.keys(entity?.fields ?? {}).find((name) => entity?.fields?.[name]?.type === "audio");
-  const shown = fields.filter((field) => field !== media && field !== picture && field !== audioField);
+  const Detail = designRegistry.detailViews[design.detailView ?? ""] ?? RecordDetail;
   return (
-    <div className="flex flex-col gap-6">
-      {media && kind === "video" && (
-        <div data-bga-detail-media="video">
-          <FileValue entity={entity} field={media} record={record} />
-        </div>
-      )}
-      {media && !kind && <Media entity={entity} record={record} field={media} title={title} className="aspect-[21/9] w-full rounded-xl" />}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        {picture && <Media entity={entity} record={record} field={picture} title={title} className="size-20 shrink-0 rounded-full" />}
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="text-sm text-muted-foreground">{section.content?.title ?? entity?.label}</p>
-          <h1 className="text-2xl font-semibold tracking-tight break-words">{title}</h1>
-        </div>
-        <ActionButtons actions={section.content?.actions ?? []} record={record} />
-      </div>
-      {audioField && (
-        <div data-bga-detail-media="audio">
-          <FileValue entity={entity} field={audioField} record={record} />
-        </div>
-      )}
-      <Card>
-        <CardContent>
-          <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-            {shown
-              .filter((field) => field !== entity?.displayField)
-              .map((field) => (
-                <div key={field} className="flex min-w-0 flex-col gap-1">
-                  <dt className="text-sm text-muted-foreground">{fieldLabel(entity, field)}</dt>
-                  <dd className="min-w-0 break-words">
-                    <FieldValue entity={entity} field={field} record={record} />
-                  </dd>
-                </div>
-              ))}
-          </dl>
-        </CardContent>
-      </Card>
-    </div>
+    <Detail
+      section={section}
+      entity={entity}
+      record={record}
+      design={design}
+      fields={fields}
+      title={recordTitle(entity, record)}
+      actions={<ActionButtons actions={section.content?.actions ?? []} record={record} />}
+    />
   );
 }

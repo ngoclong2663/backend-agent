@@ -1,0 +1,31 @@
+{
+  "kind": "font-pairing",
+  "name": "japanese-mincho",
+  "status": "ready",
+  "label": "Japanese mincho",
+  "choose": "A mincho (serif) face for headings over a gothic body: Japanese apps read like a publication.",
+  "archetypes": [
+    "feed",
+    "catalogue",
+    "learning",
+    "storefront",
+    "booking"
+  ],
+  "recipes": [
+    "editorial",
+    "paper",
+    "luxe"
+  ],
+  "heading": "Shippori Mincho",
+  "body": "Noto Sans JP",
+  "mono": null,
+  "headingWeight": 600,
+  "headingCase": "normal",
+  "tracking": "normal",
+  "ratio": "dramatic",
+  "scripts": [
+    "latin",
+    "japanese"
+  ],
+  "order": 90
+}

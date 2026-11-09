@@ -1,0 +1,35 @@
+{
+  "kind": "font-pairing",
+  "name": "geometric",
+  "status": "ready",
+  "label": "Geometric",
+  "choose": "Round geometric headings over a plain body: products that want to feel modern and friendly.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "recipes": [
+    "minimal",
+    "soft",
+    "clay",
+    "playful",
+    "aurora",
+    "glass"
+  ],
+  "heading": "Outfit",
+  "body": "Inter",
+  "mono": null,
+  "headingWeight": 600,
+  "headingCase": "normal",
+  "tracking": "tight",
+  "ratio": "default",
+  "scripts": [
+    "latin"
+  ],
+  "order": 20
+}

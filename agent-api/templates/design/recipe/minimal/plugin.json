@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "minimal",
+  "status": "ready",
+  "label": "Minimal",
+  "choose": "Plain surfaces, hairline borders, the content first; fits any product.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 10
+}

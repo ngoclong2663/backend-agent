@@ -81,7 +81,7 @@ def test_a_view_that_does_not_fit_the_data_is_replaced_with_a_note():
     task, project = design["entities"]["Task"], design["entities"]["Project"]
     assert task["view"] == "board" and task["groupBy"] == "priority", "the badge names an enum: the board's columns"
     assert project["view"] == "cards"
-    assert any("media grid needs an image" in line for line in replaced)
+    assert any("media grid" in line and "needs an image" in line for line in replaced)
     assert any("'Ghost' is not in the BackendSpec" in line for line in replaced)
     assert any("stat 'title' left out (already the title)" in line for line in replaced)
 
@@ -127,7 +127,7 @@ def test_filters_need_a_filter_the_list_has():
     brief = {"entities": {"Tag": {"view": "table", "filtersStyle": "chips"}}}
     design, _, replaced = complete_design(brief, None, _backend("news-feed"))
     assert design["entities"]["Tag"]["filtersStyle"] == "toolbar"
-    assert any("chips need a filter" in line for line in replaced)
+    assert any("chips needs a filter" in line for line in replaced)
 
 
 def test_looks_are_recipes_once_each():
@@ -210,8 +210,246 @@ def test_the_v2_prompt_reads_the_outline_without_the_design():
     assert {"design", "areas"} <= set(outline_schema()["properties"])
 
 
-def test_the_kit_has_every_shell():
+def test_the_kit_dispatches_the_shells_through_the_design_registry():
+    """Epic 30: the shells live in `shells.tsx`; AppShell names none of them (the generated registry does)."""
+    shells = (KIT / "shells.tsx").read_text()
+    for marker in ("export function TopBarShell", "export function SidebarShell", "function BottomTabs"):
+        assert marker in shells
     shell = (KIT / "AppShell.tsx").read_text()
-    for marker in ("TopBarShell", "SidebarShell", "BottomTabs", 'design.shell !== "rail"', '"topbar-tabs"'):
-        assert marker in shell
+    assert "designRegistry.shells[design.shell]" in shell and '"topbar"' not in shell
     assert "FRAME_WIDTH[layout.frame]" in (KIT / "AppPage.tsx").read_text()
+
+
+# -- Story 30.4: card anatomies and positions ----------------------------------------------------------------------
+
+
+def test_a_record_without_media_reads_text_first_and_a_poster_is_portrait():
+    backend = _backend("media-library")
+    design, _, replaced = complete_design(
+        {
+            "mainEntity": "Lesson",
+            "entities": {
+                "Lesson": {"view": "media-grid", "roles": {"media": "poster", "title": "title"}},
+                "Caption": {"view": "cards", "roles": {"title": "label"}},
+                "Course": {
+                    "view": "cards",
+                    "card": "overlay",
+                    "roles": {"media": "cover", "title": "title"},
+                    "columns": 9,
+                },
+            },
+        },
+        None,
+        backend,
+    )
+    lesson, caption, course = (design["entities"][name] for name in ("Lesson", "Caption", "Course"))
+    assert lesson["card"] == "stacked" and lesson["aspect"] == "portrait", "a poster field is portrait"
+    assert caption["card"] == "text-first" and "aspect" not in caption, "no media: text first"
+    assert course["card"] == "overlay" and course["aspect"] == "square" and course["columns"] == 6
+    assert any("columns 9 clamped to 6" in line for line in replaced)
+
+
+def test_a_card_that_needs_media_falls_back_with_a_note():
+    backend = _backend("media-library")
+    design, _, replaced = complete_design(
+        {
+            "mainEntity": "Caption",
+            "entities": {"Caption": {"view": "cards", "card": "overlay", "roles": {"title": "label"}}},
+        },
+        None,
+        backend,
+    )
+    assert design["entities"]["Caption"]["card"] == "stacked"
+    assert any("overlay needs an image, a video or an audio field; shown as stacked" in line for line in replaced)
+
+
+def test_detail_layouts_need_their_data():
+    backend = _backend("media-library")
+    design, _, replaced = complete_design(
+        {
+            "mainEntity": "Lesson",
+            "entities": {
+                "Lesson": {"detailView": "media-side", "roles": {"media": "video", "title": "title"}},
+                "Caption": {"detailView": "reader", "roles": {"title": "label"}},
+                "Course": {"detailView": "split-panel", "roles": {"title": "title"}},
+                "Episode": {"detailView": "reader", "roles": {"title": "title"}},
+            },
+        },
+        None,
+        backend,
+    )
+    entities = design["entities"]
+    assert entities["Lesson"]["detailView"] == "media-side"
+    assert entities["Caption"]["detailView"] == "record" and any(
+        "reader needs a long text field" in line for line in replaced
+    )
+    assert entities["Course"]["detailView"] == "split-panel", "a course has lessons as children"
+    assert entities["Episode"]["detailView"] == "reader", "episode notes are a text field"
+
+
+def test_the_card_plugins_are_copied_only_when_used():
+    from src.orchestrator.frontend.app.plan import design_plugins
+
+    outline = {"design": {"shell": "topbar", "entities": {"Lesson": {"view": "media-grid", "card": "overlay"}}}}
+    assert design_plugins(outline) == [{"kind": "card", "name": "overlay"}]
+    assert design_plugins({"design": {"shell": "topbar", "entities": {"Lesson": {"view": "table"}}}}) == []
+
+
+# -- Story 30.5: media layouts -------------------------------------------------------------------------------------
+
+
+def test_shelves_need_a_group_and_media_a_featured_home_needs_media_and_a_date():
+    backend = _backend("media-library")
+    design, _, replaced = complete_design(
+        {
+            "mainEntity": "Lesson",
+            "homeView": "featured",
+            "entities": {
+                "Lesson": {"view": "shelves", "roles": {"media": "video", "title": "title", "badge": "topic"}},
+                "Caption": {"view": "shelves", "roles": {"title": "label"}},
+            },
+        },
+        None,
+        backend,
+    )
+    lesson, caption = design["entities"]["Lesson"], design["entities"]["Caption"]
+    assert lesson["view"] == "shelves" and lesson["groupBy"] == "topic", "the badge's enum groups the shelves"
+    assert caption["view"] == "media-grid" or caption["view"] == "cards"
+    assert any("shelves needs" in line and "Caption" in line for line in replaced)
+    assert design["homeView"] == "featured", "lessons have a video and a date"
+    plain, _, notes = complete_design(
+        {"mainEntity": "Caption", "homeView": "featured", "entities": {"Caption": {"view": "table"}}}, None, backend
+    )
+    assert plain["homeView"] == "catalogue" and any("featured needs" in line for line in notes)
+
+
+def test_a_video_record_opens_on_a_watch_page_and_falls_back_to_its_player():
+    backend = _backend("media-library")
+    design, _, _ = complete_design(
+        {"mainEntity": "Lesson", "entities": {"Lesson": {"roles": {"media": "video"}}}}, None, backend
+    )
+    assert design["entities"]["Lesson"]["detailView"] == "watch"
+    asked, _, replaced = complete_design(
+        {"mainEntity": "Course", "entities": {"Course": {"detailView": "watch", "roles": {"media": "cover"}}}},
+        None,
+        backend,
+    )
+    assert asked["entities"]["Course"]["detailView"] == "media"
+    assert any("watch page (watch) needs a video or an audio field; shown as media" in line for line in replaced)
+
+
+def test_a_featured_home_sorts_the_main_list_newest_first():
+    from src.orchestrator.frontend.app.design import list_features
+
+    backend = _backend("media-library")
+    outline = {
+        "design": {
+            "homeView": "featured",
+            "mainEntity": "Lesson",
+            "entities": {"Lesson": {"view": "shelves", "roles": {"meta": ["publishedAt"]}}},
+        }
+    }
+    unsorted = [
+        {**op, "sort": []} if op.get("entity") == "Lesson" and op.get("action") == "list" else op
+        for op in backend["operations"]
+    ]
+    operations, notes = list_features(backend, unsorted, outline)
+    lesson_list = next(op for op in operations if op.get("entity") == "Lesson" and op.get("action") == "list")
+    assert "publishedAt" in (lesson_list.get("sort") or []) and any(
+        "gained sort publishedAt" in n["message"] for n in notes
+    )
+
+
+# -- Stories 30.6 and 30.7: font pairings, the seed and the candidates --------------------------------------------
+
+
+def test_font_pairings_follow_the_script_and_the_requested_heading_kind():
+    from src.orchestrator.frontend.app.design import assign_pairings, pairing_candidates
+
+    assert "japanese-gothic" in pairing_candidates("en", None, "catalogue")
+    japanese = pairing_candidates("ja", None, "catalogue")
+    assert japanese and all(name.startswith("japanese-") for name in japanese), (
+        "a Japanese app needs a pairing that sets Japanese"
+    )
+    serif = pairing_candidates("en", {"headingFont": "serif"}, "feed")
+    assert set(serif) <= {"editorial", "bookish"} and serif, "serif headings: a display or serif heading face"
+    design = {"archetype": "catalogue", "looks": [{"recipe": "minimal"}, {"recipe": "editorial"}, {"recipe": "aurora"}]}
+    notes = assign_pairings(design, "en", seed=7)
+    pairings = [look["fontPairing"] for look in design["looks"]]
+    assert len(set(pairings)) >= 2 and design["fontPairing"] == pairings[0] and notes == []
+    again = {"archetype": "catalogue", "looks": [{"recipe": "minimal"}, {"recipe": "editorial"}, {"recipe": "aurora"}]}
+    assign_pairings(again, "en", seed=7)
+    assert [look["fontPairing"] for look in again["looks"]] == pairings, "the same seed, the same type"
+    ja = {"archetype": "catalogue", "fontPairing": "loud", "looks": [{"recipe": "minimal"}, {"recipe": "editorial"}]}
+    notes = assign_pairings(ja, "ja", seed=1)
+    assert ja["fontPairing"].startswith("japanese-") and any("does not set this app's script" in n for n in notes)
+
+
+def test_the_look_pairing_writes_the_theme_type():
+    from src.orchestrator.frontend.app.plan import pairing_theme
+
+    outline = {
+        "design": {
+            "looks": [
+                {"recipe": "editorial", "fontPairing": "editorial"},
+                {"recipe": "minimal", "fontPairing": "neutral"},
+            ],
+            "recipe": "minimal",
+        }
+    }
+    theme = pairing_theme({"style": "dashboard", "typography": {"headingFont": "Lora", "bodyFont": "Lora"}}, outline)
+    assert theme["typography"]["headingFont"] == "Inter" and theme["typography"]["headingWeight"] == 600
+    first = pairing_theme({"style": "dashboard"}, {"design": {**outline["design"], "recipe": None}})
+    assert first["typography"]["headingFont"] == "Playfair Display" and first["typography"]["ratio"] == "dramatic"
+    assert pairing_theme({"style": "dashboard"}, {"design": {}}) == {"style": "dashboard"}
+
+
+def _seeded(seed, raw=None):
+    backend = _backend("media-library")
+    design, _, _ = complete_design(raw or {"archetype": "catalogue", "mainEntity": "Lesson"}, None, backend, seed=seed)
+    main = design["entities"]["Lesson"]
+    return (
+        design["shell"],
+        design["homeView"],
+        main["view"],
+        main.get("detailView"),
+        main.get("card"),
+        main.get("filtersStyle"),
+    )
+
+
+def test_the_seed_picks_among_candidates_the_same_seed_the_same_design():
+    prints = {_seeded(seed) for seed in range(12)}
+    assert len(prints) >= 3, prints
+    assert _seeded(3) == _seeded(3)
+    shells = {print_[0] for print_ in prints}
+    assert shells <= {"sidebar", "topbar", "topbar-tabs"}, "a catalogue is never a rail"
+    assert "watch" in {print_[3] for print_ in prints} or "media" in {print_[3] for print_ in prints}
+
+
+def test_the_briefs_own_choices_win_over_the_seed_and_a_look_breaks_ties():
+    raw = {"archetype": "catalogue", "mainEntity": "Lesson", "shell": "topbar", "homeView": "catalogue",
+           "entities": {"Lesson": {"view": "media-grid", "detailView": "media"}}}  # fmt: skip
+    for seed in range(6):
+        shell, home, view, detail, _, _ = _seeded(seed, raw)
+        assert (shell, home, view, detail) == ("topbar", "catalogue", "media-grid", "media")
+    backend = _backend("media-library")
+    for seed in range(6):
+        design, _, _ = complete_design(
+            {
+                "archetype": "catalogue",
+                "mainEntity": "Lesson",
+                "looks": [{"recipe": "cinema"}],
+                "entities": {"Lesson": {"view": "media-grid"}},
+            },
+            None, backend, seed=seed,
+        )  # fmt: skip
+        assert design["entities"]["Lesson"]["card"] == "overlay", "cinema prefers the overlay card"
+        assert design["density"] == "comfortable"
+
+
+def test_without_a_seed_the_archetype_defaults_apply_as_before():
+    backend = _backend("media-library")
+    design, _, _ = complete_design({"archetype": "catalogue", "mainEntity": "Lesson"}, None, backend)
+    assert design["shell"] == "topbar" and design["homeView"] == "catalogue" and "seed" not in design
+    assert design["entities"]["Lesson"]["view"] == "media-grid"

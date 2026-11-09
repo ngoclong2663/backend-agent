@@ -1,0 +1,11 @@
+{
+  "app": "media-library",
+  "design": {
+    "looks": [
+      {
+        "recipe": "neon"
+      }
+    ],
+    "recipe": "neon"
+  }
+}

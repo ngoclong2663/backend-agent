@@ -73,3 +73,28 @@ open a record from each list, edit and save, add a child from its parent, create
 actions), driven by the app's own `src/content/app.json`, and fails on any failed API call, error state or page error.
 Run it in `bga-runner-node` with a project's `node_modules` (the shared `bga-fe-modules-*` volume) mounted next to it:
 `node app-walk.mjs <url> <app.json> [shots dir]`; `WALK_HOST=host.docker.internal` when the app runs on the host.
+
+## App design report: `make app-design-report` (Story 23.1; signed in since Story 30.1)
+
+Builds every golden app (`examples/specs/<name>.json` + `examples/app-outlines/<name>.json`, planned without an
+engine) on the app kit in the Node sandbox and shoots it on its mock API, **signed in as one demo user per area**
+(the auth plugin's demo accounts): home, the main list and one record, at 1440 and 375 px, light. It writes
+`.data/reports/app-design/<date>/report.md` (+ `report.json`, a contact sheet of the homes) with:
+
+- the **structural fingerprint** of each area (shell, home, main view, detail, card, filters: from `app.json` and the
+  kit's `data-bga-*` markers that the check records), the distinct fingerprints and the areas that share one;
+- the **edge similarity** of the signed-in screens (edge maps of layout lines, Jaccard; `design_diversity.edge_signature`),
+  per screen, plus the greyscale squint of Epic 20 for comparison;
+- the **coverage**: which registry values the golden set uses and which ready plugins none of them uses;
+- the design-check failures, the brief's choices code replaced, each draft's recorded time, calls and cost.
+
+`--baseline` also writes `agent-api/tests/fixtures/app-golden/baseline.json` (Story 30.1's baseline was taken on
+2026-11-09 before any new plugin: 9 distinct fingerprints of 12 areas, home edge similarity mean 0.25 / max 0.52).
+
+## Design plugins: `make design-plugin-check` (Story 30.3)
+
+The gates a design plugin passes before it may be `ready` (Epic 30, D6): see
+[design-plugins.md](design-plugins.md). It builds the plugin's fixture app once with every ready recipe's CSS scoped
+under `:root[data-recipe=…]` and runs `design-check.mjs` with `DESIGN_CHECK_RECIPES`, `DESIGN_CHECK_STATES`
+(`bga-mock-state`) and `DESIGN_CHECK_A11Y`, then prints a pass / fail table and writes `preview.png` into the plugin's
+folder.

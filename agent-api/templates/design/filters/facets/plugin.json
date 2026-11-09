@@ -1,0 +1,21 @@
+{
+  "kind": "filters",
+  "name": "facets",
+  "status": "ready",
+  "label": "Facets",
+  "choose": "A side panel of filters, for back offices.",
+  "archetypes": [
+    "back-office",
+    "storefront",
+    "catalogue"
+  ],
+  "needs": [
+    "enumOrReferenceFilter"
+  ],
+  "fallback": "toolbar",
+  "exports": [],
+  "marker": "facets",
+  "builtin": true,
+  "order": 30,
+  "dispatch": false
+}

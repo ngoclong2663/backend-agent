@@ -3,22 +3,8 @@
  * presentation only (the look, the shell, an entity's view): the kit reads it; bindings and screens do not change.
  */
 
-export const RECIPES = [
-  "minimal",
-  "swiss",
-  "material",
-  "enterprise",
-  "soft",
-  "clay",
-  "glass",
-  "aurora",
-  "brutalist",
-  "neon",
-  "playful",
-  "editorial",
-] as const;
-export const SHELLS = ["sidebar", "rail", "topbar", "topbar-tabs"] as const;
-export const VIEWS = ["table", "cards", "media-grid", "feed", "board", "calendar"] as const;
+// Epic 30 (Story 30.2): the values of each axis come from the design plugin registry (`useDesignPlugins`), never from
+// a list kept here; an edit is accepted when the registry offers the value (checked by the caller).
 
 export type TLook = { recipe: string; reason?: string };
 /** What the requirement says about the look (`app.design.requested`); code applied it over the design data's pick. */
@@ -30,7 +16,7 @@ export type TAppDesign = {
   mainEntity: string | null;
   looks: TLook[];
   recipe: string | null;
-  views: { entity: string; view: string }[];
+  views: { entity: string; view: string; detailView: string | null; card: string | null; filtersStyle: string | null }[];
   areas: { id: string; label: string; roles: string[] }[];
   replaced: string[];
   requested: TRequestedLook | null;
@@ -87,7 +73,13 @@ export function readAppDesign(text: string): TAppDesign | null {
     mainEntity: str(design.mainEntity),
     looks,
     recipe: str(design.recipe) ?? looks[0]?.recipe ?? null,
-    views: Object.entries(obj(design.entities)).map(([entity, value]) => ({ entity, view: str(obj(value).view) ?? "table" })),
+    views: Object.entries(obj(design.entities)).map(([entity, value]) => ({
+      entity,
+      view: str(obj(value).view) ?? "table",
+      detailView: str(obj(value).detailView),
+      card: str(obj(value).card),
+      filtersStyle: str(obj(value).filtersStyle),
+    })),
     areas: (Array.isArray(app.areas) ? app.areas : []).map((area) => ({
       id: str(obj(area).id) ?? "",
       label: str(obj(area).label) ?? "",
@@ -98,24 +90,38 @@ export function readAppDesign(text: string): TAppDesign | null {
   };
 }
 
-type TEdit = { recipe: string } | { shell: string } | { entity: string; view: string };
+/** The axes of an entity's design a review may switch (Story 30.7), each a design plugin kind. */
+export const ENTITY_AXES = [
+  { key: "view", kind: "list-view", label: "view" },
+  { key: "detailView", kind: "detail-view", label: "detail" },
+  { key: "card", kind: "card", label: "card" },
+  { key: "filtersStyle", kind: "filters", label: "filters" },
+] as const;
+export type TEntityAxis = (typeof ENTITY_AXES)[number]["key"];
 
-/** The text with one design value changed (2-space JSON, as the editor writes), or null when it cannot be applied. */
-export function editAppDesign(text: string, edit: TEdit): string | null {
+type TEdit =
+  | { recipe: string }
+  | { shell: string }
+  | { homeView: string }
+  | { entity: string; axis: TEntityAxis; value: string }
+  | { entity: string; view: string };
+
+/** The text with one design value changed (2-space JSON, as the editor writes), or null when it cannot be applied.
+ *  `allowed`: the registry's names for the axis (an unknown value is refused). */
+export function editAppDesign(text: string, edit: TEdit, allowed?: readonly string[]): string | null {
   const spec = parse(text);
   if (!spec || obj(spec.project).flow !== "app") return null;
+  const value = "recipe" in edit ? edit.recipe : "shell" in edit ? edit.shell : "homeView" in edit ? edit.homeView : "axis" in edit ? edit.value : edit.view;
+  if (!value || (allowed && !allowed.includes(value))) return null;
   const app = obj(spec.app);
   const design = { ...obj(app.design) };
-  if ("recipe" in edit) {
-    if (!(RECIPES as readonly string[]).includes(edit.recipe)) return null;
-    design.recipe = edit.recipe;
-  } else if ("shell" in edit) {
-    if (!(SHELLS as readonly string[]).includes(edit.shell)) return null;
-    design.shell = edit.shell;
-  } else {
-    if (!(VIEWS as readonly string[]).includes(edit.view)) return null;
+  if ("recipe" in edit) design.recipe = value;
+  else if ("shell" in edit) design.shell = value;
+  else if ("homeView" in edit) design.homeView = value;
+  else {
+    const axis = "axis" in edit ? edit.axis : "view";
     const entities = { ...obj(design.entities) };
-    entities[edit.entity] = { ...obj(entities[edit.entity]), view: edit.view };
+    entities[edit.entity] = { ...obj(entities[edit.entity]), [axis]: value };
     design.entities = entities;
   }
   return JSON.stringify({ ...spec, app: { ...app, design } }, null, 2);
@@ -125,4 +131,36 @@ export function editAppDesign(text: string, edit: TEdit): string | null {
 export function describeAppDesign(design: TAppDesign): string {
   const parts = [design.archetype, design.shell && `${design.shell} shell`, design.homeView && `opens on ${design.homeView}`];
   return parts.filter(Boolean).join(" · ");
+}
+
+
+/** Story 30.7: "try another layout": a new pick for every layout axis among the registry's candidates for the app's
+ *  archetype (the looks stay). The kit falls back where the data lacks what a plugin needs (as `complete_design` would:
+ *  a board without a status, shelves without a group), so the result always renders. Returns null for a site. */
+export function shuffleAppDesign(text: string, registry: Record<string, { name: string; archetypes: string[] }[]>, random: () => number = Math.random): string | null {
+  const spec = parse(text);
+  if (!spec || obj(spec.project).flow !== "app") return null;
+  const app = obj(spec.app);
+  const design = { ...obj(app.design) };
+  const archetype = str(design.archetype);
+  const pick = (kind: string, current: string | null): string | null => {
+    const names = (registry[kind] ?? []).filter((p) => !archetype || p.archetypes.length === 0 || p.archetypes.includes(archetype)).map((p) => p.name);
+    const others = names.filter((name) => name !== current);
+    if (others.length === 0) return current;
+    return others[Math.floor(random() * others.length)] ?? current;
+  };
+  design.shell = pick("shell", str(design.shell));
+  design.homeView = pick("home", str(design.homeView));
+  const main = str(design.mainEntity);
+  const entities = { ...obj(design.entities) };
+  if (main && entities[main]) {
+    const entity = { ...obj(entities[main]) };
+    entity.view = pick("list-view", str(entity.view));
+    entity.detailView = pick("detail-view", str(entity.detailView));
+    if ((registry.card ?? []).length) entity.card = pick("card", str(entity.card));
+    entities[main] = entity;
+  }
+  design.entities = entities;
+  design.seed = Math.floor(random() * 2 ** 31);
+  return JSON.stringify({ ...spec, app: { ...app, design } }, null, 2);
 }

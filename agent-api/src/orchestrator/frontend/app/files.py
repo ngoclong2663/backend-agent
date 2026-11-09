@@ -10,6 +10,7 @@ src/app/<route>/page.tsx         metadata + <AppPage pageId=… />
 
 import json
 import re
+from pathlib import Path
 from typing import Any
 
 from src.modules.shared.domain.backend_spec.naming import pluralize, to_kebab, to_pascal
@@ -32,6 +33,18 @@ FORM_SCHEMAS_FILE = "src/components/app/form-schemas.ts"
 SCENARIOS_FILE = "src/mocks/scenarios.json"
 DATE_LOCALE_FILE = "src/components/app/date-locale.ts"
 PLUGINS_FILE = "src/components/app/plugins.ts"
+DESIGN_REGISTRY_FILE = "src/components/app/design-registry.ts"  # Epic 30: the design plugins this app uses
+# the registry's kinds the kit dispatches, their key in `designRegistry` and their props type
+DESIGN_DISPATCH = (
+    ("shell", "shells", "TShellProps"),
+    ("list-view", "listViews", "TViewProps"),
+    ("detail-view", "detailViews", "TDetailProps"),
+    ("home", "homes", "THomeProps"),
+    ("card", "cards", "TCardProps"),
+)
+# a design key → the kind it names (as `frontend/app/design.KINDS`)
+DESIGN_KEYS = {"shell": "shell", "homeView": "home", "view": "list-view", "detailView": "detail-view",
+               "filtersStyle": "filters", "card": "card"}  # fmt: skip
 # date-fns 4's locales (`date-fns/locale/<code>`); a language alone picks its first region here.
 DATE_FNS_LOCALES = (
     "af ar ar-DZ ar-EG ar-MA ar-SA ar-TN az be be-tarask bg bn bs ca ckb cs cy da de de-AT el en-US en-AU en-CA "
@@ -341,6 +354,65 @@ def plugins_ts(plugins: list[str]) -> str:
     )
 
 
+def design_plugins_used(design: dict[str, Any], areas: list[dict[str, Any]] | None = None) -> dict[str, list[str]]:
+    """Epic 30 (D4): the design plugins an app's layouts name, by kind (ready ones only), in the registry's order."""
+    from src.modules.shared.domain.frontend_spec.design_registry import registry
+
+    named: dict[str, set[str]] = {}
+    for layout in [design, *[(area.get("design") or {}) for area in areas or []]]:
+        for key, kind in DESIGN_KEYS.items():
+            if layout.get(key):
+                named.setdefault(kind, set()).add(layout[key])
+            for entity in (layout.get("entities") or {}).values():
+                if isinstance(entity, dict) and entity.get(key):
+                    named.setdefault(kind, set()).add(entity[key])
+    return {
+        kind: [name for name in registry().names(kind) if name in names]
+        for kind, names in named.items()
+        if any(name in registry().names(kind) for name in names)
+    }
+
+
+def design_registry_ts(used: dict[str, list[str]]) -> str:
+    """`design-registry.ts` (Epic 30, D3/D4): the kit's dispatch table, importing only the plugins this app uses: a
+    builtin from its kit module, a folder plugin from its copied files. Kinds the kit renders without a lookup
+    (`dispatch: false`) are left out."""
+    from src.modules.shared.domain.frontend_spec.design_registry import registry
+
+    imports: dict[str, set[str]] = {}
+    tables: list[str] = []
+    for kind, key, props in DESIGN_DISPATCH:
+        entries = []
+        for name in used.get(kind) or []:
+            plugin = registry().get(kind, name)
+            if plugin is None or not plugin.dispatch or not plugin.exports:
+                continue
+            component = plugin.exports[0]
+            module = (
+                plugin.module if plugin.builtin else f"@/components/design/{kind}/{name}/{Path(plugin.files[0]).stem}"
+            )
+            imports.setdefault(module or "./views", set()).add(component)
+            entries.append(f'    "{name}": {component},' if "-" in name else f"    {name}: {component},")
+        body = "\n".join(entries)
+        table = f"{{\n{body}\n  }}" if entries else "{}"
+        tables.append(f"  {key}: {table} as Record<string, ComponentType<{props}>>,")
+    lines = [
+        HEADER,
+        "// Epic 30 (Story 30.2): the design plugins this app uses, by kind. The kit's AppShell, AppList, AppDetail\n"
+        "// and the grid views dispatch through this table and never name a plugin themselves; a name that is not\n"
+        "// here falls back to the kind's first builtin.\n",
+        'import type { ComponentType } from "react";\n',
+        'import type { TCardProps, TDetailProps, THomeProps, TShellProps, TViewProps } from "./design-types";\n',
+    ]
+    for module in sorted(imports, key=lambda m: (not m.startswith("./"), m)):
+        lines.append(f'import {{ {", ".join(sorted(imports[module]))} }} from "{module}";\n')
+    whole = [name for name in used.get("list-view") or [] if "whole" in (registry().get("list-view", name).tags)]
+    tables.append("  /** list views that load the whole list at once (a board's columns, shelves) */")
+    tables.append(f"  whole: {json.dumps(whole)} as string[],")
+    lines.append("\nexport const designRegistry = {\n" + "\n".join(tables) + "\n};\n")
+    return "".join(lines)
+
+
 def mock_scenarios(contract: dict[str, Any] | None) -> dict[str, Any]:
     """The contract's scenarios the mocks emulate (`src/mocks/scenarios.test.ts` runs them) and the others by
     reason. Signed-in scenarios run as the backend's smoke check runs them (Story 22.7): the demo user a scenario names,
@@ -516,6 +588,7 @@ def app_files(plan: dict[str, Any], spec: dict[str, Any], contract: dict[str, An
         SCENARIOS_FILE: json.dumps(mock_scenarios(contract), indent=2, ensure_ascii=False) + "\n",
         DATE_LOCALE_FILE: date_locale_ts(data["locale"]),
         PLUGINS_FILE: plugins_ts(frontend_plugins(contract)),
+        DESIGN_REGISTRY_FILE: design_registry_ts(design_plugins_used(data["design"], data.get("areas"))),
     }
     for route in plan["routes"]:
         files[route["file"]] = route_page(route)

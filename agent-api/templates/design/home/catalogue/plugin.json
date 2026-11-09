@@ -1,0 +1,23 @@
+{
+  "kind": "home",
+  "name": "catalogue",
+  "status": "ready",
+  "label": "Catalogue home",
+  "choose": "The main entity's records to browse, grouped by category.",
+  "archetypes": [
+    "catalogue",
+    "storefront",
+    "learning"
+  ],
+  "needs": [
+    "mainList"
+  ],
+  "fallback": "dashboard",
+  "exports": [
+    "CatalogueRows"
+  ],
+  "marker": "catalogue",
+  "builtin": true,
+  "order": 30,
+  "module": "./views"
+}

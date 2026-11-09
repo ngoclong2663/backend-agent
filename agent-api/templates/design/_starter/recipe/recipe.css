@@ -1,0 +1,10 @@
+/* Style recipe {{name}} (Epic 30): theme tokens only. `@root` becomes `:root` (after the theme's tokens, so it wins),
+   `@dark` becomes `:root.dark`. Keep AA contrast on every surface; no colour outside the tokens. */
+@root {
+  --radius: 0.75rem;
+}
+@dark {
+}
+[data-slot="card"] {
+  border-width: 1px;
+}

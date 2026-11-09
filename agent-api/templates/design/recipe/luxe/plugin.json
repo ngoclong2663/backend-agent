@@ -1,0 +1,22 @@
+{
+  "kind": "recipe",
+  "name": "luxe",
+  "status": "ready",
+  "label": "Luxe",
+  "choose": "High-contrast type, generous space, thin rules: premium catalogues, boutiques and venues; not for dense back offices.",
+  "family": "bold",
+  "css": "recipe.css",
+  "order": 160,
+  "archetypes": [
+    "catalogue",
+    "storefront",
+    "booking",
+    "learning",
+    "feed"
+  ],
+  "guards": [],
+  "prefers": {
+    "card": "stacked",
+    "density": "spacious"
+  }
+}

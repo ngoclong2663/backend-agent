@@ -5,7 +5,7 @@ readable and says what it followed in a note. Nothing requested: the theme and t
 
 from typing import Any
 
-from src.modules.shared.domain.frontend_spec.fonts import font_category
+from src.modules.shared.domain.frontend_spec.fonts import heading_kind_fits as _fits
 
 from ...drafting.design_cards import fix_contrast
 from ..theme import THEME_PRESETS, mix
@@ -18,22 +18,8 @@ FONT_FOR_KIND = {
     "display": "Playfair Display",
     "mono": "JetBrains Mono",
 }
-GEOMETRIC = {"Outfit", "Poppins", "Montserrat", "Space Grotesk", "Plus Jakarta Sans", "DM Sans", "Syne", "Unbounded"}
-ROUNDED = {"Nunito", "Rubik"}
 CORNERS = {"sharp": "none", "rounded": "lg", "pill": "full"}
 PHOTO_VIEWS = ("table", "cards")  # a board, a calendar or a feed keeps its own reason
-
-
-def _fits(kind: str, font: str | None) -> bool:
-    if not font:
-        return False
-    if kind == "geometric":
-        return font in GEOMETRIC
-    if kind == "rounded":
-        return font in ROUNDED
-    if kind == "serif":
-        return font_category(font) in ("serif", "display")
-    return font_category(font) == kind
 
 
 def _photos_first(design: dict[str, Any]) -> list[str]:

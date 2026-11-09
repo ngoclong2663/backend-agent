@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "editorial",
+  "status": "ready",
+  "label": "Editorial",
+  "choose": "Magazine: serif headings, generous white space, rules; reading and culture.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 120
+}

@@ -4,9 +4,10 @@ How to add a new layout or look to the dynamic app kit, one at a time, so genera
 Backlog: [Epic 30](../../pdm/epic30_design_plugins/epic30_design_plugins.md). Background: [Epic 23](../../pdm/epic23_app_design/epic23_app_design.md)
 (the design space) and [design-checks.md](design-checks.md) (the measuring tools).
 
-> **Status (2026-11-08):** the registry, the starter templates and the `design-plugin-*` commands arrive with
-> Stories 30.2 and 30.3. Until then, follow [Before the registry](#before-the-registry): the same rules, more files to
-> touch.
+> **Status (2026-11-09):** the registry (`agent-api/src/modules/shared/domain/frontend_spec/design_registry.py`),
+> the starters (`agent-api/templates/design/_starter/<kind>/`) and the `make design-plugin-new` /
+> `make design-plugin-check` commands are in (Stories 30.2, 30.3). Every value of the design space is a folder under
+> `agent-api/templates/design/<kind>/<name>/`.
 
 ## What a design plugin is
 
@@ -51,10 +52,10 @@ is a `recipe`, not a new card.
 ```
 agent-api/templates/design/<kind>/<name>/
   plugin.json        descriptor (below)
-  <Name>.tsx         the component (not for recipe / font-pairing)
-  <name>.css         recipe and card styles (optional for other kinds)
-  fixture.json       the design values that select this plugin on the kind's fixture app
-  preview.png        written by `make design-plugin-check`; shown in the review's Design panel
+  <Name>.tsx         the component (not for recipe / font-pairing; today's values are `builtin` in the kit's own files)
+  recipe.css         a recipe's CSS (`@root` → `:root`, `@dark` → `:root.dark`); a card may name a `css` file too
+  fixture.json       the example app and the design values that select this plugin on it (the gates build it)
+  preview.png        written by `make design-plugin-check`; served to the review's Design panel
 ```
 
 ### `plugin.json`
@@ -65,33 +66,60 @@ agent-api/templates/design/<kind>/<name>/
   "name": "shelves",
   "status": "draft",
   "label": "Shelves",
-  "choose": "Records with a picture, grouped by a category people browse: one horizontal row per group.",
+  "choose": "Media records browsed in rows by group (a category or a parent), each a horizontal strip to scroll.",
   "archetypes": ["catalogue", "storefront", "learning"],
-  "needs": { "mediaField": true, "groupField": true },
+  "needs": ["mediaField", "groupField"],
   "fallback": "media-grid",
   "exports": ["Shelves"],
-  "marker": "shelves"
+  "files": ["Shelves.tsx"],
+  "marker": "shelves",
+  "tags": ["cards"]
 }
 ```
 
 | Field | Rule |
 |---|---|
-| `name` | kebab-case, describes the pattern (`shelves`, `split-panel`), never a product or brand |
-| `status` | `draft` until `make design-plugin-check` passes; only `ready` plugins are offered |
-| `choose` | one or two sentences for the model: **when** this fits, in terms of the data and the people using it. It goes into the prompt as is, so keep it short and domain-neutral |
-| `archetypes` | where it is a candidate; the prompt shows only candidates of the app's archetype |
-| `needs` | what the contract must have (`imageField`, `mediaField`, `dateField`, `statusFlow`, `dateSort`, `groupField`, `enumOrReferenceFilter`, `minRecords`, …). Add a new key only with its check function in the registry |
-| `fallback` | a `ready` plugin of the same kind used when `needs` are not met |
-| `exports` | component names the folder exports (the generated `design-registry.ts` imports them) |
-| `marker` | the `data-bga-*` value the component puts on its root, so the report can fingerprint it |
-| `guards` | recipes: products it must never be used for (health, finance, children's products, …) |
-| `family`, `prefers` | recipes: `quiet` / `soft` / `bold`; the card and density it looks best with (a tie-breaker) |
+| `kind`, `name` | the folder's; `name` kebab-case, describes the pattern (`shelves`, `split-panel`), never a product or brand |
+| `status` | `draft` until `make design-plugin-check` passes; only `ready` plugins are offered (`BGA_DESIGN_INCLUDE_DRAFTS=1` lets the check build a draft) |
+| `label`, `choose` | the label the UI shows; one or two sentences for the model: **when** this fits, in terms of the data and the people using it. `choose` goes into the prompt as is, so keep it short and domain-neutral |
+| `archetypes` | where it is a candidate; the prompt shows only the candidates of the ranked archetypes (empty: everywhere) |
+| `needs` | what the contract must have, a list of keys (`imageField`, `mediaField`, `playableField`, `dateField`, `dateSort`, `statusFlow`, `groupField`, `enumOrReferenceFilter`, `search`, `mainList`, `parentOrChildren`, `longTextField`, `featured`). Each has one check in `frontend/app/design.py` (`_Data.lacks`); add a new key there and in `design_registry.NEEDS`, with a test |
+| `fallback` | a `ready` plugin of the same kind used when `needs` are not met; the chain must end in a plugin without needs |
+| `exports`, `files` | the component the kit dispatches to and the files copied into an app that uses the plugin (`src/components/design/<kind>/<name>/`, D4). `builtin: true` + `module` (`./views`, `./shells`, `./details`) for the kit's own components instead |
+| `dispatch: false` | the kit renders it without a component lookup (the filter styles inside `AppList`'s controls, the dashboard and bento homes in `AppPage`, the calendar's own data loading); the registry still offers and checks it |
+| `marker` | the `data-bga-*` value the component puts on its root (`data-bga-view`, `-detail`, `-card`, `-shell`), so the report can fingerprint it |
+| `order`, `tags` | the position in the literal and the prompt; free words other code selects by (`cards`: a list view of cards, for Story 23.11's slots) |
+| `css`, `family`, `guards`, `prefers` | recipes: the CSS file; `quiet` / `soft` / `bold`; words of products it must never be used for (health, finance, …); the card and density it looks best with (a tie-breaker, Story 30.7) |
+| `heading`, `body`, `mono`, `headingWeight`, `headingCase`, `tracking`, `ratio`, `scripts`, `recipes` | font pairings (Story 30.6): bundled fonts only (`frontend_spec/fonts.py`), the scripts it covers, the recipes it suits |
+
+### `fixture.json`
+
+`{"app": "media-library", "design": {"entities": {"Lesson": {"view": "shelves"}}}}`: an example app
+(`examples/specs/<app>.json` + `examples/app-outlines/<app>.json`) and the design values merged over its outline's
+design. The media library (Epic 29: video, audio, images, a topic, dates, captions as children) meets every `needs`
+key but `statusFlow`; a board's fixture names `agency-projects`. The check fails when `complete_design` replaces the
+plugin on its own fixture (its `needs` are not met there).
+
+## What the registry generates
+
+| From the descriptors | Where |
+|---|---|
+| the literals `Shell`, `HomeView`, `ListView`, `DetailView`, `FiltersStyle`, `Recipe` (and the answer schema, the JSON schema snapshot) | `frontend_spec/app.py` (`Literal[plugin_names(kind)]`) |
+| the prompt's choice lists, only the candidates of the ranked archetypes | `frontend/app/design.design_choices` → `draft_app@v7` `{{ design_choices.<kind> }}` |
+| the checks: a choice whose `needs` the contract lacks falls back along the chain, one note | `frontend/app/design._Completion.choose` |
+| the recipes' families, guards and CSS | `frontend/app/recipes.py` |
+| the kit's dispatch table, importing only what the app uses | `frontend/app/files.design_registry_ts` → `src/components/app/design-registry.ts` |
+| the folder plugins copied into an app | `plan["app"]["designPlugins"]`, `scaffold_frontend` |
+| the UI's Design panel choices | `GET /api/v1/design-plugins` (`registry_digest`) |
+
+`tests/test_design_registry.py` fails when a kind's names appear as a hand-written list anywhere in `src/`, the kit
+or the UI's specs feature, and runs the fast checks (descriptor, files, exports, marker, fixture) for every plugin.
 
 ## Add a plugin, step by step
 
 1. **Pick a gap.** Run `make app-design-report` and read its "similar pairs" and "unused" lists, or take the top
    entry of the plugin backlog (Story 30.8's Status). Write down in one sentence what it adds that no plugin has.
-2. **Start it.** `make design-plugin-new KIND=<kind> NAME=<name>` copies the kind's starter.
+2. **Start it.** `make design-plugin-new KIND=<kind> NAME=<name>` copies the kind's starter (`templates/design/_starter/`).
 3. **Write the descriptor**: `choose`, `archetypes`, `needs`, `fallback`. If you need a new `needs` key, add its check
    in the registry first, with a test.
 4. **Build the component** against the kind's props contract:
@@ -106,11 +134,14 @@ agent-api/templates/design/<kind>/<name>/
      the evaluation use them).
 5. **Fixture.** Set the design values that select the plugin in `fixture.json`; make sure the fixture app meets the
    `needs` (and add a second fixture that does not, to see the fallback).
-6. **Check.** `make design-plugin-check NAME=<name>`: 375 / 1440 px, light / dark, in every ready recipe; contrast on
-   the real composite; keyboard; reduced motion and transparency; all states. Fix until the table is all pass; look at
-   the screenshots yourself as well.
-7. **Promote.** Set `"status": "ready"`. `make test` runs the registry checks (fallback exists, exports exist, fixture
-   builds).
+6. **Check.** `make design-plugin-check NAME=<name>`: the fixture built once, signed in per area, 375 / 1440 px,
+   light / dark, in every ready recipe (`DESIGN_CHECK_RECIPES`); the contrast of every text element against its
+   backdrop (text over images is skipped: look at those yourself); the keyboard pass (a focus ring on every focused
+   element); the mock API's empty, error and loading states (`bga-mock-state`); pages load with reduced motion. Fix
+   until the table is all pass; look at the screenshots (`.data/shots/design-plugin/<name>/`) yourself as well.
+   `ARGS="--fast"` runs the descriptor part alone.
+7. **Promote.** Set `"status": "ready"`. `make test` runs the registry checks (descriptor, fallback, exports, marker,
+   fixture) for every plugin.
 8. **Measure.** `make app-design-report`: the fingerprint count should go up, or the plugin should show up where the
    gap was.
 9. **Record it.** One line in the plugin backlog (what, why, the report's number before and after), then commit:
@@ -130,22 +161,15 @@ contract feature first; split that out.
 - Add a font that is not bundled (`frontend_spec/fonts.py`; a new font is `make frontend-base` + `make runner-node`).
 - Write a plugin around one sample app's domain; describe `choose` by the data's shape and who uses it.
 
-## Before the registry
+## Kit contracts
 
-Until Story 30.2 lands, a new value of the design space is added by hand in these places (and the same gates apply,
-through `make design-check-app` and `make app-design-report`):
+| Kind | Props (`components/app/design-types.ts`) | Building blocks to reuse |
+|---|---|---|
+| `shell` | `TShellProps` (children, design, nav) | `shells.tsx`: `Brand`, `NavLinks`, `BottomTabs`, `TopSearch`, `AreaSwitch`, `useNav` |
+| `list-view`, `home` | `TViewProps`, `THomeProps` (+ `listHref`) | `views.tsx`: `Media`, `Meta`, `Title`, `Figure`, `Avatar`, `CardBody`, `viewHref`, `durationText`; `RowActions` |
+| `detail-view` | `TDetailProps` (record, design, fields, title, actions) | `details.tsx`: `DetailHeading`, `FieldGrid`, `audioFieldOf` |
+| `card` | `TCardProps` (record, roles, title, href, actions, boxed, size) | the same `views.tsx` helpers |
 
-| Kind | Files to change |
-|---|---|
-| any | the literal in `agent-api/src/modules/shared/domain/frontend_spec/app.py` (`Shell`, `ListView`, `DetailView`, `HomeView`, `FiltersStyle`, `Recipe`); the choice prose in the current `agent-api/prompts/draft_app/v<N>.md` (new prompt version); the type in the kit's `components/app/app.ts` (`TEntityDesign`, the app design type); `agent-api/scripts/app_design_proto/` if the harness should offer it; schema snapshots (`UPDATE_SNAPSHOTS=1`) |
-| `shell` | `SHELLS` and `ARCHETYPES` in `agent-api/src/orchestrator/frontend/app/design.py`; `AppShell.tsx` |
-| `list-view` | `VIEWS` and the `needs` checks in `complete_design` (`design.py`); `list_features` if it needs list features from the API; a component and the dispatch in `RecordsView` (`views.tsx`); `AppList.tsx` when it changes paging or controls |
-| `detail-view` | `design.py`; `AppDetail.tsx` |
-| `home` | `ARCHETYPES` / `home_entity` in `design.py`; `AppPage.tsx` (dashboard, bento) or `AppList.tsx` (feed, catalogue, agenda) |
-| `filters` | `design.py`; `AppList.tsx` (`Controls`) |
-| `recipe` | `RECIPES`, `FAMILIES`, `STYLE_RECIPES`, `STYLE_WORDS` and guards in `agent-api/src/orchestrator/frontend/app/recipes.py`; a `/* recipe: <name> */ … /* end */` block in `recipes.css` next to it |
-| fonts | `agent-api/src/modules/shared/domain/frontend_spec/fonts.py`, then `make frontend-base` and `make runner-node` |
-
-Tests to extend: `agent-api/tests/test_app_design.py` (choices and fallbacks), `test_app_recipes.py` (recipes),
-`test_app_design_report.py` (report), plus the kit's `tsc` and lint. A change to shared frontend code must keep
-`tests/test_static_golden.py` passing.
+Tests to extend: `agent-api/tests/test_design_registry.py` (the registry), `test_app_design.py` (choices and
+fallbacks), `test_app_recipes.py` (recipes), plus the kit's `tsc` and vitest files (`make kit-test`). A change to
+shared frontend code must keep `tests/test_static_golden.py` passing.

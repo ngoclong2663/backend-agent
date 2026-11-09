@@ -1,0 +1,17 @@
+{
+  "kind": "filters",
+  "name": "{{name}}",
+  "status": "draft",
+  "label": "{{Label}}",
+  "choose": "When the records and the people using them call for it (one or two sentences, for the model).",
+  "archetypes": [
+    "catalogue"
+  ],
+  "needs": [
+    "enumOrReferenceFilter"
+  ],
+  "fallback": "toolbar",
+  "exports": [],
+  "dispatch": false,
+  "marker": "{{name}}"
+}

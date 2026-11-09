@@ -5,12 +5,10 @@ import Link from "next/link";
 import { usePathname, useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import {
   canUse,
@@ -20,20 +18,18 @@ import {
   fieldLabel,
   listOf,
   pageHref,
-  recordTitle,
   resolveParams,
-  type TAppAction,
   type TAppEntity,
   type TAppSection,
   type TRecord,
   type TRouteParams,
 } from "./app";
 import { filterOptions, useOperationQuery } from "./bindings";
-import { FieldValue } from "./FieldValue";
 import { entityDesign, useLayout } from "./layout";
 import { useSession } from "./plugins";
 import { RowActions } from "./RecordActions";
-import { Calendar, RecordsView } from "./views";
+import { designRegistry } from "./design-registry";
+import { Calendar, PlainCards, RecordsView, TableRows } from "./views";
 import { inSentence, t } from "./messages";
 
 const PAGE_SIZE = 20;
@@ -246,113 +242,17 @@ function CreateLink({ section }: { section: TAppSection }) {
   );
 }
 
-function viewHref(actions: TAppAction[], record: TRecord, route: TRouteParams): string | undefined {
-  const view = actions.find((action) => action.id === "view" && action.page);
-  return view?.page ? pageHref(view.page, resolveParams(view.params, route, record), route) : undefined;
-}
-
 function Rows({ section, entity, records, home = false }: { section: TAppSection; entity?: TAppEntity; records: TRecord[]; home?: boolean }) {
-  const route = (useParams() ?? {}) as TRouteParams;
-  const router = useRouter();
   const layout = useLayout();
-  const fields = section.data?.fields ?? [];
-  const actions = section.content?.actions ?? [];
-  const compact = app.density === "compact";
-  // Epic 23: the layout's view of this entity (an area may show it another way); tables and plain cards stay here
+  // Epic 23: the layout's view of this entity (an area may show it another way); Epic 30: the view is a plugin
   const design = entityDesign(layout, section.content?.entity);
-  const plainCards = design.view === "cards" && !design.roles?.title && !design.roles?.media;
-  if (section.content?.variant !== "recent" && design.view !== "table" && !plainCards) {
-    const listHref = entity?.list ?? undefined;
-    return <RecordsView section={section} entity={entity} records={records} design={design} home={home && layout.homeView === "catalogue"} listHref={listHref} />;
+  if (section.content?.variant === "recent") {
+    // a dashboard's recent list: plain cards only when the layout says cards (or, without a layout entry, the outline)
+    const designed = Boolean(layout.entities?.[section.content?.entity ?? ""]);
+    const cards = design.view === "cards" || (!designed && (section.content?.style ?? entity?.listStyle) === "cards");
+    return cards ? <PlainCards section={section} entity={entity} records={records} design={design} /> : <TableRows section={section} entity={entity} records={records} design={design} />;
   }
-  if (design.view === "cards" || (!layout.entities?.[section.content?.entity ?? ""] && (section.content?.style ?? entity?.listStyle) === "cards")) {
-    return (
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {records.map((record) => {
-          const href = viewHref(actions, record, route);
-          const title = recordTitle(entity, record);
-          return (
-            <li key={String(record.id)}>
-              <Card size="sm" className="h-full">
-                <CardHeader className="flex flex-row items-start justify-between gap-2">
-                  <CardTitle className="min-w-0 truncate">
-                    {href ? (
-                      <Link href={href} className="underline-offset-4 hover:underline">
-                        {title}
-                      </Link>
-                    ) : (
-                      title
-                    )}
-                  </CardTitle>
-                  <RowActions actions={actions} record={record} label={title} />
-                </CardHeader>
-                <CardContent>
-                  <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-                    {fields
-                      .filter((field) => field !== entity?.displayField)
-                      .map((field) => (
-                        <div key={field} className="contents">
-                          <dt className="text-muted-foreground">{fieldLabel(entity, field)}</dt>
-                          <dd className="min-w-0 truncate">
-                            <FieldValue entity={entity} field={field} record={record} />
-                          </dd>
-                        </div>
-                      ))}
-                  </dl>
-                </CardContent>
-              </Card>
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }
-  return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {fields.map((field) => (
-              <TableHead key={field}>{fieldLabel(entity, field)}</TableHead>
-            ))}
-            {actions.length > 0 && <TableHead className="w-12 text-right"><span className="sr-only">Actions</span></TableHead>}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {records.map((record) => {
-            const href = viewHref(actions, record, route);
-            return (
-              <TableRow
-                key={String(record.id)}
-                className={cn(href && "cursor-pointer", compact && "[&_td]:py-1.5")}
-                onClick={(event) => {
-                  if (!href || (event.target as HTMLElement).closest("a,button,[role=menuitem]")) return;
-                  router.push(href);
-                }}
-              >
-                {fields.map((field, index) => (
-                  <TableCell key={field} className={cn(index === 0 && "font-medium")}>
-                    {index === 0 && href && !entity?.references?.[field] ? (
-                      <Link href={href} className="underline-offset-4 hover:underline">
-                        <FieldValue entity={entity} field={field} record={record} link={false} />
-                      </Link>
-                    ) : (
-                      <FieldValue entity={entity} field={field} record={record} />
-                    )}
-                  </TableCell>
-                ))}
-                {actions.length > 0 && (
-                  <TableCell className="text-right">
-                    <RowActions actions={actions} record={record} label={recordTitle(entity, record)} />
-                  </TableCell>
-                )}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
-  );
+  return <RecordsView section={section} entity={entity} records={records} design={design} home={home} homeView={layout.homeView} listHref={entity?.list ?? undefined} />;
 }
 
 export function ListSkeleton({ rows = 5 }: { rows?: number }) {
@@ -396,7 +296,7 @@ function ListBody({ section, heading, hideTitle, pageId }: ListProps) {
   // Epic 23: a calendar (or the agenda home) asks for its dates itself; a board and a catalogue home load at once
   const dated = !recent && design.view === "calendar" && Boolean(design.dateField);
   const agenda = dated && home && layout.homeView === "agenda";
-  const whole = !recent && (design.view === "board" || (home && layout.homeView === "catalogue"));
+  const whole = !recent && (designRegistry.whole.includes(design.view) || (home && Boolean(designRegistry.homes[layout.homeView])));
   const page = Math.max(1, Number(state.get("page") ?? 1) || 1);
   const size = recent ? RECENT : whole ? (controls.maxLimit ?? 100) : PAGE_SIZE;
   const params: Record<string, unknown> = { ...resolveParams(section.data?.params, route) };

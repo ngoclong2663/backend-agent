@@ -96,7 +96,11 @@ class _Entity:
 
 
 def complete_outline(
-    raw: Any, backend: dict[str, Any], contract: dict[str, Any], archetype_hint: str | None = None
+    raw: Any,
+    backend: dict[str, Any],
+    contract: dict[str, Any],
+    archetype_hint: str | None = None,
+    seed: int | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """The drafted outline (any JSON) → a complete outline (`AppOutline` fields, camelCase) and the notes. Epic 23:
     the design brief and the areas are completed by `design.complete_design` (`archetype_hint`: code's pick from the
@@ -149,7 +153,8 @@ def complete_outline(
                 name: {"view": item["listStyle"]} for name, item in out["entities"].items() if item.get("listStyle")
             },
         }
-    design, areas, replaced = complete_design(raw_design, raw_areas, backend, archetype_hint)
+    locale = raw.get("locale") if isinstance(raw, dict) else None
+    design, areas, replaced = complete_design(raw_design, raw_areas, backend, archetype_hint, seed=seed, locale=locale)
     if not briefed and out.get("home", "dashboard") != "dashboard" and design["homeView"] == "dashboard":
         design["homeView"] = "catalogue"  # the outline opens on a list: keep that
     if briefed:  # the brief decides the home page: a list home opens on the main entity's list

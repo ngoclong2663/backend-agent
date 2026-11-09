@@ -1,31 +1,24 @@
-"""Style recipes and the three looks (Epic 23, Story 23.7). A recipe is a set of tokens and CSS in the app kit
-(`globals.css` from `templates/nextjs_overlay/files/dynamic/app/src/app/recipes.css`); the brief names three looks and
-code completes them: the requirement's own style words come first, the product's styles from UI UX Pro Max's data
-fill gaps, guards keep unsuitable recipes away from sensitive products, and the three span a range (Story 23.0: the
-model alone picked only quiet looks in all seven drafts).
+"""Style recipes and the three looks (Epic 23, Story 23.7). A recipe is a `recipe` design plugin (Epic 30:
+`templates/design/recipe/<name>/`: the descriptor's family and guards, its `recipe.css` appended to the app's
+`globals.css`); the brief names three looks and code completes them: the requirement's own style words come first, the
+product's styles from UI UX Pro Max's data fill gaps, guards keep unsuitable recipes away from sensitive products, and
+the three span a range (Story 23.0: the model alone picked only quiet looks in all seven drafts).
 
 Pure functions, no model call.
 """
 
 import re
 from functools import cache
-from pathlib import Path
 from typing import Any
 
-RECIPES_CSS = Path(__file__).with_name("recipes.css")
-_BLOCK = re.compile(r"/\* recipe: ([a-z]+) \*/\n(.*?)/\* end \*/", re.S)
+from src.modules.shared.domain.frontend_spec.design_registry import registry
 
-RECIPES = (
-    "minimal", "swiss", "material", "enterprise", "soft", "clay",
-    "glass", "aurora", "brutalist", "neon", "playful", "editorial",
-)  # fmt: skip
-# How loud a recipe is: the three looks span at least two families, one of them not quiet.
-FAMILIES = {
-    "quiet": ("minimal", "swiss", "enterprise", "editorial", "material"),
-    "soft": ("soft", "clay", "playful"),
-    "bold": ("glass", "aurora", "brutalist", "neon"),
+RECIPES: tuple[str, ...] = registry().names("recipe")
+# How loud a recipe is (the descriptors' `family`): the three looks span at least two families, one of them not quiet.
+FAMILY: dict[str, str] = {name: registry().plugins["recipe"][name].family or "quiet" for name in RECIPES}
+FAMILIES: dict[str, tuple[str, ...]] = {
+    family: tuple(name for name in RECIPES if FAMILY[name] == family) for family in ("quiet", "soft", "bold")
 }
-FAMILY = {recipe: family for family, recipes in FAMILIES.items() for recipe in recipes}
 # UI UX Pro Max's style names (products.csv "Primary Style Recommendation", "Secondary Styles") → a recipe.
 STYLE_RECIPES: tuple[tuple[str, str], ...] = (
     ("liquid glass", "glass"),
@@ -83,11 +76,15 @@ STYLE_WORDS: tuple[tuple[str, str], ...] = (
     ("minimalist", "minimal"),
     ("minimal", "minimal"),
 )
-# Products whose users expect calm: no dark neon or toy look (styles.csv "Do Not Use For", in short).
-SENSITIVE = ("health", "medical", "clinic", "dental", "dentist", "hospital", "patient", "pharmacy", "therapy",
-             "bank", "banking", "finance", "financial", "accounting", "insurance", "legal", "law", "tax")  # fmt: skip
-GUARDED = {"neon": "a dark neon look", "playful": "a toy-like look"}
-DEFAULT_BOLD = ("aurora", "glass", "brutalist")
+# Products whose users expect calm (the recipe descriptors' `guards`: styles.csv "Do Not Use For", in short).
+GUARDED: dict[str, tuple[str, ...]] = {
+    name: tuple(registry().plugins["recipe"][name].guards)
+    for name in RECIPES
+    if registry().plugins["recipe"][name].guards
+}
+SENSITIVE: tuple[str, ...] = tuple(dict.fromkeys(word for words in GUARDED.values() for word in words))
+# The bolder looks code adds when the brief and the data offer none (the bold family, unguarded, in registry order)
+DEFAULT_BOLD: tuple[str, ...] = tuple(name for name in RECIPES if FAMILY[name] == "bold" and name not in GUARDED)
 
 
 def _words(text: str) -> str:
@@ -131,6 +128,12 @@ def sensitive(requirement: str, product_types: list[str]) -> bool:
     return any(f" {word} " in text for word in SENSITIVE)
 
 
+def guarded(recipe: str, requirement: str, product_types: list[str]) -> bool:
+    """Whether a recipe's guards name this product (Epic 30: the words live in the recipe's descriptor)."""
+    text = _words(requirement + " " + " ".join(product_types))
+    return any(f" {word} " in text for word in GUARDED.get(recipe, ()))
+
+
 def complete_looks(
     looks: list[dict[str, Any]], requirement: str, recommended: list[dict[str, str]], product_types: list[str]
 ) -> tuple[list[dict[str, Any]], list[str]]:
@@ -148,8 +151,9 @@ def complete_looks(
         recipe = look["recipe"]
         if any(recipe == kept["recipe"] for kept in out):
             continue
-        if calm and recipe in GUARDED and recipe not in style_words(requirement):
-            notes.append(f"look '{recipe}' left out: {GUARDED[recipe]} does not suit this product")
+        if guarded(recipe, requirement, product_types) and recipe not in style_words(requirement):
+            label = registry().plugins["recipe"][recipe].label.lower()
+            notes.append(f"look '{recipe}' left out: a {label} look does not suit this product")
             continue
         out.append({"recipe": recipe, **({"reason": str(look["reason"])[:200]} if look.get("reason") else {})})
     for recipe in ("minimal", *DEFAULT_BOLD):
@@ -178,17 +182,19 @@ def first_recipe(design: dict[str, Any]) -> str:
 
 @cache
 def recipe_blocks() -> dict[str, str]:
-    """Each recipe's CSS (`recipes.css`), placeholders still in."""
-    return {name: body for name, body in _BLOCK.findall(RECIPES_CSS.read_text())}
+    """Each recipe's CSS (its plugin folder's `recipe.css`), placeholders still in."""
+    return {name: registry().recipe_css(name) for name in RECIPES}
 
 
-def recipe_css(recipe: str | None) -> str:
+def recipe_css(recipe: str | None, scope: str | None = None) -> str:
     """The app's recipe, ready to append to `globals.css`: `@root` → `:root` (later than the theme's, so it wins),
-    `@dark` → `:root.dark`; empty for no recipe (an app drafted before Epic 23 keeps today's look)."""
+    `@dark` → `:root.dark`; empty for no recipe (an app drafted before Epic 23 keeps today's look). `scope` (the
+    plugin check, Story 30.3) writes it under `:root[data-recipe="<scope>"]` so one build can show every recipe."""
     body = recipe_blocks().get(recipe or "")
     if body is None:
         return ""
-    css = body.replace("@dark", ":root.dark").replace("@root", ":root")
+    root = f':root[data-recipe="{scope}"]' if scope else ":root"
+    css = body.replace("@dark", f"{root}.dark").replace("@root", root)
     return (
         f"\n/* Style recipe: {recipe} (Epic 23, Story 23.7) */\n{css}"
         "@media (prefers-reduced-motion: reduce) {\n  :root * { transition: none !important; }\n}\n"

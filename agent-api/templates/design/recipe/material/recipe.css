@@ -1,0 +1,8 @@
+@root { --radius: 0.75rem; }
+@root [data-slot="card"] {
+  border: 0;
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 10%, transparent), 0 2px 6px color-mix(in oklab, var(--foreground) 8%, transparent);
+  transition: box-shadow 200ms;
+}
+@root [data-slot="card"]:hover { box-shadow: 0 6px 20px color-mix(in oklab, var(--foreground) 16%, transparent); }
+@root [data-slot="button"] { border-radius: 999px; }

@@ -121,14 +121,14 @@ type AppDesign = {
   mobileNav?: "drawer" | "bottom-tabs" | null;
   frame?: "narrow" | "standard" | "wide" | "full" | null;
   density?: "compact" | "comfortable" | "spacious" | null;
-  homeView?: "dashboard" | "feed" | "catalogue" | "agenda" | "bento" | null;
+  homeView?: "dashboard" | "feed" | "catalogue" | "agenda" | "bento" | "featured" | null;
   mainEntity?: string | null;
   entities?: Record<string, AppEntityDesign>;
   looks?: AppLook[];
   requested?: AppRequestedStyle | null;
-  recipe?: "minimal" | "swiss" | "material" | "enterprise" | "soft" | "clay" | "glass" | "aurora" | "brutalist" | "neon" | "playful" | "editorial" | null;
+  recipe?: "minimal" | "swiss" | "material" | "enterprise" | "soft" | "clay" | "aurora" | "glass" | "brutalist" | "neon" | "playful" | "editorial" | "cinema" | "paper" | "terminal" | "luxe" | null;
+  fontPairing?: "neutral" | "geometric" | "editorial" | "bookish" | "workshop" | "loud" | "humanist" | "japanese-gothic" | "japanese-mincho" | null;
   reason?: string | null;
-  replaced?: string[];
 };
 
 // How an entity is named and shown; every field is optional (code fills it from the BackendSpec).
@@ -145,10 +145,13 @@ type AppEntity = {
 
 // How one entity's records are shown (Stories 23.3–23.5).
 type AppEntityDesign = {
-  view?: "table" | "cards" | "media-grid" | "feed" | "board" | "calendar" | null;
-  detailView?: "record" | "media" | "profile" | null;
+  view?: "table" | "cards" | "media-grid" | "feed" | "board" | "calendar" | "shelves" | null;
+  detailView?: "record" | "media" | "profile" | "media-side" | "split-panel" | "reader" | "watch" | null;
   roles?: AppFieldRoles;
   filtersStyle?: "toolbar" | "chips" | "facets" | "search-first" | null;
+  card?: "stacked" | "overlay" | "side" | "text-first" | null;
+  aspect?: "wide" | "portrait" | "square" | "auto" | null;
+  columns?: number | null;
   groupBy?: string | null;
   dateField?: string | null;
   endField?: string | null;
@@ -183,8 +186,9 @@ type AppLanding = {
 
 // One look the user can pick (Story 23.7): a style recipe and why it fits.
 type AppLook = {
-  recipe: "minimal" | "swiss" | "material" | "enterprise" | "soft" | "clay" | "glass" | "aurora" | "brutalist" | "neon" | "playful" | "editorial";
+  recipe: "minimal" | "swiss" | "material" | "enterprise" | "soft" | "clay" | "aurora" | "glass" | "brutalist" | "neon" | "playful" | "editorial" | "cinema" | "paper" | "terminal" | "luxe";
   reason?: string | null;
+  fontPairing?: "neutral" | "geometric" | "editorial" | "bookish" | "workshop" | "loud" | "humanist" | "japanese-gothic" | "japanese-mincho" | null;
 };
 
 type AppNavItem = {

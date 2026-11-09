@@ -1,0 +1,24 @@
+{
+  "kind": "detail-view",
+  "name": "reader",
+  "status": "ready",
+  "label": "Reader",
+  "choose": "A narrow reading column for records with long text (articles, notes, lesson descriptions): the text first, the other fields under it.",
+  "archetypes": [
+    "feed",
+    "learning",
+    "catalogue"
+  ],
+  "needs": [
+    "longTextField"
+  ],
+  "fallback": "record",
+  "exports": [
+    "ReaderDetail"
+  ],
+  "files": [
+    "ReaderDetail.tsx"
+  ],
+  "marker": "reader",
+  "order": 60
+}

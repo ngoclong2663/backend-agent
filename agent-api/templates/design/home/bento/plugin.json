@@ -1,0 +1,19 @@
+{
+  "kind": "home",
+  "name": "bento",
+  "status": "ready",
+  "label": "Bento",
+  "choose": "Figures and short lists in tiles of different sizes.",
+  "archetypes": [
+    "back-office",
+    "workspace",
+    "learning"
+  ],
+  "needs": [],
+  "fallback": "dashboard",
+  "exports": [],
+  "marker": "bento",
+  "builtin": true,
+  "order": 50,
+  "dispatch": false
+}

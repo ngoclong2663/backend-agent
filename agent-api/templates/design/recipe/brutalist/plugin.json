@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "brutalist",
+  "status": "ready",
+  "label": "Brutalist",
+  "choose": "Neo-brutalism: hard edges, thick borders, raw colour; bold brands.",
+  "family": "bold",
+  "css": "recipe.css",
+  "order": 90
+}

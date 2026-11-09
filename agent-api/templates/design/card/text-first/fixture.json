@@ -1,0 +1,11 @@
+{
+  "app": "media-library",
+  "design": {
+    "entities": {
+      "Caption": {
+        "view": "cards",
+        "card": "text-first"
+      }
+    }
+  }
+}

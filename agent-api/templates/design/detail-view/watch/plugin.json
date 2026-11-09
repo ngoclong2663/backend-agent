@@ -1,0 +1,23 @@
+{
+  "kind": "detail-view",
+  "name": "watch",
+  "status": "ready",
+  "label": "Watch page",
+  "choose": "The player first (left on wide screens), the title, meta and actions under it, and an Up next list of the same group: videos and podcasts people watch one after another.",
+  "archetypes": [
+    "catalogue",
+    "learning"
+  ],
+  "needs": [
+    "playableField"
+  ],
+  "fallback": "media",
+  "exports": [
+    "WatchDetail"
+  ],
+  "files": [
+    "WatchDetail.tsx"
+  ],
+  "marker": "watch",
+  "order": 70
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "shell",
+  "name": "topbar",
+  "status": "ready",
+  "label": "Top bar",
+  "choose": "Few sections, browsing, a search at the top: the sections in the bar, bottom tabs on phones.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "fallback": "sidebar",
+  "exports": [
+    "TopBarShell"
+  ],
+  "marker": "topbar",
+  "builtin": true,
+  "order": 20,
+  "module": "./shells"
+}

@@ -1,0 +1,10 @@
+{
+  "app": "agency-projects",
+  "design": {
+    "entities": {
+      "Task": {
+        "view": "board"
+      }
+    }
+  }
+}

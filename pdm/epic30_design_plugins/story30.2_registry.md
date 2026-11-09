@@ -41,9 +41,9 @@ kit pick it up, so that a new option is a small, safe change.
 
 ## Acceptance criteria
 
-- [ ] Every value of today's design space is a plugin folder; no hand-kept list of them remains.
-- [ ] The golden apps render the same before and after (fingerprints equal, design check clean).
-- [ ] An app's bundle contains only the plugins it uses.
+- [x] Every value of today's design space is a plugin folder; no hand-kept list of them remains.
+- [x] The golden apps render the same before and after (fingerprints equal, design check clean).
+- [x] An app's bundle contains only the plugins it uses.
 
 ## Verify
 
@@ -52,3 +52,30 @@ kit pick it up, so that a new option is a small, safe change.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `frontend_spec/design_registry.py` (`DesignPluginDescriptor`, `DesignRegistry`: loads
+`templates/design/<kind>/<name>/plugin.json` once, checks fallbacks (exist, ready, a chain ends without needs), known
+`needs`, files; a broken folder is left out with a warning, `strict=True` raises). Generated from it: the literals in
+`frontend_spec/app.py` (`Literal[plugin_names(kind)]`; the answer schema and JSON schema follow), the prompt's choice
+lists (`design.design_choices` → `draft_app@v7` `{{ design_choices.<kind> }}`, only the candidates of the ranked
+archetypes), `complete_design`'s checks (`_Completion.choose`: the drafted plugin if ready, else the default, then down
+the fallback chain while a `needs` key is lacking, one note; `_Data.lacks` is the one check per key), the recipes'
+families, guards and CSS (`recipes.py` reads the descriptors; `recipes.css` split into `templates/design/recipe/<name>/
+recipe.css`), the kit's `design-registry.ts` (`files.design_registry_ts`: imports only the plugins the app's layouts
+name; `AppShell`, `RecordsView`, `AppDetail` and `AppList` dispatch through it), the folder plugins copied by the
+scaffold (`plan["app"]["designPlugins"]`, D4) and the UI's choices (`GET /api/v1/design-plugins`, `useDesignPlugins`;
+`app-design.ts` keeps no list). Today's 4 shells, 6 list views, 3 detail views, 5 homes, 4 filter styles and 12
+recipes are folders (`builtin: true` + `module` for the kit's own components, moved into `shells.tsx`, `views.tsx`
+(`TableRows`, `PlainCards` from `AppList`) and `details.tsx`). Guard: `test_no_hand_written_list_of_plugin_names_remains`
+scans `src/`, the kit and the UI's specs feature (`slots.CARD_VIEWS` and `recipes.DEFAULT_BOLD` now derive from the
+registry: `tags: ["cards"]`, the bold family).
+
+Verified: `make kit-test ARGS="--app plant-shop:plant-shop"` (type-check + vitest) clean; the plant shop's generated
+registry imports `SidebarShell, TopBarShell`, `CatalogueRows, MediaGrid, RoleCards, TableRows` and nothing else;
+`make test`; the signed-in report's fingerprints equal the baseline (see the Status of 30.8 for the run).
+
+Deviations: today's components stay in the kit's core modules (`builtin`) rather than moving each into its folder —
+they share helpers and are in every app; folder plugins (30.4 on) are copied only when used, which is what D4 is for.
+Filter styles, the dashboard / bento homes and the calendar's data loading are `dispatch: false` plugins (offered,
+checked and dispatched by name inside `AppList` / `AppPage`, no component lookup). The literal order changed in one
+place (aurora before glass, so the bold defaults keep today's order): schema snapshots regenerated.

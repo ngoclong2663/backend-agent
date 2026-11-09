@@ -1,0 +1,10 @@
+{
+  "app": "media-library",
+  "design": {
+    "entities": {
+      "Lesson": {
+        "detailView": "record"
+      }
+    }
+  }
+}

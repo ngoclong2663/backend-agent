@@ -1,0 +1,26 @@
+{
+  "kind": "home",
+  "name": "featured",
+  "status": "ready",
+  "label": "Featured",
+  "choose": "One record across the top (its media large, title, subtitle, the main action): the first flagged featured, else the newest; then shelves.",
+  "archetypes": [
+    "catalogue",
+    "learning",
+    "storefront"
+  ],
+  "needs": [
+    "mainList",
+    "mediaField",
+    "featured"
+  ],
+  "fallback": "catalogue",
+  "exports": [
+    "FeaturedHome"
+  ],
+  "files": [
+    "FeaturedHome.tsx"
+  ],
+  "marker": "featured",
+  "order": 60
+}

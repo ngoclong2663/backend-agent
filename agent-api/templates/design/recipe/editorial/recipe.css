@@ -1,0 +1,6 @@
+@root { --radius: 0.125rem; }
+@root h1, @root h2, @root h3 { font-family: var(--font-display), ui-serif, Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+@root h1 { font-size: 2.25rem; }
+@root [data-slot="card"] { box-shadow: none; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+@root [data-bga-view="feed"] { gap: 0; }
+@root [data-bga-header] { border-bottom: 1px solid var(--foreground); }

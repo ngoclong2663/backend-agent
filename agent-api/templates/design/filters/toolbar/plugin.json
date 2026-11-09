@@ -1,0 +1,22 @@
+{
+  "kind": "filters",
+  "name": "toolbar",
+  "status": "ready",
+  "label": "Toolbar",
+  "choose": "A search box and selects in a row.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [],
+  "marker": "toolbar",
+  "builtin": true,
+  "order": 10,
+  "dispatch": false
+}

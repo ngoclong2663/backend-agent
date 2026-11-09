@@ -1,0 +1,25 @@
+{
+  "kind": "card",
+  "name": "overlay",
+  "status": "ready",
+  "label": "Overlay",
+  "choose": "The media fills the card and the title sits over a dark scrim at its foot: posters, covers, stills people recognise by their picture.",
+  "archetypes": [
+    "catalogue",
+    "learning",
+    "storefront",
+    "feed"
+  ],
+  "needs": [
+    "mediaField"
+  ],
+  "fallback": "stacked",
+  "exports": [
+    "OverlayCard"
+  ],
+  "files": [
+    "OverlayCard.tsx"
+  ],
+  "marker": "overlay",
+  "order": 20
+}

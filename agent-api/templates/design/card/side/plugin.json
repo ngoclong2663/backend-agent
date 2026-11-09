@@ -1,0 +1,26 @@
+{
+  "kind": "card",
+  "name": "side",
+  "status": "ready",
+  "label": "Side",
+  "choose": "The media on the left, the text on the right, one column on phones: listings, people, products whose details people read.",
+  "archetypes": [
+    "back-office",
+    "storefront",
+    "booking",
+    "catalogue",
+    "learning"
+  ],
+  "needs": [
+    "mediaField"
+  ],
+  "fallback": "stacked",
+  "exports": [
+    "SideCard"
+  ],
+  "files": [
+    "SideCard.tsx"
+  ],
+  "marker": "side",
+  "order": 30
+}

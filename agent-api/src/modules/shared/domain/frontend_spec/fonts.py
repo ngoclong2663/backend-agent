@@ -153,3 +153,29 @@ def font_imports(*names: str) -> list[str]:
         if font is not None:
             imports += [f"{font.package}/{weight}.css" for weight in font.weights]
     return imports
+
+
+# The requirement's kind of heading face (Story 23.13 `AppRequestedStyle.headingFont`) → the bundled faces of that kind
+GEOMETRIC_FACES = frozenset(
+    {"Outfit", "Poppins", "Montserrat", "Space Grotesk", "Plus Jakarta Sans", "DM Sans", "Syne", "Unbounded"}
+)
+ROUNDED_FACES = frozenset({"Nunito", "Rubik"})
+
+
+def heading_kind_fits(kind: str, font: str | None) -> bool:
+    """Whether a face is of the requested kind (`serif`, `sans`, `geometric`, `rounded`, `display`, `mono`)."""
+    if not font:
+        return False
+    if kind == "geometric":
+        return font in GEOMETRIC_FACES
+    if kind == "rounded":
+        return font in ROUNDED_FACES
+    if kind == "serif":
+        return font_category(font) in ("serif", "display")
+    return font_category(font) == kind
+
+
+def font_scripts(name: str) -> tuple[str, ...]:
+    """The scripts a bundled face covers (`latin`; `ja` for the Japanese faces), `()` for an unbundled name."""
+    font = FONTS.get(name) or JA_FONTS.get(name)
+    return font.scripts if font else ()

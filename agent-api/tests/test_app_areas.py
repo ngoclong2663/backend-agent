@@ -94,8 +94,8 @@ def test_the_kit_reads_the_areas_and_sends_each_role_home():
         / "session.ts"
     ).read_text()
     assert "export async function homePath" in session and "candidate.roles.includes(role)" in session
-    shell = (
-        KIT / "nextjs_overlay" / "files" / "dynamic" / "app" / "src" / "components" / "app" / "AppShell.tsx"
+    shell = (  # Epic 30: the shells moved into their own module, dispatched by the generated design registry
+        KIT / "nextjs_overlay" / "files" / "dynamic" / "app" / "src" / "components" / "app" / "shells.tsx"
     ).read_text()
     assert "function AreaSwitch" in shell and "layout.area.prefix" in shell
 

@@ -1,0 +1,11 @@
+{
+  "app": "media-library",
+  "design": {
+    "homeView": "featured",
+    "entities": {
+      "Lesson": {
+        "view": "shelves"
+      }
+    }
+  }
+}

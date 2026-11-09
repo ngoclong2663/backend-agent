@@ -1,0 +1,21 @@
+{
+  "kind": "filters",
+  "name": "search-first",
+  "status": "ready",
+  "label": "Search first",
+  "choose": "A large search, the filters as chips under it; catalogues.",
+  "archetypes": [
+    "catalogue",
+    "storefront",
+    "learning"
+  ],
+  "needs": [
+    "search"
+  ],
+  "fallback": "toolbar",
+  "exports": [],
+  "marker": "search-first",
+  "builtin": true,
+  "order": 40,
+  "dispatch": false
+}

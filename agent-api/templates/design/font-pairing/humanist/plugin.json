@@ -1,0 +1,33 @@
+{
+  "kind": "font-pairing",
+  "name": "humanist",
+  "status": "ready",
+  "label": "Humanist",
+  "choose": "Warm humanist sans for headings and body: health, learning and services that should feel approachable.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "recipes": [
+    "soft",
+    "clay",
+    "material",
+    "minimal"
+  ],
+  "heading": "Nunito",
+  "body": "Source Sans 3",
+  "mono": null,
+  "headingWeight": 700,
+  "headingCase": "normal",
+  "tracking": "normal",
+  "ratio": "default",
+  "scripts": [
+    "latin"
+  ],
+  "order": 70
+}

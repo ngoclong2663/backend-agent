@@ -1,0 +1,25 @@
+{
+  "kind": "card",
+  "name": "text-first",
+  "status": "ready",
+  "label": "Text first",
+  "choose": "No media: a large title, the meta in a row and the badge, for records without images.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [
+    "TextFirstCard"
+  ],
+  "files": [
+    "TextFirstCard.tsx"
+  ],
+  "marker": "text-first",
+  "order": 40
+}

@@ -1,0 +1,30 @@
+{
+  "kind": "font-pairing",
+  "name": "editorial",
+  "status": "ready",
+  "label": "Editorial",
+  "choose": "A display serif over a readable sans: magazines, culture, food and anything read like a publication.",
+  "archetypes": [
+    "feed",
+    "catalogue",
+    "learning",
+    "storefront",
+    "booking"
+  ],
+  "recipes": [
+    "editorial",
+    "paper",
+    "luxe"
+  ],
+  "heading": "Playfair Display",
+  "body": "Source Sans 3",
+  "mono": null,
+  "headingWeight": 500,
+  "headingCase": "normal",
+  "tracking": "normal",
+  "ratio": "dramatic",
+  "scripts": [
+    "latin"
+  ],
+  "order": 30
+}

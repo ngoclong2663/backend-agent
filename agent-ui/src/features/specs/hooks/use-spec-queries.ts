@@ -3,6 +3,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createSpecDraft,
+  fetchDesignPlugins,
   fetchEngines,
   fetchExampleIndex,
   fetchSpecDraft,
@@ -25,6 +26,11 @@ export function useExampleIndex() {
 
 export function useEngines() {
   return useQuery({ queryKey: specKeys.engines(), queryFn: fetchEngines, staleTime: 30_000 });
+}
+
+/** Epic 30: the design plugin registry (changes only with a deployment). */
+export function useDesignPlugins() {
+  return useQuery({ queryKey: specKeys.designPlugins(), queryFn: fetchDesignPlugins, staleTime: Infinity });
 }
 
 export function useFrontendImport() {

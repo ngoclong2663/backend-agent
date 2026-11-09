@@ -1,0 +1,21 @@
+{
+  "kind": "recipe",
+  "name": "paper",
+  "status": "ready",
+  "label": "Paper",
+  "choose": "Warm off-white, ruled lines, reading first: notes, articles, journals and course text.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 140,
+  "archetypes": [
+    "feed",
+    "learning",
+    "catalogue",
+    "booking"
+  ],
+  "guards": [],
+  "prefers": {
+    "card": "side",
+    "density": "comfortable"
+  }
+}

@@ -1,54 +1,250 @@
 {
-  "date": "2026-11-06",
-  "distinctFrames": 3,
+  "date": "2026-11-09",
+  "distinctFrames": 6,
+  "distinctFingerprints": 9,
+  "sharedFingerprints": [
+    [
+      "event-tickets/attendees",
+      "plant-shop/storefront",
+      "video-library/app"
+    ],
+    [
+      "event-tickets/organizers",
+      "plant-shop/management"
+    ]
+  ],
   "home": {
-    "mean": 0.7422,
-    "max": 0.9804
+    "mean": 0.684,
+    "max": 0.9866
   },
   "list": {
-    "mean": 0.7592,
-    "max": 0.9914
+    "mean": 0.6824,
+    "max": 0.986
+  },
+  "edges": {
+    "home": {
+      "mean": 0.2502,
+      "max": 0.5212
+    },
+    "list": {
+      "mean": 0.2432,
+      "max": 0.5901
+    },
+    "record": {
+      "mean": 0.3227,
+      "max": 0.6436
+    }
   },
   "frames": {
     "news-feed": [
-      "sidebar",
-      "list",
-      "cards"
+      "topbar",
+      "feed",
+      "feed"
     ],
     "video-library": [
-      "sidebar",
-      "list",
-      "cards"
+      "topbar",
+      "catalogue",
+      "media-grid"
     ],
     "learning-platform": [
       "sidebar",
       "dashboard",
-      "cards"
+      "media-grid"
     ],
     "agency-projects": [
       "sidebar",
       "dashboard",
-      "cards"
+      "board"
     ],
     "clinic-bookings": [
       "sidebar",
-      "list",
-      "table"
+      "agenda",
+      "calendar"
     ],
     "plant-shop": [
-      "sidebar",
-      "dashboard",
-      "cards"
+      "topbar",
+      "catalogue",
+      "media-grid"
     ],
     "event-tickets": [
-      "sidebar",
-      "dashboard",
-      "cards"
+      "topbar",
+      "catalogue",
+      "media-grid"
     ],
     "workshop-bookings": [
       "sidebar",
       "dashboard",
       "cards"
+    ],
+    "media-library": [
+      "topbar",
+      "catalogue",
+      "media-grid"
     ]
+  },
+  "fingerprints": {
+    "news-feed/app": {
+      "shell": "topbar",
+      "home": "feed",
+      "view": "feed",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "video-library/app": {
+      "shell": "topbar",
+      "home": "catalogue",
+      "view": "media-grid",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "learning-platform/app": {
+      "shell": "sidebar",
+      "home": "dashboard",
+      "view": "media-grid",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "agency-projects/app": {
+      "shell": "sidebar",
+      "home": "dashboard",
+      "view": "board",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "clinic-bookings/patient": {
+      "shell": "topbar",
+      "home": "catalogue",
+      "view": "cards",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "clinic-bookings/front-desk": {
+      "shell": "sidebar",
+      "home": "agenda",
+      "view": "calendar",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "plant-shop/storefront": {
+      "shell": "topbar",
+      "home": "catalogue",
+      "view": "media-grid",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "plant-shop/management": {
+      "shell": "sidebar",
+      "home": "dashboard",
+      "view": "table",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "event-tickets/attendees": {
+      "shell": "topbar",
+      "home": "catalogue",
+      "view": "media-grid",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "event-tickets/organizers": {
+      "shell": "sidebar",
+      "home": "dashboard",
+      "view": "table",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "workshop-bookings/app": {
+      "shell": "sidebar",
+      "home": "dashboard",
+      "view": "cards",
+      "detail": "record",
+      "card": "-",
+      "filters": "toolbar"
+    },
+    "media-library/app": {
+      "shell": "topbar",
+      "home": "catalogue",
+      "view": "media-grid",
+      "detail": "media",
+      "card": "-",
+      "filters": "chips"
+    }
+  },
+  "coverage": {
+    "used": {
+      "shell": [
+        "sidebar",
+        "topbar"
+      ],
+      "list-view": [
+        "board",
+        "calendar",
+        "cards",
+        "feed",
+        "media-grid",
+        "table"
+      ],
+      "detail-view": [
+        "media",
+        "record"
+      ],
+      "home": [
+        "agenda",
+        "catalogue",
+        "dashboard",
+        "feed"
+      ],
+      "filters": [
+        "chips",
+        "toolbar"
+      ],
+      "card": [],
+      "recipe": [
+        "aurora",
+        "editorial",
+        "minimal",
+        "playful",
+        "soft",
+        "swiss"
+      ],
+      "font-pairing": []
+    },
+    "unused": {
+      "shell": [
+        "rail",
+        "topbar-tabs"
+      ],
+      "list-view": [],
+      "detail-view": [
+        "profile"
+      ],
+      "home": [
+        "bento"
+      ],
+      "filters": [
+        "facets",
+        "search-first"
+      ],
+      "card": [],
+      "recipe": [
+        "brutalist",
+        "clay",
+        "enterprise",
+        "glass",
+        "material",
+        "neon"
+      ],
+      "font-pairing": []
+    }
   }
 }

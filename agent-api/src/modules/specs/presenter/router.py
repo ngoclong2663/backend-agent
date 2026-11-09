@@ -102,6 +102,18 @@ async def import_frontend_spec(
 
 # -- FrontendSpecs (Story 12.1, 12.5) ----------------------------------------------------------------------------
 
+design_plugin_router = APIRouter(prefix="/api/v1/design-plugins", tags=["frontend-specs"])
+
+
+@design_plugin_router.get("")
+async def list_design_plugins(_: CurrentUserDep) -> dict[str, list[dict[str, Any]]]:
+    """Epic 30 (Story 30.2): the ready design plugins by kind (name, label, when to choose it, archetypes, needs,
+    fallback, family, preview), for the review's Design panel; no hand-kept list in the UI."""
+    from src.modules.shared.domain.frontend_spec.design_registry import registry_digest
+
+    return registry_digest()
+
+
 frontend_spec_router = APIRouter(prefix="/api/v1/frontend-specs", tags=["frontend-specs"])
 
 

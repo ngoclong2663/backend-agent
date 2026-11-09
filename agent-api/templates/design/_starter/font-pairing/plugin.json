@@ -1,0 +1,19 @@
+{
+  "kind": "font-pairing",
+  "name": "{{name}}",
+  "status": "draft",
+  "label": "{{Label}}",
+  "choose": "The voice this type gives a product (one sentence).",
+  "archetypes": [],
+  "recipes": [],
+  "heading": "Inter",
+  "body": "Inter",
+  "mono": null,
+  "headingWeight": 600,
+  "headingCase": "normal",
+  "tracking": "normal",
+  "ratio": 1.2,
+  "scripts": [
+    "latin"
+  ]
+}

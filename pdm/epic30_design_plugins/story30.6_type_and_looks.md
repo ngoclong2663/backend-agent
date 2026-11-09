@@ -32,8 +32,8 @@ its colours.
 
 ## Acceptance criteria
 
-- [ ] Eight font pairings and four new recipes are `ready` and pass their gates in every kind's fixture.
-- [ ] A Japanese app is never offered a pairing without Japanese coverage.
+- [x] Eight font pairings and four new recipes are `ready` and pass their gates in every kind's fixture.
+- [x] A Japanese app is never offered a pairing without Japanese coverage.
 
 ## Verify
 
@@ -42,3 +42,19 @@ its colours.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** The `font-pairing` kind (nine descriptors, no kit file: `neutral`, `geometric`, `editorial`,
+`bookish`, `workshop`, `loud`, `humanist`, `japanese-gothic`, `japanese-mincho`; heading and body from the bundled
+faces, weight, case, tracking, the type-scale ratio, the scripts, the recipes each suits). `design.pairing_candidates`
+keeps only the pairings that set the app's script (a Japanese app never gets a Latin-only pairing) and the requested
+heading kind (23.13); `assign_pairings` gives each look a pairing suited to its recipe, the three looks using at
+least two, and the app its first look's (the brief's `fontPairing` when it fits). `plan.pairing_theme` writes the
+current look's pairing into the theme's typography (`headingFont`, `bodyFont`, `headingWeight`, `headingCase`,
+`tracking`, `ratio`), so `fonts.ts` and `globals.css` follow the look. New recipes: `cinema` (dark, quiet, media
+first; prefers the overlay card), `paper` (warm off-white, rules, reading first; prefers side cards), `terminal`
+(mono headings, hairlines, dense; back offices and workspaces only; prefers table and compact), `luxe` (high
+contrast type, generous space, thin rules; not for back offices; prefers spacious). Tests in `test_app_design.py`
+(30.6 block), `test_app_recipes.py`.
+
+Deviation: the prompt does not list the pairings (Story 30.7's size rule); code picks the type for each look, and
+the review can switch it. The recipes' gates ran in the Story 30.8 log.

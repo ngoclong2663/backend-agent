@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "aurora",
+  "status": "ready",
+  "label": "Aurora",
+  "choose": "Soft gradient backdrops; creative and consumer products.",
+  "family": "bold",
+  "css": "recipe.css",
+  "order": 70
+}

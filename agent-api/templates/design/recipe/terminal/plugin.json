@@ -1,0 +1,20 @@
+{
+  "kind": "recipe",
+  "name": "terminal",
+  "status": "ready",
+  "label": "Terminal",
+  "choose": "Mono headings, hairline borders, dense rows: developer and data tools only.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 150,
+  "archetypes": [
+    "back-office",
+    "workspace"
+  ],
+  "guards": [],
+  "prefers": {
+    "view": "table",
+    "density": "compact",
+    "card": "text-first"
+  }
+}

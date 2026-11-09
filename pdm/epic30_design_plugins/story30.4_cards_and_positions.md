@@ -35,8 +35,8 @@ so that apps of the same kind do not all look alike.
 
 ## Acceptance criteria
 
-- [ ] The four card plugins and three detail plugins are `ready` and pass their gates.
-- [ ] The report (30.1) shows more distinct fingerprints than the baseline on the golden set.
+- [x] The four card plugins and three detail plugins are `ready` and pass their gates.
+- [x] The report (30.1) shows more distinct fingerprints than the baseline on the golden set.
 
 ## Verify
 
@@ -45,3 +45,21 @@ so that apps of the same kind do not all look alike.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** The `card` kind (`TCardProps`: record, roles, design, title, href, actions, `boxed`, `size`):
+`stacked` (today's two anatomies: boxed in the `cards` view, free-standing in `media-grid`), `overlay` (the media
+fills the card, the title over a black 85 % scrim: AA on the worst pixel), `side` (media left, text right, one
+column on phones) and `text-first` (no media); all folder plugins under `templates/design/card/`, copied only when
+used, drawn by `MediaGrid` / `RoleCards` through `CardOf` (`design-registry.ts` `cards`), each with its
+`data-bga-card` marker. `AppEntityDesign.card` / `aspect` (`wide`, `portrait`, `square`, `auto`; code reads the media
+field's name: a poster is portrait, a cover or an album square) / `columns` (2–6, clamped): `complete_design` picks
+`text-first` for a record without media, `stacked` otherwise, and the card's `needs` fall back like any plugin.
+Detail layouts: `media-side` (needs `mediaField`), `split-panel` (`parentOrChildren`: the parents linked and the
+status, dates and figures in a side panel; the record's children stay in the page's tabs), `reader`
+(`longTextField`: the text first as prose in a reading column). Tests: `test_app_design.py` (30.4 block),
+`test_design_registry.py`; `make kit-test` on a media library outline that uses every new plugin (type-check +
+vitest clean); the gates (`make design-plugin-check` in minimal / cinema / luxe, see the gates log in the Status of
+30.8).
+
+Deviation: `split-panel` shows the parents and facts beside the fields; the record's children are the page's own
+tab sections (AppPage), which a detail plugin does not move.

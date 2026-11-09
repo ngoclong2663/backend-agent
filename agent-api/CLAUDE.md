@@ -214,6 +214,17 @@ Agent-specific notes:
   components. Apps: `stock_seed_videos` fills seeded `video` fields (a Pixabay file, else a YouTube watch link) with
   `app.json` `videoCredits`; the kit's `VideoPlayer` shows a YouTube link as the facade and the credit under the player.
   `make video-keys` checks the keys. `FRONTEND_MAX_PHOTOS` now caps paid photos only (`STOCK_PHOTO_LIMIT` for stock).
+- Design plugins (Epic 30): every value of the app design space (shell, list view, detail view, home, filters, card,
+  recipe, font pairing) is a folder `templates/design/<kind>/<name>/` (`plugin.json` + kit files), read once by
+  `frontend_spec/design_registry.py`; the literals in `frontend_spec/app.py`, the `draft_app@v7` choice lists
+  (`design.design_choices`, only the ranked archetypes' candidates), `complete_design`'s checks (`needs` → the
+  descriptor's `fallback` chain, `_Data.lacks`), the recipes (`recipes.py`), the kit's generated
+  `design-registry.ts` (the plugins the app uses; `AppShell`, `RecordsView`, `AppDetail` dispatch through it) and the
+  UI's choices (`GET /api/v1/design-plugins`) all come from it. Builtin plugins live in `shells.tsx`, `views.tsx`,
+  `details.tsx`; folder plugins are copied only when used (`plan.app.designPlugins`). `make design-plugin-new` /
+  `make design-plugin-check` (the gates: recipes, states, keyboard, contrast; `docs/development/design-plugins.md`);
+  `tests/test_design_registry.py` refuses a hand-written list of plugin names. The app design report signs in per
+  area and fingerprints the screens (Story 30.1; baseline `tests/fixtures/app-golden/baseline.json`).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "clay",
+  "status": "ready",
+  "label": "Clay",
+  "choose": "Claymorphism: rounded, thick, friendly; playful consumer products.",
+  "family": "soft",
+  "css": "recipe.css",
+  "order": 60
+}

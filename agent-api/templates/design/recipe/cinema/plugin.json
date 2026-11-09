@@ -1,0 +1,20 @@
+{
+  "kind": "recipe",
+  "name": "cinema",
+  "status": "ready",
+  "label": "Cinema",
+  "choose": "Dark first, quiet surfaces, media first: videos, music and photos watched in the evening; not for products read like print.",
+  "family": "bold",
+  "css": "recipe.css",
+  "order": 130,
+  "archetypes": [
+    "catalogue",
+    "learning",
+    "feed"
+  ],
+  "guards": [],
+  "prefers": {
+    "card": "overlay",
+    "density": "comfortable"
+  }
+}

@@ -1,0 +1,4 @@
+@root { --radius: 0rem; --heading-weight: 800; --heading-tracking: -0.03em; }
+@root [data-slot="card"] { box-shadow: none; border: 0; border-top: 3px solid var(--foreground); border-radius: 0; }
+@root h1, @root h2, @root h3 { font-weight: 800; letter-spacing: -0.03em; }
+@root [data-bga-header] { border-bottom: 3px solid var(--foreground); }

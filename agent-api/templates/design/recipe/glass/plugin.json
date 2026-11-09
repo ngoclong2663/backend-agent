@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "glass",
+  "status": "ready",
+  "label": "Glass",
+  "choose": "Glassmorphism, liquid glass: translucent panels over colour; media and lifestyle.",
+  "family": "bold",
+  "css": "recipe.css",
+  "order": 80
+}

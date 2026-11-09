@@ -1,0 +1,29 @@
+{
+  "kind": "list-view",
+  "name": "shelves",
+  "status": "ready",
+  "label": "Shelves",
+  "choose": "Media records browsed in rows by group (a category or a parent), each a strip to scroll sideways, with See all.",
+  "archetypes": [
+    "catalogue",
+    "learning",
+    "storefront"
+  ],
+  "needs": [
+    "mediaField",
+    "groupField"
+  ],
+  "fallback": "media-grid",
+  "exports": [
+    "Shelves"
+  ],
+  "files": [
+    "Shelves.tsx"
+  ],
+  "marker": "shelves",
+  "order": 70,
+  "tags": [
+    "cards",
+    "whole"
+  ]
+}

@@ -5,39 +5,65 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Stack } from "@/components/layout/Stack";
 import { cn } from "@/lib/utils";
-import { SHELLS, VIEWS, editAppDesign, readAppDesign } from "../lib/app-design";
+import { Button } from "@/components/ui/button";
+import { ENTITY_AXES, editAppDesign, readAppDesign, shuffleAppDesign, type TEntityAxis } from "../lib/app-design";
+import { useDesignPlugins } from "../hooks/use-spec-queries";
+import type { TDesignPlugin } from "../types";
 
 type AppDesignPanelProps = {
   specText: string;
   onApply: (text: string) => void;
 };
 
-/** How loud a recipe is (`agent-api` `frontend/app/recipes.py` FAMILIES), for the cards' hint. */
-const FAMILY: Record<string, string> = {
-  minimal: "quiet",
-  swiss: "quiet",
-  enterprise: "quiet",
-  editorial: "quiet",
-  material: "quiet",
-  soft: "soft",
-  clay: "soft",
-  playful: "soft",
-  glass: "bold",
-  aurora: "bold",
-  brutalist: "bold",
-  neon: "bold",
-};
+function Choice({
+  label,
+  value,
+  options,
+  onChange,
+  bold = false,
+}: {
+  label: string;
+  value: string;
+  options: TDesignPlugin[];
+  onChange: (value: string) => void;
+  bold?: boolean;
+}) {
+  const names = options.map((option) => option.name);
+  const known = names.includes(value) ? value : (names[0] ?? value);
+  return (
+    <label className="flex items-center justify-between gap-2">
+      <span className={cn(bold && "font-medium")}>{label}</span>
+      <Select value={known} onValueChange={(next) => next && onChange(String(next))}>
+        <SelectTrigger size="sm" className="w-40" aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.name} value={option.name} title={option.choose}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
+}
 
 /**
- * Epic 23 (Stories 23.6, 23.7): an app draft's design brief in the editor: pick one of the three looks, the shell and
- * each entity's view. Each is a spec edit the app kit reads (no model call, no other screen changes).
+ * Epic 23 (Stories 23.6, 23.7): an app draft's design brief in the editor: pick one of the three looks, the shell,
+ * the home and each entity's view, detail, card and filters. Each is a spec edit the app kit reads (no model call, no
+ * other screen changes). Epic 30 (Stories 30.2, 30.7): the choices come from the design plugin registry.
  */
 export function AppDesignPanel({ specText, onApply }: AppDesignPanelProps) {
   const design = readAppDesign(specText);
+  const registry = useDesignPlugins().data ?? {};
   if (!design) return null;
   const apply = (next: string | null) => {
     if (next !== null) onApply(next);
   };
+  const plugins = (kind: string): TDesignPlugin[] => registry[kind] ?? [];
+  const names = (kind: string) => plugins(kind).map((plugin) => plugin.name);
+  const family = (recipe: string) => plugins("recipe").find((plugin) => plugin.name === recipe)?.family ?? "custom";
   return (
     <Stack gap="md" className="text-sm">
       {design.requested && (
@@ -83,7 +109,7 @@ export function AppDesignPanel({ specText, onApply }: AppDesignPanelProps) {
                 <span className="flex min-w-0 flex-col gap-0.5">
                   <span className="flex items-center gap-2 font-medium capitalize">
                     {look.recipe}
-                    <Badge variant="outline">{FAMILY[look.recipe] ?? "custom"}</Badge>
+                    <Badge variant="outline">{family(look.recipe)}</Badge>
                   </span>
                   {look.reason && <span className="text-xs text-muted-foreground">{look.reason}</span>}
                 </span>
@@ -97,37 +123,20 @@ export function AppDesignPanel({ specText, onApply }: AppDesignPanelProps) {
           <PanelLeft className="size-4" aria-hidden /> Layout
           {design.archetype && <Badge variant="secondary">{design.archetype}</Badge>}
         </span>
-        <label className="flex items-center justify-between gap-2">
-          <span>Shell</span>
-          <Select value={design.shell ?? "sidebar"} onValueChange={(value) => value && apply(editAppDesign(specText, { shell: String(value) }))}>
-            <SelectTrigger size="sm" className="w-36" aria-label="Shell">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SHELLS.map((shell) => (
-                <SelectItem key={shell} value={shell}>
-                  {shell}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </label>
-        {design.views.map(({ entity, view }) => (
-          <label key={entity} className="flex items-center justify-between gap-2">
-            <span className={cn(entity === design.mainEntity && "font-medium")}>{entity}</span>
-            <Select value={view} onValueChange={(value) => value && apply(editAppDesign(specText, { entity, view: String(value) }))}>
-              <SelectTrigger size="sm" className="w-36" aria-label={`${entity} view`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {VIEWS.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </label>
+        <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => apply(shuffleAppDesign(specText, registry))}>
+          Try another layout
+        </Button>
+        <Choice label="Shell" value={design.shell ?? "sidebar"} options={plugins("shell")} onChange={(shell) => apply(editAppDesign(specText, { shell }, names("shell")))} />
+        <Choice label="Home" value={design.homeView ?? "dashboard"} options={plugins("home")} onChange={(homeView) => apply(editAppDesign(specText, { homeView }, names("home")))} />
+        {design.views.map((entity) => (
+          <div key={entity.entity} className="flex flex-col gap-1.5 rounded-lg border p-2">
+            <span className={cn("text-xs text-muted-foreground", entity.entity === design.mainEntity && "font-medium text-foreground")}>{entity.entity}</span>
+            {ENTITY_AXES.filter((axis) => plugins(axis.kind).length > 0).map((axis) => {
+              const current = axis.key === "view" ? entity.view : (entity[axis.key] ?? plugins(axis.kind)[0]?.name ?? "");
+              const onChange = (value: string) => apply(editAppDesign(specText, { entity: entity.entity, axis: axis.key as TEntityAxis, value }, names(axis.kind)));
+              return <Choice key={axis.key} label={axis.label} value={current} options={plugins(axis.kind)} onChange={onChange} />;
+            })}
+          </div>
         ))}
       </div>
       {design.areas.length > 0 && (
@@ -152,7 +161,7 @@ export function AppDesignPanel({ specText, onApply }: AppDesignPanelProps) {
           </ul>
         </details>
       )}
-      <p className="text-xs text-muted-foreground">Looks, the shell and views change without a model call.</p>
+      <p className="text-xs text-muted-foreground">Looks, the shell, the home and the views change without a model call.</p>
     </Stack>
   );
 }

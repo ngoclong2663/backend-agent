@@ -31,9 +31,9 @@ and under my control.
 
 ## Acceptance criteria
 
-- [ ] Five drafts of one requirement with different seeds give at least three distinct fingerprints (30.1).
-- [ ] The same draft re-applied gives the same design.
-- [ ] The prompt's size stays within 10% of today's whatever the registry's size.
+- [x] Five drafts of one requirement with different seeds give at least three distinct fingerprints (30.1).
+- [x] The same draft re-applied gives the same design.
+- [x] The prompt's size stays within 10% of today's whatever the registry's size.
 
 ## Verify
 
@@ -42,3 +42,22 @@ and under my control.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** Candidates (`_Completion.candidates`: the ready plugins of the kind offered for the archetype
+whose `needs` the contract meets); the brief's choice wins when it is a ready plugin (then the fallback chain), an
+open axis takes the first look's recipe `prefers` when it is a candidate, else the seed's pick among the candidates
+(the archetype default is one of them), without a seed the archetype default as before. The seed (D9) is the
+requirement's hash (`design_seed`), written as `design.seed`; the seeded axes are the shell, the home and the main
+entity's view, detail, card and filters (other entities keep their defaults); the look's `prefers.density` sets the
+density when the brief leaves it open. The review's Design panel (`AppDesignPanel`) lists every axis from
+`GET /api/v1/design-plugins` (shell, home; per entity view, detail, card, filters; the looks) and has "Try another
+layout" (`shuffleAppDesign`: a new pick per layout axis among the archetype's candidates, a new seed, the looks kept),
+each a spec edit with no engine call. The prompt lists only the ranked archetypes' candidates (`design_choices`) and
+stays within 10 % of v6 (`test_draft_app_v7_prompt_lists_the_registry_choices`). Tests: `test_app_design.py` (30.7
+block: ≥ 3 distinct fingerprints over 12 seeds of one brief, the same seed the same design, the brief's own choices
+under any seed, cinema → overlay).
+
+Deviations: the UI's shuffle cannot check `needs` (it has no contract); the kit falls back where data lacks (a board
+without a status renders as cards, shelves without a group as a grid). Preview screenshots per plugin
+(`preview.png`) are written by the plugin check and served through the registry digest's `preview` path, but the
+panel shows labels and `choose` texts, not the images, for now.

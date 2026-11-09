@@ -1,0 +1,25 @@
+{
+  "kind": "detail-view",
+  "name": "media-side",
+  "status": "ready",
+  "label": "Media beside",
+  "choose": "The image or the player on the left and the fields on the right on wide screens, one column on phones: products, listings, lessons.",
+  "archetypes": [
+    "catalogue",
+    "storefront",
+    "learning",
+    "back-office"
+  ],
+  "needs": [
+    "mediaField"
+  ],
+  "fallback": "media",
+  "exports": [
+    "MediaSideDetail"
+  ],
+  "files": [
+    "MediaSideDetail.tsx"
+  ],
+  "marker": "media-side",
+  "order": 40
+}

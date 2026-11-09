@@ -1,0 +1,24 @@
+{
+  "kind": "detail-view",
+  "name": "record",
+  "status": "ready",
+  "label": "Record",
+  "choose": "The fields in a grid under the name and the actions.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [
+    "RecordDetail"
+  ],
+  "marker": "record",
+  "builtin": true,
+  "order": 10,
+  "module": "./details"
+}

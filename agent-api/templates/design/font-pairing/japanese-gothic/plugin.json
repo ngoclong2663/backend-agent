@@ -1,0 +1,42 @@
+{
+  "kind": "font-pairing",
+  "name": "japanese-gothic",
+  "status": "ready",
+  "label": "Japanese gothic",
+  "choose": "A gothic face that sets Japanese and Latin alike: apps written in Japanese (clean, even strokes).",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "recipes": [
+    "minimal",
+    "swiss",
+    "material",
+    "enterprise",
+    "soft",
+    "clay",
+    "glass",
+    "aurora",
+    "neon",
+    "playful",
+    "terminal",
+    "cinema"
+  ],
+  "heading": "Noto Sans JP",
+  "body": "Noto Sans JP",
+  "mono": null,
+  "headingWeight": 700,
+  "headingCase": "normal",
+  "tracking": "normal",
+  "ratio": "default",
+  "scripts": [
+    "latin",
+    "japanese"
+  ],
+  "order": 80
+}

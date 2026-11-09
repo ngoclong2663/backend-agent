@@ -222,3 +222,28 @@ def image_similarity(first: list[int], second: list[int]) -> float:
     if len(first) != len(second) or not first:
         raise ValueError("thumbnails must have the same size")
     return round(1 - sum(abs(a - b) for a, b in zip(first, second, strict=True)) / (255 * len(first)), 4)
+
+
+EDGE_THUMBNAIL = (96, 60)  # Story 30.1: layout lines, finer than the squint's masses
+
+
+def edge_signature(path: Path) -> list[int]:
+    """The first screen's edge map as bits at `EDGE_THUMBNAIL` size (Story 30.1): where layout lines are, whatever the
+    colours. The greyscale squint (`first_screen`) measures light and dark masses, which on signed-in app screens is
+    mostly white space; edges tell a sidebar from a top bar and a grid of cards from a table."""
+    from PIL import Image, ImageFilter
+
+    with Image.open(path) as image:
+        width = min(image.width, FIRST_SCREEN[0])
+        top = image.crop((0, 0, width, min(image.height, FIRST_SCREEN[1]))).convert("L")
+        edges = top.filter(ImageFilter.FIND_EDGES).resize(EDGE_THUMBNAIL, Image.Resampling.BOX)
+        return [1 if value > 12 else 0 for value in edges.get_flattened_data()]
+
+
+def edge_similarity(first: list[int], second: list[int]) -> float:
+    """Jaccard similarity of two edge maps (1.0 = the same lines in the same places)."""
+    if len(first) != len(second) or not first:
+        raise ValueError("edge maps must have the same size")
+    both = sum(1 for a, b in zip(first, second, strict=True) if a and b)
+    either = sum(1 for a, b in zip(first, second, strict=True) if a or b)
+    return round(both / either, 4) if either else 1.0

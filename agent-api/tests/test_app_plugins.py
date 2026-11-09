@@ -205,12 +205,14 @@ def test_only_the_token_helper_touches_local_storage():
             if "localStorage." in path.read_text():
                 users.append(path.relative_to(root).as_posix())
     # Story 26.4 / 28.5: the guided tour keeps its progress per user (`bga-tour…` keys, never a token); Story 28.6:
-    # the runtime config reads the evaluation browser's mock switch
+    # the runtime config reads the evaluation browser's mock switch; Story 30.3: the mock API reads the design plugin
+    # check's state switch (`bga-mock-state`)
     assert sorted(users) == [
         "app/src/components/app/tour/progress.test.ts",
         "app/src/components/app/tour/progress.ts",
         "src/lib/auth/token.ts",
         "src/lib/runtime-config.ts",
+        "src/mocks/handlers.ts",
     ]
     assert "src/lib/auth/token.ts".startswith(OWNED_PREFIXES)
     for name in ("AppTour.tsx", "progress.ts"):

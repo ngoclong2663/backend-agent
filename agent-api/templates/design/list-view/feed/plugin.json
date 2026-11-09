@@ -1,0 +1,24 @@
+{
+  "kind": "list-view",
+  "name": "feed",
+  "status": "ready",
+  "label": "Feed",
+  "choose": "Read one after another, newest first (posts, updates).",
+  "archetypes": [
+    "feed",
+    "catalogue",
+    "learning"
+  ],
+  "needs": [],
+  "fallback": "cards",
+  "exports": [
+    "Feed"
+  ],
+  "marker": "feed",
+  "builtin": true,
+  "order": 40,
+  "module": "./views",
+  "tags": [
+    "cards"
+  ]
+}

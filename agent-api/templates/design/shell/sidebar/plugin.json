@@ -1,0 +1,24 @@
+{
+  "kind": "shell",
+  "name": "sidebar",
+  "status": "ready",
+  "label": "Sidebar",
+  "choose": "Many sections, used all day at a desk: a collapsible sidebar with the sections, a top bar with the page's place.",
+  "archetypes": [
+    "back-office",
+    "catalogue",
+    "feed",
+    "workspace",
+    "booking",
+    "learning",
+    "storefront"
+  ],
+  "needs": [],
+  "exports": [
+    "SidebarShell"
+  ],
+  "marker": "sidebar",
+  "builtin": true,
+  "order": 10,
+  "module": "./shells"
+}

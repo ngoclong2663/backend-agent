@@ -236,7 +236,7 @@ def test_the_brief_takes_a_video_as_media_and_defaults_its_detail_to_the_player(
     )
     lesson = design["entities"]["Lesson"]
     assert lesson["roles"]["media"] == "video" and lesson["roles"]["duration"] == "durationSeconds"
-    assert lesson["detailView"] == "media" and lesson["view"] == "media-grid"
+    assert lesson["detailView"] == "watch" and lesson["view"] == "media-grid"  # Story 30.5: a watch page (Up next)
     assert design["entities"]["Episode"]["roles"]["media"] == "audio"
     # a non-number field cannot be the duration; a text field cannot be the media
     design, _, replaced = complete_design(

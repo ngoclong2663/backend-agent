@@ -1,0 +1,10 @@
+{
+  "kind": "recipe",
+  "name": "material",
+  "status": "ready",
+  "label": "Material",
+  "choose": "Tonal surfaces and soft elevation; familiar on phones.",
+  "family": "quiet",
+  "css": "recipe.css",
+  "order": 30
+}

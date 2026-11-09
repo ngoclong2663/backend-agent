@@ -1,0 +1,24 @@
+{
+  "kind": "detail-view",
+  "name": "media",
+  "status": "ready",
+  "label": "Media first",
+  "choose": "A large image (or the player) first, then the fields.",
+  "archetypes": [
+    "catalogue",
+    "learning",
+    "storefront",
+    "feed"
+  ],
+  "needs": [
+    "mediaField"
+  ],
+  "fallback": "record",
+  "exports": [
+    "MediaDetail"
+  ],
+  "marker": "media",
+  "builtin": true,
+  "order": 20,
+  "module": "./details"
+}

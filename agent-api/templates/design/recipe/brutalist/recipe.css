@@ -1,0 +1,11 @@
+@root { --radius: 0.375rem; --heading-weight: 800; }
+@root body { background: color-mix(in oklab, var(--primary) 10%, var(--background)); }
+@root [data-slot="card"], @root [data-slot="input"], @root [data-slot="select-trigger"], @root [data-slot="button"], @root [data-bga-brand] > span {
+  border: 2.5px solid var(--foreground) !important;
+  box-shadow: 4px 4px 0 var(--foreground) !important;
+}
+@root [data-slot="card"] { background: var(--card); }
+@root [data-slot="button"]:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--foreground) !important; }
+@root [data-bga-header] { border-bottom: 2.5px solid var(--foreground); background: var(--background); backdrop-filter: none; }
+@root [data-slot="sidebar-inner"] { border-right: 2.5px solid var(--foreground); }
+@root h1, @root h2, @root h3 { font-weight: 800; letter-spacing: -0.02em; }
