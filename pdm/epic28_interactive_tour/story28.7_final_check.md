@@ -99,7 +99,11 @@ drafted spec (`tests/fixtures/specs/ember-kitchen*.json`, `lantern-audio*.json`)
    user*, and the viewer can browse the user list. The draft named the liker / commenter `creatorId` (the field of
    the role that made the row was named after the other role), so the access rules read "a viewer creates a record
    for a creator" and added the staff directory (`user.list` for viewers) and a picker. `draft_app@v8` now also
-   says a person field is named after that person's role; the code side is the next fix.
+   says a person field is named after that person's role. Code: "staff create it for a person" (25.4) now needs the
+   creating roles to manage those records too (a role policy on another of its operations, or an ownership bypass:
+   staff update and assign a member's case); a role that only creates a record makes it for itself and owns it,
+   whatever its person field is called (`_maker_owns`). No picker, no viewers' user directory; a like with nothing
+   left to fill in becomes the one-click button of finding 8. Rerun as the table's sixth row.
 
 Also found on the way: the access rules made instructor-made courses private to their instructor, so learners opened
 an empty course list (a record whose person field names the role that creates it is now readable by every other

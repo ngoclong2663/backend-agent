@@ -333,3 +333,72 @@ def test_an_entity_with_a_visibility_policy_keeps_its_reads_open():
     listing = contract_operations(build_contract(spec))["video.list"]["operation"]["x-bga"]
     assert listing["visibility"]["roles"] == ["Viewer"] and listing["visibility"]["where"] == {"status": "published"}
     assert "ownership" not in listing or not listing["ownership"]
+
+
+def _feed_spec(comment_policy: bool) -> dict:
+    """Creators post videos; viewers comment and like. The person field of a comment and a like is named after the
+    other role (`creatorId`), as a real draft wrote it (2026-11-09); with or without the draft's own ownership
+    policy."""
+    policies = [
+        {"name": "creatorsOnly", "type": "role", "roles": ["Creator"]},
+        {"name": "viewersOnly", "type": "role", "roles": ["Viewer"]},
+    ]
+    if comment_policy:
+        policies.append({"name": "ownComments", "type": "ownership", "ownerField": "creatorId", "bypassRoles": []})
+    child = [
+        {"name": "id", "type": "uuid", "primary": True},
+        {"name": "videoId", "type": "uuid", "required": True},
+        {"name": "creatorId", "type": "uuid", "required": True},
+    ]
+    return {
+        "specVersion": "1.0",
+        "project": {"name": "Clips", "description": "Creators post short videos; viewers watch, like and comment"},
+        "stack": STACK,
+        "auth": {"type": "jwt", "roles": ["Viewer", "Creator"]},
+        "policies": policies,
+        "entities": [
+            {
+                "name": "Video",
+                "fields": [
+                    {"name": "id", "type": "uuid", "primary": True},
+                    {"name": "title", "type": "string", "required": True},
+                    {"name": "creatorId", "type": "uuid", "required": True},
+                ],
+            },
+            {"name": "Comment", "fields": [*child, {"name": "content", "type": "string", "required": True}]},
+            {"name": "Like", "fields": child},
+        ],
+        "relationships": [
+            {"name": "videoComments", "type": "one-to-many", "from": "Video", "to": "Comment", "foreignKey": "videoId"},
+            {"name": "videoLikes", "type": "one-to-many", "from": "Video", "to": "Like", "foreignKey": "videoId"},
+        ],
+        "operations": [
+            *_crud("Video", "/videos", {"create": "creatorsOnly", "get": None, "list": None}),
+            *_crud(
+                "Comment",
+                "/comments",
+                {"create": "viewersOnly", "list": None, "delete": "ownComments" if comment_policy else None},
+            ),
+            *_crud("Like", "/likes", {"create": "viewersOnly", "list": None}),
+        ],
+    }
+
+
+def test_a_role_making_its_own_record_owns_it_whatever_the_field_is_called():
+    """Signed in as a viewer, the comment and like forms asked to choose a user and the viewer could browse every user:
+    the person field was named after the other role, so the rules read "a viewer creates it for a creator" (25.4) and
+    added a picker and a viewer's user directory. A role that only creates a record, and manages nothing else of it,
+    makes it for itself: the owner is the signed-in maker, no picker, no directory. Staff who create for a person
+    manage those records too (the case spec above: staff update and assign the member's cases)."""
+    for comment_policy in (True, False):
+        data = _feed_spec(comment_policy)
+        notes = secure_access(data)
+        assert validate_spec_data(data).report.valid
+        assert not any("create it for" in note["message"] for note in notes), [n["message"] for n in notes]
+        assert "user.list" not in _ops(data), "no user directory for viewers"
+        for entity in ("Comment", "Like"):
+            assert not owner_from_request(copy.deepcopy(data), entity), "the owner is the signed-in viewer"
+        roles = person_roles(copy.deepcopy(data))
+        assert roles[("Comment", "creatorId")] == ["Viewer"] and roles[("Like", "creatorId")] == ["Viewer"]
+        assert roles[("Video", "creatorId")] == ["Creator"]
+        assert not any(r["from"] == "User" for r in data.get("relationships") or []), "no person picked in a form"

@@ -432,3 +432,24 @@ def test_a_child_with_nothing_to_fill_in_is_an_action_on_its_parent():
         for section in page["sections"]:
             if section["component"] == "AppList" and section["content"]["entity"] == "Like":
                 assert "create" not in section["content"]
+
+
+def test_a_viewers_like_and_comment_ask_for_nothing_but_the_comment():
+    """The access rules and the screens together (2026-11-09, a TikTok-like draft): a viewer likes a video with one
+    click on it, and comments with a form of one field; neither asks to choose a user."""
+    from src.orchestrator.drafting.access import secure_access
+    from tests.test_access_rules import _feed_spec
+
+    raw = _feed_spec(comment_policy=True)
+    secure_access(raw)
+    backend = validate_spec_data(raw).normalized
+    extended, _, contract, screens = _plan(backend, {})
+    spec = validate_frontend_spec_data(screens.spec)
+    assert spec.report.valid, [e.message for e in spec.report.errors]
+    assert check_spec_pair(spec.normalized, extended) == []
+    for form in screens.spec["forms"]:
+        assert not any(field.get("reference", {}).get("entity") == "User" for field in form["fields"]), form["id"]
+    comment = next(form for form in screens.spec["forms"] if form["operationId"] == "comment.create")
+    assert [f["name"] for f in comment["fields"] if not f.get("hidden")] == ["content"]
+    video = next(page for page in screens.spec["pages"] if page["route"] == "/videos/[id]")
+    assert any(a.get("operationId") == "like.create" for a in video["sections"][0]["content"]["actions"])

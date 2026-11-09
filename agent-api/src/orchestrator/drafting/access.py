@@ -148,6 +148,7 @@ def find_owned(spec: dict[str, Any], create: bool = True) -> dict[str, Owned]:
             owners = owners[:1] if len(owners) == 1 else []
         if not owners:
             continue
+        owners = _maker_owns(spec, entity, owners, bypass) or owners
         owned[entity] = Owned(entity, policy["ownerField"], owners, bypass, name)
     # 2. a field named after a role, on an entity without an ownership policy
     for name, entity in entities.items():
@@ -164,6 +165,9 @@ def find_owned(spec: dict[str, Any], create: bool = True) -> dict[str, Owned]:
         if len(candidates) != 1:
             continue
         owner_field, role = candidates[0]
+        makers = _maker_owns(spec, name, [role], [])
+        if makers is not None and len(makers) == 1:
+            role = makers[0]  # the field's name says another role; the record is its maker's
         staff = _staff_of(spec, name, [role, *(r for f, r in fields.items() if f != owner_field)], roles)
         if not staff and role in creators:
             # a record created by the role its person field names (an instructor's course, a seller's listing) names
@@ -179,6 +183,28 @@ def find_owned(spec: dict[str, Any], create: bool = True) -> dict[str, Owned]:
             if owner_field != item.field and role not in item.roles:
                 item.workers[role] = owner_field
     return owned
+
+
+def _managers(spec: dict[str, Any], entity: str, bypass: list[str]) -> set[str]:
+    """Roles that manage an entity's records beyond creating them: a role policy on any of its other operations, or an
+    ownership bypass (they read every record)."""
+    policies = _policies(spec)
+    named = set(bypass)
+    for op in spec.get("operations") or []:
+        policy = policies.get(op.get("policy") or "")
+        if _entity(op) == entity and op.get("action") != "create" and policy and policy.get("type") == "role":
+            named |= set(policy.get("roles") or [])
+    return named
+
+
+def _maker_owns(spec: dict[str, Any], entity: str, owners: list[str], bypass: list[str]) -> list[str] | None:
+    """The creating roles, when they make the record for themselves although its person field is named after another
+    role: they create it and manage nothing else of it (a viewer's like or comment in a field named `creatorId`). Staff
+    who create for a person manage those records too (update, assign, read every one). None otherwise."""
+    creators = _creators(spec, entity)
+    if not creators or set(creators) & set(owners) or set(creators) <= _managers(spec, entity, bypass):
+        return None
+    return creators
 
 
 def _creators(spec: dict[str, Any], entity: str) -> list[str]:
