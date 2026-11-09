@@ -232,6 +232,19 @@ def test_synthesized_fixtures_respect_a_unique_together_rule():
     keys = [tuple(str(row[f]) for f in fields) for row in fixtures["Progress"]]
     assert len(keys) == len(set(keys)) and len(keys) >= 2, keys
     assert all(row["learnerId"] and row["lessonId"] for row in fixtures["Progress"])
+    learners = {row["learnerId"] for row in fixtures["Progress"]}
+    lessons = {row["lessonId"] for row in fixtures["Progress"]}
+    assert len(keys) < len(learners) * len(lessons) or len(keys) == 1, "one learner × lesson pair is left free"
+
+
+def test_a_unique_together_rule_with_a_text_field_keeps_every_distinct_fixture(tmp_path):
+    """The free-pair trim counts pairs only over foreign keys: `workshopId` + `attendeeEmail` has no finite set, so
+    three distinct bookings stay (trimming to two left no open record for the overlap and duplicate scenarios)."""
+    from src.orchestrator.integration.contract import build_fixtures
+
+    spec = booking_spec(tmp_path)
+    fixtures, _ = build_fixtures(spec, build_plan(spec))
+    assert len(fixtures["Booking"]) == 3
 
 
 def test_a_unique_together_rule_on_a_pair_the_entity_already_declares_unique_reuses_its_constraint():
@@ -265,3 +278,38 @@ def test_a_unique_together_rule_on_a_pair_the_entity_already_declares_unique_reu
     assert [a for a in model.get("tableArgs") or [] if "UniqueConstraint" in a["code"]], (
         "without one, the rule adds its own"
     )
+
+
+def test_a_read_only_module_with_a_unique_together_rule_starts():
+    """gen_01M6Z9E38WE8XQHJ50MKTBEM78 (2026-11-09, TikTok Lite): `VideoInteraction` had a `uniqueTogether` rule but
+    only a list operation, so its repository got the `CONSTRAINT_ERRORS` table (which names `ErrorCode`) without the
+    import that only a writing repository adds; the app failed at import with `NameError: ErrorCode` in a
+    generator-owned file, which the engine may not repair. A read-only repository has no table to consult."""
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+
+    raw = json.loads((Path(__file__).parent / "fixtures" / "specs" / "tiktok-lite.json").read_text())
+    spec = validate_spec_data(raw).normalized
+    plan = build_plan(spec)
+    module = next(m for m in plan["modules"] if m["name"] == "video_interactions")
+    files = module_files(plan, spec, module)
+    repository = next(code for path, code in files.items() if path.endswith("video_interaction_repository.py"))
+    assert "CONSTRAINT_ERRORS" not in repository and "ErrorCode" not in repository
+    for path, code in files.items():
+        if path.endswith(".py"):
+            compile(code, path, "exec")
+    # the generated files only name what they import
+    import subprocess
+    import sys
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        for path, code in files.items():
+            target = Path(tmp) / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(code)
+        result = subprocess.run(
+            [sys.executable, "-m", "ruff", "check", "--select", "F821", "--no-cache", tmp],
+            capture_output=True,
+            text=True,
+        )
+    assert result.returncode == 0, result.stdout

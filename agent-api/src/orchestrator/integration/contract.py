@@ -312,11 +312,13 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
                 kept.append(row)
             # leave at least one pair free: the evaluation's and the smoke check's first create must not collide
             # (gen_01M6Z75NJYKSXNF4JGQPZ4XYF8: the seed filled every learner × lesson pair, so "mark watched" was 409)
-            capacity = 1
-            for field in fields:
-                capacity *= len(options.get(field) or [1])
-            if options and len(kept) >= capacity > 1:
-                kept = kept[: capacity - 1]
+            # (only when every field is a foreign key: a free text or enum field has no finite set of pairs)
+            if all(field in options for field in fields):
+                capacity = 1
+                for field in fields:
+                    capacity *= len(options[field])
+                if len(kept) >= capacity > 1:
+                    kept = kept[: capacity - 1]
             records[model["entity"]] = kept
     for model in models:  # Story 10.5: a file field holds an object key under its prefix, per owner when there is one
         owner = next((c["apiName"] for c in model["columns"] if c.get("source") == "currentUser"), None)

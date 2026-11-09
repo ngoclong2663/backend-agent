@@ -38,6 +38,7 @@ drafts on `antigravity_json` (gemini-3.8-flash-low, fast), generation on the `an
 |---|---|---|---|---|
 | Ember Kitchen, a cooking video school (`.data/final/studio-lessons.md`: video lessons with captions in two languages, instructors and learners, questions handed from learner to instructor, a dark cinema look) | `gen_01M6Z75NJYKSXNF4JGQPZ4XYF8` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 10 min 14 s (03:55:59 → 04:06:13) | 4 calls, 70 s, $0 |
 | Lantern Audio, a podcast network (`.data/final/podcast-network.md`: audio episodes with transcripts under shows, a producer drafts then publishes, a warm paper look) | `gen_01M6Z81Z2TM5SFN3ZMD05TPW56` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 5 min 53 s (04:11:26 → 04:17:19) | 5 calls, 60 s, $0 |
+| TikTok Clone, the user's own requirement (`.data/final/tiktok-lite.md`: "a website with basic features look like tiktok"; videos, comments, likes as interactions, viewers and creators) | `gen_01M6ZAFZH8VYM36J6DWVQEYE36` | COMPLETED, all three lanes, no warnings, live API switched (rerun of finding 4 below) | 10 min 01 s (04:53:37 → 05:03:38) | 5 calls, 73 s, $0 |
 
 The only warning left on both is the migration check (a duplicated unique constraint, fixed afterwards, below). Three
 earlier rounds of the same two requirements failed and each failure became a fix with a regression test on the real
@@ -55,6 +56,15 @@ drafted spec (`tests/fixtures/specs/ember-kitchen*.json`, `lantern-audio*.json`)
    `completion.related_entities` skips entity-less models; `build_fixtures` keeps `uniqueTogether` pairs unique.
 3. `gen_01M6Z75RG2H8YD1JT4XNZ5AMPP` (backend startup failed): the same link table's routes landed in the join entity's
    module (`episode_guests_router` missing). The planner now drops a many-to-many whose join entity exists.
+
+4. `gen_01M6Z9E38WE8XQHJ50MKTBEM78` (the user's own run, "a website with basic features look like tiktok", backend
+   startup failed in generator-owned files): `VideoInteraction` had a `uniqueTogether` rule (one like per viewer) but
+   only a list operation, so its repository got the `CONSTRAINT_ERRORS` table, which names `ErrorCode`, without the
+   import that only a writing repository adds (`NameError` at import; the engine may not repair owned files). The
+   table is written only with the writes that consult it (`tests/fixtures/specs/tiktok-lite.json`). Found with it:
+   the free-pair trim of the `uniqueTogether` fixtures counted a free text field as one slot and cut the booking
+   fixtures to two, which lost the overlap and duplicate scenarios; it now counts foreign keys only. Rerun as
+   `gen_01M6ZAFZH8VYM36J6DWVQEYE36` (the table's third row: clean).
 
 Also found on the way: the access rules made instructor-made courses private to their instructor, so learners opened
 an empty course list (a record whose person field names the role that creates it is now readable by every other

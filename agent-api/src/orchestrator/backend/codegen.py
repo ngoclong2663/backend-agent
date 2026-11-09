@@ -680,7 +680,7 @@ class _Module:
             if "== FOREIGN_KEY_VIOLATION" in "".join(methods)
             else ""
         )
-        if self.model.get("constraintErrors"):
+        if writes and self.model.get("constraintErrors"):  # read by __flush only: a read-only module has none
             entries = "".join(
                 f'    "{name}": {{"code": ErrorCode.{rule["code"]}, "message": {json.dumps(rule["message"])}, '
                 f'"fields": {json.dumps(rule["fields"])}}},\n'
