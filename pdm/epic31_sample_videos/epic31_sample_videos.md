@@ -86,3 +86,9 @@ videos with their channels. 101 units spent.
 (`PIXABAY_API_KEY`) works, and its docs were read the same day: videos may be linked directly, images (posters) may
 not; 100 requests per 60 s per key; requests cached 24 h. Its Cloudflare front refuses curl's default client name, so
 the adapter sends a descriptive `User-Agent` (Story 31.2).
+
+**Stories 31.1–31.4 done 2026-11-09** (see each story's Status): both providers behind one port with their caches and
+limits, videos in sites (the `Video` section, hero background clips, the facade and the polite background player,
+trees) and in apps (seeded video fields, the kit's facade and credits). `FRONTEND_MAX_PHOTOS` now caps paid photos
+only (the user's note, 2026-11-09): with Unsplash the hour's requests and the search cache are the bound. 31.5 runs
+with the other epics' final checks.

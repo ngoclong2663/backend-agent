@@ -1,106 +1,505 @@
 {
   "specVersion": "1.0",
-  "project": { "name": "Section Library", "description": "Every section the renderer ships, nested in every layout node, in every variant", "mode": "static" },
-  "theme": { "style": "playful", "colorScheme": "light-dark" },
+  "project": {
+    "name": "Section Library",
+    "description": "Every section the renderer ships, nested in every layout node, in every variant",
+    "mode": "static"
+  },
+  "theme": {
+    "style": "playful",
+    "colorScheme": "light-dark"
+  },
   "layout": {
-    "header": { "navigation": [{ "label": "Catalogue", "page": "catalogue" }, { "label": "More", "page": "more" },
-      { "label": "Centered", "page": "centered" }, { "label": "Banner", "page": "banner" }] },
-    "footer": { "text": "Section Library", "links": [{ "label": "Docs", "href": "https://example.com/docs" }] }
+    "header": {
+      "navigation": [
+        {
+          "label": "Catalogue",
+          "page": "catalogue"
+        },
+        {
+          "label": "More",
+          "page": "more"
+        },
+        {
+          "label": "Centered",
+          "page": "centered"
+        },
+        {
+          "label": "Banner",
+          "page": "banner"
+        }
+      ]
+    },
+    "footer": {
+      "text": "Section Library",
+      "links": [
+        {
+          "label": "Docs",
+          "href": "https://example.com/docs"
+        }
+      ]
+    }
   },
   "pages": [
     {
       "route": "/",
       "title": "Home",
       "sections": [
-        { "id": "hero", "component": "Hero",
-          "content": { "variant": "split", "eyebrow": "New", "heading": "Everything in one place", "body": "Every library section on three pages.",
-                       "image": "asset:hero", "cta": { "label": "Browse", "page": "catalogue" },
-                       "secondaryCta": { "label": "Docs", "href": "https://example.com/docs" } } },
-        { "id": "numbers", "component": "Stats", "content": { "title": "In numbers", "items": [
-          { "label": "Sections", "value": 17 }, { "label": "Layouts", "value": "4" }, { "label": "Engine calls", "value": 0 } ] } },
-        { "id": "row", "component": "Columns", "content": { "title": "Side by side" }, "children": [
-          { "id": "story", "component": "RichText", "content": { "heading": "Our story", "body": "First paragraph.\n\nSecond paragraph." } },
-          { "id": "aside", "component": "Stack", "children": [
-            { "id": "contact", "component": "ContactInfo", "content": { "email": "hi@example.com", "address": "1 High Street", "mapUrl": "https://maps.example.com/1" } },
-            { "id": "mini-stats", "component": "Stats", "content": { "items": [{ "label": "Replies", "value": "24h" }] } }
-          ] }
-        ] },
-        { "id": "cta", "component": "CallToAction", "content": { "heading": "Ready?", "body": "It takes a minute.", "cta": { "label": "Start", "page": "more" } } }
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "split",
+            "eyebrow": "New",
+            "heading": "Everything in one place",
+            "body": "Every library section on three pages.",
+            "image": "asset:hero",
+            "cta": {
+              "label": "Browse",
+              "page": "catalogue"
+            },
+            "secondaryCta": {
+              "label": "Docs",
+              "href": "https://example.com/docs"
+            }
+          }
+        },
+        {
+          "id": "numbers",
+          "component": "Stats",
+          "content": {
+            "title": "In numbers",
+            "items": [
+              {
+                "label": "Sections",
+                "value": 17
+              },
+              {
+                "label": "Layouts",
+                "value": "4"
+              },
+              {
+                "label": "Engine calls",
+                "value": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "row",
+          "component": "Columns",
+          "content": {
+            "title": "Side by side"
+          },
+          "children": [
+            {
+              "id": "story",
+              "component": "RichText",
+              "content": {
+                "heading": "Our story",
+                "body": "First paragraph.\n\nSecond paragraph."
+              }
+            },
+            {
+              "id": "aside",
+              "component": "Stack",
+              "children": [
+                {
+                  "id": "contact",
+                  "component": "ContactInfo",
+                  "content": {
+                    "email": "hi@example.com",
+                    "address": "1 High Street",
+                    "mapUrl": "https://maps.example.com/1"
+                  }
+                },
+                {
+                  "id": "mini-stats",
+                  "component": "Stats",
+                  "content": {
+                    "items": [
+                      {
+                        "label": "Replies",
+                        "value": "24h"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cta",
+          "component": "CallToAction",
+          "content": {
+            "heading": "Ready?",
+            "body": "It takes a minute.",
+            "cta": {
+              "label": "Start",
+              "page": "more"
+            }
+          }
+        }
       ]
     },
     {
       "route": "/catalogue",
       "title": "Catalogue",
       "sections": [
-        { "id": "products", "component": "CardGrid", "content": { "title": "Products", "cardStyle": "filled" }, "data": { "collection": "products" } },
-        { "id": "news", "component": "List", "content": { "title": "News" }, "data": { "collection": "news", "fields": ["title", "summary"] } },
-        { "id": "table", "component": "DataTable", "content": { "title": "Price list" }, "data": { "collection": "products", "fields": ["name", "price"] } }
+        {
+          "id": "products",
+          "component": "CardGrid",
+          "content": {
+            "title": "Products",
+            "cardStyle": "filled"
+          },
+          "data": {
+            "collection": "products"
+          }
+        },
+        {
+          "id": "news",
+          "component": "List",
+          "content": {
+            "title": "News"
+          },
+          "data": {
+            "collection": "news",
+            "fields": [
+              "title",
+              "summary"
+            ]
+          }
+        },
+        {
+          "id": "table",
+          "component": "DataTable",
+          "content": {
+            "title": "Price list"
+          },
+          "data": {
+            "collection": "products",
+            "fields": [
+              "name",
+              "price"
+            ]
+          }
+        }
       ]
     },
     {
       "route": "/more",
       "title": "More",
       "sections": [
-        { "id": "tabs", "component": "Tabs", "content": { "labels": ["Features", "Questions", "Plans"] }, "children": [
-          { "id": "features", "component": "Features", "content": { "title": "Features", "columns": 2, "cardStyle": "outline", "items": [
-            { "title": "Typed content", "body": "Checked against a schema." }, { "title": "No engine", "body": "Rendered from JSON." } ] } },
-          { "id": "faq", "component": "Faq", "data": { "collection": "faq" } },
-          { "id": "pricing", "component": "Pricing", "data": { "collection": "plans" } }
-        ] },
-        { "id": "grid", "component": "Grid", "content": { "title": "People and work", "columns": 2 }, "children": [
-          { "id": "quotes", "component": "Testimonials", "data": { "collection": "testimonials" } },
-          { "id": "gallery", "component": "Gallery", "content": { "columns": 2, "items": [
-            { "image": "asset:work", "title": "Project A", "caption": "Branding" }, { "image": "asset:work", "title": "Project B" } ] } }
-        ] }
+        {
+          "id": "tabs",
+          "component": "Tabs",
+          "content": {
+            "labels": [
+              "Features",
+              "Questions",
+              "Plans"
+            ]
+          },
+          "children": [
+            {
+              "id": "features",
+              "component": "Features",
+              "content": {
+                "title": "Features",
+                "columns": 2,
+                "cardStyle": "outline",
+                "items": [
+                  {
+                    "title": "Typed content",
+                    "body": "Checked against a schema."
+                  },
+                  {
+                    "title": "No engine",
+                    "body": "Rendered from JSON."
+                  }
+                ]
+              }
+            },
+            {
+              "id": "faq",
+              "component": "Faq",
+              "data": {
+                "collection": "faq"
+              }
+            },
+            {
+              "id": "pricing",
+              "component": "Pricing",
+              "data": {
+                "collection": "plans"
+              }
+            }
+          ]
+        },
+        {
+          "id": "grid",
+          "component": "Grid",
+          "content": {
+            "title": "People and work",
+            "columns": 2
+          },
+          "children": [
+            {
+              "id": "quotes",
+              "component": "Testimonials",
+              "data": {
+                "collection": "testimonials"
+              }
+            },
+            {
+              "id": "gallery",
+              "component": "Gallery",
+              "content": {
+                "columns": 2,
+                "items": [
+                  {
+                    "image": "asset:work",
+                    "title": "Project A",
+                    "caption": "Branding"
+                  },
+                  {
+                    "image": "asset:work",
+                    "title": "Project B"
+                  }
+                ]
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "route": "/centered",
       "title": "Centered",
       "sections": [
-        { "id": "hero", "component": "Hero",
-          "content": { "variant": "centered", "background": "muted", "eyebrow": "Variants", "heading": "A centred opener",
-                       "body": "Centred text with the image below it.", "image": "asset:hero",
-                       "cta": { "label": "See the banner", "page": "banner" } } },
-        { "id": "features", "component": "Features", "content": { "title": "Filled cards on primary", "description": "Tinted cards, no outline.",
-          "cardStyle": "filled", "background": "primary", "items": [
-            { "title": "One accent", "body": "The primary colour only." }, { "title": "One radius", "body": "Every corner from the theme radius." },
-            { "title": "Two families", "body": "Heading and body fonts." } ] } },
-        { "id": "quotes", "component": "Testimonials", "content": { "title": "Plain on muted", "cardStyle": "plain", "background": "muted" },
-          "data": { "collection": "testimonials" } },
-        { "id": "cta", "component": "CallToAction", "content": { "background": "default", "heading": "Outlined panel", "body": "The default background.",
-          "cta": { "label": "Home", "page": "home" } } }
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "background": "muted",
+            "eyebrow": "Variants",
+            "heading": "A centred opener",
+            "body": "Centred text with the image below it.",
+            "image": "asset:hero",
+            "cta": {
+              "label": "See the banner",
+              "page": "banner"
+            }
+          }
+        },
+        {
+          "id": "features",
+          "component": "Features",
+          "content": {
+            "title": "Filled cards on primary",
+            "description": "Tinted cards, no outline.",
+            "cardStyle": "filled",
+            "background": "primary",
+            "items": [
+              {
+                "title": "One accent",
+                "body": "The primary colour only."
+              },
+              {
+                "title": "One radius",
+                "body": "Every corner from the theme radius."
+              },
+              {
+                "title": "Two families",
+                "body": "Heading and body fonts."
+              }
+            ]
+          }
+        },
+        {
+          "id": "quotes",
+          "component": "Testimonials",
+          "content": {
+            "title": "Plain on muted",
+            "cardStyle": "plain",
+            "background": "muted"
+          },
+          "data": {
+            "collection": "testimonials"
+          }
+        },
+        {
+          "id": "cta",
+          "component": "CallToAction",
+          "content": {
+            "background": "default",
+            "heading": "Outlined panel",
+            "body": "The default background.",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        }
       ]
     },
     {
       "route": "/banner",
       "title": "Banner",
       "sections": [
-        { "id": "hero", "component": "Hero",
-          "content": { "variant": "banner", "heading": "A full-width banner", "body": "The image fills the band.", "image": "asset:hero",
-                       "cta": { "label": "Plain banner", "page": "banner-plain" }, "secondaryCta": { "label": "Home", "page": "home" } } },
-        { "id": "plans", "component": "Pricing", "content": { "title": "Filled plans over an image", "cardStyle": "filled", "background": "image",
-          "backgroundImage": "asset:work" }, "data": { "collection": "plans" } },
-        { "id": "numbers", "component": "Stats", "content": { "title": "Plain stats on primary", "cardStyle": "plain", "background": "primary", "items": [
-          { "label": "Presets", "value": 5 }, { "label": "Fonts", "value": 22 }, { "label": "Engine calls", "value": 0 } ] } },
-        { "id": "faq", "component": "Faq", "content": { "title": "On muted", "background": "muted" }, "data": { "collection": "faq" } },
-        { "id": "cta", "component": "CallToAction", "content": { "background": "muted", "heading": "Muted panel", "cta": { "label": "Home", "page": "home" } } }
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "banner",
+            "heading": "A full-width banner",
+            "body": "The image fills the band.",
+            "image": "asset:hero",
+            "cta": {
+              "label": "Plain banner",
+              "page": "banner-plain"
+            },
+            "secondaryCta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        },
+        {
+          "id": "plans",
+          "component": "Pricing",
+          "content": {
+            "title": "Filled plans over an image",
+            "cardStyle": "filled",
+            "background": "image",
+            "backgroundImage": "asset:work"
+          },
+          "data": {
+            "collection": "plans"
+          }
+        },
+        {
+          "id": "numbers",
+          "component": "Stats",
+          "content": {
+            "title": "Plain stats on primary",
+            "cardStyle": "plain",
+            "background": "primary",
+            "items": [
+              {
+                "label": "Presets",
+                "value": 5
+              },
+              {
+                "label": "Fonts",
+                "value": 22
+              },
+              {
+                "label": "Engine calls",
+                "value": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "faq",
+          "component": "Faq",
+          "content": {
+            "title": "On muted",
+            "background": "muted"
+          },
+          "data": {
+            "collection": "faq"
+          }
+        },
+        {
+          "id": "cta",
+          "component": "CallToAction",
+          "content": {
+            "background": "muted",
+            "heading": "Muted panel",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        }
       ]
     },
     {
       "route": "/banner-plain",
       "title": "Plain banner",
       "sections": [
-        { "id": "hero", "component": "Hero",
-          "content": { "variant": "banner", "eyebrow": "No image", "heading": "The band takes the primary colour",
-                       "cta": { "label": "Home", "page": "home" }, "secondaryCta": { "label": "Centered", "page": "centered" } } },
-        { "id": "gallery", "component": "Gallery", "content": { "title": "Over an image", "background": "image", "backgroundImage": "asset:hero", "items": [
-          { "image": "asset:work", "title": "Project C" }, { "image": "asset:mug", "title": "Project D" } ] } },
-        { "id": "story", "component": "RichText", "content": { "heading": "Text on primary", "background": "primary",
-          "body": "Body copy keeps to about 65 characters a line, so it reads easily on every screen.\n\nA second paragraph." } },
-        { "id": "contact", "component": "ContactInfo", "content": { "title": "Contact on muted", "background": "muted", "email": "hi@example.com" } },
-        { "id": "cta", "component": "CallToAction", "content": { "background": "image", "backgroundImage": "asset:work", "heading": "Panel over an image",
-          "cta": { "label": "Home", "page": "home" } } }
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "banner",
+            "eyebrow": "No image",
+            "heading": "The band takes the primary colour",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            },
+            "secondaryCta": {
+              "label": "Centered",
+              "page": "centered"
+            }
+          }
+        },
+        {
+          "id": "gallery",
+          "component": "Gallery",
+          "content": {
+            "title": "Over an image",
+            "background": "image",
+            "backgroundImage": "asset:hero",
+            "items": [
+              {
+                "image": "asset:work",
+                "title": "Project C"
+              },
+              {
+                "image": "asset:mug",
+                "title": "Project D"
+              }
+            ]
+          }
+        },
+        {
+          "id": "story",
+          "component": "RichText",
+          "content": {
+            "heading": "Text on primary",
+            "background": "primary",
+            "body": "Body copy keeps to about 65 characters a line, so it reads easily on every screen.\n\nA second paragraph."
+          }
+        },
+        {
+          "id": "contact",
+          "component": "ContactInfo",
+          "content": {
+            "title": "Contact on muted",
+            "background": "muted",
+            "email": "hi@example.com"
+          }
+        },
+        {
+          "id": "cta",
+          "component": "CallToAction",
+          "content": {
+            "background": "image",
+            "backgroundImage": "asset:work",
+            "heading": "Panel over an image",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        }
       ]
     },
     {
@@ -108,12 +507,103 @@
       "title": "Stage",
       "rhythm": "alternate",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "stage", "eyebrow": "Layouts", "heading": "The image is the screen", "body": "A full first screen, the text on its lower edge.", "image": "asset:hero", "cta": {"label": "Next layout", "page": "layouts-type"}}},
-        {"id": "features", "component": "Features", "content": {"title": "Numbered list", "form": "list", "items": [{"title": "One accent", "body": "The primary colour only, never a second accent.", "icon": "intent:palette"}, {"title": "One radius", "body": "Every corner comes from the theme radius.", "icon": "lucide:SquareRoundCorner"}, {"title": "Two families", "body": "One heading font and one body font.", "icon": "phosphor:TextAa"}]}},
-        {"id": "quotes", "component": "Testimonials", "content": {"title": "One large quote", "form": "quote"}, "data": {"collection": "testimonials"}},
-        {"id": "stats", "component": "Stats", "content": {"title": "Figures", "form": "figures", "items": [{"label": "Hero layouts", "value": "8", "icon": "intent:layout"}, {"label": "Section forms", "value": "10", "icon": "intent:shapes"}, {"label": "Engine calls", "value": "0", "icon": "intent:fast"}]}},
-        {"id": "faq", "component": "Faq", "content": {"title": "Alternating rhythm"}, "data": {"collection": "faq"}},
-        {"id": "cta", "component": "CallToAction", "content": {"heading": "Back to the start", "cta": {"label": "Home", "page": "home"}}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "stage",
+            "eyebrow": "Layouts",
+            "heading": "The image is the screen",
+            "body": "A full first screen, the text on its lower edge.",
+            "image": "asset:hero",
+            "cta": {
+              "label": "Next layout",
+              "page": "layouts-type"
+            }
+          }
+        },
+        {
+          "id": "features",
+          "component": "Features",
+          "content": {
+            "title": "Numbered list",
+            "form": "list",
+            "items": [
+              {
+                "title": "One accent",
+                "body": "The primary colour only, never a second accent.",
+                "icon": "intent:palette"
+              },
+              {
+                "title": "One radius",
+                "body": "Every corner comes from the theme radius.",
+                "icon": "lucide:SquareRoundCorner"
+              },
+              {
+                "title": "Two families",
+                "body": "One heading font and one body font.",
+                "icon": "phosphor:TextAa"
+              }
+            ]
+          }
+        },
+        {
+          "id": "quotes",
+          "component": "Testimonials",
+          "content": {
+            "title": "One large quote",
+            "form": "quote"
+          },
+          "data": {
+            "collection": "testimonials"
+          }
+        },
+        {
+          "id": "stats",
+          "component": "Stats",
+          "content": {
+            "title": "Figures",
+            "form": "figures",
+            "items": [
+              {
+                "label": "Hero layouts",
+                "value": "8",
+                "icon": "intent:layout"
+              },
+              {
+                "label": "Section forms",
+                "value": "10",
+                "icon": "intent:shapes"
+              },
+              {
+                "label": "Engine calls",
+                "value": "0",
+                "icon": "intent:fast"
+              }
+            ]
+          }
+        },
+        {
+          "id": "faq",
+          "component": "Faq",
+          "content": {
+            "title": "Alternating rhythm"
+          },
+          "data": {
+            "collection": "faq"
+          }
+        },
+        {
+          "id": "cta",
+          "component": "CallToAction",
+          "content": {
+            "heading": "Back to the start",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        }
       ]
     },
     {
@@ -121,10 +611,84 @@
       "title": "Type",
       "rhythm": "dividers",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "type", "heading": "Type is the picture", "body": "An oversized headline across the width.", "cta": {"label": "Next layout", "page": "layouts-stacked"}, "secondaryCta": {"label": "Home", "page": "home"}}},
-        {"id": "features", "component": "Features", "content": {"title": "Ledger", "form": "ledger", "items": [{"title": "One accent", "body": "The primary colour only, never a second accent.", "icon": "intent:palette"}, {"title": "One radius", "body": "Every corner comes from the theme radius.", "icon": "lucide:SquareRoundCorner"}, {"title": "Two families", "body": "One heading font and one body font.", "icon": "phosphor:TextAa"}]}},
-        {"id": "quotes", "component": "Testimonials", "content": {"title": "A strip of quotes", "form": "strip"}, "data": {"collection": "testimonials"}},
-        {"id": "stats", "component": "Stats", "content": {"title": "Inline", "form": "inline", "items": [{"label": "Hero layouts", "value": "8", "icon": "intent:layout"}, {"label": "Section forms", "value": "10", "icon": "intent:shapes"}, {"label": "Engine calls", "value": "0", "icon": "intent:fast"}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "type",
+            "heading": "Type is the picture",
+            "body": "An oversized headline across the width.",
+            "cta": {
+              "label": "Next layout",
+              "page": "layouts-stacked"
+            },
+            "secondaryCta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        },
+        {
+          "id": "features",
+          "component": "Features",
+          "content": {
+            "title": "Ledger",
+            "form": "ledger",
+            "items": [
+              {
+                "title": "One accent",
+                "body": "The primary colour only, never a second accent.",
+                "icon": "intent:palette"
+              },
+              {
+                "title": "One radius",
+                "body": "Every corner comes from the theme radius.",
+                "icon": "lucide:SquareRoundCorner"
+              },
+              {
+                "title": "Two families",
+                "body": "One heading font and one body font.",
+                "icon": "phosphor:TextAa"
+              }
+            ]
+          }
+        },
+        {
+          "id": "quotes",
+          "component": "Testimonials",
+          "content": {
+            "title": "A strip of quotes",
+            "form": "strip"
+          },
+          "data": {
+            "collection": "testimonials"
+          }
+        },
+        {
+          "id": "stats",
+          "component": "Stats",
+          "content": {
+            "title": "Inline",
+            "form": "inline",
+            "items": [
+              {
+                "label": "Hero layouts",
+                "value": "8",
+                "icon": "intent:layout"
+              },
+              {
+                "label": "Section forms",
+                "value": "10",
+                "icon": "intent:shapes"
+              },
+              {
+                "label": "Engine calls",
+                "value": "0",
+                "icon": "intent:fast"
+              }
+            ]
+          }
+        }
       ]
     },
     {
@@ -132,37 +696,242 @@
       "title": "Stacked",
       "rhythm": "alternate",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "stacked", "eyebrow": "Layouts", "heading": "A headline over a wide picture", "body": "Text and actions in a row, the image under them.", "image": "asset:work", "cta": {"label": "Next layout", "page": "layouts-collage"}}},
-        {"id": "features", "component": "Features", "content": {"title": "Alternating rows", "form": "alternating", "items": [{"title": "One accent", "body": "The primary colour only, never a second accent.", "image": "asset:hero"}, {"title": "One radius", "body": "Every corner comes from the theme radius.", "image": "asset:mug"}, {"title": "Two families", "body": "One heading font and one body font.", "image": "asset:work"}]}},
-        {"id": "products", "component": "CardGrid", "content": {"title": "A featured first card", "featured": true}, "data": {"collection": "products"}},
-        {"id": "text", "component": "RichText", "content": {"heading": "Then text", "body": "A paragraph on the page colour or the muted tone, opposite to the section before it."}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "stacked",
+            "eyebrow": "Layouts",
+            "heading": "A headline over a wide picture",
+            "body": "Text and actions in a row, the image under them.",
+            "image": "asset:work",
+            "cta": {
+              "label": "Next layout",
+              "page": "layouts-collage"
+            }
+          }
+        },
+        {
+          "id": "features",
+          "component": "Features",
+          "content": {
+            "title": "Alternating rows",
+            "form": "alternating",
+            "items": [
+              {
+                "title": "One accent",
+                "body": "The primary colour only, never a second accent.",
+                "image": "asset:hero"
+              },
+              {
+                "title": "One radius",
+                "body": "Every corner comes from the theme radius.",
+                "image": "asset:mug"
+              },
+              {
+                "title": "Two families",
+                "body": "One heading font and one body font.",
+                "image": "asset:work"
+              }
+            ]
+          }
+        },
+        {
+          "id": "products",
+          "component": "CardGrid",
+          "content": {
+            "title": "A featured first card",
+            "featured": true
+          },
+          "data": {
+            "collection": "products"
+          }
+        },
+        {
+          "id": "text",
+          "component": "RichText",
+          "content": {
+            "heading": "Then text",
+            "body": "A paragraph on the page colour or the muted tone, opposite to the section before it."
+          }
+        }
       ]
     },
     {
       "route": "/layouts-collage",
       "title": "Collage",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "collage", "heading": "Three pictures at once", "body": "The text beside a grid of images.", "image": "asset:hero", "images": ["asset:mug", "asset:work"], "cta": {"label": "Next layout", "page": "layouts-vertical"}}},
-        {"id": "features", "component": "Features", "content": {"title": "Cards, as before", "form": "cards", "items": [{"title": "One accent", "body": "The primary colour only, never a second accent.", "icon": "intent:palette"}, {"title": "One radius", "body": "Every corner comes from the theme radius.", "icon": "lucide:SquareRoundCorner"}, {"title": "Two families", "body": "One heading font and one body font.", "icon": "phosphor:TextAa"}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "collage",
+            "heading": "Three pictures at once",
+            "body": "The text beside a grid of images.",
+            "image": "asset:hero",
+            "images": [
+              "asset:mug",
+              "asset:work"
+            ],
+            "cta": {
+              "label": "Next layout",
+              "page": "layouts-vertical"
+            }
+          }
+        },
+        {
+          "id": "features",
+          "component": "Features",
+          "content": {
+            "title": "Cards, as before",
+            "form": "cards",
+            "items": [
+              {
+                "title": "One accent",
+                "body": "The primary colour only, never a second accent.",
+                "icon": "intent:palette"
+              },
+              {
+                "title": "One radius",
+                "body": "Every corner comes from the theme radius.",
+                "icon": "lucide:SquareRoundCorner"
+              },
+              {
+                "title": "Two families",
+                "body": "One heading font and one body font.",
+                "icon": "phosphor:TextAa"
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "route": "/layouts-vertical",
       "title": "Vertical",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "vertical", "eyebrow": "Studio", "heading": "A label on its side", "body": "The eyebrow turns into a tall label beside the headline.", "image": "asset:mug", "cta": {"label": "Home", "page": "home"}}},
-        {"id": "quotes", "component": "Testimonials", "content": {"title": "Cards", "form": "cards", "cardStyle": "filled"}, "data": {"collection": "testimonials"}},
-        {"id": "cta", "component": "CallToAction", "content": {"heading": "Back to the start", "cta": {"label": "Home", "page": "home"}}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "vertical",
+            "eyebrow": "Studio",
+            "heading": "A label on its side",
+            "body": "The eyebrow turns into a tall label beside the headline.",
+            "image": "asset:mug",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        },
+        {
+          "id": "quotes",
+          "component": "Testimonials",
+          "content": {
+            "title": "Cards",
+            "form": "cards",
+            "cardStyle": "filled"
+          },
+          "data": {
+            "collection": "testimonials"
+          }
+        },
+        {
+          "id": "cta",
+          "component": "CallToAction",
+          "content": {
+            "heading": "Back to the start",
+            "cta": {
+              "label": "Home",
+              "page": "home"
+            }
+          }
+        }
       ]
     },
     {
       "route": "/new-steps",
       "title": "Steps",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "How it works", "cta": {"label": "Next", "page": "new-timeline"}}},
-        {"id": "numbered", "component": "Steps", "content": {"title": "Numbered", "items": [{"title": "Choose a time", "body": "Pick a slot that suits you."}, {"title": "Confirm by e-mail", "body": "We send the details the same day."}, {"title": "Come in", "body": "Arrive ten minutes early."}]}},
-        {"id": "horizontal", "component": "Steps", "content": {"title": "Horizontal", "form": "horizontal", "background": "muted", "items": [{"title": "Choose a time", "body": "Pick a slot that suits you."}, {"title": "Confirm by e-mail", "body": "We send the details the same day."}, {"title": "Come in", "body": "Arrive ten minutes early."}]}},
-        {"id": "connected", "component": "Steps", "content": {"title": "Connected", "form": "connected", "items": [{"title": "Choose a time", "body": "Pick a slot that suits you."}, {"title": "Confirm by e-mail", "body": "We send the details the same day."}, {"title": "Come in", "body": "Arrive ten minutes early."}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "How it works",
+            "cta": {
+              "label": "Next",
+              "page": "new-timeline"
+            }
+          }
+        },
+        {
+          "id": "numbered",
+          "component": "Steps",
+          "content": {
+            "title": "Numbered",
+            "items": [
+              {
+                "title": "Choose a time",
+                "body": "Pick a slot that suits you."
+              },
+              {
+                "title": "Confirm by e-mail",
+                "body": "We send the details the same day."
+              },
+              {
+                "title": "Come in",
+                "body": "Arrive ten minutes early."
+              }
+            ]
+          }
+        },
+        {
+          "id": "horizontal",
+          "component": "Steps",
+          "content": {
+            "title": "Horizontal",
+            "form": "horizontal",
+            "background": "muted",
+            "items": [
+              {
+                "title": "Choose a time",
+                "body": "Pick a slot that suits you."
+              },
+              {
+                "title": "Confirm by e-mail",
+                "body": "We send the details the same day."
+              },
+              {
+                "title": "Come in",
+                "body": "Arrive ten minutes early."
+              }
+            ]
+          }
+        },
+        {
+          "id": "connected",
+          "component": "Steps",
+          "content": {
+            "title": "Connected",
+            "form": "connected",
+            "items": [
+              {
+                "title": "Choose a time",
+                "body": "Pick a slot that suits you."
+              },
+              {
+                "title": "Confirm by e-mail",
+                "body": "We send the details the same day."
+              },
+              {
+                "title": "Come in",
+                "body": "Arrive ten minutes early."
+              }
+            ]
+          }
+        }
       ]
     },
     {
@@ -170,9 +939,70 @@
       "title": "Timeline",
       "rhythm": "dividers",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "Our story so far", "cta": {"label": "Next", "page": "new-team"}}},
-        {"id": "vertical", "component": "Timeline", "content": {"title": "Vertical", "items": [{"date": "2015", "title": "A garage oven", "body": "The first loaves, sold to neighbours."}, {"date": "2019", "title": "The shop", "body": "A real counter and a wood-fired oven.", "image": "asset:work"}, {"date": "2024", "title": "Cakes to order", "body": "Celebration cakes, two days' notice."}]}},
-        {"id": "alternating", "component": "Timeline", "content": {"title": "Alternating", "form": "alternating", "background": "muted", "items": [{"date": "2015", "title": "A garage oven", "body": "The first loaves, sold to neighbours."}, {"date": "2019", "title": "The shop", "body": "A real counter and a wood-fired oven.", "image": "asset:work"}, {"date": "2024", "title": "Cakes to order", "body": "Celebration cakes, two days' notice."}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "Our story so far",
+            "cta": {
+              "label": "Next",
+              "page": "new-team"
+            }
+          }
+        },
+        {
+          "id": "vertical",
+          "component": "Timeline",
+          "content": {
+            "title": "Vertical",
+            "items": [
+              {
+                "date": "2015",
+                "title": "A garage oven",
+                "body": "The first loaves, sold to neighbours."
+              },
+              {
+                "date": "2019",
+                "title": "The shop",
+                "body": "A real counter and a wood-fired oven.",
+                "image": "asset:work"
+              },
+              {
+                "date": "2024",
+                "title": "Cakes to order",
+                "body": "Celebration cakes, two days' notice."
+              }
+            ]
+          }
+        },
+        {
+          "id": "alternating",
+          "component": "Timeline",
+          "content": {
+            "title": "Alternating",
+            "form": "alternating",
+            "background": "muted",
+            "items": [
+              {
+                "date": "2015",
+                "title": "A garage oven",
+                "body": "The first loaves, sold to neighbours."
+              },
+              {
+                "date": "2019",
+                "title": "The shop",
+                "body": "A real counter and a wood-fired oven.",
+                "image": "asset:work"
+              },
+              {
+                "date": "2024",
+                "title": "Cakes to order",
+                "body": "Celebration cakes, two days' notice."
+              }
+            ]
+          }
+        }
       ]
     },
     {
@@ -180,49 +1010,497 @@
       "title": "Team",
       "rhythm": "alternate",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "The people", "cta": {"label": "Next", "page": "new-prices"}}},
-        {"id": "grid", "component": "Team", "content": {"title": "Grid", "items": [{"name": "Mira Hale", "role": "Founder", "bio": "Trained in Lyon; runs the morning bake.", "image": "asset:mug"}, {"name": "Jonas Berg", "role": "Pastry", "bio": "Laminated doughs and anything with butter."}, {"name": "Ada Kim", "role": "Front of house"}]}},
-        {"id": "list", "component": "Team", "content": {"title": "List", "form": "list", "items": [{"name": "Mira Hale", "role": "Founder", "bio": "Trained in Lyon; runs the morning bake.", "image": "asset:mug"}, {"name": "Jonas Berg", "role": "Pastry", "bio": "Laminated doughs and anything with butter."}, {"name": "Ada Kim", "role": "Front of house"}]}},
-        {"id": "portraits", "component": "Team", "content": {"title": "Portraits", "form": "portraits", "background": "primary", "items": [{"name": "Mira Hale", "role": "Founder", "bio": "Trained in Lyon; runs the morning bake.", "image": "asset:mug"}, {"name": "Jonas Berg", "role": "Pastry", "bio": "Laminated doughs and anything with butter."}, {"name": "Ada Kim", "role": "Front of house"}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "The people",
+            "cta": {
+              "label": "Next",
+              "page": "new-prices"
+            }
+          }
+        },
+        {
+          "id": "grid",
+          "component": "Team",
+          "content": {
+            "title": "Grid",
+            "items": [
+              {
+                "name": "Mira Hale",
+                "role": "Founder",
+                "bio": "Trained in Lyon; runs the morning bake.",
+                "image": "asset:mug"
+              },
+              {
+                "name": "Jonas Berg",
+                "role": "Pastry",
+                "bio": "Laminated doughs and anything with butter."
+              },
+              {
+                "name": "Ada Kim",
+                "role": "Front of house"
+              }
+            ]
+          }
+        },
+        {
+          "id": "list",
+          "component": "Team",
+          "content": {
+            "title": "List",
+            "form": "list",
+            "items": [
+              {
+                "name": "Mira Hale",
+                "role": "Founder",
+                "bio": "Trained in Lyon; runs the morning bake.",
+                "image": "asset:mug"
+              },
+              {
+                "name": "Jonas Berg",
+                "role": "Pastry",
+                "bio": "Laminated doughs and anything with butter."
+              },
+              {
+                "name": "Ada Kim",
+                "role": "Front of house"
+              }
+            ]
+          }
+        },
+        {
+          "id": "portraits",
+          "component": "Team",
+          "content": {
+            "title": "Portraits",
+            "form": "portraits",
+            "background": "primary",
+            "items": [
+              {
+                "name": "Mira Hale",
+                "role": "Founder",
+                "bio": "Trained in Lyon; runs the morning bake.",
+                "image": "asset:mug"
+              },
+              {
+                "name": "Jonas Berg",
+                "role": "Pastry",
+                "bio": "Laminated doughs and anything with butter."
+              },
+              {
+                "name": "Ada Kim",
+                "role": "Front of house"
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "route": "/new-prices",
       "title": "Prices",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "The menu", "cta": {"label": "Next", "page": "new-location"}}},
-        {"id": "menu", "component": "PriceList", "content": {"title": "Menu", "groups": [{"title": "Breads", "items": [{"name": "Country loaf", "price": "€6", "description": "Wheat, rye, 24-hour rise", "tags": ["vegan"]}, {"name": "Seeded rye", "price": "€6.50"}]}, {"title": "Pastries", "items": [{"name": "Croissant", "price": "€2.80"}, {"name": "Cinnamon bun", "price": "€3.20", "tags": ["bestseller"]}]}]}},
-        {"id": "columns", "component": "PriceList", "content": {"title": "Columns", "form": "columns", "background": "muted", "groups": [{"title": "Breads", "items": [{"name": "Country loaf", "price": "€6", "description": "Wheat, rye, 24-hour rise", "tags": ["vegan"]}, {"name": "Seeded rye", "price": "€6.50"}]}, {"title": "Pastries", "items": [{"name": "Croissant", "price": "€2.80"}, {"name": "Cinnamon bun", "price": "€3.20", "tags": ["bestseller"]}]}]}},
-        {"id": "cards", "component": "PriceList", "content": {"title": "Cards", "form": "cards", "groups": [{"title": "Breads", "items": [{"name": "Country loaf", "price": "€6", "description": "Wheat, rye, 24-hour rise", "tags": ["vegan"]}, {"name": "Seeded rye", "price": "€6.50"}]}, {"title": "Pastries", "items": [{"name": "Croissant", "price": "€2.80"}, {"name": "Cinnamon bun", "price": "€3.20", "tags": ["bestseller"]}]}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "The menu",
+            "cta": {
+              "label": "Next",
+              "page": "new-location"
+            }
+          }
+        },
+        {
+          "id": "menu",
+          "component": "PriceList",
+          "content": {
+            "title": "Menu",
+            "groups": [
+              {
+                "title": "Breads",
+                "items": [
+                  {
+                    "name": "Country loaf",
+                    "price": "€6",
+                    "description": "Wheat, rye, 24-hour rise",
+                    "tags": [
+                      "vegan"
+                    ]
+                  },
+                  {
+                    "name": "Seeded rye",
+                    "price": "€6.50"
+                  }
+                ]
+              },
+              {
+                "title": "Pastries",
+                "items": [
+                  {
+                    "name": "Croissant",
+                    "price": "€2.80"
+                  },
+                  {
+                    "name": "Cinnamon bun",
+                    "price": "€3.20",
+                    "tags": [
+                      "bestseller"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "columns",
+          "component": "PriceList",
+          "content": {
+            "title": "Columns",
+            "form": "columns",
+            "background": "muted",
+            "groups": [
+              {
+                "title": "Breads",
+                "items": [
+                  {
+                    "name": "Country loaf",
+                    "price": "€6",
+                    "description": "Wheat, rye, 24-hour rise",
+                    "tags": [
+                      "vegan"
+                    ]
+                  },
+                  {
+                    "name": "Seeded rye",
+                    "price": "€6.50"
+                  }
+                ]
+              },
+              {
+                "title": "Pastries",
+                "items": [
+                  {
+                    "name": "Croissant",
+                    "price": "€2.80"
+                  },
+                  {
+                    "name": "Cinnamon bun",
+                    "price": "€3.20",
+                    "tags": [
+                      "bestseller"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cards",
+          "component": "PriceList",
+          "content": {
+            "title": "Cards",
+            "form": "cards",
+            "groups": [
+              {
+                "title": "Breads",
+                "items": [
+                  {
+                    "name": "Country loaf",
+                    "price": "€6",
+                    "description": "Wheat, rye, 24-hour rise",
+                    "tags": [
+                      "vegan"
+                    ]
+                  },
+                  {
+                    "name": "Seeded rye",
+                    "price": "€6.50"
+                  }
+                ]
+              },
+              {
+                "title": "Pastries",
+                "items": [
+                  {
+                    "name": "Croissant",
+                    "price": "€2.80"
+                  },
+                  {
+                    "name": "Cinnamon bun",
+                    "price": "€3.20",
+                    "tags": [
+                      "bestseller"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "route": "/new-location",
       "title": "Location",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "Find us", "cta": {"label": "Next", "page": "new-comparison"}}},
-        {"id": "split", "component": "Location", "content": {"address": "14 rue des Boulangers, Lyon", "hours": [{"days": "Mon", "note": "closed"}, {"days": "Tue–Fri", "opens": "07:00", "closes": "14:00"}, {"days": "Sat, Sun", "opens": "08:00", "closes": "13:00"}], "phone": "+33 1 23 45 67 89", "email": "orders@example.com", "mapLink": "https://www.openstreetmap.org/", "image": "asset:hero"}},
-        {"id": "card", "component": "Location", "content": {"address": "14 rue des Boulangers, Lyon", "hours": [{"days": "Mon", "note": "closed"}, {"days": "Tue–Fri", "opens": "07:00", "closes": "14:00"}, {"days": "Sat, Sun", "opens": "08:00", "closes": "13:00"}], "phone": "+33 1 23 45 67 89", "email": "orders@example.com", "mapLink": "https://www.openstreetmap.org/", "title": "On a card", "form": "card", "background": "muted"}},
-        {"id": "band", "component": "Location", "content": {"address": "14 rue des Boulangers, Lyon", "hours": [{"days": "Mon", "note": "closed"}, {"days": "Tue–Fri", "opens": "07:00", "closes": "14:00"}, {"days": "Sat, Sun", "opens": "08:00", "closes": "13:00"}], "phone": "+33 1 23 45 67 89", "email": "orders@example.com", "mapLink": "https://www.openstreetmap.org/", "title": "As a band", "form": "band", "image": "asset:work"}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "Find us",
+            "cta": {
+              "label": "Next",
+              "page": "new-comparison"
+            }
+          }
+        },
+        {
+          "id": "split",
+          "component": "Location",
+          "content": {
+            "address": "14 rue des Boulangers, Lyon",
+            "hours": [
+              {
+                "days": "Mon",
+                "note": "closed"
+              },
+              {
+                "days": "Tue–Fri",
+                "opens": "07:00",
+                "closes": "14:00"
+              },
+              {
+                "days": "Sat, Sun",
+                "opens": "08:00",
+                "closes": "13:00"
+              }
+            ],
+            "phone": "+33 1 23 45 67 89",
+            "email": "orders@example.com",
+            "mapLink": "https://www.openstreetmap.org/",
+            "image": "asset:hero"
+          }
+        },
+        {
+          "id": "card",
+          "component": "Location",
+          "content": {
+            "address": "14 rue des Boulangers, Lyon",
+            "hours": [
+              {
+                "days": "Mon",
+                "note": "closed"
+              },
+              {
+                "days": "Tue–Fri",
+                "opens": "07:00",
+                "closes": "14:00"
+              },
+              {
+                "days": "Sat, Sun",
+                "opens": "08:00",
+                "closes": "13:00"
+              }
+            ],
+            "phone": "+33 1 23 45 67 89",
+            "email": "orders@example.com",
+            "mapLink": "https://www.openstreetmap.org/",
+            "title": "On a card",
+            "form": "card",
+            "background": "muted"
+          }
+        },
+        {
+          "id": "band",
+          "component": "Location",
+          "content": {
+            "address": "14 rue des Boulangers, Lyon",
+            "hours": [
+              {
+                "days": "Mon",
+                "note": "closed"
+              },
+              {
+                "days": "Tue–Fri",
+                "opens": "07:00",
+                "closes": "14:00"
+              },
+              {
+                "days": "Sat, Sun",
+                "opens": "08:00",
+                "closes": "13:00"
+              }
+            ],
+            "phone": "+33 1 23 45 67 89",
+            "email": "orders@example.com",
+            "mapLink": "https://www.openstreetmap.org/",
+            "title": "As a band",
+            "form": "band",
+            "image": "asset:work"
+          }
+        }
       ]
     },
     {
       "route": "/new-comparison",
       "title": "Comparison",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "Two packages", "cta": {"label": "Next", "page": "new-statement"}}},
-        {"id": "table", "component": "Comparison", "content": {"title": "Table", "columns": ["Starter", "Studio"], "rows": [{"label": "Logo", "values": [true, true]}, {"label": "Pages", "values": ["1", "5"]}, {"label": "Print kit", "values": [false, true]}]}},
-        {"id": "cards", "component": "Comparison", "content": {"title": "Cards", "form": "cards", "background": "muted", "columns": ["Starter", "Studio"], "rows": [{"label": "Logo", "values": [true, true]}, {"label": "Pages", "values": ["1", "5"]}, {"label": "Print kit", "values": [false, true]}]}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "Two packages",
+            "cta": {
+              "label": "Next",
+              "page": "new-statement"
+            }
+          }
+        },
+        {
+          "id": "table",
+          "component": "Comparison",
+          "content": {
+            "title": "Table",
+            "columns": [
+              "Starter",
+              "Studio"
+            ],
+            "rows": [
+              {
+                "label": "Logo",
+                "values": [
+                  true,
+                  true
+                ]
+              },
+              {
+                "label": "Pages",
+                "values": [
+                  "1",
+                  "5"
+                ]
+              },
+              {
+                "label": "Print kit",
+                "values": [
+                  false,
+                  true
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cards",
+          "component": "Comparison",
+          "content": {
+            "title": "Cards",
+            "form": "cards",
+            "background": "muted",
+            "columns": [
+              "Starter",
+              "Studio"
+            ],
+            "rows": [
+              {
+                "label": "Logo",
+                "values": [
+                  true,
+                  true
+                ]
+              },
+              {
+                "label": "Pages",
+                "values": [
+                  "1",
+                  "5"
+                ]
+              },
+              {
+                "label": "Print kit",
+                "values": [
+                  false,
+                  true
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "route": "/new-statement",
       "title": "Statement",
       "sections": [
-        {"id": "hero", "component": "Hero", "content": {"variant": "centered", "heading": "What we stand for", "cta": {"label": "Next", "page": "home"}}},
-        {"id": "large", "component": "Statement", "content": {"text": "Bread takes time. We give it twenty-four hours, so you do not have to think about it.", "image": "asset:hero"}},
-        {"id": "quote", "component": "Statement", "content": {"form": "quote", "background": "muted", "text": "The best croissant on this side of the river.", "attribution": "A regular, since 2016"}},
-        {"id": "band", "component": "Statement", "content": {"form": "band", "text": "Everything is baked here, every morning."}}
+        {
+          "id": "hero",
+          "component": "Hero",
+          "content": {
+            "variant": "centered",
+            "heading": "What we stand for",
+            "cta": {
+              "label": "Next",
+              "page": "home"
+            }
+          }
+        },
+        {
+          "id": "large",
+          "component": "Statement",
+          "content": {
+            "text": "Bread takes time. We give it twenty-four hours, so you do not have to think about it.",
+            "image": "asset:hero"
+          }
+        },
+        {
+          "id": "quote",
+          "component": "Statement",
+          "content": {
+            "form": "quote",
+            "background": "muted",
+            "text": "The best croissant on this side of the river.",
+            "attribution": "A regular, since 2016"
+          }
+        },
+        {
+          "id": "band",
+          "component": "Statement",
+          "content": {
+            "form": "band",
+            "text": "Everything is baked here, every morning."
+          }
+        },
+        {
+          "id": "videos",
+          "component": "Video",
+          "content": {
+            "title": "Watch the bakers",
+            "description": "A talk and a short clip.",
+            "video": "asset:talk",
+            "items": [
+              {
+                "video": "asset:clip",
+                "title": "The oven at dawn",
+                "caption": "Six seconds of a quiet morning"
+              },
+              {
+                "video": "asset:talk",
+                "title": "The talk again"
+              }
+            ],
+            "columns": 2,
+            "background": "muted"
+          }
+        }
       ]
     },
     {
@@ -230,71 +1508,584 @@
       "title": "Designed",
       "sections": [],
       "css": ".rug { background-image: radial-gradient(color-mix(in oklch, var(--primary) 8%, transparent) 1.5px, transparent 1.5px); background-size: 24px 24px; }",
-      "tree": {"type": "main", "props": {"className": "rug relative overflow-x-hidden bg-background text-foreground"}, "children": [
-        {"type": "section", "props": {"className": "mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-12", "animate": {"on": "view", "type": "fade-up", "duration": 0.6}}, "children": [
-          {"type": "div", "props": {"className": "md:col-span-7"}, "children": [
-            {"type": "span", "props": {"className": "inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs uppercase tracking-widest text-primary"}, "children": [
-              {"type": "Sparkles", "props": {"className": "size-3.5"}}, "Epic 21"]},
-            {"type": "h1", "props": {"className": "heading mt-6 font-heading text-5xl font-black leading-[1.05] tracking-tight md:text-7xl"}, "children": [
-              {"type": "span", "props": {"className": "block"}, "children": ["A page the"]},
-              {"type": "span", "props": {"className": "block text-primary underline decoration-wavy underline-offset-8"}, "children": ["model designed."]}]},
-            {"type": "p", "props": {"className": "mt-6 max-w-xl text-muted-foreground"}, "children": ["Elements, primitives, icons, a library section and data components, all from one JSON tree."]},
-            {"type": "div", "props": {"className": "mt-8 flex flex-wrap gap-3"}, "children": [
-              {"type": "Link", "props": {"to": "page:catalogue", "className": "inline-flex h-10 items-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"}, "children": ["Browse the catalogue", {"type": "ArrowRight", "props": {"className": "size-4"}}]},
-              {"type": "Link", "props": {"href": "https://example.com/docs", "className": "inline-flex h-10 items-center rounded-md border px-5 text-sm"}, "children": ["Docs"]}]}]},
-          {"type": "figure", "props": {"className": "md:col-span-5 lg:-mt-10", "animate": {"on": "view", "type": "scale-in", "delay": 0.2}}, "children": [
-            {"type": "div", "props": {"className": "rounded-3xl border-2 border-primary/20 bg-card p-3 shadow-xl"}, "children": [
-              {"type": "img", "props": {"src": "asset:hero", "alt": "A desk", "className": "rounded-2xl"}}]},
-            {"type": "figcaption", "props": {"className": "mt-3 flex items-center gap-2 px-2 text-xs text-muted-foreground"}, "children": [
-              {"type": "Clock", "props": {"className": "size-3.5 text-primary"}}, "Rendered in seconds, no engine call"]}]}]},
-        {"type": "section", "props": {"className": "border-y border-border/60 bg-muted/40 py-12"}, "children": [
-          {"type": "div", "props": {"className": "mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-3"}, "children": [
-            {"type": "Metric", "props": {"collection": "products", "fn": "count", "label": "Products", "className": "flex flex-col gap-1"}},
-            {"type": "Metric", "props": {"collection": "products", "fn": "max", "field": "stock", "label": "Largest stock", "format": "count"}},
-            {"type": "Chart", "props": {"collection": "products", "kind": "bar", "fn": "sum", "field": "stock", "groupBy": "name", "className": "h-32 w-full"}}]}]},
-        {"type": "section", "props": {"className": "mx-auto max-w-7xl px-6 py-16"}, "children": [
-          {"type": "h2", "props": {"className": "heading font-heading text-3xl"}, "children": ["Three of the products"]},
-          {"type": "CollectionStrip", "props": {"collection": "products", "limit": 3, "sortBy": "name", "className": "mt-8"}, "children": [
-            {"type": "ItemList", "props": {"className": "grid gap-6 sm:grid-cols-3"}, "children": [
-              {"type": "article", "props": {"className": "rounded-2xl border bg-card p-4"}, "children": [
-                {"type": "RecordImage", "props": {"field": "image", "className": "rounded-xl"}},
-                {"type": "h3", "props": {"className": "mt-3 font-heading text-lg"}, "children": [{"type": "RecordField", "props": {"field": "name"}}]},
-                {"type": "RecordPrice", "props": {"field": "stock", "currency": "GBP", "className": "text-sm text-muted-foreground"}}]}]},
-            {"type": "Empty", "props": {"className": "text-sm text-muted-foreground"}, "children": ["No products yet."]}]}]},
-        {"type": "section", "props": {"className": "mx-auto max-w-7xl px-6 pb-16"}, "children": [
-          {"type": "CollectionBrowser", "props": {"collection": "products", "pageSize": 1, "sortFields": [{"field": "name", "label": "Name"}], "searchFields": ["name"]}, "children": [
-            {"type": "div", "props": {"className": "flex flex-wrap items-center gap-3"}, "children": [
-              {"type": "SearchBox", "props": {"placeholder": "Search products", "className": "max-w-xs"}},
-              {"type": "SortControl", "props": {"label": "Sort"}},
-              {"type": "ResultCount"}]},
-            {"type": "ItemList", "props": {"className": "mt-6 divide-y rounded-xl border"}, "children": [
-              {"type": "div", "props": {"className": "flex items-center justify-between p-3"}, "children": [
-                {"type": "RecordField", "props": {"field": "name", "className": "font-medium"}},
-                {"type": "RecordField", "props": {"field": "price"}}]}]},
-            {"type": "Pagination", "props": {"className": "mt-4 flex items-center justify-between text-sm"}}]}]},
-        {"type": "Tabs", "props": {"defaultValue": "why", "className": "mx-auto max-w-3xl px-6 pb-16"}, "children": [
-          {"type": "TabsList", "children": [
-            {"type": "TabsTrigger", "props": {"value": "why"}, "children": ["Why"]},
-            {"type": "TabsTrigger", "props": {"value": "how"}, "children": ["How"]}]},
-          {"type": "TabsContent", "props": {"value": "why"}, "children": [{"type": "p", "props": {"className": "text-muted-foreground"}, "children": ["The model designs the layout; code keeps the data exact."]}]},
-          {"type": "TabsContent", "props": {"value": "how"}, "children": [{"type": "p", "props": {"className": "text-muted-foreground"}, "children": ["One JSON tree per page, checked and bound by the generator."]}]}]},
-        {"type": "Faq", "props": {"title": "Questions about designed pages", "items": [{"question": "Can a tree use a library section?", "answer": "Yes: this one is a Faq node."}]}}
-      ]}
+      "tree": {
+        "type": "main",
+        "props": {
+          "className": "rug relative overflow-x-hidden bg-background text-foreground"
+        },
+        "children": [
+          {
+            "type": "section",
+            "props": {
+              "className": "mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-12",
+              "animate": {
+                "on": "view",
+                "type": "fade-up",
+                "duration": 0.6
+              }
+            },
+            "children": [
+              {
+                "type": "div",
+                "props": {
+                  "className": "md:col-span-7"
+                },
+                "children": [
+                  {
+                    "type": "span",
+                    "props": {
+                      "className": "inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs uppercase tracking-widest text-primary"
+                    },
+                    "children": [
+                      {
+                        "type": "Sparkles",
+                        "props": {
+                          "className": "size-3.5"
+                        }
+                      },
+                      "Epic 21"
+                    ]
+                  },
+                  {
+                    "type": "h1",
+                    "props": {
+                      "className": "heading mt-6 font-heading text-5xl font-black leading-[1.05] tracking-tight md:text-7xl"
+                    },
+                    "children": [
+                      {
+                        "type": "span",
+                        "props": {
+                          "className": "block"
+                        },
+                        "children": [
+                          "A page the"
+                        ]
+                      },
+                      {
+                        "type": "span",
+                        "props": {
+                          "className": "block text-primary underline decoration-wavy underline-offset-8"
+                        },
+                        "children": [
+                          "model designed."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "props": {
+                      "className": "mt-6 max-w-xl text-muted-foreground"
+                    },
+                    "children": [
+                      "Elements, primitives, icons, a library section and data components, all from one JSON tree."
+                    ]
+                  },
+                  {
+                    "type": "div",
+                    "props": {
+                      "className": "mt-8 flex flex-wrap gap-3"
+                    },
+                    "children": [
+                      {
+                        "type": "Link",
+                        "props": {
+                          "to": "page:catalogue",
+                          "className": "inline-flex h-10 items-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"
+                        },
+                        "children": [
+                          "Browse the catalogue",
+                          {
+                            "type": "ArrowRight",
+                            "props": {
+                              "className": "size-4"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Link",
+                        "props": {
+                          "href": "https://example.com/docs",
+                          "className": "inline-flex h-10 items-center rounded-md border px-5 text-sm"
+                        },
+                        "children": [
+                          "Docs"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "figure",
+                "props": {
+                  "className": "md:col-span-5 lg:-mt-10",
+                  "animate": {
+                    "on": "view",
+                    "type": "scale-in",
+                    "delay": 0.2
+                  }
+                },
+                "children": [
+                  {
+                    "type": "div",
+                    "props": {
+                      "className": "rounded-3xl border-2 border-primary/20 bg-card p-3 shadow-xl"
+                    },
+                    "children": [
+                      {
+                        "type": "img",
+                        "props": {
+                          "src": "asset:hero",
+                          "alt": "A desk",
+                          "className": "rounded-2xl"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "figcaption",
+                    "props": {
+                      "className": "mt-3 flex items-center gap-2 px-2 text-xs text-muted-foreground"
+                    },
+                    "children": [
+                      {
+                        "type": "Clock",
+                        "props": {
+                          "className": "size-3.5 text-primary"
+                        }
+                      },
+                      "Rendered in seconds, no engine call"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "props": {
+              "className": "border-y border-border/60 bg-muted/40 py-12"
+            },
+            "children": [
+              {
+                "type": "div",
+                "props": {
+                  "className": "mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-3"
+                },
+                "children": [
+                  {
+                    "type": "Metric",
+                    "props": {
+                      "collection": "products",
+                      "fn": "count",
+                      "label": "Products",
+                      "className": "flex flex-col gap-1"
+                    }
+                  },
+                  {
+                    "type": "Metric",
+                    "props": {
+                      "collection": "products",
+                      "fn": "max",
+                      "field": "stock",
+                      "label": "Largest stock",
+                      "format": "count"
+                    }
+                  },
+                  {
+                    "type": "Chart",
+                    "props": {
+                      "collection": "products",
+                      "kind": "bar",
+                      "fn": "sum",
+                      "field": "stock",
+                      "groupBy": "name",
+                      "className": "h-32 w-full"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "props": {
+              "className": "mx-auto max-w-7xl px-6 py-16"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "props": {
+                  "className": "heading font-heading text-3xl"
+                },
+                "children": [
+                  "Three of the products"
+                ]
+              },
+              {
+                "type": "CollectionStrip",
+                "props": {
+                  "collection": "products",
+                  "limit": 3,
+                  "sortBy": "name",
+                  "className": "mt-8"
+                },
+                "children": [
+                  {
+                    "type": "ItemList",
+                    "props": {
+                      "className": "grid gap-6 sm:grid-cols-3"
+                    },
+                    "children": [
+                      {
+                        "type": "article",
+                        "props": {
+                          "className": "rounded-2xl border bg-card p-4"
+                        },
+                        "children": [
+                          {
+                            "type": "RecordImage",
+                            "props": {
+                              "field": "image",
+                              "className": "rounded-xl"
+                            }
+                          },
+                          {
+                            "type": "h3",
+                            "props": {
+                              "className": "mt-3 font-heading text-lg"
+                            },
+                            "children": [
+                              {
+                                "type": "RecordField",
+                                "props": {
+                                  "field": "name"
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "type": "RecordPrice",
+                            "props": {
+                              "field": "stock",
+                              "currency": "GBP",
+                              "className": "text-sm text-muted-foreground"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Empty",
+                    "props": {
+                      "className": "text-sm text-muted-foreground"
+                    },
+                    "children": [
+                      "No products yet."
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "props": {
+              "className": "mx-auto max-w-7xl px-6 pb-16"
+            },
+            "children": [
+              {
+                "type": "CollectionBrowser",
+                "props": {
+                  "collection": "products",
+                  "pageSize": 1,
+                  "sortFields": [
+                    {
+                      "field": "name",
+                      "label": "Name"
+                    }
+                  ],
+                  "searchFields": [
+                    "name"
+                  ]
+                },
+                "children": [
+                  {
+                    "type": "div",
+                    "props": {
+                      "className": "flex flex-wrap items-center gap-3"
+                    },
+                    "children": [
+                      {
+                        "type": "SearchBox",
+                        "props": {
+                          "placeholder": "Search products",
+                          "className": "max-w-xs"
+                        }
+                      },
+                      {
+                        "type": "SortControl",
+                        "props": {
+                          "label": "Sort"
+                        }
+                      },
+                      {
+                        "type": "ResultCount"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ItemList",
+                    "props": {
+                      "className": "mt-6 divide-y rounded-xl border"
+                    },
+                    "children": [
+                      {
+                        "type": "div",
+                        "props": {
+                          "className": "flex items-center justify-between p-3"
+                        },
+                        "children": [
+                          {
+                            "type": "RecordField",
+                            "props": {
+                              "field": "name",
+                              "className": "font-medium"
+                            }
+                          },
+                          {
+                            "type": "RecordField",
+                            "props": {
+                              "field": "price"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Pagination",
+                    "props": {
+                      "className": "mt-4 flex items-center justify-between text-sm"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Tabs",
+            "props": {
+              "defaultValue": "why",
+              "className": "mx-auto max-w-3xl px-6 pb-16"
+            },
+            "children": [
+              {
+                "type": "TabsList",
+                "children": [
+                  {
+                    "type": "TabsTrigger",
+                    "props": {
+                      "value": "why"
+                    },
+                    "children": [
+                      "Why"
+                    ]
+                  },
+                  {
+                    "type": "TabsTrigger",
+                    "props": {
+                      "value": "how"
+                    },
+                    "children": [
+                      "How"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "TabsContent",
+                "props": {
+                  "value": "why"
+                },
+                "children": [
+                  {
+                    "type": "p",
+                    "props": {
+                      "className": "text-muted-foreground"
+                    },
+                    "children": [
+                      "The model designs the layout; code keeps the data exact."
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "TabsContent",
+                "props": {
+                  "value": "how"
+                },
+                "children": [
+                  {
+                    "type": "p",
+                    "props": {
+                      "className": "text-muted-foreground"
+                    },
+                    "children": [
+                      "One JSON tree per page, checked and bound by the generator."
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Faq",
+            "props": {
+              "title": "Questions about designed pages",
+              "items": [
+                {
+                  "question": "Can a tree use a library section?",
+                  "answer": "Yes: this one is a Faq node."
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   ],
   "content": [
-    { "collection": "products", "records": [
-      { "id": "blue", "name": "Blue mug", "price": "£12", "stock": 12, "image": "asset:mug" },
-      { "id": "green", "name": "Green mug", "price": "£14", "stock": 30, "image": "asset:mug" } ] },
-    { "collection": "news", "records": [
-      { "title": "We launched", "summary": "The library is live.", "date": "2026-10-29" } ] },
-    { "collection": "faq", "records": [ { "question": "Is it fast?", "answer": "Yes." } ] },
-    { "collection": "plans", "records": [
-      { "name": "Free", "price": 0, "features": ["One site"] },
-      { "name": "Pro", "price": "£9", "features": ["Ten sites", "Support"], "highlighted": true, "icon": "intent:rocket", "cta": { "label": "Buy", "page": "catalogue" } } ] },
-    { "collection": "testimonials", "records": [ { "quote": "Lovely.", "author": "Sam", "role": "Owner" } ] }
+    {
+      "collection": "products",
+      "records": [
+        {
+          "id": "blue",
+          "name": "Blue mug",
+          "price": "£12",
+          "stock": 12,
+          "image": "asset:mug"
+        },
+        {
+          "id": "green",
+          "name": "Green mug",
+          "price": "£14",
+          "stock": 30,
+          "image": "asset:mug"
+        }
+      ]
+    },
+    {
+      "collection": "news",
+      "records": [
+        {
+          "title": "We launched",
+          "summary": "The library is live.",
+          "date": "2026-10-29"
+        }
+      ]
+    },
+    {
+      "collection": "faq",
+      "records": [
+        {
+          "question": "Is it fast?",
+          "answer": "Yes."
+        }
+      ]
+    },
+    {
+      "collection": "plans",
+      "records": [
+        {
+          "name": "Free",
+          "price": 0,
+          "features": [
+            "One site"
+          ]
+        },
+        {
+          "name": "Pro",
+          "price": "£9",
+          "features": [
+            "Ten sites",
+            "Support"
+          ],
+          "highlighted": true,
+          "icon": "intent:rocket",
+          "cta": {
+            "label": "Buy",
+            "page": "catalogue"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "testimonials",
+      "records": [
+        {
+          "quote": "Lovely.",
+          "author": "Sam",
+          "role": "Owner"
+        }
+      ]
+    }
   ],
   "assets": [
-    { "id": "hero", "alt": "A desk" }, { "id": "mug", "alt": "A mug" }, { "id": "work", "alt": "A project" }
+    {
+      "id": "hero",
+      "alt": "A desk"
+    },
+    {
+      "id": "mug",
+      "alt": "A mug"
+    },
+    {
+      "id": "work",
+      "alt": "A project"
+    },
+    {
+      "id": "talk",
+      "kind": "video",
+      "alt": "A talk on sourdough",
+      "source": "youtube",
+      "video": {
+        "provider": "youtube",
+        "id": "aqz-KE-bpKQ",
+        "title": "A talk on sourdough",
+        "poster": "https://i.ytimg.com/vi/aqz-KE-bpKQ/hqdefault.jpg",
+        "duration": 200
+      },
+      "credit": {
+        "provider": "youtube",
+        "name": "A channel",
+        "profileUrl": "https://www.youtube.com/channel/UC000",
+        "sourceUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+        "title": "A talk on sourdough"
+      }
+    },
+    {
+      "id": "clip",
+      "kind": "video",
+      "alt": "The oven at dawn",
+      "source": "pixabay",
+      "video": {
+        "provider": "pixabay",
+        "id": "1",
+        "url": "https://cdn.pixabay.com/video/sample.mp4",
+        "width": 1280,
+        "height": 720,
+        "duration": 6
+      },
+      "credit": {
+        "provider": "pixabay",
+        "name": "A filmer",
+        "profileUrl": "https://pixabay.com/users/a-filmer-1/",
+        "sourceUrl": "https://pixabay.com/videos/id-1/"
+      }
+    }
   ]
 }

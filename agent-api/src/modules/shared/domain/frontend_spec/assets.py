@@ -6,6 +6,9 @@ photo              an AI photograph (19.2) → public/assets/<id>.webp; until ma
 upload:<id>        a file the user uploaded (15.4) → public/assets/<id>.<ext>
 lucide:<Name>      a lucide-react icon from the pinned base
 https://…          a remote image (never fetched by the sandbox)
+search             a video to find at draft time (Epic 31; `query`, `place`) → youtube | pixabay once found
+youtube            a YouTube video, embedded in its player on play (`video.id`)
+pixabay            a Pixabay video file, played by our own <video> (`video.url`, a stored poster)
 """
 
 import re
@@ -13,7 +16,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-RenderMode = Literal["svg-component", "public-file", "remote", "icon", "placeholder", "photo"]
+RenderMode = Literal[
+    "svg-component", "public-file", "remote", "icon", "placeholder", "photo", "video-embed", "video-file"
+]
+VIDEO_SOURCES = frozenset({"search", "youtube", "pixabay"})  # Epic 31: `kind: video` only
 
 # The base's lucide-react icon names, written by scripts/frontend-base.sh next to the base's lock file.
 LUCIDE_ICONS_FILE = Path(__file__).resolve().parents[5] / "templates" / "nextjs_base" / "lucide-icons.txt"
@@ -35,8 +41,8 @@ def lucide_icons(path: Path = LUCIDE_ICONS_FILE) -> frozenset[str]:
 
 
 def source_kind(source: str) -> str:
-    """placeholder | generate | photo | upload | lucide | https | insecure (another scheme) | unknown."""
-    if source in ("placeholder", "generate", "photo"):
+    """placeholder | generate | photo | search | youtube | pixabay | upload | lucide | https | insecure | unknown."""
+    if source in ("placeholder", "generate", "photo") or source in VIDEO_SOURCES:
         return source
     if source.startswith("upload:"):
         return "upload"
@@ -56,6 +62,8 @@ def render_mode(asset: dict) -> RenderMode:
         "upload": "public-file",
         "https": "remote",
         "lucide": "icon",
+        "youtube": "video-embed",
+        "pixabay": "video-file",
     }.get(source_kind(asset.get("source") or "placeholder"), "placeholder")  # type: ignore[return-value]
 
 

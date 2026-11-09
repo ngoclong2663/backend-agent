@@ -275,7 +275,7 @@ def test_a_static_draft_through_the_api_inlines_the_inputs(client, user_headers,
     draft_id = _draft(client, user_headers, "static", "A website for a two-person design studio: services and work.")
     draft = _run_draft(tmp_path, made, draft_id)
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [c["prompt"] for c in draft["usage"]["calls"]] == ["draft_frontend_spec@v10"]
+    assert [c["prompt"] for c in draft["usage"]["calls"]] == ["draft_frontend_spec@v11"]
     assert draft["usage"]["modelCalls"] == 1 and draft["usage"]["inputTokens"] == 1000
     prompt = json.loads(made.requests[-1].content)["contents"][0]["parts"][0]["text"]
     assert "## Inputs" in prompt and "FrontendSpec schema digest" in prompt and ".bga/" not in prompt
@@ -291,7 +291,7 @@ def test_a_repair_round_sends_the_files_and_applies_patches(client, user_headers
     made = engine(tmp_path, [answer({"files": {"frontend-spec.json": spec, "notes.json": {}}}), answer(fix)])
     draft_id = _draft(client, user_headers, "static", "A website for a two-person design studio: services and work.")
     draft = _run_draft(tmp_path, made, draft_id)
-    assert [c["prompt"] for c in draft["usage"]["calls"]] == ["draft_frontend_spec@v10", "repair_spec@v3"]
+    assert [c["prompt"] for c in draft["usage"]["calls"]] == ["draft_frontend_spec@v11", "repair_spec@v3"]
     assert draft["status"] == "SUCCEEDED", draft["validation"]
     repair_prompt = json.loads(made.requests[-1].content)["contents"][0]["parts"][0]["text"]
     assert '"patches"' in repair_prompt and "## The files" in repair_prompt and "SCHEMA_VIOLATION" in repair_prompt
@@ -309,7 +309,7 @@ def test_a_repair_that_changes_nothing_ends_the_loop(client, user_headers, tmp_p
     draft_id = _draft(client, user_headers, "static", "A website for a two-person design studio: services and work.")
     draft = _run_draft(tmp_path, made, draft_id)
     assert draft["status"] == "NEEDS_REVIEW"
-    assert [c["prompt"] for c in draft["usage"]["calls"]] == ["draft_frontend_spec@v10", "repair_spec@v3"], (
+    assert [c["prompt"] for c in draft["usage"]["calls"]] == ["draft_frontend_spec@v11", "repair_spec@v3"], (
         "the second repair round is not bought: the first changed nothing"
     )
     assert "changed nothing" in draft["error"]
@@ -335,7 +335,7 @@ def test_a_static_draft_designs_its_pages_through_the_api(client, user_headers, 
     draft = _run_draft(tmp_path, made, draft_id)
     assert draft["status"] == "SUCCEEDED", draft["validation"]
     prompts = [call["prompt"] for call in draft["usage"]["calls"]]
-    assert prompts[0] == "draft_frontend_spec@v10" and "draft_tree@v1" in prompts, prompts
+    assert prompts[0] == "draft_frontend_spec@v11" and "draft_tree@v1" in prompts, prompts
     assert all(call["status"] == "ok" for call in draft["usage"]["calls"]), draft["usage"]["calls"]
     pages = draft["frontend_spec"]["pages"]
     assert all(page.get("tree") for page in pages), draft["assumptions"]

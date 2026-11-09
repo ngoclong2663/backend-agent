@@ -14,6 +14,8 @@ BUILTIN_SECTIONS: dict[str, dict[str, Any]] = {
     "Pricing": {"uses": ["card", "badge", "button"], "description": "Plans side by side"},
     "Stats": {"uses": ["card"], "description": "Key numbers"},
     "Gallery": {"uses": ["aspect-ratio"], "description": "Image grid"},
+    # Epic 31: videos people watch (a featured one, or a grid), only when the requirement has something to watch
+    "Video": {"uses": [], "description": "A featured video, or a grid of two to six videos, each credited"},
     "RichText": {"uses": [], "description": "Formatted text block"},
     "ContactInfo": {"uses": ["card"], "description": "Address, e-mail, phone, map link"},
     # Story 20.8: sections for what businesses really have, so pages follow the requirement, not a landing template.

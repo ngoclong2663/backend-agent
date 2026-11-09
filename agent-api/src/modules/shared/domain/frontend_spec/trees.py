@@ -81,8 +81,17 @@ DATA_RECORD = frozenset({"ItemList", "RecordField", "RecordImage", "RecordPrice"
 DATA_WRITE = frozenset({"RecordForm", "RecordAction"})
 DATA_AGGREGATE = frozenset({"Metric", "Chart"})
 DATA_STATES = frozenset({"Empty", "Loading", "Error"})
+# Epic 31 (D8): the library's video pieces, bound to a `video` asset (`asset: "asset:<id>"`); raw `video` / `iframe`
+# elements stay removed
+DATA_MEDIA = frozenset({"VideoEmbed", "BackgroundVideo"})
 DATA_COMPONENTS = (
-    frozenset(DATA_CONTAINERS) | DATA_LIST_CONTROLS | DATA_RECORD | DATA_WRITE | DATA_AGGREGATE | DATA_STATES
+    frozenset(DATA_CONTAINERS)
+    | DATA_LIST_CONTROLS
+    | DATA_RECORD
+    | DATA_WRITE
+    | DATA_AGGREGATE
+    | DATA_STATES
+    | DATA_MEDIA
 )
 AGGREGATE_FUNCTIONS = ("count", "sum", "avg", "min", "max")
 CHART_KINDS = ("bar", "line", "area", "donut")
@@ -173,11 +182,15 @@ def page_refs(node: Any) -> Iterator[tuple[str, str]]:
 
 
 def asset_refs(node: Any) -> Iterator[tuple[str, str]]:
-    """(asset id, pointer) for every `img src="asset:…"`."""
+    """(asset id, pointer) for every `img src="asset:…"` and every video component's `asset` (Epic 31)."""
     for item, path, _ in walk(node):
-        src = (item.get("props") or {}).get("src")
+        props = item.get("props") or {}
+        src = props.get("src")
         if isinstance(src, str) and (match := _ASSET_REF.match(src)):
             yield match.group(1), f"{path}/props/src"
+        asset = props.get("asset")
+        if item.get("type") in DATA_MEDIA and isinstance(asset, str) and (match := _ASSET_REF.match(asset)):
+            yield match.group(1), f"{path}/props/asset"
 
 
 def class_problems(class_name: Any) -> list[str]:

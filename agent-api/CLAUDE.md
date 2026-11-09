@@ -201,6 +201,19 @@ Agent-specific notes:
   and `media`; the design brief has a `duration` role and takes a video or audio field as `media` (a video record's
   detail defaults to `media`); `draft_app@v6` names the types and `drafting/app.fix_media_fields` turns a media-like
   `file` into its kind. `examples/specs/media-library.json` is the synthetic media app (also in the design report).
+- Sample videos (Epic 31): `VIDEO_PROVIDERS` (`youtube`, `pixabay`; `YOUTUBE_API_KEY`, `PIXABAY_API_KEY`) →
+  `videos/factory.providers_for(place)` in the place's order (`watch`: YouTube then Pixabay; `background`: Pixabay;
+  `seed`: Pixabay then YouTube). `videos/youtube.py` (search.list with the epic's filters, videos.list for the
+  duration and `embeddable`, a daily unit counter under a margin), `videos/pixabay.py` (film clips, the file chosen by
+  width and byte budget per place, the descriptive `User-Agent`, `X-RateLimit-Remaining`, posters downloaded into the
+  cache), both cached a day under `ARTIFACT_ROOT/asset-cache/video/`. A site drafts a `video` asset as
+  `source: "search"` + `query` + `place` (`draft_frontend_spec@v11`, only with a provider on); `videos/stock.
+  stock_site_videos` resolves it (`source` → `youtube` / `pixabay`, the code-only `video` and `credit`), the `Video`
+  section and the hero's `backgroundVideo` render through `components/assets/VideoEmbed.tsx` (a facade: no YouTube
+  request before play) and `BackgroundVideo.tsx` (muted, pausable, still under reduced motion); trees take them as data
+  components. Apps: `stock_seed_videos` fills seeded `video` fields (a Pixabay file, else a YouTube watch link) with
+  `app.json` `videoCredits`; the kit's `VideoPlayer` shows a YouTube link as the facade and the credit under the player.
+  `make video-keys` checks the keys. `FRONTEND_MAX_PHOTOS` now caps paid photos only (`STOCK_PHOTO_LIMIT` for stock).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

@@ -136,6 +136,7 @@ export type THeroContent = {
   body?: string;
   image?: string;
   images?: string[];
+  backgroundVideo?: string;
   cta?: TCta;
   secondaryCta?: TCta;
 };
@@ -325,4 +326,20 @@ export type TTimelineContent = {
   description?: string;
   items?: TTimelineItem[];
   form?: "vertical" | "alternating";
+};
+
+export type TVideoItem = {
+  video: string;
+  title?: string;
+  caption?: string;
+};
+
+export type TVideoContent = {
+  background?: "default" | "muted" | "primary" | "image";
+  backgroundImage?: string;
+  title?: string;
+  description?: string;
+  video?: string;
+  items?: TVideoItem[];
+  columns?: 2 | 3 | 4;
 };

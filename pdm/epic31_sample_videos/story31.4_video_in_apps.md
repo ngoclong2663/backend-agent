@@ -33,7 +33,7 @@ record, so that the app looks like a working product on mocks and in the preview
 ## Acceptance criteria
 
 - [ ] An app draft with video records and the providers on plays real videos on mocks and in the preview.
-- [ ] Videos uploaded by users still play in the native player with their subtitles.
+- [x] Videos uploaded by users still play in the native player with their subtitles.
 - [ ] Without the providers the app seeds Epic 29's samples as before.
 
 ## Verify
@@ -43,3 +43,14 @@ record, so that the app looks like a working product on mocks and in the preview
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09 (unit part).** `videos/stock.stock_seed_videos`: each seeded `video` field gets a video found from
+the record's label (one search per distinct label), a Pixabay file first, else a YouTube watch link; the record's empty
+image field gets YouTube's thumbnail (hotlinking allowed); a Pixabay poster is never hotlinked, so in apps the player
+shows the first frame (deviation: Pixabay posters ship only with sites, as public files); nothing found keeps Epic 29's
+sample with a note. The drafting app flow runs it after the seed photos; `app.json` gains `videoCredits` (by URL).
+Kit: `VideoPlayer` recognises a YouTube link (`youtubeId`) and renders the facade (poster, play, the iframe on click,
+the credit); a Pixabay or an uploaded file plays natively with the record's subtitle tracks, the credit under the
+player when the app has one. The storage plugin's rule stands: uploads take keys; a seeded outside link is returned as
+the field's URL (`signed_url`). Tests: `test_sample_videos.py` (Pixabay first, then YouTube, posters, credits in
+`app.json`; the samples kept without a provider). Epic 30's watch page and shelves are not built yet (30.5).

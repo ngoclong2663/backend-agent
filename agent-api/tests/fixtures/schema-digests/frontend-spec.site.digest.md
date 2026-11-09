@@ -24,6 +24,8 @@ type Asset = {
   style?: string | null;
   aspectRatio?: "16:9" | "4:3" | "1:1" | "3:4" | "21:9" | null;
   decorative?: boolean;
+  query?: string | null;
+  place?: "watch" | "background" | null;
 };
 
 type Component = {
@@ -267,6 +269,7 @@ type HeroProps = {
   body?: string | null;
   image?: string | null;
   images?: string[] | null;
+  backgroundVideo?: string | null;
   cta?: Cta | null;
   secondaryCta?: Cta | null;
 };
@@ -375,6 +378,23 @@ type GalleryProps = {
   backgroundImage?: string | null;
   title?: string | null;
   items?: GalleryItem[] | null;
+  columns?: 2 | 3 | 4 | null;
+};
+
+type VideoItem = {
+  video: string;
+  title?: string | null;
+  caption?: string | null;
+};
+
+// Epic 31 (Story 31.3): one featured video (`video`) with a heading and a short text, or a grid of two to six videos with their titles (`items`).
+type VideoProps = {
+  background?: "default" | "muted" | "primary" | "image";
+  backgroundImage?: string | null;
+  title?: string | null;
+  description?: string | null;
+  video?: string | null;
+  items?: VideoItem[] | null;
   columns?: 2 | 3 | 4 | null;
 };
 

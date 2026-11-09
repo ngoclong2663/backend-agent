@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Container } from "@/components/layout/Container";
 import { Backdrop, surfaceClass } from "@/components/layout/Section";
 import { cn } from "@/lib/utils";
+import { BackgroundVideo } from "@/components/assets/BackgroundVideo";
 import { AssetImage } from "./AssetImage";
 import { CtaLink } from "./CtaLink";
 import { displayClass, headlineClass } from "./styles";
@@ -64,22 +65,34 @@ function Band({ className, children }: { className?: string; children: ReactNode
  * "CTA above the fold" rule hold in every layout.
  */
 export function Hero(props: HeroProps) {
-  const { variant = "split", background = "default", backgroundImage, image, images } = props;
+  const { variant = "split", background = "default", backgroundImage, backgroundVideo, image, images } = props;
   const collage = [image, ...(images ?? [])].filter((item, index, all): item is string => !!item && all.indexOf(item) === index);
-  const layout = variant === "collage" && collage.length < 2 ? "split" : variant;
+  // Epic 31 (Story 31.3): a background clip wants text over media: the banner (or stage) layout
+  const layout = variant === "collage" && collage.length < 2 ? "split" : backgroundVideo && variant !== "stage" ? "banner" : variant;
 
   if (layout === "banner" || layout === "stage") {
     const stage = layout === "stage";
     const backdrop = image ?? (background === "image" ? backgroundImage : undefined);
-    const surface = backdrop ? "image" : background === "default" ? "primary" : background;
+    const surface = backdrop || backgroundVideo ? "image" : background === "default" ? "primary" : background;
     return (
       <section
         className={cn(
           stage ? "flex min-h-[min(85svh,820px)] items-end pt-32 pb-12 sm:pb-16" : "py-24 sm:py-32",
           surfaceClass(surface),
         )}
+        data-bga-hero-video={backgroundVideo ? "" : undefined}
       >
-        {backdrop && (
+        {backgroundVideo ? (
+          <Backdrop
+            className={
+              stage
+                ? "bg-linear-to-t from-background via-background/70 to-background/10"
+                : "bg-linear-to-r from-background via-background/75 to-background/30"
+            }
+          >
+            <BackgroundVideo asset={backgroundVideo} />
+          </Backdrop>
+        ) : backdrop && (
           <Backdrop
             className={
               stage

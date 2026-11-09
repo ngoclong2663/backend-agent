@@ -159,7 +159,7 @@ def test_static_draft_writes_only_a_frontend_spec(client, user_headers, tmp_path
     assert draft["status"] == "SUCCEEDED", draft["validation"]
     assert draft["frontend_spec"]["project"]["mode"] == "static" and draft["backend_spec"] is None
     assert draft["unresolved"] == [] and set(draft["validation"]) == {"frontend"}
-    assert draft["usage"]["calls"][0]["prompt"] == "draft_frontend_spec@v10"
+    assert draft["usage"]["calls"][0]["prompt"] == "draft_frontend_spec@v11"
     # Story 20.4: three direction cards from the fake's concept library, the best fit applied, its notes after the
     # engine's; the drafted home sections are kept as the pool.
     design = draft["design"]
@@ -270,7 +270,7 @@ def test_stock_phrases_get_one_repair_round(client, user_headers, tmp_path):
     }
     text = "A website for a two-person design studio: services, work, about and contact."
     draft = _run(tmp_path, _create(client, user_headers, "static", text), FakeEngine(tmp_path, scenario))
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_frontend_spec@v10", "repair_spec@v3"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_frontend_spec@v11", "repair_spec@v3"]
     assert draft["status"] == "SUCCEEDED" and draft["attempts"] == 0
     cta = next(s for s in draft["frontend_spec"]["pages"][0]["sections"] if s["id"] == "cta")
     assert cta["content"]["cta"]["label"] == "Start your project"

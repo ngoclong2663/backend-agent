@@ -9,7 +9,16 @@ from pydantic import ValidationError
 from src.modules.shared.domain.backend_spec.issues import Severity, SpecIssue, ValidationReport
 
 from .app import APP_SECTIONS
-from .assets import ICON_NAME, MAX_GENERATED_ASSETS, MAX_PHOTOS, SVG_KINDS, UPLOAD_ID, lucide_icons, source_kind
+from .assets import (
+    ICON_NAME,
+    MAX_GENERATED_ASSETS,
+    MAX_PHOTOS,
+    SVG_KINDS,
+    UPLOAD_ID,
+    VIDEO_SOURCES,
+    lucide_icons,
+    source_kind,
+)
 from .catalogue import BUILTIN_SECTIONS, SHADCN_PRIMITIVES, THEME_PRESETS
 from .copy_rules import stock_copy
 from .fonts import FONTS, closest_font
@@ -427,7 +436,29 @@ class _SemanticChecker:
                         f"{path}/source",
                         f"Asset '{asset.id}': a {asset.kind} cannot be a photo",
                         hint="photos are for kinds image, illustration and logo; icons come from lucide:<Name>, "
-                        "patterns are generated, videos and files are uploaded",
+                        "patterns are generated, videos are searched (Epic 31) or uploaded, files are uploaded",
+                    )
+            elif kind in VIDEO_SOURCES:  # Epic 31: a video found at draft time, or still to find
+                if asset.kind != "video":
+                    self._add(
+                        C.FE_UNSUPPORTED_ASSET_SOURCE,
+                        f"{path}/source",
+                        f"Asset '{asset.id}': a {asset.kind} cannot be a video search",
+                        hint='Videos are `"kind": "video"` with `"source": "search"`, a `query` and a `place`',
+                    )
+                elif kind == "search" and not (asset.query or asset.alt):
+                    self._add(
+                        C.FE_UNSUPPORTED_ASSET_SOURCE,
+                        f"{path}/query",
+                        f"Asset '{asset.id}': a video search needs a `query` (what the video shows)",
+                        hint='e.g. "a potter centering clay on the wheel"',
+                    )
+                elif kind != "search" and asset.video is None:
+                    self._add(
+                        C.FE_UNSUPPORTED_ASSET_SOURCE,
+                        f"{path}/source",
+                        f"Asset '{asset.id}': source '{kind}' is written by the drafting code with its `video`",
+                        hint='Draft a video as "source": "search" with a "query"; code resolves it',
                     )
             elif kind == "lucide":
                 name = asset.source.removeprefix("lucide:")
@@ -643,7 +674,8 @@ class _SemanticChecker:
         if item is None:
             return
         data = section.data
-        if section.content.get("items") is None and data is None:
+        featured = name == "Video" and section.content.get("video") is not None  # Epic 31: one featured video
+        if section.content.get("items") is None and data is None and not featured:
             self._add(
                 C.FE_INVALID_PROPS,
                 f"{path}/content/items",

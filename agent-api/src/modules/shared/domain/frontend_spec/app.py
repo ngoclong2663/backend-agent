@@ -212,7 +212,7 @@ _APP_ONLY_PROPERTIES = {
     "FrontendSpecV1": ("app",),
     "Project": ("flow",),
     "FormField": ("help", "currency", "unit", "reference", "upload", "transition"),
-    "Asset": ("credit",),  # Epic 27: written by code from the photo service, never drafted
+    "Asset": ("credit", "video"),  # Epic 27 / 31: written by code from the photo and video services, never drafted
 }
 _APP_ONLY_DEFS = (
     "AppOutline",
@@ -226,7 +226,7 @@ _APP_ONLY_DEFS = (
 )
 DESIGN_DEFS = ("AppDesign", "AppEntityDesign", "AppFieldRoles", "AppLook", "AppArea", "AppRequestedStyle")  # Epic 23
 _APP_ONLY_DEFS += DESIGN_DEFS
-_APP_ONLY_DEFS += ("AssetCredit",)
+_APP_ONLY_DEFS += ("AssetCredit", "AssetVideo")
 # Epic 23: the outline's parts the `draft_app@v2` prompt does not explain; its outline digest and answer schema leave
 # them out, so v2 reads as before (`draft_app@v3` asks for them).
 DESIGN_PARTS = ("design", "areas")

@@ -4,6 +4,8 @@ import { createContext, Suspense, useContext, useMemo, type ComponentType, type 
 import Link from "next/link";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AssetImage } from "@/components/assets/AssetImage";
+import { BackgroundVideo } from "@/components/assets/BackgroundVideo";
+import { VideoEmbed } from "@/components/assets/VideoEmbed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatValue } from "@/components/sections/format";
@@ -260,6 +262,15 @@ function RecordImage({ field = "image", altField, ...props }: TDataProps) {
   return <AssetImage asset={asset} className={className(props)} />;
 }
 
+/** Epic 31 (D8): a designed page shows a video only through the library's pieces, bound to a `video` asset. */
+function TreeVideoEmbed({ asset, ...props }: TDataProps) {
+  return typeof asset === "string" ? <VideoEmbed asset={asset} className={className(props)} /> : null;
+}
+
+function TreeBackgroundVideo({ asset, ...props }: TDataProps) {
+  return typeof asset === "string" ? <BackgroundVideo asset={asset} className={className(props)} /> : null;
+}
+
 function RecordStars({ field = "rating", max = 5, ...props }: TDataProps) {
   const record = useRecord();
   if (!record) return null;
@@ -409,6 +420,8 @@ export const DATA_COMPONENTS: Record<string, ComponentType<TDataProps>> = {
   ItemList,
   RecordField,
   RecordImage,
+  VideoEmbed: TreeVideoEmbed,
+  BackgroundVideo: TreeBackgroundVideo,
   RecordPrice,
   RecordLink,
   RecordStars,

@@ -62,6 +62,7 @@ EMULATED_CODES = frozenset(
 # Plugins whose operations a browser never calls (incoming webhooks, the worker): their scenarios are the backend's.
 UNEMULATED_PLUGINS = frozenset({"webhooks", "jobs", "email"})
 DEFAULT_ICON = "LayoutGrid"
+VIDEO_CREDIT_KEYS = ("provider", "name", "profileUrl", "sourceUrl", "title")  # Epic 31
 
 
 def icon_name(name: str | None, default: str = DEFAULT_ICON) -> str:
@@ -239,7 +240,17 @@ def app_data(plan: dict[str, Any], spec: dict[str, Any], contract: dict[str, Any
         "photoCredits": {
             asset["source"]: {key: asset["credit"][key] for key in ("name", "profileUrl", "sourceUrl")}
             for asset in spec.get("assets") or []
-            if isinstance(asset.get("credit"), dict) and str(asset.get("source") or "").startswith("https://")
+            if isinstance(asset.get("credit"), dict)
+            and str(asset.get("source") or "").startswith("https://")
+            and asset.get("kind") != "video"
+        },
+        # Epic 31: the seeded records' videos (by URL): the provider's credit, shown under the player
+        "videoCredits": {
+            asset["source"]: {k: v for k, v in asset["credit"].items() if k in VIDEO_CREDIT_KEYS and v}
+            for asset in spec.get("assets") or []
+            if isinstance(asset.get("credit"), dict)
+            and str(asset.get("source") or "").startswith("https://")
+            and asset.get("kind") == "video"
         },
     }
 

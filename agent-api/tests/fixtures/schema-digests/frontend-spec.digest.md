@@ -87,6 +87,7 @@ type AppFieldRoles = {
   stat?: string | null;
   price?: string | null;
   avatar?: string | null;
+  duration?: string | null;
 };
 
 type AppHighlight = {
@@ -154,15 +155,31 @@ type Asset = {
   aspectRatio?: "16:9" | "4:3" | "1:1" | "3:4" | "21:9" | null;
   decorative?: boolean;
   credit?: AssetCredit | null;
+  query?: string | null;
+  place?: "watch" | "background" | null;
+  video?: AssetVideo | null;
 };
 
-// Epic 27: a stock photo's credit, shown with it as the photo service requires ("Photo by <name> on Unsplash").
+// Epic 27: a stock photo's credit, shown with it as the photo service requires ("Photo by <name> on Unsplash"); Epic 31: a sample video's ("<title> · <channel> on YouTube", "Video by <name> on Pixabay").
 type AssetCredit = {
-  provider?: string;
+  provider?: "unsplash" | "youtube" | "pixabay";
   name: string;
   profileUrl: string;
   sourceUrl: string;
   photoId?: string | null;
+  title?: string | null;
+};
+
+// Epic 31 (code-only, written by the drafting code from a provider's hit): what a `video` asset plays.
+type AssetVideo = {
+  provider: "youtube" | "pixabay";
+  id: string;
+  title?: string | null;
+  url?: string | null;
+  poster?: string | null;
+  width?: number | null;
+  height?: number | null;
+  duration?: number | null;
 };
 
 type Component = {
@@ -434,6 +451,7 @@ type HeroProps = {
   body?: string | null;
   image?: string | null;
   images?: string[] | null;
+  backgroundVideo?: string | null;
   cta?: Cta | null;
   secondaryCta?: Cta | null;
 };
@@ -542,6 +560,23 @@ type GalleryProps = {
   backgroundImage?: string | null;
   title?: string | null;
   items?: GalleryItem[] | null;
+  columns?: 2 | 3 | 4 | null;
+};
+
+type VideoItem = {
+  video: string;
+  title?: string | null;
+  caption?: string | null;
+};
+
+// Epic 31 (Story 31.3): one featured video (`video`) with a heading and a short text, or a grid of two to six videos with their titles (`items`).
+type VideoProps = {
+  background?: "default" | "muted" | "primary" | "image";
+  backgroundImage?: string | null;
+  title?: string | null;
+  description?: string | null;
+  video?: string | null;
+  items?: VideoItem[] | null;
   columns?: 2 | 3 | 4 | null;
 };
 

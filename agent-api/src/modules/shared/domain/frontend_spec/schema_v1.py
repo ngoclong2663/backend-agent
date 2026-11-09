@@ -316,13 +316,33 @@ AspectRatio = Literal["16:9", "4:3", "1:1", "3:4", "21:9"]
 
 
 class AssetCredit(SpecModel):
-    """Epic 27: a stock photo's credit, shown with it as the photo service requires ("Photo by <name> on Unsplash")."""
+    """Epic 27: a stock photo's credit, shown with it as the photo service requires ("Photo by <name> on Unsplash");
+    Epic 31: a sample video's ("<title> · <channel> on YouTube", "Video by <name> on Pixabay")."""
 
-    provider: Literal["unsplash"] = "unsplash"
+    provider: Literal["unsplash", "youtube", "pixabay"] = "unsplash"
     name: str = Field(min_length=1, max_length=120)
     profile_url: str = Field(pattern=r"^https://", max_length=500)
     source_url: str = Field(pattern=r"^https://", max_length=500)
     photo_id: str | None = Field(default=None, max_length=64)
+    title: str | None = Field(default=None, max_length=200)  # Epic 31: the video's title (YouTube)
+
+
+VideoPlace = Literal["watch", "background"]
+
+
+class AssetVideo(SpecModel):
+    """Epic 31 (code-only, written by the drafting code from a provider's hit): what a `video` asset plays. YouTube:
+    the video id (embedded in YouTube's player on play); Pixabay: the file's URL (our own `<video>`), its poster (a
+    file of the site: Pixabay's images are not hotlinked), size and duration."""
+
+    provider: Literal["youtube", "pixabay"]
+    id: str = Field(min_length=1, max_length=64)
+    title: str | None = Field(default=None, max_length=200)
+    url: str | None = Field(default=None, pattern=r"^https://", max_length=2048)
+    poster: str | None = Field(default=None, max_length=2048)  # an https:// URL (YouTube) or a site path
+    width: int | None = Field(default=None, ge=1)
+    height: int | None = Field(default=None, ge=1)
+    duration: int | None = Field(default=None, ge=0)
 
 
 class Asset(SpecModel):
@@ -341,6 +361,11 @@ class Asset(SpecModel):
     aspect_ratio: AspectRatio | None = None  # default per kind
     decorative: bool = False  # no alt needed; rendered aria-hidden
     credit: AssetCredit | None = None  # Epic 27: a stock photo (an `https://` source) and who took it
+    # Epic 31: a `video` asset drafted as a search (`source: "search"`): what it should show and where it goes; the
+    # drafting code resolves it (`source` becomes `youtube` or `pixabay`, `video` the hit; both code-only)
+    query: str | None = Field(default=None, max_length=200)
+    place: VideoPlace | None = None
+    video: AssetVideo | None = None
 
 
 class FrontendSpecV1(SpecModel):

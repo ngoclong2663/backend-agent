@@ -349,6 +349,11 @@ export function NewGenerationView() {
                   {!submit.enginesReportedByWorker && (
                     <CardDescription>The worker is not reporting; engine availability may be stale.</CardDescription>
                   )}
+                  {submit.media && (
+                    <CardDescription data-bga-media-providers>
+                      Photos: {submit.media.photos}. Videos: {submit.media.videos.length ? submit.media.videos.join(", ") : "off"}.
+                    </CardDescription>
+                  )}
                 </CardHeader>
                 <CardContent className="py-4">
                   <GenerationOptionsForm form={submit.form} engines={submit.engines} mode={mode} />

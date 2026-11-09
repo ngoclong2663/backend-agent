@@ -16,6 +16,7 @@ from src.modules.shared.domain.backend_spec.naming import pluralize, to_camel, t
 from src.modules.shared.domain.frontend_spec import BUILTIN_SECTIONS, all_trees, iter_sections, route_params
 from src.modules.shared.domain.frontend_spec.assets import aspect_ratio, render_mode
 from src.modules.shared.domain.frontend_spec.trees import TREE_SHADCN
+from src.videos.cache import video_cache_dir
 
 from ..integration.contract import contract_operations, resolve
 from .renderer import custom_components, library_primitives, renderer_gaps
@@ -165,6 +166,16 @@ class _Planner:
                 entry["url"] = source
             elif mode == "icon":
                 entry["icon"] = source.removeprefix("lucide:")
+            elif mode in ("video-embed", "video-file") and isinstance(asset.get("video"), dict):
+                # Epic 31: the provider's hit; a Pixabay poster is a file of the site (its images are not hotlinked)
+                video = dict(asset["video"])
+                poster = video.get("poster")
+                if mode == "video-file" and isinstance(poster, str) and poster.startswith("/assets/"):
+                    entry["posterFile"] = f"public{poster}"
+                    entry["posterSource"] = str(video_cache_dir("pixabay") / "posters" / f"{video['id']}.jpg")
+                entry["video"] = video
+                if video.get("url"):
+                    entry["url"] = video["url"]
             planned.append(entry)
         return planned
 

@@ -39,6 +39,7 @@ CONTENT_SECTIONS = frozenset(
     {"Hero", "Features", "CallToAction", "Testimonials", "Faq", "Pricing", "Stats", "Gallery", "RichText"}
     | {"ContactInfo", "ActionBar"}
     | {"Steps", "Timeline", "Team", "PriceList", "Location", "Comparison", "Statement"}  # Story 20.8
+    | {"Video"}  # Epic 31
 )
 RECORD_SECTIONS = frozenset({"CardGrid", "List", "DataTable"})  # records of a collection or a list operation
 RENDERED = CONTENT_SECTIONS | RECORD_SECTIONS | LAYOUT_SECTIONS | {"DetailView", "Form"}

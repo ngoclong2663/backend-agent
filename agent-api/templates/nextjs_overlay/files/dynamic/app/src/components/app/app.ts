@@ -224,10 +224,23 @@ export type TDesign = {
 export type TArea = { id: string; label: string; roles: string[]; prefix: string; design: Partial<TDesign> };
 
 export type TPhotoCredit = { name: string; profileUrl: string; sourceUrl: string };
+export type TVideoCredit = { provider: "youtube" | "pixabay"; name: string; profileUrl?: string; sourceUrl: string; title?: string };
 
 /** Epic 27: the credit of a seeded stock photo, by its URL (none for an upload or an outside link). */
 export function photoCredit(url: string | null | undefined): TPhotoCredit | null {
   return (url && app.photoCredits?.[url]) || null;
+}
+
+/** Epic 31: the credit of a seeded sample video, by its URL (none for an upload). */
+export function videoCredit(url: string | null | undefined): TVideoCredit | null {
+  return (url && app.videoCredits?.[url]) || null;
+}
+
+/** Epic 31: the id of a YouTube link (`youtube.com/watch?v=`, `youtu.be/`, an embed), else null. */
+export function youtubeId(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = /(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/embed\/)([A-Za-z0-9_-]{6,})/.exec(url);
+  return match ? match[1] : null;
 }
 
 export type TApp = {
@@ -253,6 +266,8 @@ export type TApp = {
   photoCredits?: Record<string, TPhotoCredit>;
   /** Epic 29: which media kinds the app has (the shell adds the listening bar for audio). */
   media?: { video: boolean; audio: boolean; subtitles: boolean };
+  /** Epic 31: seeded sample videos by URL and their provider's credit (shown under the player). */
+  videoCredits?: Record<string, TVideoCredit>;
 };
 
 /** Story 26.4: one step of a workflow tour: who does it, where, and the action that performs it. Epic 28: its

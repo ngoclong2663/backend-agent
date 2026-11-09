@@ -52,7 +52,7 @@ def test_a_static_draft_designs_every_page(client, user_headers, tmp_path, monke
     assert draft["status"] == "SUCCEEDED", draft["validation"]
     prompts = [call["prompt"] for call in draft["usage"]["calls"]]
     pages = draft["frontend_spec"]["pages"]
-    assert prompts[0] == "draft_frontend_spec@v10" and prompts.count("draft_tree@v1") == len(pages) + 1, prompts
+    assert prompts[0] == "draft_frontend_spec@v11" and prompts.count("draft_tree@v1") == len(pages) + 1, prompts
     assert all(page.get("tree") for page in pages), [page["route"] for page in pages if not page.get("tree")]
     assert pages[0]["css"].startswith('[data-page="home"] .fake-rug'), "the page CSS is scoped by the draft"
     assert pages[0]["tree"]["children"][0]["props"]["animate"]["type"] == "fade-up"

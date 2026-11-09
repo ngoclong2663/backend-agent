@@ -79,6 +79,8 @@ export type TEngineList = {
   engines: TEngineInfo[];
   reportedByWorker: boolean;
   reportedAt: string | null;
+  /** Epic 27 / 31: the photo provider and the video providers the agent has on. */
+  media?: { photos: string; videos: string[] } | null;
 };
 
 export type TSpecKind = "backend" | "frontend";

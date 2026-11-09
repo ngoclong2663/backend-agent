@@ -48,8 +48,8 @@ real without me uploading videos.
 
 - [ ] A static draft of a requirement about something to watch shows real embedded videos with credits; a draft whose
       hero suits motion gets a background video that can be paused and stays still under reduced motion.
-- [ ] No YouTube request happens before a user clicks play.
-- [ ] Without the providers the site builds as today.
+- [x] No YouTube request happens before a user clicks play.
+- [x] Without the providers the site builds as today.
 - [ ] `make design-check-fixture` passes with the `Video` section and a background-video hero (`--motion`).
 
 ## Verify
@@ -59,3 +59,22 @@ real without me uploading videos.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09 (unit part).** Assets: `kind: video` with `source: "search"`, `query` and `place` (drafted),
+resolved by `videos/stock.stock_site_videos` to `source: youtube | pixabay` with the code-only `video` (provider, id or
+file URL, title, poster, size, duration) and `credit`; no result → `placeholder` with a note; the validator takes a
+search only on a `video` asset with a query, and a resolved source only with its `video`. `Video` section
+(`VideoProps`: `video` or `items` of 2–6, `columns`; in the catalogue as "only when the requirement has something to
+watch"); `HeroProps.backgroundVideo` (the banner / stage layouts). Components: `components/assets/VideoEmbed.tsx`
+(the facade: poster, play, title, credit; the `youtube-nocookie.com` iframe only on click; a link without JavaScript;
+a Pixabay file in `<video controls>`), `BackgroundVideo.tsx` (D9: muted, looped, `playsinline`, the poster first, a
+pause button, still under reduced motion and save-data, a scrim, the credit in the corner), `sections/Video.tsx`; the
+Hero renders a `backgroundVideo` through the banner layout. Trees: `VideoEmbed` / `BackgroundVideo` are data
+components bound to an asset (`asset_refs` checks them); raw `video` / `iframe` stay removed. The asset registry
+writes `video` and the widened `credit` only for sites with videos (photo-only registries are byte-identical); the
+README lists every video with its author or channel and link; the design checklist gained the video rules. The static
+prompt is `draft_frontend_spec@v11` (a Videos bullet only with a provider on). Tests: `tests/test_sample_videos.py`
+(the order per place, the fallback to the other provider, both empty, the budget, the schema and validator, the
+planner, the registry, the README, trees, the prompt) and the section-library fixture gained a `Video` section (built
+by `make design-check-fixture`, below). Deviation: the hero's text contrast on the clip's worst frame is kept by the
+scrim, not measured per frame; the live draft check is 31.5.

@@ -24,6 +24,18 @@ variant changes.
 | Off-black / off-white in dark mode | `frontend_theme.py` clamps the dark palette to `#0a0a0a` / `#fafafa` | body `#0a0a0a`…`#14122f` (tinted per preset) with `#fafafa` / `#f8fafc` text; never `#000` / `#fff` |
 | Motion on transform and opacity only, with a `prefers-reduced-motion` fallback | The only library motion is the CardGrid hover lift (`transition-transform`, `motion-reduce:` off); colour changes are instant | by review |
 
+## Videos (Epic 31)
+
+Sample videos come through the library only (`Video` section, the hero's `backgroundVideo`, the tree's `VideoEmbed` /
+`BackgroundVideo` data components); raw `video` / `iframe` elements stay removed from designed pages.
+
+| Rule | How it is kept |
+|---|---|
+| No request to YouTube before the user presses play | `VideoEmbed` is a facade: the poster (YouTube's thumbnail), a play button, the title and the credit; the `youtube-nocookie.com` iframe is mounted on click only; without JavaScript the facade is a link to the video |
+| A moving background is polite | `BackgroundVideo`: muted, `playsinline`, looped, the poster first; a visible pause / play button; paused and still under `prefers-reduced-motion` and when the browser asks to save data; the hero's text keeps its contrast over a `bg-background/70` scrim |
+| Every video is credited | "<title> · <channel> on YouTube" or "Video by <name> on Pixabay", linked, under the player or in the hero's corner; the README lists every video |
+| Nothing is copied | YouTube plays in its player; Pixabay files are linked; only Pixabay posters are stored (its images may not be hotlinked) |
+
 ## Designed pages (Epic 21)
 
 A page may be an element tree the drafting engine designed (`pages[].tree`, `layout.chrome`, `footerTree`),

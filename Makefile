@@ -39,10 +39,11 @@ DEV_ENV := DB_URL=postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@loc
            GEMINI_IMAGE_API_KEY=$(GEMINI_IMAGE_API_KEY) \
            GEMINI_API_KEY=$(GEMINI_API_KEY) \
            ANTIGRAVITY_AUTH=$(ANTIGRAVITY_AUTH) \
-           IMAGE_PROVIDER=$(or $(IMAGE_PROVIDER),gemini)
+           IMAGE_PROVIDER=$(or $(IMAGE_PROVIDER),gemini) \
+           VIDEO_PROVIDERS=$(VIDEO_PROVIDERS) YOUTUBE_API_KEY=$(YOUTUBE_API_KEY) PIXABAY_API_KEY=$(PIXABAY_API_KEY)
 
 .PHONY: env up down down-all ps logs dev dev-down dev-api dev-worker dev-ui setup venv migrate test lint template runner runner-node frontend-base icon-index \
-        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app app-design-report app-design-proto kit-test sample-media
+        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app app-design-report app-design-proto kit-test sample-media video-keys
 
 env:
 	@test -f .env && echo ".env already exists" || ( \
@@ -111,6 +112,10 @@ design-check-fixture:
 # The app kit's design check (Story 22.4): an app's screens at 375 / 1440 px, light and dark, on its mock API.
 design-check-app:
 	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.design_check_app $(ARGS)
+
+# The video providers' keys (Epic 31): one cheap call each (YouTube videos.list, one Pixabay search).
+video-keys:
+	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.check_video_keys
 
 # The generated apps' sample media (Story 29.2): made once with ffmpeg in a one-off container, then committed.
 sample-media:

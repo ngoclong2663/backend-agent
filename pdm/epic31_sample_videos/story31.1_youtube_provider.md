@@ -36,8 +36,8 @@ quota, so that sites and apps can show real videos without the model naming any.
 ## Acceptance criteria
 
 - [ ] The terms' requirements are recorded in this Status and reflected in the epic's decisions.
-- [ ] A phrase returns embeddable, safe-search videos with their credit, from the cache on the second call.
-- [ ] With no key, no quota or an error, the provider returns nothing and the draft goes on.
+- [x] A phrase returns embeddable, safe-search videos with their credit, from the cache on the second call.
+- [x] With no key, no quota or an error, the provider returns nothing and the draft goes on.
 
 ## Verify
 
@@ -47,3 +47,19 @@ quota, so that sites and apps can show real videos without the model naming any.
 
 Proposed 2026-11-08. Key checked the same day (see the epic's Status): `videos.list` and one `search.list` with
 D2's filters both answered; 101 units spent.
+
+**Done 2026-11-09.** Terms (D7, read 2026-11-09, applied in `videos/youtube.py`'s docstring and code): videos play
+only in YouTube's embedded player (`youtube-nocookie.com/embed/<id>`, 31.3), never downloaded or re-hosted; each shows
+its title and channel with a link back to YouTube (`credit`), no YouTube branding of our own; API data stays fresh
+(ids and metadata cached a day, availability checked again when a site is previewed, nothing stored in the project but
+the id, title and channel); safe search strict, embeddable results only, the app's language. The port
+(`videos/port.py`: `VideoHit`, `VideoCredit`, `VideoUnavailable`, the places `watch` / `background` / `seed` and their
+duration limits). The adapter: `search.list` (100 units) with D2's filters and `videoDuration` from the place, then
+`videos.list` (1 unit) for the duration and `status.embeddable`; cached by phrase, language and place under
+`ARTIFACT_ROOT/asset-cache/video/youtube/`; a daily unit counter (midnight Pacific) that refuses a search under a 600-unit
+margin; 403 `quotaExceeded`, other errors and the network end the search with a reason, never the draft. Settings:
+`VIDEO_PROVIDERS`, `YOUTUBE_API_KEY` (`.env.example`, compose, the Makefile's dev env); the engines API carries `media`
+(the photo provider and the video providers on) and the Options card shows it. `make video-keys` is the key check
+(`scripts/check_video_keys.py`, one `videos.list`). Tests: `tests/test_video_providers.py` on a recorded responder
+(the filters, the unembeddable result filtered out, the cache, the day's units, the margin, the quota, errors,
+availability).

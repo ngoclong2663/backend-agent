@@ -161,6 +161,13 @@ class Config(BaseSettings):
     # and the name its referral links carry; without the key photos are off.
     unsplash_access_key: str | None = None
     unsplash_app_name: str = "fullstack_generation_agent"
+    # Epic 31: sample videos. VIDEO_PROVIDERS lists the providers that are on (`youtube`, `pixabay`; empty: none), each
+    # with its key; YouTube embeds (watched videos), Pixabay MP4 files (hero loops, seeded video fields). Nothing is
+    # downloaded but Pixabay's posters; PIXABAY_STORE_VIDEOS would store the files too (off, measured in 31.5).
+    video_providers: str = ""
+    youtube_api_key: str | None = None
+    pixabay_api_key: str | None = None
+    pixabay_store_videos: bool = False
     gemini_image_api_key: str | None = None
     gemini_image_model: str = "gemini-3.1-flash-lite-image"
     gemini_image_size: str = "1K"
@@ -228,6 +235,8 @@ class Config(BaseSettings):
         "langsmith_api_key",
         "langsmith_agent_id",
         "gemini_image_api_key",
+        "youtube_api_key",
+        "pixabay_api_key",
         "draft_engine",
         "llm_provider",
         "antigravity_json_effort",

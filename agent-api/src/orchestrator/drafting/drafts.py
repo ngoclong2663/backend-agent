@@ -60,6 +60,8 @@ from src.modules.shared.domain.frontend_spec.copy_rules import phrase_list
 from src.modules.shared.domain.generation_modes import initial_lanes
 from src.modules.shared.domain.schema_digest import schema_digest
 from src.orchestrator.drafting import trees as tree_drafting
+from src.videos.factory import providers_for, videos_enabled
+from src.videos.stock import VideoSearch, stock_seed_videos, stock_site_videos
 
 from .. import tracing
 from ..checks.consistency import check_spec_pair
@@ -107,6 +109,11 @@ EXAMPLES = {
     "backend": "specs/shop.json",
     "static": "frontend-specs/static-landing.json",
 }
+
+
+# Epic 27 photos are free and cached: the only bound on a draft is the hour's requests (50 for a demo app), so the
+# stock flow takes every drafted photo up to this ceiling; FRONTEND_MAX_PHOTOS caps paid (Gemini) photos alone.
+STOCK_PHOTO_LIMIT = 40
 
 
 def crash_site(exc: BaseException) -> str:
@@ -240,6 +247,7 @@ def write_inputs(
             "stock_phrases": phrase_list(),
             "photos_enabled": photos_enabled(),
             "max_photos": config.frontend_max_photos,
+            "videos_enabled": videos_enabled(),  # Epic 31: a Video section and hero background clips
         }
     if design:
         (inputs / "design.md").write_text(fact_pack(design[0], seed or 0, str(mode)))
@@ -557,7 +565,7 @@ def draw_images(work: Path, chosen: dict[str, Any] | None) -> list[dict[str, Any
     assets = [asset for asset in spec["assets"] if isinstance(asset, dict)]
     drawn = sum(source_kind(str(asset.get("source") or "placeholder")) == "generate" for asset in assets)
     photos_on = photos_enabled()
-    max_photos = config.frontend_max_photos
+    max_photos = STOCK_PHOTO_LIMIT if get_stock_photos() is not None else config.frontend_max_photos
     photos_count = sum(
         1
         for a in assets
@@ -836,7 +844,7 @@ class DraftRunner:
         if inline:
             context |= inline_inputs(work, context)
         frontend = mode != GenerationMode.BACKEND
-        purpose, version = ("draft_frontend_spec", "v10") if frontend else ("draft_spec", "v5")
+        purpose, version = ("draft_frontend_spec", "v11") if frontend else ("draft_spec", "v5")
         max_repairs = config.draft_repair_attempts_frontend if frontend else config.draft_repair_attempts_backend
         calls: list[dict[str, Any]] = []
         trace = tracing.GenerationTrace.open(
@@ -943,13 +951,29 @@ class DraftRunner:
                 raw_frontend, _ = _load(work / FRONTEND_FILE)
                 if isinstance(raw_backend, dict) and isinstance(raw_frontend, dict):
                     await update_progress("photos")
-                    photo_assets, stock_notes = await stock_seed_photos(raw_backend, stock, config.frontend_max_photos)
+                    # FRONTEND_MAX_PHOTOS caps paid photos; stock photos are bounded by the hour's requests (2026-11-09)
+                    photo_assets, stock_notes = await stock_seed_photos(raw_backend, stock, STOCK_PHOTO_LIMIT)
                     if photo_assets:
                         raw_frontend["assets"] = [*(raw_frontend.get("assets") or []), *photo_assets]
                         _write_json(work / BACKEND_FILE, raw_backend)
                         _write_json(work / FRONTEND_FILE, raw_frontend)
                         check = check_draft(work, mode)
                     notes += stock_notes
+            if check.ok and videos_enabled():  # Epic 31 (Story 31.4): the seeded records' videos, credited in the app
+                raw_backend, _ = _load(work / BACKEND_FILE)
+                raw_frontend, _ = _load(work / FRONTEND_FILE)
+                if isinstance(raw_backend, dict) and isinstance(raw_frontend, dict):
+                    await update_progress("videos")
+                    language = str((raw_frontend.get("project") or {}).get("locale") or "en")[:2]
+                    video_assets, video_notes = await stock_seed_videos(
+                        raw_backend, VideoSearch(providers_for, language)
+                    )
+                    if video_assets:
+                        raw_frontend["assets"] = [*(raw_frontend.get("assets") or []), *video_assets]
+                        _write_json(work / BACKEND_FILE, raw_backend)
+                        _write_json(work / FRONTEND_FILE, raw_frontend)
+                        check = check_draft(work, mode)
+                    notes += video_notes
             if business is not None:
                 before = len(business.calls)
                 await update_progress("binding workflows")
@@ -1103,8 +1127,10 @@ class DraftRunner:
             if issue is None and isinstance(spec, dict) and isinstance(spec.get("assets"), list):
                 photo_assets = [a for a in spec["assets"] if isinstance(a, dict) and a.get("source") == "photo"]
                 # Hard cap on paid calls per draft: photos past FRONTEND_MAX_PHOTOS stay `photo` (a placeholder).
-                over_cap = photo_assets[config.frontend_max_photos :]
-                photo_assets = photo_assets[: config.frontend_max_photos]
+                # Stock photos (Epic 27) are bounded by the hour's requests and the cache instead (2026-11-09).
+                cap = STOCK_PHOTO_LIMIT if get_stock_photos() is not None else config.frontend_max_photos
+                over_cap = photo_assets[cap:]
+                photo_assets = photo_assets[:cap]
                 if over_cap:
                     ids = ", ".join(str(a.get("id")) for a in over_cap)
                     msg = (
@@ -1119,6 +1145,13 @@ class DraftRunner:
                     _write_json(work / FRONTEND_FILE, spec)
                     check = check_draft(work, mode)
                     photo_assets = []
+                searched = [a for a in spec["assets"] if isinstance(a, dict) and a.get("source") == "search"]
+                if searched:  # Epic 31 (Story 31.3): videos found at draft time, embedded or hotlinked, credited
+                    await update_progress("videos")
+                    language = str((spec.get("project") or {}).get("locale") or "en")[:2]
+                    photo_notes += await stock_site_videos(searched, VideoSearch(providers_for, language), posters={})
+                    _write_json(work / FRONTEND_FILE, spec)
+                    check = check_draft(work, mode)
                 if photo_assets:
                     await update_progress("photos")
                     semaphore = asyncio.Semaphore(config.image_concurrency)

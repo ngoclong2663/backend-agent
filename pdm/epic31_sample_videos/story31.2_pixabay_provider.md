@@ -58,8 +58,8 @@ videos our own player plays.
 
 - [ ] A phrase and a place return an MP4 file that fits the place and its byte budget, with a poster stored by us and
       its credit, from the cache on the second call.
-- [ ] Every request sends the descriptive `User-Agent`; every search is cached for at least 24 h.
-- [ ] With no key, no requests left, a challenge or an error, the provider returns nothing and the draft goes on.
+- [x] Every request sends the descriptive `User-Agent`; every search is cached for at least 24 h.
+- [x] With no key, no requests left, a challenge or an error, the provider returns nothing and the draft goes on.
 
 ## Verify
 
@@ -73,3 +73,14 @@ Pexels can return later behind the same port.
 **Key checked (2026-11-08):** `PIXABAY_API_KEY` in `.env` works: one search ("ocean waves", `safesearch=true`, 3
 results) answered 200 with 500 total hits and four sizes per hit; `X-RateLimit-Limit: 100`, `Remaining: 98`,
 `Reset: 60`. The first two requests (curl's default client name) got Cloudflare's challenge (`429`), see Context.
+
+**Done 2026-11-09.** `videos/pixabay.py`: `api/videos/` with `video_type=film`, `safesearch=true`, the language and the
+place's `min_width`; hits kept by orientation (landscape for every place today) and duration (≤ 45 s for a background,
+≤ 240 s for a card); the file chosen by its numbers (`choose_file`: the smallest at least as wide as the place, under
+its byte budget: 6 MB background, 12 MB player; a 4K source's 16.8 MB `tiny` loses to its 11 MB `small`); the credit
+"Video by <user> on Pixabay" with the video's page and the user's page. `User-Agent: <app>/<version>` on every
+request; `X-RateLimit-Remaining` read, a search refused under 10 left; a 429 with `cf-mitigated` is reported as the
+challenge; 24 h cache under `asset-cache/video/pixabay/`; posters downloaded once into the cache (`poster_bytes`) and
+shipped as a public file of the site (31.3). `PIXABAY_STORE_VIDEOS` is a setting (off), not yet acted on (31.5
+measures it). Tests: the responder with four sizes, the orientation and duration filters, the file choice per place,
+the limits, the challenge, errors, an empty answer, the cache, the poster download.

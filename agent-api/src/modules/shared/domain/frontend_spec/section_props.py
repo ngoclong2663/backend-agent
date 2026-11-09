@@ -157,6 +157,15 @@ class GalleryItem(Props):
     caption: str | None = Field(default=None, max_length=300)
 
 
+VIDEO_REF = r"^asset:[a-z][a-z0-9-]*$"  # Epic 31: a `video` asset of the spec (never a URL or an iframe)
+
+
+class VideoItem(Props):
+    video: str = Field(pattern=VIDEO_REF)
+    title: str | None = Field(default=None, max_length=120)
+    caption: str | None = Field(default=None, max_length=300)
+
+
 # -- sections ----------------------------------------------------------------------------------------------------------
 
 
@@ -170,6 +179,9 @@ class HeroProps(Surface):
     body: str | None = Field(default=None, max_length=600)
     image: str | None = Field(default=None, pattern=IMAGE)
     images: list[Image] | None = Field(default=None, max_length=4)  # the `collage` layout (with `image` first)
+    # Epic 31 (Story 31.3): a muted, pausable clip behind the text (a `video` asset with a Pixabay file), in the
+    # layouts that put text over media (`banner`, `stage`); the image stays the poster and the fallback
+    background_video: str | None = Field(default=None, pattern=VIDEO_REF)
     cta: Cta | None = None
     secondary_cta: Cta | None = None
 
@@ -222,6 +234,23 @@ class GalleryProps(Surface):
     title: str | None = None
     items: list[GalleryItem] | None = Field(default=None, max_length=48)
     columns: Columns | None = None
+
+
+class VideoProps(Surface):
+    """Epic 31 (Story 31.3): one featured video (`video`) with a heading and a short text, or a grid of two to six
+    videos with their titles (`items`). Only when the requirement has something to watch."""
+
+    title: str | None = Field(default=None, max_length=120)
+    description: str | None = Field(default=None, max_length=600)
+    video: str | None = Field(default=None, pattern=VIDEO_REF)
+    items: list[VideoItem] | None = Field(default=None, max_length=6)
+    columns: Columns | None = None
+
+    @model_validator(mode="after")
+    def _something_to_watch(self):
+        if self.video is None and not self.items:
+            raise ValueError("a Video section needs 'video' or 'items'")
+        return self
 
 
 class RichTextProps(Surface):
@@ -425,6 +454,7 @@ SECTION_PROPS: dict[str, type[Props]] = {
     "Pricing": PricingProps,
     "Stats": StatsProps,
     "Gallery": GalleryProps,
+    "Video": VideoProps,
     "RichText": RichTextProps,
     "ContactInfo": ContactInfoProps,
     "Steps": StepsProps,
@@ -452,6 +482,7 @@ SECTION_ITEMS: dict[str, type[Props]] = {
     "Pricing": PlanItem,
     "Stats": StatItem,
     "Gallery": GalleryItem,
+    "Video": VideoItem,
     "Steps": StepItem,
     "Timeline": TimelineItem,
     "Team": TeamMember,

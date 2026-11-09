@@ -163,6 +163,13 @@ def scaffold_frontend(
                 _copy(source, project / target, {})
                 overlay_files.append(target)
 
+    for asset in plan.get("assets") or []:  # Epic 31: a Pixabay poster is a file of the site (never hotlinked)
+        source = Path(asset["posterSource"]) if asset.get("posterSource") else None
+        if source is not None and source.is_file() and asset.get("posterFile"):
+            target = project / asset["posterFile"]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(source.read_bytes())
+
     package_path = project / "package.json"
     package = json.loads(package_path.read_text())
     package["name"] = plan["project"]["slug"]

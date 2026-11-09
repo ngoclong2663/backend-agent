@@ -132,6 +132,7 @@ export function useNewGeneration({
     generateFromRequirement,
     engines: engines.data?.engines ?? [],
     enginesReportedByWorker: engines.data?.reportedByWorker ?? true,
+    media: engines.data?.media ?? null,
     isSubmitting: create.isPending,
   };
 }
