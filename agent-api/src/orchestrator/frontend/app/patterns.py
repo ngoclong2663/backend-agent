@@ -115,13 +115,30 @@ def area_kind(archetype: str | None, roles: list[str], main: str | None, contrac
 
 
 def area_pattern(kind: str) -> DesignPluginDescriptor:
-    """The ready pattern of the kind, else `back-office` (the planner as it always was)."""
-    found = registry().get("pattern", kind)
-    if found is not None and found.status == "ready":
+    """The ready pattern of the kind, else `back-office` (the planner as it always was). `BGA_DESIGN_INCLUDE_DRAFTS=1`
+    (the registry's switch for the checks) plans a draft pattern too."""
+    found = next((p for p in registry().ready("pattern") if p.name == kind), None)
+    if found is not None:
         return found
     default = registry().get("pattern", DEFAULT_PATTERN)
     assert default is not None, "the back-office pattern ships with the agent"
     return default
+
+
+def manages_some(contract: dict[str, Any], entity: str | None, roles: list[str]) -> bool:
+    """Some of these roles manage the entity's records: a mixed area (members and editors in one app)."""
+    return any(manages(contract, entity, [role]) for role in roles)
+
+
+def screen_pattern(
+    archetype: str | None, roles: list[str], main: str | None, contract: dict[str, Any]
+) -> DesignPluginDescriptor:
+    """The pattern an area's screens follow: its kind's, except in a mixed area, which stays a back-office until it
+    is split into an area per audience (a consumer pattern's menu would hide the staff's screens)."""
+    kind = area_kind(archetype, roles, main, contract)
+    if kind != DEFAULT_PATTERN and manages_some(contract, main, roles):
+        return area_pattern(DEFAULT_PATTERN)
+    return area_pattern(kind)
 
 
 def app_areas(spec: dict[str, Any], roles: list[str]) -> list[dict[str, Any]]:
@@ -157,5 +174,6 @@ def area_patterns(
     out = {}
     for area in app_areas(spec, roles if roles is not None else contract_roles(contract)):
         kind = area_kind(area["archetype"], area["roles"], area["main"], contract)
-        out[area["id"]] = {"kind": kind, "pattern": area_pattern(kind).name}
+        pattern = screen_pattern(area["archetype"], area["roles"], area["main"], contract)
+        out[area["id"]] = {"kind": kind, "pattern": pattern.name}
     return out

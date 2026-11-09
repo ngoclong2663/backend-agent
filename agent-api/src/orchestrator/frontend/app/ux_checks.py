@@ -108,6 +108,7 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
             listed = {
                 (s.get("content") or {}).get("entity")
                 for page in area_menu
+                if not page["route"].endswith("/mine")  # the pattern's one page of a person's own records
                 for s in page.get("sections") or []
                 if s.get("component") == "AppList"
             }

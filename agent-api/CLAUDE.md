@@ -231,7 +231,12 @@ Agent-specific notes:
   area's people never get, its UX checks). `frontend/app/patterns.py`: the child shapes from the contract
   (`interaction` / `contribution` / `part`, `owned`), the area's kind (its archetype, or `back-office` when every role
   manages the main entity) and its pattern (`plan.app.patterns`; a draft pattern falls back to `back-office`, which is
-  the planner as it always was). `frontend/app/ux_checks.py` judges a planned app per area
+  the planner as it always was; a mixed area, where some roles manage the main entity, stays `back-office`). The
+  planner (`_Screens(pattern=, main=)`) reads it: a consumer pattern's menu is the main entity, the cart, the person's
+  own top-level records and one Mine page (`pattern_menu`; `reach_every_page` is a back-office's); a child whose shape
+  the pattern places on the record is an action there (one click, or its form in a dialog: `on_parent`); no edit page,
+  delete or owner's action on records these people never create (`others`); no dashboard; tables become cards.
+  `frontend/app/ux_checks.py` judges a planned app per area
   (`make app-design-report ARGS="--ux-only [--baseline]"`; `tests/fixtures/app-golden/ux-baseline.json`).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`

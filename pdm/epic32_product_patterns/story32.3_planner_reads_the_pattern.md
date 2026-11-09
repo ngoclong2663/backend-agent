@@ -35,9 +35,9 @@ not wander through tables and form pages meant for staff.
 
 ## Acceptance criteria
 
-- [ ] Under a consumer pattern, an area's menu is the main entity and "mine"; children follow the placement; no page
+- [x] Under a consumer pattern, an area's menu is the main entity and "mine"; children follow the placement; no page
       a role cannot use.
-- [ ] `uncovered_operations` is empty for every golden app and the recorded drafts.
+- [x] `uncovered_operations` is empty for every golden app and the recorded drafts.
 
 ## Verify
 
@@ -46,3 +46,32 @@ not wander through tables and form pages meant for staff.
 ## Status
 
 Proposed 2026-11-09.
+
+**Done 2026-11-09 (with deviations).** `_Screens` takes the area's pattern and main entity (`patterns.screen_pattern`,
+from `_area_screens` and the single-area path). With a consumer pattern (its menu is not `every`):
+
+- **Menu** (`pattern_menu`): the main entity, the cart (`storefront`: the person's own child of the main entity with a
+  quantity), the person's own top-level records ("My Orders": a list filtered to its owner), and one **Mine** page
+  (`/mine`) with a tab per own reaction or contribution, labelled as the draft's menu labelled it. `reach_every_page`
+  adds nothing; the own children's standalone lists are not planned (they are on Mine).
+- **Children** (`on_parent`): a child whose shape the pattern places `inline` or `sheet` is an action on its parent's
+  record: one click when nothing is left to fill in (on the cards, rows and the record's page), else its form in a
+  dialog on the record's page (the kit's existing action dialog; `$route.id` fills the parent). No create page, no
+  "Add" link, no tab create link; an inline interaction has no tab of the person's own rows on the record.
+- **Never**: no dashboard page or menu item (the home becomes the main entity); no edit page or link, no delete and no
+  owner's action (an ownership-guarded record action: publish, reject) on records these people never create; a list
+  drawn as a table is drawn as cards.
+
+Planned with the draft patterns on (`BGA_DESIGN_INCLUDE_DRAFTS=1`): the recorded TikTok-like viewers get Feed + Mine, a
+like on the feed's cards and the video (one click), a comment in a dialog on the video, no edit route, no dashboard, no
+creator's actions; the only UX failure left is `contributions-readable` (32.4). `plant-shop`'s shopper gets Plants,
+Cart, My Orders and add to cart on the product (a dialog for the quantity, two clicks) and passes every check. The
+specs stay valid, the pair check clean and coverage complete. With the switch off every area plans as before; the
+committed baseline is unchanged until a pattern is `ready` (32.5, 32.6).
+
+Deviations: step 2's `sheet` is the kit's action dialog for now (`AppSheet` is part of 32.5's kit work); step 3's
+coverage needed no change (actions already count, and a consumer area's figures stay on its staff area's dashboard;
+an all-consumer app's aggregates would be a coverage warning, not an error). **Finding:** mixed areas (members and
+editors of `news-feed`, viewers and creators of `video-library`, learners and managers of `learning-platform`) keep
+`back-office`: a consumer menu would hide the staff's management screens. They need an area per audience, which
+`complete_outline` could split from the roles (a new story, proposed for after 32.4).

@@ -47,6 +47,7 @@ WORDS = {
     "add": ("Add {x}", "{x}を追加"),
     "recent": ("Recent {x}", "最近の{x}"),
     "dashboard": ("Dashboard", "ダッシュボード"),
+    "mine": ("Mine", "マイページ"),
     "created": ("{x} created", "{x}を作成しました"),
     "signIn": ("Sign in", "ログイン"),
     "createAccount": ("Create an account", "アカウントを作成"),
@@ -341,8 +342,14 @@ class _Screens:
         outline: dict[str, Any],
         contract: dict[str, Any],
         allowed: set[str] | None = None,
+        pattern: Any = None,
+        main: str | None = None,
     ):
+        """`pattern`: the area's product pattern (Epic 32; None or `back-office`: the planner as it always was);
+        `main`: the area's main entity."""
         self.backend, self.outline, self.contract = backend, outline, contract
+        self.pattern, self.main = pattern, main
+        self._shapes: dict[str, dict[str, Any]] | None = None
         self.operations = contract_operations(contract)
         if allowed is not None:  # Story 23.10: an area plans only what its roles may call
             self.operations = {op_id: found for op_id, found in self.operations.items() if op_id in allowed}
@@ -426,6 +433,83 @@ class _Screens:
     def children_of(self, entity: str) -> list[tuple[str, dict[str, Any]]]:
         return [(name, ref) for name in self.entities if (ref := self.parent_of(name)) and ref["entity"] == entity]
 
+    # -- product patterns (Epic 32)
+
+    @property
+    def consumer(self) -> bool:
+        """The area's people use the product (its pattern's menu is not a back-office's)."""
+        return self.pattern is not None and "every" not in (self.pattern.menu or [])
+
+    def never(self, what: str) -> bool:
+        return self.pattern is not None and what in (self.pattern.never or [])
+
+    def shape(self, entity: str) -> str | None:
+        if self._shapes is None:
+            from .patterns import child_shapes
+
+            self._shapes = child_shapes(self.contract)
+        return (self._shapes.get(entity) or {}).get("shape")
+
+    def owned(self, entity: str) -> bool:
+        self.shape(entity)
+        return bool(((self._shapes or {}).get(entity) or {}).get("owned"))
+
+    def on_record(self, entity: str) -> bool:
+        """The pattern places this child's create on its parent's record (`inline` or `sheet`)."""
+        shape = self.shape(entity)
+        if self.pattern is None or shape is None:
+            return False
+        return (self.pattern.children or {}).get(shape) in ("inline", "sheet")
+
+    def others(self, entity: str) -> bool:
+        """Records these people never create, in an area that never edits other people's records (`edit-others`)."""
+        return self.never("edit-others") and "create" not in self.crud[entity]
+
+    def cart(self) -> str | None:
+        """A storefront's cart: the person's own child of the main entity with a quantity."""
+        if not self.consumer or "cart" not in (self.pattern.menu or []):
+            return None
+        from .patterns import child_shapes, children_of
+
+        own = {c: info for c, info in child_shapes(self.contract).items() if info["owned"] and c in self.entities}
+        return next((c for c, info in children_of(own, self.main).items() if info["quantity"]), None)
+
+    def on_mine(self, entity: str) -> bool:
+        """A person's own reaction or contribution under a record, listed on the consumer pattern's Mine page."""
+        if not self.consumer or "mine" not in (self.pattern.menu or []) or entity == self.cart():
+            return False
+        has_parent = any(ref["entity"] in self.entities for ref in self.references(entity))
+        return has_parent and self.owned(entity) and self.shape(entity) in ("interaction", "contribution")
+
+    def edits(self, entity: str) -> bool:
+        """An edit page for the entity: never in an area whose people never create its records (`edit-others`)."""
+        crud = self.crud[entity]
+        if "update" not in crud:
+            return False
+        return not self.others(entity)
+
+    def on_parent(self, entity: str) -> dict[str, Any] | None:
+        """A child's create as an action on its parent's record: when it has nothing to fill in (every pattern), or
+        when the area's pattern places its shape there; `form` is None for one click, else the fields of its dialog."""
+        parent = self.quick_create(entity)
+        if parent is not None:
+            return {"parent": parent, "form": None}
+        if not self.on_record(entity) or "create" not in self.crud[entity]:
+            return None
+        parent = self.route_parent(entity)
+        if parent is None:
+            return None
+        fields = self.form_fields(entity, self.crud[entity]["create"], {parent["field"]: "$route.id"})
+        return {"parent": parent, "form": fields} if fields else None
+
+    def on_parent_children(self, entity: str) -> list[tuple[str, dict[str, Any]]]:
+        """The children created from this entity's records (`on_parent`)."""
+        return [
+            (child, found)
+            for child in self.entities
+            if (found := self.on_parent(child)) and found["parent"]["entity"] == entity
+        ]
+
     def quick_create(self, entity: str) -> dict[str, Any] | None:
         """A child whose create has nothing visible to fill in (the parent from the route, the owner from the signed-in
         user, the rest defaulted: a like, a follow, a bookmark): its parent reference, else None. Such a create is an
@@ -437,15 +521,6 @@ class _Screens:
             return None
         fields = self.form_fields(entity, self.crud[entity]["create"], {parent["field"]: "$route.id"})
         return parent if fields and all(field.get("hidden") for field in fields) else None
-
-    def quick_children(self, entity: str) -> list[tuple[str, dict[str, Any]]]:
-        """The children created from this entity's records with one click."""
-        out = []
-        for child in self.entities:
-            parent = self.quick_create(child)
-            if parent is not None and parent["entity"] == entity:
-                out.append((child, parent))
-        return out
 
     def w(self, key: str, x: str | None = None, lower: bool = True) -> str:
         """The planner's own words in the outline's language (Story 23.8): English, or Japanese for `ja`."""
@@ -748,7 +823,7 @@ class _Screens:
             actions.append(
                 {"id": "view", "label": self.w("view"), "kind": "link", "page": f"{slug}-id", "params": {"id": record}}
             )
-        if "update" in crud:
+        if self.edits(entity):
             actions.append(
                 {
                     "id": "edit",
@@ -758,24 +833,52 @@ class _Screens:
                     "params": {"id": record},
                 }
             )
-        for child, parent in self.quick_children(entity):  # a like, a follow: one click on the record
-            op_id = self.crud[child]["create"]
-            actions.append(
-                {
-                    "id": f"add-{self.slug(child)}",
-                    # the operation's own verb ("interaction.like" → "Like"), else the noun reads as one ("Bookmark")
-                    "label": self.label(child) if op_id.split(".", 1)[-1] == "create" else self.op_label(op_id),
-                    "kind": "mutation",
-                    "operationId": op_id,
-                    "body": {parent["field"]: record},
-                    "onSuccess": {"toast": self.w("created", self.label(child), lower=False)},
-                }
-            )
+        for child, found in self.on_parent_children(entity):  # a like with one click; a comment in a dialog (Epic 32)
+            op_id, parent = self.crud[child]["create"], found["parent"]
+            done = {"toast": self.w("created", self.label(child), lower=False)}
+            if found["form"] is None:
+                actions.append(
+                    {
+                        "id": f"add-{self.slug(child)}",
+                        # the operation's own verb ("interaction.like" → "Like"), else the noun reads as one
+                        "label": self.label(child) if op_id.split(".", 1)[-1] == "create" else self.op_label(op_id),
+                        "kind": "mutation",
+                        "operationId": op_id,
+                        "body": {parent["field"]: record},
+                        "onSuccess": done,
+                    }
+                )
+            elif detail:  # a form opens a dialog: on the record's page, where `$route.id` is the record
+                form_id = self.add_form(
+                    {
+                        "id": f"{to_camel(child)}_create_on_{to_camel(entity)}",
+                        "operationId": op_id,
+                        "fields": found["form"],
+                        "submitLabel": self.w("create", self.label(child)),
+                        "onSuccess": done,
+                    }
+                )
+                if form_id:
+                    actions.append(
+                        {
+                            "id": f"add-{self.slug(child)}",
+                            "label": self.w("add", self.label(child)),
+                            "kind": "mutation",
+                            "operationId": op_id,
+                            "form": form_id,
+                            "onSuccess": done,
+                        }
+                    )
             self.place(op_id)
         for op_id in self.custom[entity]:
             found = self.operations[op_id]
             if found["method"] == "GET" or self.path_params(op_id) != ["id"] or self.required_query(op_id):
                 continue
+            if (
+                self.others(entity)
+                and ((found["operation"].get("x-bga") or {}).get("policy") or {}).get("type") == "ownership"
+            ):
+                continue  # Epic 32: an owner's action (publish) on records these people never create
             properties, _ = self.request(op_id)
             if properties and not detail:
                 continue  # a body opens a dialog: on the record's page only
@@ -836,7 +939,7 @@ class _Screens:
                 }
             )
             self.place(self.payments["checkout"])
-        if "delete" in crud:
+        if "delete" in crud and not self.others(entity):
             delete: dict[str, Any] = {
                 "id": "delete",
                 "label": self.w("delete"),
@@ -897,7 +1000,7 @@ class _Screens:
             "content": {
                 "entity": entity,
                 "title": self.plural(entity),
-                "style": shown.get("listStyle") or "table",
+                "style": self.list_style(shown.get("listStyle") or "table"),
                 **({"controls": controls} if controls else {}),
                 "actions": self.record_actions(entity, "$record.id", detail=False),
                 **content,
@@ -922,7 +1025,7 @@ class _Screens:
         list_sections += self.collection_sections(entity)
         if button:
             self.create_button(entity, list_sections)
-        if "list" in crud:
+        if "list" in crud and not self.on_mine(entity):
             create = {"create": {"page": f"{slug}-new", "label": self.w("new", label)}}
             linked = create if standalone_create and not button else {}
             list_sections.append(self.list_section(entity, crud["list"], f"{slug}-list", **linked))
@@ -931,7 +1034,7 @@ class _Screens:
         if standalone_create and not button:
             after = f"{slug}-id" if "get" in crud else slug if list_sections else "home"
             self.create_page(entity, f"{slug}-new", f"/{slug}/new", {}, after, create_fields)
-        if parent and "create" in crud and not standalone_create and self.quick_create(entity) is None:
+        if parent and "create" in crud and not standalone_create and self.on_parent(entity) is None:
             parent_slug = self.slug(parent["entity"])
             self.create_page(
                 entity,
@@ -945,7 +1048,7 @@ class _Screens:
             )
         if "get" in crud:
             self.detail_page(entity)
-        if "update" in crud:
+        if self.edits(entity):
             self.edit_page(entity)
 
     def create_button(self, entity: str, sections: list[dict[str, Any]]) -> None:
@@ -1064,7 +1167,7 @@ class _Screens:
             reference = self.route_parent(child)
             if child in listed or not reference or reference["entity"] != entity or "create" not in self.crud[child]:
                 continue
-            if self.quick_create(child) is not None:
+            if self.on_parent(child) is not None:
                 continue  # already an action of the record
             sections[0]["content"]["actions"].insert(
                 0,
@@ -1077,9 +1180,11 @@ class _Screens:
                 },
             )
         for child, reference in self.children_of(entity):
+            if self.consumer and self.shape(child) == "interaction" and self.on_parent(child) is not None:
+                continue  # Epic 32: a like is a button on the record, not a tab of the person's like rows
             child_slug, child_crud = self.slug(child), self.crud[child]
             create = {}
-            if self.quick_create(child) is not None:
+            if self.on_parent(child) is not None:
                 pass  # the create is an action of this record
             elif (
                 "create" in child_crud
@@ -1264,6 +1369,8 @@ class _Screens:
         self.custom_list_pages()
         self.plugin_pages()
         home = self.outline.get("home") or "dashboard"
+        if home == "dashboard" and self.never("dashboard") and self.main:
+            home = self.main  # Epic 32: people who use the product open on what they came for
         listed = {page["id"] for page in self.pages}
         nav = []
         for item in self.outline.get("nav") or []:
@@ -1280,16 +1387,80 @@ class _Screens:
             figures = [
                 item for item in self.outline.get("dashboard") or [] if item.get("operationId") in self.operations
             ]
-            if figures and "/dashboard" not in {page["route"] for page in self.pages}:
+            if figures and "/dashboard" not in {page["route"] for page in self.pages} and not self.never("dashboard"):
                 self.page("dashboard", "/dashboard", self.w("dashboard"), self.dashboard(name))
                 nav.append({"label": self.w("dashboard"), "page": "dashboard"})
         else:
             self.page("home", "/", name, self.dashboard(name))
             nav.insert(0, {"label": self.w("dashboard"), "page": "home"})
         self.nav = nav + self.nav
-        self.reach_every_page()
+        if self.consumer:
+            self.nav = self.pattern_menu()
+        else:
+            self.reach_every_page()
         self.pages.sort(key=lambda page: (page["route"] != "/", page["route"]))
         return self.pages
+
+    def list_style(self, style: str) -> str:
+        """A consumer area's lists are records to look at, never a staff table (Epic 32)."""
+        return "cards" if self.consumer and style == "table" else style
+
+    def pattern_menu(self) -> list[dict[str, Any]]:
+        """The menu of a consumer pattern (Epic 32): the main entity, the cart, and one "Mine" page for the person's
+        own reactions and contributions; nothing else joins it (`reach_every_page` is a back-office's)."""
+        entries = self.pattern.menu or []
+        pages = {page["id"] for page in self.pages}
+        by_page = {item["page"]: item for item in self.nav}
+        menu: list[dict[str, Any]] = []
+        if "main" in entries and self.main and self.slug(self.main) in pages:
+            menu.append(
+                by_page.get(self.slug(self.main))
+                or {"label": self.plural(self.main), "page": self.slug(self.main), "entity": self.main}
+            )
+        from .patterns import child_shapes
+
+        own = {
+            child: info
+            for child, info in child_shapes(self.contract).items()
+            if info["owned"] and child in self.entities
+        }
+        cart = self.cart()
+        if cart and self.slug(cart) in pages:
+            menu.append(
+                by_page.get(self.slug(cart)) or {"label": self.plural(cart), "page": self.slug(cart), "entity": cart}
+            )
+        for entity in self.entities:  # the person's own top-level records ("My orders"): a page of their own
+            if entity in (self.main, cart) or entity in own or self.slug(entity) not in pages:
+                continue
+            listing = self.operations.get(self.crud[entity].get("list") or "")
+            policy = ((listing or {}).get("operation", {}).get("x-bga") or {}).get("policy") or {}
+            if policy.get("type") == "ownership":
+                menu.append(
+                    by_page.get(self.slug(entity))
+                    or {"label": self.plural(entity), "page": self.slug(entity), "entity": entity}
+                )
+        if "mine" in entries:
+            mine = [
+                child
+                for child, info in own.items()
+                if child != cart and info["shape"] in ("interaction", "contribution") and "list" in self.crud[child]
+            ]
+            if mine:
+                labels = {item.get("entity"): item.get("label") for item in self.outline.get("nav") or []}
+                sections = [
+                    self.list_section(
+                        child,
+                        self.crud[child]["list"],
+                        f"{self.slug(child)}-mine",
+                        tab=labels.get(child) or self.plural(child),
+                    )
+                    for child in mine
+                ]
+                self.page("mine", "/mine", self.w("mine"), sections)
+                menu.append({"label": self.w("mine"), "page": "mine"})
+        if not menu:  # no main entity known: the outline's menu as drafted
+            return [item for item in self.nav if item["page"] != "dashboard"]
+        return menu
 
 
 def app_frontend_spec(
@@ -1318,7 +1489,14 @@ def app_frontend_spec(
     if areas:  # Story 23.10: a set of screens per group of roles, each under its prefix
         screens, pages, forms, navigation = _area_screens(backend, outline, contract, name, areas)
     else:
-        screens = _Screens(backend, outline, contract)
+        from .design import home_entity
+        from .patterns import screen_pattern
+
+        design = outline.get("design") or {}
+        main = design.get("mainEntity") or home_entity(design)
+        roles = list((backend.get("auth") or {}).get("roles") or [])
+        pattern = screen_pattern(design.get("archetype"), roles, main, contract)
+        screens = _Screens(backend, outline, contract, pattern=pattern, main=main)
         pages = screens.build(name)
         forms = screens.forms
         navigation = [{"label": item["label"][:60], "page": item["page"]} for item in screens.nav]
@@ -1383,6 +1561,7 @@ def _area_screens(
     under their prefix with their pages and forms renamed (`<area>-<id>`); sign-in and payment pages once. Every
     operation must be on a screen of some area whose roles may call it (the coverage check runs on the union)."""
     from .design import home_entity
+    from .patterns import screen_pattern
 
     first: _Screens | None = None
     pages: list[dict[str, Any]] = []
@@ -1402,7 +1581,9 @@ def _area_screens(
             "home": home_entity(design) or "dashboard",
             "nav": [item for item in outline.get("nav") or [] if item.get("entity") in listed] or outline.get("nav"),
         }
-        screens = _Screens(backend, area_outline, contract, allowed)
+        main = design.get("mainEntity") or home_entity(design)
+        pattern = screen_pattern(design.get("archetype"), area.get("roles") or [], main, contract)
+        screens = _Screens(backend, area_outline, contract, allowed, pattern=pattern, main=main)
         built = screens.build(name)
         if index == 0:
             first = screens
