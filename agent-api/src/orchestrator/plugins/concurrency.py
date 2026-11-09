@@ -304,6 +304,30 @@ def _caller_id(meta: dict[str, Any], plan: dict[str, Any], scenario: dict[str, A
     return next((row.get(pk) for row in users if row.get(auth.get("loginField")) == login), None)
 
 
+def _free_caller(
+    meta: dict[str, Any],
+    plan: dict[str, Any],
+    success: dict[str, Any],
+    fields: list[str],
+    server_set: set[str],
+    pairs: set[tuple],
+) -> tuple[str, Any] | None:
+    """(login, id) of another demo user of the caller's role whose pair with the success's body is free."""
+    auth = plan.get("auth") or {}
+    demo = auth.get("demoUsers") or []
+    login = success.get("user") or (demo[0]["login"] if demo else None)
+    role = next((user.get("role") for user in demo if user.get("login") == login), None)
+    for user in demo:
+        if user.get("login") == login or user.get("role") != role:
+            continue
+        uid = _caller_id(meta, plan, {"user": user["login"]})
+        if uid is None:
+            continue
+        if tuple(uid if f in server_set else success["body"].get(f) for f in fields) not in pairs:
+            return user["login"], uid
+    return None
+
+
 def contract_scenarios(
     contract: dict[str, Any],
     plan: dict[str, Any],
@@ -425,8 +449,14 @@ def contract_scenarios(
                                 body[name] = free
                         moved = True
                         break
-                if not moved and isinstance(success["body"].get(varied), str) and not columns[varied].get("enum"):
-                    success["body"][varied] = f"{success['body'][varied]} (new)"
+                if not moved and server_set:  # every pair of this caller is seeded: another demo user of the role
+                    other = _free_caller(meta, plan, success, fields, server_set, pairs)
+                    if other is not None:
+                        success["user"], caller = other
+                        moved = True
+                plain = not columns[varied].get("enum") and not columns[varied].get("foreignKey")
+                if not moved and plain and isinstance(success["body"].get(varied), str):
+                    success["body"][varied] = f"{success['body'][varied]} (new)"  # a free text: never an id
             text_field = next(  # a free text the other scenarios make their own (never an enum: "s2-LIKE")
                 (
                     f

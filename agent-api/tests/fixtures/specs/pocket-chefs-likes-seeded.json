@@ -1,0 +1,697 @@
+{
+  "auth": {
+    "roles": [
+      "cook"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 120,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "coverPhoto",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "name": "video",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "name": "durationSeconds",
+          "nullable": true,
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "min": 1,
+          "name": "cookingTimeMinutes",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "ingredients",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": 0,
+          "name": "viewCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "draft",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "draft",
+            "published",
+            "deleted"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Recipe"
+    },
+    {
+      "displayField": "recipeId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "counted",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "counted"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "View"
+    },
+    {
+      "displayField": "recipeId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "active",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "active"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Like"
+    },
+    {
+      "displayField": "content",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 1000,
+          "name": "content",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "published",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "published"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Comment"
+    },
+    {
+      "displayField": "recipeId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "saved",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "saved"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "SavedRecipe"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "method": "POST",
+      "operationId": "recipe.create",
+      "path": "/recipes",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "method": "GET",
+      "operationId": "recipe.get",
+      "path": "/recipes/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "filters": [
+        "status",
+        "cookId"
+      ],
+      "method": "GET",
+      "operationId": "recipe.list",
+      "pagination": true,
+      "path": "/recipes",
+      "search": [
+        "title"
+      ],
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Recipe",
+      "method": "PATCH",
+      "operationId": "recipe.update",
+      "path": "/recipes/{id}",
+      "policy": "recipeOwner",
+      "request": {
+        "entity": "Recipe",
+        "fields": [
+          "title",
+          "coverPhoto",
+          "video",
+          "cookingTimeMinutes",
+          "ingredients"
+        ]
+      },
+      "rules": [
+        "recipeStatusTransition",
+        "deletedIsFinal"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Recipe",
+      "method": "DELETE",
+      "operationId": "recipe.delete",
+      "path": "/recipes/{id}",
+      "policy": "recipeOwner",
+      "rules": [
+        "deletedIsFinal"
+      ],
+      "type": "crud"
+    },
+    {
+      "description": "Cook publishes a draft recipe. Validates that title, video, cover photo, cooking time, and ingredients are complete, transitioning status from draft to published.",
+      "entity": "Recipe",
+      "method": "POST",
+      "operationId": "recipe.publish",
+      "path": "/recipes/{id}/publish",
+      "policy": "recipeOwner",
+      "rules": [
+        "recipeStatusTransition"
+      ],
+      "summary": "Publish recipe",
+      "type": "custom",
+      "response": {
+        "entity": "Recipe"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Record a view when a cook opens a recipe, incrementing view count.",
+      "entity": "View",
+      "method": "POST",
+      "operationId": "view.create",
+      "path": "/views",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "View",
+      "filters": [
+        "recipeId",
+        "cookId"
+      ],
+      "method": "GET",
+      "operationId": "view.list",
+      "pagination": true,
+      "path": "/views",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Like",
+      "method": "POST",
+      "operationId": "like.create",
+      "path": "/likes",
+      "rules": [
+        "likeOncePerCook"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Like",
+      "method": "DELETE",
+      "operationId": "like.delete",
+      "path": "/likes/{id}",
+      "policy": "likeOwner",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Like",
+      "filters": [
+        "recipeId",
+        "cookId"
+      ],
+      "method": "GET",
+      "operationId": "like.list",
+      "pagination": true,
+      "path": "/likes",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Comment",
+      "method": "GET",
+      "operationId": "comment.get",
+      "path": "/comments/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "commentOwner",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Comment",
+      "filters": [
+        "recipeId"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "SavedRecipe",
+      "method": "POST",
+      "operationId": "savedRecipe.create",
+      "path": "/saved-recipes",
+      "rules": [
+        "saveOncePerCook"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "SavedRecipe",
+      "method": "DELETE",
+      "operationId": "savedRecipe.delete",
+      "path": "/saved-recipes/{id}",
+      "policy": "savedRecipeOwner",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "SavedRecipe",
+      "filters": [
+        "recipeId",
+        "cookId"
+      ],
+      "method": "GET",
+      "operationId": "savedRecipe.list",
+      "pagination": true,
+      "path": "/saved-recipes",
+      "policy": "savedRecipeOwner",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "operationId": "recipe.sumViewCount",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/sum-view-count",
+      "summary": "Total Recipe Views",
+      "aggregate": {
+        "fn": "sum",
+        "field": "viewCount"
+      }
+    },
+    {
+      "operationId": "recipe.countWhereStatusPublished",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/count-where-status-published",
+      "summary": "Published Recipes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "published"
+        }
+      }
+    },
+    {
+      "operationId": "recipe.countWhereStatusDraft",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/count-where-status-draft",
+      "summary": "Draft Recipes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "draft"
+        }
+      }
+    },
+    {
+      "operationId": "like.count",
+      "type": "aggregate",
+      "entity": "Like",
+      "method": "GET",
+      "path": "/likes/aggregate/count",
+      "summary": "Total Likes",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "savedRecipe.count",
+      "type": "aggregate",
+      "entity": "SavedRecipe",
+      "method": "GET",
+      "path": "/saved-recipes/aggregate/count",
+      "summary": "Saved by Cooks",
+      "aggregate": {
+        "fn": "count"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "recipeOwner",
+      "ownerField": "cookId",
+      "type": "ownership"
+    },
+    {
+      "name": "likeOwner",
+      "ownerField": "cookId",
+      "type": "ownership"
+    },
+    {
+      "name": "commentOwner",
+      "ownerField": "cookId",
+      "type": "ownership"
+    },
+    {
+      "name": "savedRecipeOwner",
+      "ownerField": "cookId",
+      "type": "ownership"
+    },
+    {
+      "name": "viewOwner",
+      "ownerField": "cookId",
+      "type": "ownership"
+    }
+  ],
+  "project": {
+    "description": "A community where home cooks share short recipe videos, like and save dishes, comment, and manage their studio.",
+    "name": "Pocket Chefs"
+  },
+  "relationships": [
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeViews",
+      "onDelete": "CASCADE",
+      "to": "View",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeLikes",
+      "onDelete": "CASCADE",
+      "to": "Like",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeSavedRecipes",
+      "onDelete": "CASCADE",
+      "to": "SavedRecipe",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "entity": "Recipe",
+      "id": "recipeStatusTransition",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "draft": [
+            "published",
+            "deleted"
+          ],
+          "published": [
+            "deleted"
+          ]
+        }
+      }
+    },
+    {
+      "entity": "Recipe",
+      "id": "deletedIsFinal",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "deleted"
+        ]
+      }
+    },
+    {
+      "entity": "Like",
+      "id": "likeOncePerCook",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "recipeId",
+          "cookId"
+        ]
+      }
+    },
+    {
+      "entity": "SavedRecipe",
+      "id": "saveOncePerCook",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "recipeId",
+          "cookId"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Recipe",
+      "records": [
+        {
+          "cookingTimeMinutes": 25,
+          "coverPhoto": "https://images.unsplash.com/photo-1764586119076-61711e8ed25a?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Q2xhc3NpYyUyMFJvbWFuJTIwQ2FyYm9uYXJhJTIwUmVjaXBlfGVufDF8MHx8fDE3OTQyMTM3OTV8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "createdAt": "2026-11-01T12:00:00Z",
+          "durationSeconds": 45,
+          "id": "c0a80123-0001-4000-8000-000000000001",
+          "ingredients": "Spaghetti, guanciale, pecorino romano, egg yolks, freshly ground black pepper",
+          "status": "published",
+          "title": "Classic Roman Carbonara",
+          "video": "https://cdn.pixabay.com/video/2019/10/31/28544-370332703_small.mp4",
+          "viewCount": 142,
+          "cookId": "c0a80123-0000-4000-8000-000000000001"
+        },
+        {
+          "cookingTimeMinutes": 40,
+          "coverPhoto": "https://images.unsplash.com/photo-1744988278657-5c1674813ade?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Q3Jpc3B5JTIwUm9zZW1hcnklMjBGb2NhY2NpYSUyMFJlY2lwZXxlbnwxfDB8fHwxNzk0MjE2MDQ2fDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "createdAt": "2026-11-02T15:30:00Z",
+          "durationSeconds": 60,
+          "id": "c0a80123-0002-4000-8000-000000000002",
+          "ingredients": "Bread flour, rosemary, cherry tomatoes, extra virgin olive oil, flaky sea salt, yeast",
+          "status": "published",
+          "title": "Crispy Rosemary Focaccia",
+          "video": "https://cdn.pixabay.com/video/2017/08/29/11610-231571879_small.mp4",
+          "viewCount": 98,
+          "cookId": "c0a80123-0000-4000-8000-000000000001"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

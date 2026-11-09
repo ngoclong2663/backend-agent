@@ -342,3 +342,30 @@ def test_a_success_moves_to_a_free_enum_value_when_every_parent_is_taken():
     for scenario in meta["scenarios"]:
         kind = (scenario.get("body") or {}).get("type")
         assert kind is None or kind in values, (scenario["name"], kind)
+
+
+def test_a_success_runs_as_another_demo_user_when_every_pair_of_the_first_is_seeded():
+    """gen_01M6ZSM85JDAZTZ1Q3Q2ADZHFV (2026-11-09, Pocket Chefs): a cook likes a recipe once (`uniqueTogether`
+    recipeId + cookId, the cook from the session); the seed had the demo cook's like on both recipes, and the success's
+    id was written "<id> (new)" (a text fallback that must never touch an id), so the mock answered 400 for 201. The
+    success runs as the role's other demo user, whose pair is free; an id is never rewritten."""
+    import json
+    from pathlib import Path
+
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.backend.planner import build_plan
+    from src.orchestrator.integration.contract import build_contract, contract_operations
+
+    raw = json.loads((Path(__file__).parent / "fixtures" / "specs" / "pocket-chefs-likes-seeded.json").read_text())
+    spec = validate_spec_data(raw).normalized
+    contract = build_contract(spec, build_plan(spec))
+    fixtures = contract["x-bga"]["fixtures"]
+    users = {u["email"]: u["id"] for u in fixtures["User"]}
+    recipes = {r["id"] for r in fixtures["Recipe"]}
+    for op_id, entity in (("like.create", "Like"), ("savedRecipe.create", "SavedRecipe")):
+        meta = contract_operations(contract)[op_id]["operation"]["x-bga"]
+        success = next(s for s in meta["scenarios"] if s["name"] == "success")
+        assert success["body"]["recipeId"] in recipes, success["body"]
+        caller = users[success.get("user") or contract["x-bga"]["auth"]["login"]["body"]["email"]]
+        taken = {(r["recipeId"], r["cookId"]) for r in fixtures[entity]}
+        assert (success["body"]["recipeId"], caller) not in taken, (op_id, success)
