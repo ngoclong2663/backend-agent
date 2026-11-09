@@ -202,6 +202,26 @@ export type TEvaluationReport = {
   summary: { summary: string; values: { id: string; delivered: string; evidence: string }[]; gaps: string[]; improvements: string[] } | null;
   business: { app?: { name: string; purpose: string }; values?: { id: string; value: string }[]; workflows?: { id: string; name: string; priority?: string }[] };
   screenshots: boolean;
+  /** Story 28.6: each role's guided tour, played by the walker on the mocks (information only). */
+  tour?: TTourPlay[];
+};
+
+export type TTourPlayStep = {
+  id: string;
+  title?: string;
+  role?: string | null;
+  kind: "do" | "look" | "note";
+  result: "completed" | "skipped" | "stuck" | "not reached";
+  reason?: string;
+  ms?: number;
+  file?: string;
+};
+
+export type TTourPlay = {
+  role: string | null;
+  login: string | null;
+  error?: string;
+  tours: { id: string; name?: string; completed: boolean; steps: TTourPlayStep[] }[];
 };
 
 /** Story 26.6: the latest business evaluation of a generation (information only, never its status). */

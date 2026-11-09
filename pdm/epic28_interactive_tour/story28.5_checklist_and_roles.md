@@ -31,7 +31,7 @@ workflow through the other roles' steps, so that I can learn at my own pace and 
 
 ## Acceptance criteria
 
-- [ ] Closing the tour halfway and signing in again continues at the same step.
+- [x] Closing the tour halfway and signing in again continues at the same step.
 - [ ] The checklist shows each step's state and role, at 375 and 1440 px, light and dark.
 - [ ] In a demo, one person can play a workflow from its first step to its outcome across roles.
 
@@ -43,3 +43,15 @@ end to end.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `tour/progress.ts`: `bga-tour-progress:<role>:<user>` in localStorage with each step's state
+(`done` / `skipped`), the operation it had, the current step and the finished tours; a new tour version keeps the
+steps whose id and operation are unchanged. `tour/Checklist.tsx`: a shadcn `Sheet` (a bottom drawer below 768 px) from
+the "Guide" button, which shows "done / total"; per tour its steps with state and actor, "Continue" from the first open
+step, "Start again", and the role that is next when every own step is done. Start: the first sign-in starts the first
+tour with an open step; closing a tour halfway opens the checklist; the last step shows the outcome and marks the tour
+done. "Continue as <role>": a note of another role (or a `needs` note of another role) offers it when the app lists
+demo accounts; the auth plugin's new `signInDemo` slot signs out and in as that demo user (stubbed `false` without the
+plugin), a session-storage handoff restarts the tour at the same step for the new account. Tests: the kit's
+`progress.test.ts` (reload, version change, start again); the two-role hand run and the 375 / 1440 px check of the
+sheet are in 28.7.

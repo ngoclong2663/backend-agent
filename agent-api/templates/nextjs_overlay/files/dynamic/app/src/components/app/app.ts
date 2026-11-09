@@ -143,6 +143,8 @@ export type TAppForm = {
   fields: TFormField[];
   submitLabel?: string;
   onSuccess?: { toast?: string; navigate?: string };
+  /** Story 28.3: values "Fill with an example" types in (the contract's success scenario, by field). */
+  example?: Record<string, unknown>;
 };
 
 export type TAppError = { status: number; code: string; message: string; fields?: string[] };
@@ -234,7 +236,10 @@ export type TApp = {
   photoCredits?: Record<string, TPhotoCredit>;
 };
 
-/** Story 26.4: one step of a workflow tour: who does it, where, and the action that performs it. */
+/** Story 26.4: one step of a workflow tour: who does it, where, and the action that performs it. Epic 28: its
+ *  `kind` (`do`: the user performs the operation and the tour waits; `look`: a section to read, Next; `note`: the app
+ *  does it, or another role), the business record it acts on and what makes a record ready for it (`needs`). */
+export type TTourStepKind = "do" | "look" | "note";
 export type TTourStep = {
   id: string;
   role: string | null;
@@ -246,6 +251,10 @@ export type TTourStep = {
   target?: { section: string; action: string | null };
   automatic?: boolean;
   skip?: string;
+  kind?: TTourStepKind;
+  record?: string;
+  statusAfter?: string;
+  needs?: { step: string; role?: string | null; status?: string };
 };
 
 export type TTour = { id: string; name: string; outcome?: string; roles: string[]; steps: TTourStep[] };

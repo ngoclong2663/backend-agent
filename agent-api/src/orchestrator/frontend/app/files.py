@@ -9,6 +9,7 @@ src/app/<route>/page.tsx         metadata + <AppPage pageId=… />
 """
 
 import json
+import re
 from typing import Any
 
 from src.modules.shared.domain.backend_spec.naming import pluralize, to_kebab, to_pascal
@@ -191,7 +192,7 @@ def app_data(plan: dict[str, Any], spec: dict[str, Any], contract: dict[str, Any
         "auth": app_auth(contract, pages),
         "access": app_access(contract),
         "entities": app_entities(spec, contract, pages),
-        "forms": {form["id"]: _form(form) for form in spec.get("forms") or []},
+        "forms": {form["id"]: _form(form, contract) for form in spec.get("forms") or []},
         # Epic 27: the seeded records' stock photos (by URL) and who took them, shown where the photo shows
         "photoCredits": {
             asset["source"]: {key: asset["credit"][key] for key in ("name", "profileUrl", "sourceUrl")}
@@ -266,7 +267,7 @@ def frontend_plugins(contract: dict[str, Any] | None) -> list[str]:
 # The kit's plugin slots: the names each plugin's `frontend/files/src/components/plugins/<name>/index.ts` exports;
 # an app without the plugin gets the kit's stubs (`plugin-stubs.tsx`) under the same names.
 PLUGIN_SLOTS = {
-    "auth-jwt": ("AppAuth", "UserMenu", "useSession"),
+    "auth-jwt": ("AppAuth", "UserMenu", "useSession", "signInDemo"),
     "storage": ("UploadField", "FileValue"),
     "payments": ("PayAction", "AppPayment"),
     "relations": ("AppLinks",),
@@ -333,9 +334,70 @@ def mock_scenarios(contract: dict[str, Any] | None) -> dict[str, Any]:
     return out
 
 
-def _form(form: dict[str, Any]) -> dict[str, Any]:
+def _form(form: dict[str, Any], contract: dict[str, Any] | None = None) -> dict[str, Any]:
     keys = ("operationId", "params", "load", "fields", "submitLabel", "onSuccess")
-    return {key: form[key] for key in keys if form.get(key) is not None}
+    out = {key: form[key] for key in keys if form.get(key) is not None}
+    example = form_example(form, contract) if contract else None
+    if example:
+        out["example"] = example
+    return out
+
+
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_DATETIME = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}")
+_NUMBERS = ("integer", "number", "decimal")
+
+
+def form_example(form: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any] | None:
+    """Story 28.3 (D4): the values "Fill with an example" types into a form: the operation's first success scenario
+    body (what the mocks and the smoke check send), reduced to the form's visible fields. References and files are
+    left out (picked or chosen on the screen), and so is any value the field's own checks would refuse (an enum value
+    the field has not, a number out of range, a date in another shape). None without a success scenario."""
+    found = contract_operations(contract).get(form.get("operationId") or "")
+    if found is None or (found["operation"].get("x-bga") or {}).get("plugin") == "auth-jwt":
+        return None  # sign-in and sign-up are never tour steps: no example types a demo account's credentials
+    scenarios = (found["operation"].get("x-bga") or {}).get("scenarios") or []
+    body = next(
+        (s.get("body") for s in scenarios if s.get("name") == "success" and isinstance(s.get("body"), dict)), None
+    )
+    if body is None:
+        return None
+    out: dict[str, Any] = {}
+    for field in form.get("fields") or []:
+        name = field.get("name")
+        if field.get("hidden") or field.get("reference") or field.get("upload") or name not in body:
+            continue
+        value = _fits(field, body[name])
+        if value is not None:
+            out[name] = value
+    return out or None
+
+
+def _fits(field: dict[str, Any], value: Any) -> Any:
+    """The value when the field takes it, else None (booleans and numbers checked by type, strings trimmed)."""
+    kind = field.get("type")
+    if value is None or isinstance(value, dict | list):
+        return None
+    if kind == "boolean":
+        return value if isinstance(value, bool) else None
+    if kind in _NUMBERS:
+        if isinstance(value, bool) or not isinstance(value, int | float):
+            return None
+        if field.get("min") is not None and value < field["min"]:
+            return None
+        if field.get("max") is not None and value > field["max"]:
+            return None
+        return value if kind != "integer" or isinstance(value, int) else None
+    if not isinstance(value, str) or not value:
+        return None
+    if kind == "enum":
+        return value if value in (field.get("values") or []) else None
+    if kind == "date":
+        return value if _DATE.match(value) else None
+    if kind == "datetime":
+        return value if _DATETIME.match(value) else None
+    limit = field.get("maxLength")
+    return value[:limit] if isinstance(limit, int) and limit > 0 else value
 
 
 def date_locale(locale: str) -> str:

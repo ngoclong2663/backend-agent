@@ -13,7 +13,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Stack } from "@/components/layout/Stack";
 import { evaluationShotUrl } from "../../api/generations-api";
 import { useEvaluation } from "../../hooks/use-evaluation";
-import type { TEvaluationLine, TEvaluationReport } from "../../types";
+import type { TEvaluationLine, TEvaluationReport, TTourPlayStep } from "../../types";
 
 const RESULT_STYLE: Record<TEvaluationLine["result"], { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pass: { label: "Met", variant: "default" },
@@ -21,6 +21,13 @@ const RESULT_STYLE: Record<TEvaluationLine["result"], { label: string; variant: 
   blocked: { label: "Blocked", variant: "secondary" },
   unbound: { label: "Not checked", variant: "outline" },
   "n/a": { label: "n/a", variant: "outline" },
+};
+
+const TOUR_RESULT: Record<TTourPlayStep["result"], { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  completed: { label: "Completed", variant: "default" },
+  skipped: { label: "Skipped", variant: "secondary" },
+  stuck: { label: "Stuck", variant: "destructive" },
+  "not reached": { label: "Not reached", variant: "outline" },
 };
 
 const KIND_LABEL: Record<string, string> = {
@@ -197,6 +204,57 @@ function Report({ id, report }: { id: string; report: TEvaluationReport }) {
           </Card>
         );
       })}
+      {(report.tour ?? []).length > 0 && (
+        <Card data-bga-evaluation-tour>
+          <CardHeader>
+            <CardTitle>The guided tour, played</CardTitle>
+            <CardDescription>
+              Each role&apos;s tour on the mock API: a step is completed when the walker did it as a user would, skipped
+              when the tour itself skipped it, stuck when it could not be finished. Not part of the score.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
+            {(report.tour ?? []).map((play) => (
+              <div key={play.login ?? play.role ?? "everyone"} className="flex flex-col gap-3">
+                <h3 className="text-sm font-semibold">
+                  {play.role ? `As ${play.role}` : "As everyone"}
+                  {play.login && <span className="ml-1 font-mono text-xs font-normal text-muted-foreground">{play.login}</span>}
+                </h3>
+                {play.error && <p className="text-sm text-destructive">{play.error}</p>}
+                {play.tours.map((tour) => (
+                  <div key={tour.id} className="flex flex-col gap-2 rounded-md border p-3" data-bga-tour-play={`${play.role ?? "everyone"}/${tour.id}`}>
+                    <div className="flex items-center gap-2 text-sm">
+                      {tour.completed ? <CircleCheck className="size-4 text-primary" /> : <CircleDashed className="size-4 text-muted-foreground" />}
+                      <strong>{tour.name ?? tour.id}</strong>
+                      <span className="text-muted-foreground">
+                        {tour.steps.filter((step) => step.result === "completed").length} / {tour.steps.length} steps
+                      </span>
+                    </div>
+                    <ol className="flex flex-col gap-1.5 text-sm">
+                      {tour.steps.map((step) => (
+                        <li key={step.id} className="flex flex-col gap-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <Badge variant={TOUR_RESULT[step.result]?.variant ?? "outline"}>{TOUR_RESULT[step.result]?.label ?? step.result}</Badge>
+                            <span className="text-xs text-muted-foreground">{step.kind}</span>
+                            <span>{step.title ?? step.id}</span>
+                            {step.role && <span className="text-xs text-muted-foreground">({step.role})</span>}
+                            {typeof step.ms === "number" && <span className="text-xs tabular-nums text-muted-foreground">{(step.ms / 1000).toFixed(1)} s</span>}
+                          </span>
+                          {step.reason && <span className="text-xs text-muted-foreground">{step.reason}</span>}
+                          {step.file && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={evaluationShotUrl(id, step.file.replace(/^shots\//, ""))} alt={`Stuck at ${step.title ?? step.id}`} className="max-w-md rounded-md border" loading="lazy" />
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
       {report.judged.length > 0 && (
         <Card>
           <CardHeader>

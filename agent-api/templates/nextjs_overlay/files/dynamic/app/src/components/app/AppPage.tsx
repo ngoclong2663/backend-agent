@@ -10,6 +10,7 @@ import { AppSection } from "./AppSection";
 import { FRAME_WIDTH, useLayout } from "./layout";
 import { useSession } from "./plugins";
 import { inSentence, t } from "./messages";
+import { signal } from "./signals";
 
 type AppPageProps = {
   pageId: string;
@@ -46,6 +47,10 @@ export function AppPage({ pageId }: AppPageProps) {
   useEffect(() => {
     if (signedOut && app.auth) router.replace(`${app.auth.signIn}?next=${encodeURIComponent(pathname)}`);
   }, [signedOut, router, pathname]);
+  const rendered = Boolean(page) && !(session.enabled && (!session.ready || signedOut));
+  useEffect(() => {
+    if (rendered) signal("page", { page: pageId }); // Story 28.1: the tour follows the pages the user opens
+  }, [rendered, pageId, pathname]);
   if (!page) notFound();
   if (session.enabled && (!session.ready || signedOut)) return null;
   if (session.enabled && operation && !canUse(operation, session)) {

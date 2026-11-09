@@ -84,6 +84,8 @@ frontend lane of a `static-landing.json` job. The legacy dynamic FrontendSpecs l
 
 | Flag | Effect |
 |---|---|
+| `bga-mock-api=1` (localStorage, generated apps) | Story 28.6: a browser with this key runs the generated app on its mock API whatever the server says (`src/lib/runtime-config.ts`, `MOCK_API_OVERRIDE`). Set only by the evaluation's walker (`templates/evaluation/walk.mjs` `tour`), so the guided tour is played without creating real records; `bga-tour-off=1` (Story 26.4) keeps the tour from starting in the screenshot browser. |
+| `make kit-test` | Epic 28: scaffolds an app of the dynamic app flow (default: workshop bookings, every plugin), type-checks it in the Node sandbox and runs the kit's vitest files (`src/components/**/*.test.*`, copied with the kit but skipped by generation's `tests` check). |
 | `BGA_SANDBOX_TESTS=1` | Runs `tests/sandbox/` against the real Docker sandbox (needs Docker and `make runner`), including a real preview container built from `backend.zip` (needs network for its `pip install`). Workspaces go under `.data/test-sandbox/` because Docker Desktop only shares configured paths. |
 | `BGA_KEEP_SANDBOX_DIRS=1` | Keeps those sandbox workspaces for inspection. |
 | `BGA_LIVE_ENGINE_TESTS=1` | Runs `tests/live/` with the real CLIs (costs money, needs credentials). |

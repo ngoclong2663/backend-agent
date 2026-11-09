@@ -100,7 +100,7 @@ def test_the_scaffold_copies_each_plugins_frontend_and_names_it(workshop):
     ):
         assert (out / relative).is_file(), relative
     registry = (out / "src/components/app/plugins.ts").read_text()
-    assert 'export { AppAuth, UserMenu, useSession } from "@/components/plugins/auth-jwt";' in registry
+    assert 'export { AppAuth, UserMenu, useSession, signInDemo } from "@/components/plugins/auth-jwt";' in registry
     assert 'export { AppLinks } from "@/components/plugins/relations";' in registry
     assert {"progress", "badge", "card", "dropdown-menu", "command", "popover"} <= set(plan["shadcn"])
 
@@ -204,11 +204,17 @@ def test_only_the_token_helper_touches_local_storage():
         for path in root.rglob("*.ts*"):
             if "localStorage." in path.read_text():
                 users.append(path.relative_to(root).as_posix())
-    # Story 26.4: the guided tour remembers "seen" per user (`bga-tour…` keys, never a token)
-    assert sorted(users) == ["app/src/components/app/tour/AppTour.tsx", "src/lib/auth/token.ts"]
+    # Story 26.4 / 28.5: the guided tour keeps its progress per user (`bga-tour…` keys, never a token); Story 28.6:
+    # the runtime config reads the evaluation browser's mock switch
+    assert sorted(users) == [
+        "app/src/components/app/tour/progress.test.ts",
+        "app/src/components/app/tour/progress.ts",
+        "src/lib/auth/token.ts",
+        "src/lib/runtime-config.ts",
+    ]
     assert "src/lib/auth/token.ts".startswith(OWNED_PREFIXES)
-    tour = (DYNAMIC / "app/src/components/app/tour/AppTour.tsx").read_text()
-    assert "token" not in tour.lower()
+    for name in ("AppTour.tsx", "progress.ts"):
+        assert "token" not in (DYNAMIC / "app/src/components/app/tour" / name).read_text().lower()
 
 
 def test_the_preview_passes_the_token_mode():

@@ -6,6 +6,7 @@ import { app } from "@/components/app/app";
 import { useOperationMutation } from "@/components/app/bindings";
 import { errorMessage } from "@/components/app/errors";
 import type { TUploadField } from "@/components/app/plugin-types";
+import { signal } from "@/components/app/signals";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -69,6 +70,7 @@ export const UploadField: TUploadField = ({ field, id, value, onChange, invalid,
       await put(target, file, setProgress);
       setPreview({ url: URL.createObjectURL(file), name: file.name });
       onChange(target.key);
+      signal("operation", { operationId: upload.presign, record: target.key }); // Story 28.1: the file is up
     } catch (error) {
       setProblem(error instanceof Error && !("code" in error) ? error.message : errorMessage(upload.presign, error));
     } finally {

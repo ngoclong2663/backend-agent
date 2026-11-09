@@ -175,6 +175,17 @@ Agent-specific notes:
   `GET/POST /api/v1/generations/{id}/evaluation[/run]` (GET 404: nothing to evaluate, no Business tab; `NONE`: no run
   yet), screenshots under `ARTIFACT_ROOT/<gen>/evaluation/<run>/shots`. `POST …/run {"expectationsFrom": <gen>}` checks an
   app against another generation's frozen expectations, bound to this app first (Story 26.7: the option-off comparison).
+- Interactive tour (Epic 28): the kit sends one `bga:done` signal per event (`components/app/signals.ts`: an
+  operation's success with its record id, a page render, a dialog opening, a field filled, a refused submit) from
+  `AppForm`, `RecordActions`, `AppPage`, the payment and upload fields. `tour_workflows` gives each step a `kind`
+  (`do` / `look` / `note`, `step_kind`) and record steps `needs` (the earlier step that makes a record ready); the
+  tour (`tour/AppTour.tsx`, react-joyride in controlled mode) completes a `do` step on its operation's signal, walks a
+  form's required fields, offers "Fill with an example" (`app.json` `forms[].example`, `files.form_example`: the
+  contract's success scenario; the registry `form/registry.ts`), never submits (D3), opens a record whose
+  `allowedActions` allow the step (`tour/records.ts`) and keeps progress per user and step (`tour/progress.ts`, the
+  checklist `tour/Checklist.tsx`; "Continue as <role>" through the auth plugin's `signInDemo` slot). The evaluation
+  plays each role's tour on the mocks (`evaluation/tour.py`, `walk.mjs` `tour`; the kit's `bga-mock-api` switch forces
+  MSW in that browser) into `report.tour`. `make kit-test` type-checks the kit and runs its vitest files in the sandbox.
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

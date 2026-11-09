@@ -17,8 +17,10 @@ import { app, pageHref, resolveParams, type TAppSection, type TFormField, type T
 import { useOperationMutation, useOperationQuery } from "./bindings";
 import { errorMessage, fieldErrors } from "./errors";
 import { FieldInput, isWide } from "./form/FieldInput";
+import { isBlank, registerForm } from "./form/registry";
 import { formSchemas } from "./form-schemas";
 import { t } from "./messages";
+import { recordOf, signal } from "./signals";
 
 type TValues = Record<string, unknown>;
 
@@ -67,6 +69,16 @@ export function AppFormBody({ formId, params, onDone, onCancel, submit, submitLa
       methods.reset({ ...defaults, ...Object.fromEntries(loaded) });
     }
   }, [load.data, defaults, methods]);
+  // Story 28.3: the tour fills this form through the registry (never submits it)
+  useEffect(
+    () =>
+      registerForm(formId, {
+        getValues: () => methods.getValues() as Record<string, unknown>,
+        setValue: (name, value, options) => methods.setValue(name, value as never, options),
+        trigger: (name) => methods.trigger(name as never),
+      }),
+    [formId, methods],
+  );
 
   if (!form) return null;
   if (form.load && load.isLoading) {
@@ -93,6 +105,12 @@ export function AppFormBody({ formId, params, onDone, onCancel, submit, submitLa
       { params: params ?? resolveParams(form.params, route), body },
       {
         onSuccess: (result) => {
+          // Story 28.1: exactly one signal per successful submit, with the operation and the record it made or changed
+          signal("operation", {
+            operationId: form.operationId,
+            form: formId,
+            record: recordOf(params ?? resolveParams(form.params, route), result),
+          });
           if (form.onSuccess?.toast) toast.success(form.onSuccess.toast);
           onDone?.(result);
         },
@@ -101,6 +119,7 @@ export function AppFormBody({ formId, params, onDone, onCancel, submit, submitLa
           const byField = fieldErrors(form.operationId, error, shownNames);
           for (const [name, message] of Object.entries(byField)) methods.setError(name, { message });
           if (Object.keys(byField).length === 0) toast.error(errorMessage(form.operationId, error));
+          signal("error", { operationId: form.operationId, form: formId, fields: Object.keys(byField) });
         },
       },
     );
@@ -165,6 +184,13 @@ function FormField({ formId, field, value, onChange, onBlur, error, wide, record
 }) {
   const id = `${formId}-${field.name}`;
   const invalid = Boolean(error);
+  const filled = !isBlank(value) && !invalid;
+  useEffect(() => {
+    // Story 28.1: a field that went from empty to a valid value (debounced; the value itself is never sent)
+    if (!filled) return;
+    const timer = setTimeout(() => signal("field", { form: formId, field: field.name }), 300);
+    return () => clearTimeout(timer);
+  }, [filled, formId, field.name]);
   const label = (
     <FieldLabel htmlFor={id}>
       <span>

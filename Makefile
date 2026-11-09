@@ -42,7 +42,7 @@ DEV_ENV := DB_URL=postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@loc
            IMAGE_PROVIDER=$(or $(IMAGE_PROVIDER),gemini)
 
 .PHONY: env up down down-all ps logs dev dev-down dev-api dev-worker dev-ui setup venv migrate test lint template runner runner-node frontend-base icon-index \
-        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app app-design-report app-design-proto
+        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app app-design-report app-design-proto kit-test sample-media
 
 env:
 	@test -f .env && echo ".env already exists" || ( \
@@ -112,6 +112,14 @@ design-check-fixture:
 design-check-app:
 	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.design_check_app $(ARGS)
 
+# The generated apps' sample media (Story 29.2): made once with ffmpeg in a one-off container, then committed.
+sample-media:
+	sh scripts/sample-media.sh $(API_DIR)/templates/samples
+
+# The app kit's own checks (Epic 28): type-check an app and run the kit's vitest files in the Node sandbox.
+kit-test:
+	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none LANGSMITH_TRACING=false $(PY)/python -m scripts.kit_tests $(ARGS)
+
 # The app design report (Story 23.1): the golden apps' similarity, frames and design checks, no model call.
 app-design-report:
 	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none LANGSMITH_TRACING=false $(PY)/python -m scripts.app_design_report $(ARGS)
@@ -179,7 +187,7 @@ migrate:
 	cd $(API_DIR) && $(DEV_ENV) $(PY)/alembic upgrade head
 
 test: template
-	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=fake $(PY)/pytest $(ARGS)
+	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=fake $(PY)/python -m pytest $(ARGS)
 
 lint:
 	cd $(API_DIR) && $(PY)/ruff check . && $(PY)/ruff format --check .

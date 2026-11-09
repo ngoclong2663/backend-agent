@@ -7,6 +7,7 @@ import { app, resolveParams, type TRouteParams } from "@/components/app/app";
 import { useOperationMutation } from "@/components/app/bindings";
 import { errorMessage } from "@/components/app/errors";
 import type { TPayAction } from "@/components/app/plugin-types";
+import { recordOf, signal } from "@/components/app/signals";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -29,6 +30,8 @@ export const PayAction: TPayAction = ({ action, record, variant }) => {
       {
         onSuccess: (result) => {
           const payment = result as { paymentId?: string; checkoutUrl?: string | null };
+          // Story 28.1: the checkout started (the payment itself settles through the provider)
+          if (action.operationId) signal("operation", { operationId: action.operationId, record: recordOf(resolveParams(action.params, route, record), result) });
           try {
             sessionStorage.setItem(PAYMENT_KEY, JSON.stringify({ paymentId: payment.paymentId, back: window.location.pathname }));
           } catch {

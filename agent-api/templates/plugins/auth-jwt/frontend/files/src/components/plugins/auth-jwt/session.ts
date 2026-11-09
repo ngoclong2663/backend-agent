@@ -93,3 +93,19 @@ export function nextPath(fallback = "/"): string {
   const next = new URLSearchParams(window.location.search).get("next");
   return next && next.startsWith("/") && !next.startsWith("//") ? next : fallback;
 }
+
+/** Story 28.5 ("Continue as <role>"): signs in as one of the demo accounts the sign-in page lists, so a demo can
+ *  follow a workflow across roles in one browser. False when the app has no demo accounts or the sign-in failed. */
+export async function signInDemo(login: string, queryClient: QueryClient): Promise<boolean> {
+  const auth = app.auth;
+  const user = auth?.demoUsers.find((candidate) => candidate.login === login);
+  if (!auth || !user || !auth.password) return false;
+  try {
+    await signOut();
+    await signIn({ [auth.loginField]: user.login, password: auth.password });
+    await queryClient.invalidateQueries();
+    return true;
+  } catch {
+    return false;
+  }
+}

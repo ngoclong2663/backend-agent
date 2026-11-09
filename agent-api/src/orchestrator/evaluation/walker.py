@@ -16,6 +16,7 @@ from src.configs import config
 from .api import EvaluationError
 
 WALK_SCRIPT = Path(__file__).resolve().parents[3] / "templates" / "evaluation" / "walk.mjs"
+SAMPLES = Path(__file__).resolve().parents[3] / "templates" / "samples"  # Story 28.6: what a required upload gets
 PLAYWRIGHT = "1.64.1"  # the base's @playwright/test, whose Chromium the runner image has
 
 
@@ -24,6 +25,8 @@ class Walker:
         cache = Path(config.workspace_root) / "_evaluation_walk"
         cache.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(WALK_SCRIPT, cache / "walk.mjs")
+        if SAMPLES.is_dir():
+            shutil.copytree(SAMPLES, cache / "samples", dirs_exist_ok=True)
         package = {"name": "bga-evaluation-walk", "private": True, "type": "module",
                    "dependencies": {"playwright-core": PLAYWRIGHT}}  # fmt: skip
         (cache / "package.json").write_text(json.dumps(package))

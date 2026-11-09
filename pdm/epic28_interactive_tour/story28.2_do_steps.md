@@ -33,9 +33,9 @@ done the step, so that I learn the workflow by doing it.
 
 ## Acceptance criteria
 
-- [ ] On a workflow app on mocks, each role's `do` steps complete only after the user performs the operation.
-- [ ] The user can always skip a step or close the tour; the rest of the app stays usable.
-- [ ] `look` and `note` steps behave as in 26.4.
+- [x] On a workflow app on mocks, each role's `do` steps complete only after the user performs the operation.
+- [x] The user can always skip a step or close the tour; the rest of the app stays usable.
+- [x] `look` and `note` steps behave as in 26.4.
 
 ## Verify
 
@@ -45,3 +45,15 @@ role's tour by hand.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `AppTour.tsx` rewritten in react-joyride 3.2's controlled mode (`stepIndex`, `onEvent(data,
+controls)`): a `do` step shows "Your turn", a "Skip this step" link and only Back; the spotlight lets the target through
+(`blockTargetInteraction: false`, the overlay still blocks the rest) and the step completes on the `operation` signal
+of its own operation (another operation's signal is ignored), after 500 ms for the page to settle. A `dialog` signal
+of the step's operation moves the spotlight into the dialog's form (its first required field, else its submit) through
+`controls.replay()`; a form already on the screen (a create page) starts the field walk at once (28.3). A refused
+submit (`error` signal) keeps the step and points at the first marked field with "Fix the highlighted field and try
+again". A target not found within 6 s (or joyride's `error:target_not_found`) makes the step a centred note with the
+reason and Next. Deviations: joyride's `beforeTimeout` stays 15 s; the step kinds `look` / `note` keep 26.4's Back /
+Skip / Next. Verified by type-check and vitest in the sandbox (`make kit-test`); the hand run on a workflow app on mocks
+is part of 28.7.

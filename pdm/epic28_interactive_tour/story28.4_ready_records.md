@@ -33,7 +33,7 @@ step creates one, so that the button the step points at is always there.
 
 - [ ] On the golden workflow apps on mocks, no step on a record page ends with its target missing because of the
       record chosen.
-- [ ] With no qualifying record the step names the earlier step and can jump to it.
+- [x] With no qualifying record the step names the earlier step and can jump to it.
 
 ## Verify
 
@@ -42,3 +42,13 @@ step creates one, so that the button the step points at is always there.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `tour_workflows` adds `needs` to `do` steps on record pages: the earlier `do` step of the same
+workflow on the same business record, its role and the status it leaves (`statusAfter`). The kit (`tour/records.ts`):
+a `do` step whose route ends in a record opens, in order, the record the previous step made or changed (the
+`operation` signal's record id, kept per entity), the record the user is on, then the first record of the entity's
+list (50 read) whose `allowedActions` allow the step's action (`allowed`, the same rule the buttons follow); candidates
+are read through the record's `get` so their actions are current. With none, the step is a centred note "A record is
+ready for this after: <earlier step>" with "Go to that step" (a jump to its index), or, when the earlier step is
+another role's, "…after <actor> did: <step>" with "Continue as <role>" (28.5). The first acceptance criterion (no
+target missing on the golden apps on mocks) is checked by the walker in 28.6 / 28.7.

@@ -31,6 +31,7 @@ import { AppFormBody } from "./AppForm";
 import { errorMessage } from "./errors";
 import { PayAction } from "./plugins";
 import { t } from "./messages";
+import { recordOf, signal } from "./signals";
 
 /** A mutation action: confirms first when it says so, opens its form in a dialog when it has one (Story 22.3). */
 function useAction(action: TAppAction, record: TRecord | undefined, onClose?: () => void) {
@@ -50,7 +51,11 @@ function useAction(action: TAppAction, record: TRecord | undefined, onClose?: ()
     mutation.mutate(
       { params, body: action.body ?? {} },
       {
-        onSuccess: done,
+        onSuccess: (result) => {
+          // Story 28.1: one signal per successful write (a failure sends none); the form path signals from AppForm
+          if (action.operationId) signal("operation", { operationId: action.operationId, record: recordOf(params, result) });
+          done();
+        },
         onError: (error) => toast.error(errorMessage(action.operationId, error)),
         onSettled: () => onClose?.(),
       },
@@ -58,9 +63,13 @@ function useAction(action: TAppAction, record: TRecord | undefined, onClose?: ()
   }
 
   function start() {
-    if (action.form) setEditing(true);
-    else if (action.confirm) setConfirming(true);
-    else run();
+    if (action.form) {
+      setEditing(true);
+      signal("dialog", { operationId: action.operationId, form: action.form });
+    } else if (action.confirm) {
+      setConfirming(true);
+      signal("dialog", { operationId: action.operationId });
+    } else run();
   }
 
   const dialogs = (

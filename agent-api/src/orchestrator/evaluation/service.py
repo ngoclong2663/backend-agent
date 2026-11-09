@@ -277,6 +277,19 @@ class EvaluationService:
             except Exception as exc:
                 logger.warning("evaluation browser unavailable", extra={"error": str(exc)[:300]})
         log_lines: list[str] = []
+        tour_results: list[dict[str, Any]] = []
+        if walker is not None and app.get("workflows"):
+            # Story 28.6: each role's guided tour, played on the mocks (never the live API), before the checks
+            await self._progress(run_id, "playing the guided tour")
+            from .tour import play_tours
+
+            try:
+                tour_results = await asyncio.to_thread(
+                    play_tours, walker, previews["frontend"].url, app, auth, log_lines.append
+                )
+            except Exception as exc:  # information only: a failed play never ends the evaluation
+                logger.warning("tour play failed", extra={"error": str(exc)[:300]})
+                log_lines.append(f"  tour play failed: {str(exc)[:200]}")
         await self._progress(run_id, "checking the workflows")
         checker = Checker(
             api=Api(reachable(previews["backend"].url), auth, operations),
@@ -327,6 +340,7 @@ class EvaluationService:
             "binding": {"problems": binding.get("problems") or [], "steps": len(binding.get("steps") or [])},
             "expectationsFrom": expectations_from,
             "judged": judged,
+            "tour": tour_results,
             "summary": summary,
             "texts": data.get("texts") or expectation_texts(business, expected),
             "business": {k: business.get(k) for k in ("app", "values", "actors", "workflows", "scope")},

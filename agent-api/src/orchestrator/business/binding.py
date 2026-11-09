@@ -4,7 +4,9 @@ The binding (one provider call at draft time, `business/flow.py`) names, per wor
 performs it and the page where it is done. Code checks every name against the contract and the planned screens; what
 does not match is a **binding problem** with its reason, never dropped silently. From the binding, `tour_workflows`
 writes what `app.json` `workflows` gives the kit's `AppTour`: per core workflow, its steps in order, each with its role,
-page (route) and the action target on that page (`data-bga-section` / `data-bga-action`).
+page (route) and the action target on that page (`data-bga-section` / `data-bga-action`). Epic 28 adds each step's
+`kind` (`do`: the user performs its operation; `look`: a section that shows data; `note`: automatic, another role's or
+not on the screens) and, for steps on a record page, `needs` (the earlier step that makes a record ready for it).
 """
 
 import hashlib
@@ -258,6 +260,8 @@ def tour_workflows(
                 "title": text[:1].upper() + text[1:],
                 "operationId": item.get("operationId") or None,
             }
+            if step.get("statusAfter"):
+                entry["statusAfter"] = step["statusAfter"]
             if item.get("automatic"):
                 entry["automatic"] = True
             places = targets.get(item.get("operationId") or "") or []
@@ -280,6 +284,12 @@ def tour_workflows(
                 entry["skip"] = "no app role plays this actor"
             elif "target" not in entry and not item.get("automatic"):
                 entry["skip"] = "no screen performs this step"
+            entry["kind"] = step_kind(entry)
+            if step.get("record"):
+                entry["record"] = step["record"]
+            needs = _needs(steps, entry, step.get("record"))
+            if needs is not None:
+                entry["needs"] = needs
             steps.append(entry)
         tours.append(
             {
@@ -294,3 +304,29 @@ def tour_workflows(
         return None
     version = hashlib.sha256(json.dumps(tours, sort_keys=True).encode()).hexdigest()[:12]
     return {"version": version, "tours": tours}
+
+
+def step_kind(entry: dict[str, Any]) -> str:
+    """Epic 28 (D2): `do` when the step performs an operation through a control on the screen (an action button, a
+    form's submit), `look` when its target is a section that shows data, `note` when the app does it by itself, no app
+    role plays its actor or no screen performs it. A step of another role is a `note` for the viewer: the kit decides
+    that at run time, since the role depends on who is signed in."""
+    if entry.get("automatic") or entry.get("skip") or not entry.get("target"):
+        return "note"
+    return "do" if entry["target"].get("action") else "look"
+
+
+def _needs(earlier: list[dict[str, Any]], entry: dict[str, Any], record: str | None) -> dict[str, Any] | None:
+    """Story 28.4: a `do` step on a record page needs a record its action is allowed on. The earlier `do` step of
+    the same workflow on the same record is what makes one (a create, or the status change before this one), with
+    the status it leaves the record in when the binding knows it."""
+    if entry.get("kind") != "do" or not record or "[" not in str(entry.get("route") or ""):
+        return None
+    for previous in reversed(earlier):
+        if previous.get("record") == record and previous.get("kind") == "do":
+            needs: dict[str, Any] = {"step": previous["id"], "role": previous.get("role")}
+            status = previous.get("statusAfter")
+            if status:
+                needs["status"] = status
+            return needs
+    return None

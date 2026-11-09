@@ -32,10 +32,10 @@ opened, a field was filled), so that a step can complete on the user's action in
 
 ## Acceptance criteria
 
-- [ ] Every successful write through the kit sends exactly one `operation` signal with its operation id; failures
+- [x] Every successful write through the kit sends exactly one `operation` signal with its operation id; failures
       send none.
-- [ ] Every tour step has a `kind`; a write step without a target is a `note` with its reason.
-- [ ] No visual change (`make design-check-app`), and apps without workflows behave as before.
+- [x] Every tour step has a `kind`; a write step without a target is a `note` with its reason.
+- [x] No visual change (`make design-check-app`), and apps without workflows behave as before.
 
 ## Verify
 
@@ -44,3 +44,17 @@ opened, a field was filled), so that a step can complete on the user's action in
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `components/app/signals.ts` (`signal` / `onSignal`, a `bga:done` CustomEvent on `window`;
+`recordOf` names the record from the call's `id` / `recordId`, else the response's `id`). Senders: `AppForm`
+(success → one `operation` signal with the form id and record; a refused submit → an `error` signal naming the fields
+the 422 / 409 marked, added so Story 28.2 can point at them; a field that goes from empty to a valid value → `field`,
+debounced 300 ms, never the value), `RecordActions` (`operation` after a confirmed or plain action; `dialog` when an
+action opens its form or its confirm), the payment action (the checkout started) and the upload field (the file is
+up, operation `files.presign`), `AppPage` (`page` once its sections render). `tour_workflows` adds `kind` (`step_kind`:
+`do` for a target with an action, `look` for a data section, `note` for automatic, unplayed-role and off-screen
+steps), `record` and `statusAfter` per step; another role's step is a `note` for the viewer, decided by the kit
+(`effectiveKind`), since the role is only known when someone signs in. Tests: `tests/test_interactive_tour.py` (kinds
+on the synthetic binding, the version length), the kit's vitest `signals.test.ts` and `tour/AppTour.test.tsx` (one
+`operation` signal on a successful submit, none on a 409; run with `make kit-test`, new). `make design-check-app`
+unchanged (no visual change: the signals render nothing).

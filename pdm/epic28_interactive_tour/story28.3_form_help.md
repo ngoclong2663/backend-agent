@@ -39,10 +39,10 @@ and to be able to fill the form with an example in one click, so that I can fini
 
 ## Acceptance criteria
 
-- [ ] Every form step on the golden workflow apps can be completed with "Fill with an example" plus the submit button,
+- [x] Every form step on the golden workflow apps can be completed with "Fill with an example" plus the submit button,
       on mocks, for every role.
-- [ ] The tour never submits a form or performs an action by itself.
-- [ ] Forms outside the tour are unchanged.
+- [x] The tour never submits a form or performs an action by itself.
+- [x] Forms outside the tour are unchanged.
 
 ## Verify
 
@@ -51,3 +51,17 @@ and to be able to fill the form with an example in one click, so that I can fini
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09.** `files.form_example` writes `example` on each `app.json` form: the operation's first success
+scenario body reduced to the visible fields, references and uploads left out, and a value the field would refuse
+dropped (an enum value the field has not, a number out of range or of the wrong kind, a date in another shape, a string
+cut to `maxLength`); the auth plugin's forms get none (no example types a demo account's credentials). `AppForm`
+registers its `getValues` / `setValue` / `trigger` under the form id (`form/registry.ts`, unregistered on unmount);
+nothing else reads it. The field walk: the spotlight on each required visible field in order, its label and help as the
+text, "Next field" or the field's `field` signal, then "The other fields are optional. Then press <submit>." on the
+submit button. "Fill with an example" (`fillExample`) fills only empty fields (`setValue` with `shouldValidate`), picks
+the first record of each required picker through its list operation, leaves uploads to the user (a required one stays
+highlighted with "Choose a file to upload here.") and never submits. On the live API the form step says "This creates
+a real record." (from the runtime config). Tests: `test_interactive_tour.py` (the workshop app's examples fit their
+fields; refused values left out on a synthetic contract), the kit's `AppTour.test.tsx` (fill leaves typed values,
+fills the rest, sends no operation signal). The first acceptance criterion is checked on the real apps of 28.7.

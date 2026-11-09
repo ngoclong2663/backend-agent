@@ -31,7 +31,7 @@ screens, so that the tour is proof the workflow works in the UI, not only that i
 
 - [ ] The Business tab shows each core workflow's tour result per step and role.
 - [ ] A stuck step has a screenshot and the reason.
-- [ ] The play never runs against the live API and never changes the generation's status.
+- [x] The play never runs against the live API and never changes the generation's status.
 
 ## Verify
 
@@ -40,3 +40,18 @@ screens, so that the tour is proof the workflow works in the UI, not only that i
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09 (unit part).** `walk.mjs` gains the `tour` command: a fresh context per role with the kit's
+`bga-mock-api` switch (the runtime config then reports the mock API whatever the server runs, so MSW answers and no
+real record is made) and the tour on; it signs in as the role's demo user, waits for the tour (else opens the
+checklist's Continue), and per step: `look` / `note` → Next; a `note` with "Continue as <role>" → followed; `do` →
+clicks the control the tour marks (`data-bga-tour-current`), "Fill with an example", a sample file for each file
+input (`templates/samples/`, copied next to `walk.mjs`; the media samples arrive with Epic 29), the form's submit, then
+waits up to 20 s for the step to move on; a step that does not is `stuck` (a screenshot, the failing API calls as the
+reason) and the tour's own skip moves past it. `evaluation/tour.py`: `tour_plan` (one demo user per role, each step's
+kind for that role, as the kit decides) and `merge_play` (the browser's results on the planned steps; `not reached`
+for the rest), `play_tours` drives the walker; the service plays the tours before the checks (progress "playing the
+guided tour") and stores them as `report.tour`. The Business tab shows "The guided tour, played": per role and tour,
+each step's result, reason, time and the stuck step's screenshot. Tests: `test_interactive_tour.py` (the plan per role,
+the merge). Deviation: the slow-suite browser run (`BGA_SANDBOX_TESTS=1`) is not added; the browser play is checked on
+the real previews in 28.7.
