@@ -201,3 +201,19 @@ def test_the_tour_finds_a_step_done_by_opening_the_record():
     _, screens = _feed_with("feed", {"Like": "onOpen"})
     places = action_targets(screens.spec)["like.create"]
     assert {(p["route"], p["action"]) for p in places} == {("/videos/[id]", None)}
+
+
+def test_a_catalogue_area_of_members_behaves_like_one():
+    """Story 32.8's first real run (Pocket Chefs, 2026-11-09): the model called the members' area a `catalogue`, for
+    which no pattern was ready, so members met the cook's Edit, Publish and Delete, a "Record view" button and a
+    dashboard. Under the `catalogue` pattern: Feed and Mine, like, save and comment on the recipe (the draft's
+    `create: onRecord`), the view counted when the recipe opens, every check passed."""
+    spec, backend, contract = recorded_app("pocket-chefs")
+    _valid(spec, backend, contract)
+    assert _menu(spec, "members") == ["Feed", "Mine"]
+    record = next(page for page in spec["pages"] if page["route"] == "/members/recipes/[id]")
+    detail = next(s for s in record["sections"] if s["component"] == "AppDetail")
+    assert detail["content"]["onOpen"]["operationId"] == "recipe.recordView"
+    assert not {"Edit", "Publish", "Delete", "Record view"} & {a["label"] for a in detail["content"]["actions"]}
+    members = next(a for a in ux_checks(spec, backend, contract) if a["area"] == "members")
+    assert members["kind"] == "catalogue" and members["failed"] == []

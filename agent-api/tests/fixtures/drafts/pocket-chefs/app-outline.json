@@ -1,0 +1,505 @@
+{
+  "name": "Pocket Chefs",
+  "tagline": "A community where home cooks share short recipe videos",
+  "icon": "ChefHat",
+  "nav": [
+    {
+      "entity": "Recipe",
+      "label": "Feed",
+      "icon": "UtensilsCrossed"
+    },
+    {
+      "entity": "RecipeSave",
+      "label": "Saved Recipes",
+      "icon": "Bookmark"
+    }
+  ],
+  "home": "Recipe",
+  "entities": {
+    "Recipe": {
+      "label": "Recipe",
+      "plural": "Recipes",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "cookingTimeMinutes",
+        "status",
+        "viewCount",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "cookId",
+        "title",
+        "video",
+        "coverPhoto",
+        "cookingTimeMinutes",
+        "ingredients",
+        "status",
+        "viewCount",
+        "likeCount",
+        "saveCount",
+        "createdAt",
+        "updatedAt"
+      ],
+      "fieldLabels": {
+        "cookId": "Cook",
+        "title": "Title",
+        "video": "Recipe Video",
+        "coverPhoto": "Cover Photo",
+        "cookingTimeMinutes": "Cooking Time (mins)",
+        "ingredients": "Ingredients",
+        "status": "Status",
+        "viewCount": "Views",
+        "likeCount": "Likes",
+        "saveCount": "Saves",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      },
+      "help": {
+        "cookingTimeMinutes": "Total preparation and cooking duration in minutes",
+        "coverPhoto": "High-quality cover photo representing the finished dish",
+        "ingredients": "Ingredients list with measurements and instructions",
+        "video": "Short video clip showing the dish being prepared"
+      },
+      "create": "page"
+    },
+    "RecipeLike": {
+      "label": "Like",
+      "plural": "Likes",
+      "displayField": "recipeId",
+      "listFields": [
+        "recipeId",
+        "memberId",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "recipeId",
+        "memberId",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "recipeId": "Recipe",
+        "memberId": "Member",
+        "createdAt": "Liked At"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "RecipeSave": {
+      "label": "Saved Recipe",
+      "plural": "Saved Recipes",
+      "displayField": "recipeId",
+      "listFields": [
+        "recipeId",
+        "memberId",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "recipeId",
+        "memberId",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "recipeId": "Recipe",
+        "memberId": "Member",
+        "createdAt": "Saved At"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "Comment": {
+      "label": "Comment",
+      "plural": "Comments",
+      "displayField": "text",
+      "listFields": [
+        "recipeId",
+        "memberId",
+        "text",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "recipeId",
+        "memberId",
+        "text",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "recipeId": "Recipe",
+        "memberId": "Commenter",
+        "text": "Comment",
+        "status": "Status",
+        "createdAt": "Posted At"
+      },
+      "help": {
+        "text": "Write your feedback or cooking question directly on this dish"
+      },
+      "create": "onRecord"
+    }
+  },
+  "design": {
+    "archetype": "feed",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "standard",
+    "density": "comfortable",
+    "mainEntity": "Recipe",
+    "entities": {
+      "Recipe": {
+        "view": "feed",
+        "roles": {
+          "title": "title",
+          "media": "coverPhoto",
+          "stat": "viewCount",
+          "badge": "status",
+          "meta": [
+            "cookingTimeMinutes",
+            "createdAt"
+          ]
+        },
+        "detailView": "media",
+        "filtersStyle": "chips",
+        "card": "overlay",
+        "aspect": "portrait"
+      },
+      "RecipeLike": {
+        "view": "cards",
+        "roles": {
+          "title": "recipeId",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "card": "text-first"
+      },
+      "RecipeSave": {
+        "view": "cards",
+        "roles": {
+          "title": "recipeId",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "card": "text-first"
+      },
+      "Comment": {
+        "view": "feed",
+        "roles": {
+          "subtitle": "text",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "card": "text-first"
+      }
+    },
+    "homeView": "feed",
+    "looks": [
+      {
+        "recipe": "editorial",
+        "reason": "The requirement asks for it",
+        "fontPairing": "bookish"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Clean surface and quiet framing that puts short cooking videos and dish photography front and center.",
+        "fontPairing": "editorial"
+      },
+      {
+        "recipe": "clay",
+        "reason": "A bolder option (added by code)",
+        "fontPairing": "editorial"
+      }
+    ],
+    "requested": {
+      "accent": "#c8382c",
+      "background": "#faf6ee",
+      "scheme": "light",
+      "headingFont": "serif",
+      "photos": "prominent",
+      "words": "warm and editorial, like a food magazine, cream paper and a deep tomato red"
+    },
+    "seed": 2529420851,
+    "replaced": [
+      "Recipe: duration 'cookingTimeMinutes' left out (a integer field is not a duration)",
+      "Recipe: watch page (watch) needs a video or an audio field; shown as media first (media)",
+      "Comment: title 'memberId' left out (a uuid field is not a name)",
+      "area 'cooks' moved first: sign-up gives the role 'Cook'",
+      "look 'paper' replaced by 'clay': three quiet looks offer no choice"
+    ],
+    "fontPairing": "bookish"
+  },
+  "areas": [
+    {
+      "id": "cooks",
+      "label": "Cook Studio",
+      "roles": [
+        "Cook"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "full",
+        "mainEntity": "Recipe",
+        "entities": {
+          "Recipe": {
+            "groupBy": "status",
+            "view": "board",
+            "roles": {
+              "media": "video"
+            },
+            "detailView": "media",
+            "filtersStyle": "toolbar",
+            "card": "stacked"
+          },
+          "RecipeLike": {
+            "view": "table",
+            "roles": {}
+          },
+          "RecipeSave": {
+            "view": "table",
+            "roles": {}
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "members",
+      "label": "Community",
+      "roles": [
+        "Member"
+      ],
+      "prefix": "/members",
+      "design": {
+        "archetype": "catalogue",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "wide",
+        "mainEntity": "Recipe",
+        "entities": {
+          "Recipe": {
+            "view": "media-grid",
+            "roles": {
+              "media": "video"
+            },
+            "detailView": "media",
+            "filtersStyle": "toolbar",
+            "card": "text-first"
+          },
+          "RecipeLike": {
+            "view": "table",
+            "roles": {}
+          },
+          "RecipeSave": {
+            "view": "table",
+            "roles": {}
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "feed"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Published Recipes",
+      "kind": "figure",
+      "entity": "Recipe",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Draft Recipes",
+      "kind": "figure",
+      "entity": "Recipe",
+      "fn": "count",
+      "filter": {
+        "status": "draft"
+      }
+    },
+    {
+      "label": "Total Views",
+      "kind": "figure",
+      "entity": "Recipe",
+      "fn": "sum",
+      "field": "viewCount",
+      "filter": {}
+    },
+    {
+      "label": "Community Likes",
+      "kind": "figure",
+      "entity": "RecipeLike",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Saved Recipes",
+      "kind": "figure",
+      "entity": "RecipeSave",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Comments Shared",
+      "kind": "figure",
+      "entity": "Comment",
+      "fn": "count",
+      "filter": {}
+    }
+  ],
+  "workflows": {
+    "version": "5ba39e869da2",
+    "tours": [
+      {
+        "id": "publish_recipe",
+        "name": "Publish Recipe",
+        "outcome": "A new recipe video is shared and available for community members to watch",
+        "roles": [
+          "Cook"
+        ],
+        "steps": [
+          {
+            "id": "draft_recipe",
+            "role": "Cook",
+            "actor": "Cook",
+            "title": "Drafts a recipe with title, video, cover photo, cooking time, and ingredients (the recipe becomes draft). Rule: All fields including video, cover photo, cooking time, and ingredients must be provided",
+            "operationId": "recipe.create",
+            "statusAfter": "draft",
+            "page": "recipes-new",
+            "route": "/recipes/new",
+            "target": {
+              "section": "recipe-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "recipe"
+          },
+          {
+            "id": "publish_recipe_step",
+            "role": "Cook",
+            "actor": "Cook",
+            "title": "Publishes the recipe to the community feed (the recipe becomes published)",
+            "operationId": "recipe.publish",
+            "statusAfter": "published",
+            "page": "recipes-id",
+            "route": "/recipes/[id]",
+            "target": {
+              "section": "recipes-detail",
+              "action": "publish"
+            },
+            "kind": "do",
+            "record": "recipe",
+            "needs": {
+              "step": "draft_recipe",
+              "role": "Cook",
+              "status": "draft"
+            }
+          }
+        ]
+      },
+      {
+        "id": "discover_and_engage",
+        "name": "Discover and Engage with Recipe",
+        "outcome": "The recipe gains a view, engagement signals, and public community feedback",
+        "roles": [
+          "Member"
+        ],
+        "steps": [
+          {
+            "id": "open_recipe",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Opens a recipe to watch the video (the recipe becomes viewed). Rule: Opening a recipe increments its view count by one",
+            "operationId": "recipe.recordView",
+            "statusAfter": "viewed",
+            "page": "members-recipes-id",
+            "route": "/members/recipes/[id]",
+            "target": {
+              "section": "recipes-detail",
+              "action": "record-view"
+            },
+            "kind": "do",
+            "record": "recipe"
+          },
+          {
+            "id": "react_recipe",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Likes or saves the recipe to cook later (the recipe becomes saved). Rule: Member must be signed in to like or save",
+            "operationId": "recipeSave.create",
+            "statusAfter": "saved",
+            "page": "members-recipes-id",
+            "route": "/members/recipes/[id]",
+            "target": {
+              "section": "recipes-detail",
+              "action": "add-recipe-saves"
+            },
+            "kind": "do",
+            "record": "recipe",
+            "needs": {
+              "step": "open_recipe",
+              "role": "Member",
+              "status": "viewed"
+            }
+          },
+          {
+            "id": "post_comment",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Writes a comment directly under the recipe (the comment becomes posted). Rule: Comments are public and visible to everyone reading the recipe",
+            "operationId": "comment.create",
+            "statusAfter": "posted",
+            "page": "members-recipes-id",
+            "route": "/members/recipes/[id]",
+            "target": {
+              "section": "recipes-detail",
+              "action": "add-comments"
+            },
+            "kind": "do",
+            "record": "comment"
+          }
+        ]
+      },
+      {
+        "id": "monitor_studio",
+        "name": "Monitor Recipe Performance in Studio",
+        "outcome": "The cook evaluates recipe reach and manages their recipe catalog",
+        "roles": [
+          "Cook"
+        ],
+        "steps": [
+          {
+            "id": "review_performance",
+            "role": "Cook",
+            "actor": "Cook",
+            "title": "Reviews view counts and engagement numbers for posted recipes. Rule: Studio only shows recipes and analytics belonging to the cook",
+            "operationId": "recipe.get",
+            "page": "recipes-id",
+            "route": "/recipes/[id]",
+            "target": {
+              "section": "recipes-detail",
+              "action": null
+            },
+            "kind": "look",
+            "record": "recipe"
+          }
+        ]
+      }
+    ]
+  }
+}

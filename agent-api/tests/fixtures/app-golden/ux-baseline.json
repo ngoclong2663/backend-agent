@@ -1,12 +1,12 @@
 {
   "date": "2026-11-09",
   "summary": {
-    "failures": 24,
+    "failures": 22,
     "byCheck": {
       "contributions-readable": 1,
       "no-dashboard": 6,
       "no-own-interaction-menu": 1,
-      "no-table": 16
+      "no-table": 14
     }
   },
   "areas": {
@@ -98,10 +98,8 @@
     },
     "media-library/app": {
       "archetype": "catalogue",
-      "kind": "catalogue",
-      "failed": [
-        "no-table"
-      ],
+      "kind": "back-office",
+      "failed": [],
       "task": null
     },
     "ember-kitchen/learners": {
@@ -171,6 +169,18 @@
         "operationId": "interaction.like",
         "clicks": 1
       }
+    },
+    "pocket-chefs/cooks": {
+      "archetype": "workspace",
+      "kind": "workspace",
+      "failed": [],
+      "task": null
+    },
+    "pocket-chefs/members": {
+      "archetype": "catalogue",
+      "kind": "catalogue",
+      "failed": [],
+      "task": null
     }
   }
 }

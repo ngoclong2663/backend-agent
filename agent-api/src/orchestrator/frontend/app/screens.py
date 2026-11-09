@@ -43,7 +43,7 @@ OPEN_WORDS = frozenset(
 
 
 def _name_words(name: str) -> set[str]:
-    """`VideoView` → {"video", "view"}."""
+    """`VideoView` → {"video", "view"}; `recordView` → {"record", "view"}."""
     return {word.lower() for word in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])", name)}
 
 
@@ -486,8 +486,8 @@ class _Screens:
             return None
         for op_id in self.custom[entity]:
             found = self.operations[op_id]
-            verb = op_id.split(".", 1)[-1].lower()
-            if found["method"] == "GET" or self.path_params(op_id) != ["id"] or verb not in OPEN_WORDS:
+            verb = op_id.split(".", 1)[-1]  # `view`, `watch`, `recordView`
+            if found["method"] == "GET" or self.path_params(op_id) != ["id"] or not _name_words(verb) & OPEN_WORDS:
                 continue
             if not self.request(op_id)[0]:
                 return {"operationId": op_id, "params": {"id": "$route.id"}}
