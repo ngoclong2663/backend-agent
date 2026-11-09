@@ -88,3 +88,9 @@ archetypes (after the epic); native-app gestures (swipe to the next video is a s
 ## Status
 
 Proposed 2026-11-09, for review.
+
+**Done 2026-11-09** (branch `feat/epic32-product-patterns`): Stories 32.1–32.8. A `pattern` design plugin kind with
+`back-office` (today's screens), `feed`, `catalogue` and `storefront` ready; the planner, the access rules and the
+draft (`draft_app@v9`, `entities.<Entity>.create`) read it; UX checks per kind from 49 failures to 22, none in a
+back-office area; two fresh real requirements generated and checked live in the UI after eight findings, each fixed
+with a test on its real draft. Deviations and the open items in the stories' Status notes.

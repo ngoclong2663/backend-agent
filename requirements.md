@@ -1023,7 +1023,7 @@ _Implemented 2026-11-07 (Epic 25)._
 - **Credit:** the title and channel (YouTube) or the author (Pixabay) with links next to each video, and in the README.
 - **Fallback:** no result, no quota or an unavailable video leaves the place as today and the draft goes on.
 
-### FR-46: Product Patterns (proposed, Epic 32)
+### FR-46: Product Patterns (Epic 32, done 2026-11-09)
 
 - **Behaviour by kind:** each kind of product (the archetype of an app's area: feed, storefront, booking, learning,
   catalogue, workspace, back-office) has a pattern saying what its people see and where they act: the menu, where a

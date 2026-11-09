@@ -94,7 +94,7 @@ lane, tracing, results, and an OpenAPI explorer that sends test calls to the run
 | 29 | [Media fields: video, audio and subtitles, uploaded and played](epic29_media_fields/epic29_media_fields.md) (done 2026-11-09) | Phase 5 | 6 |
 | 30 | [Design plugins: a registry of layouts and looks that grows every day](epic30_design_plugins/epic30_design_plugins.md) (done 2026-11-09; guide: [design-plugins.md](../docs/development/design-plugins.md)) | Phase 5 | 8 |
 | 31 | [Sample videos: YouTube embeds and stock video files](epic31_sample_videos/epic31_sample_videos.md) (done 2026-11-09) | Phase 5 | 5 |
-| 32 | [Product patterns: screens that behave like the product](epic32_product_patterns/epic32_product_patterns.md) (proposed 2026-11-09) | Phase 5 | 8 |
+| 32 | [Product patterns: screens that behave like the product](epic32_product_patterns/epic32_product_patterns.md) (done 2026-11-09) | Phase 5 | 8 |
 
 ### Suggested delivery order
 
