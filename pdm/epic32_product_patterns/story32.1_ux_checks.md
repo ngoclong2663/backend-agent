@@ -39,8 +39,8 @@ that every pattern is judged by how the app behaves and the gain can be shown in
 
 ## Acceptance criteria
 
-- [ ] The structural checks run on every golden app and the recorded drafts; the baseline is committed.
-- [ ] The baseline shows today's failures on the consumer areas (expected: tables, dashboards and form pages in
+- [x] The structural checks run on every golden app and the recorded drafts; the baseline is committed.
+- [x] The baseline shows today's failures on the consumer areas (expected: tables, dashboards and form pages in
       `news-feed` and the TikTok-like drafts) and none on the back-office areas.
 
 ## Verify
@@ -50,3 +50,33 @@ that every pattern is judged by how the app behaves and the gain can be shown in
 ## Status
 
 Proposed 2026-11-09.
+
+**Done 2026-11-09 (with a deviation).** `orchestrator/frontend/app/ux_checks.py` (pure: the planned FrontendSpec, its
+BackendSpec and contract), `make app-design-report ARGS="--ux-only [--baseline]"`, the baseline
+`tests/fixtures/app-golden/ux-baseline.json` held by `tests/test_ux_checks.py`, the guide's section in
+`docs/development/design-checks.md`. Measured on the eleven golden apps and three recorded TikTok-like drafts
+(`tests/fixtures/drafts/tiktok-likes`, `tiktok-feed-sessions`, `tiktok-viewer-ids`): 49 failures, every one in a
+consumer area; every back-office area passes.
+
+| Check | Failures |
+|---|---|
+| `no-table` | 25 |
+| `no-dashboard` | 12 |
+| `no-own-interaction-menu` | 4 |
+| `contribution-on-record`, `no-edit-others` | 3 each |
+| `add-to-cart-on-product`, `contributions-readable` | 1 each |
+
+The TikTok-like viewers fail exactly what the user met in the UI (a dashboard, an edit route for other people's
+videos, a table of their own likes, comments on a page of their own and, in the latest draft, readable by their
+author alone); `plant-shop`'s shopper adds to the cart in three clicks (a form page for the quantity).
+
+Findings for the next stories: (1) the design's archetype inference gives **staff areas a consumer archetype**
+(`clinic-bookings/front-desk` is `booking`, as is the patient's area): 32.2 must give an area whose roles manage the
+main entity's records `back-office` whatever the words say. (2) Single-area apps mix a consumer and a staff role
+(`news-feed`: members and editors; its source and tag tables are the editors'): the pattern must keep the staff's
+screens reachable for the staff role only. (3) The child shapes are classified from the create request (no model
+input); `CartItem` is an `interaction` (its quantity is optional), so a storefront tells the cart apart by its
+quantity field.
+
+Deviation: step 2's task clicks are counted on the planned screens (deterministic, in the tests), not in the browser
+with the kit's signals; the browser task runs in the final check (32.8), by hand and with the walker.

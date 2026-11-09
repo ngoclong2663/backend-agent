@@ -91,6 +91,76 @@ def golden_app(name: str, locale: str | None = None) -> tuple[dict[str, Any], di
     return spec, backend, contract
 
 
+# Epic 32 (Story 32.1): real drafts recorded from the user's runs, planned from their fixtures for the UX checks
+RECORDED = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "drafts"
+RECORDED_APPS = ["tiktok-likes", "tiktok-feed-sessions", "tiktok-viewer-ids"]
+
+
+def recorded_app(name: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """A recorded real draft (its secured BackendSpec and app outline) planned as `draft_app` plans it."""
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.backend.planner import build_plan
+    from src.orchestrator.drafting.app import app_theme
+    from src.orchestrator.frontend.app.outline import complete_outline
+    from src.orchestrator.frontend.app.screens import app_frontend_spec, ensure_aggregates
+    from src.orchestrator.integration.contract import build_contract
+
+    folder = RECORDED / name
+    backend = validate_spec_data(json.loads((folder / "backend-spec.json").read_text())).normalized
+    raw = json.loads((folder / "app-outline.json").read_text())
+    outline, _ = complete_outline(raw, backend, build_contract(backend, build_plan(backend)))
+    backend, outline, _ = ensure_aggregates(backend, outline)
+    contract = build_contract(backend, build_plan(backend))
+    return app_frontend_spec(backend, outline, app_theme(None), contract).spec, backend, contract
+
+
+def ux_report(names: list[str], recorded: list[str]) -> dict[str, Any]:
+    """Story 32.1: the UX checks of every area of the golden apps and the recorded drafts, no browser."""
+    from src.orchestrator.frontend.app.ux_checks import summary, ux_checks
+
+    out: dict[str, Any] = {"date": str(date.today()), "areas": {}}
+    for name in [*names, *recorded]:
+        spec, backend, contract = recorded_app(name) if name in recorded else golden_app(name)
+        for area in ux_checks(spec, backend, contract):
+            out["areas"][f"{name}/{area['area']}"] = area
+    out["summary"] = summary(list(out["areas"].values()))
+    return out
+
+
+def ux_markdown(results: dict[str, Any]) -> str:
+    lines = [
+        f"# UX checks — {results['date']}",
+        "",
+        f"{results['summary']['failures']} failures: "
+        + ", ".join(f"{check} {n}" for check, n in results["summary"]["byCheck"].items()),
+        "",
+        "| Area | Archetype | Main task (clicks) | Failed |",
+        "|---|---|---|---|",
+    ]
+    for key, area in results["areas"].items():
+        task = area.get("task") or {}
+        clicks = f"{task.get('operationId')} ({task.get('clicks')})" if task else "—"
+        failed = sorted({f["check"] for f in area["failed"]})
+        lines.append(f"| {key} | {area['archetype']} | {clicks} | {', '.join(failed) or '—'} |")
+    return "\n".join(lines) + "\n"
+
+
+def ux_baseline(results: dict[str, Any]) -> dict[str, Any]:
+    """What Epic 32's patterns are measured against: per area, the failed checks and the main task's clicks."""
+    return {
+        "date": results["date"],
+        "summary": results["summary"],
+        "areas": {
+            key: {
+                "archetype": area["archetype"],
+                "failed": sorted({f["check"] for f in area["failed"]}),
+                "task": area.get("task"),
+            }
+            for key, area in results["areas"].items()
+        },
+    }
+
+
 def areas(spec: dict[str, Any]) -> list[dict[str, Any]]:
     """The app's areas (Story 23.10), or the app itself as one area at `/`, each with its layout."""
     app = spec.get("app") or {}
@@ -480,6 +550,15 @@ def baseline(results: dict[str, Any]) -> dict[str, Any]:
 async def main(args: argparse.Namespace) -> None:
     out = OUT / str(date.today())
     out.mkdir(parents=True, exist_ok=True)
+    if args.ux_only:  # Story 32.1: the UX checks alone, no build, no browser
+        ux = ux_report(args.app or APPS, [] if args.app else RECORDED_APPS)
+        (out / "ux.json").write_text(json.dumps(ux, indent=2, ensure_ascii=False) + "\n")
+        (out / "ux.md").write_text(ux_markdown(ux))
+        print(ux_markdown(ux))
+        if args.baseline:
+            (GOLDEN / "ux-baseline.json").write_text(json.dumps(ux_baseline(ux), indent=2, ensure_ascii=False) + "\n")
+            print(f"baseline → {GOLDEN / 'ux-baseline.json'}")
+        return
     if args.locale or args.slots:  # a variant: its own folder, never the baseline
         out = out / "-".join(filter(None, [args.locale, "slots" if args.slots else None]))
         out.mkdir(parents=True, exist_ok=True)
@@ -497,4 +576,5 @@ if __name__ == "__main__":
     parser.add_argument("--baseline", action="store_true", help="write tests/fixtures/app-golden/baseline.json")
     parser.add_argument("--locale", help="build the apps in this locale (Story 23.8: ja)")
     parser.add_argument("--slots", action="store_true", help="with the fake engine's view slots (Story 23.11)")
+    parser.add_argument("--ux-only", action="store_true", help="the UX checks alone, no browser (Story 32.1)")
     asyncio.run(main(parser.parse_args()))

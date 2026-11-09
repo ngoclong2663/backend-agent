@@ -91,6 +91,29 @@ engine) on the app kit in the Node sandbox and shoots it on its mock API, **sign
 `--baseline` also writes `agent-api/tests/fixtures/app-golden/baseline.json` (Story 30.1's baseline was taken on
 2026-11-09 before any new plugin: 9 distinct fingerprints of 12 areas, home edge similarity mean 0.25 / max 0.52).
 
+## UX checks: `make app-design-report ARGS=--ux-only` (Story 32.1)
+
+How a planned app behaves for each area's people, judged by the area's archetype; no build, no browser
+(`orchestrator/frontend/app/ux_checks.py`). Runs on the golden apps and the recorded real drafts
+(`tests/fixtures/drafts/tiktok-*`); writes `ux.json` / `ux.md` next to the report. `--baseline` writes
+`tests/fixtures/app-golden/ux-baseline.json`, which `tests/test_ux_checks.py` holds the planner to: a change in how an
+area behaves updates it on purpose.
+
+| Check | Areas | Fails when |
+|---|---|---|
+| `no-unusable-page` | every | a page's operation is not for the area's roles |
+| `no-dashboard`, `no-table` | consumer (feed, storefront, catalogue, booking, learning) | a page of figures; a list as a table |
+| `no-own-interaction-menu` | consumer | a menu item lists a person's own reactions (likes, progress), not a storefront's cart |
+| `no-edit-others` | consumer | an edit page of an entity these roles never create |
+| `home-is-feed`, `interaction-on-record`, `contribution-on-record`, `contributions-readable` | feed | the home lists no main entity; a like is not on the record; a comment is a page of its own; each person reads only their own comments |
+| `add-to-cart-on-product`, `cart-in-menu` | storefront | adding to the cart is not on the product; no cart in the menu |
+| `every-create-reachable` | back-office | a create the roles may call has no form or action |
+
+A record's children are classified by their create request (`child_shapes`): `interaction` (nothing required to fill
+in), `contribution` (a person's text), `part` (the rest); `owned` when the owner comes from the session. The main task
+(a feed's first interaction, a shop's add to cart) is counted in clicks on the planned screens: 1 on the home's cards,
+2 on another page, 3 through a form page.
+
 ## Design plugins: `make design-plugin-check` (Story 30.3)
 
 The gates a design plugin passes before it may be `ready` (Epic 30, D6): see

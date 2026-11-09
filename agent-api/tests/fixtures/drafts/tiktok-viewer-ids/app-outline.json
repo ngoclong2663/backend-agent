@@ -1,0 +1,413 @@
+{
+  "name": "TikTok Mini",
+  "tagline": "Discover, watch, and share short-form videos",
+  "icon": "PlaySquare",
+  "nav": [
+    {
+      "entity": "Video",
+      "label": "Feed",
+      "icon": "Film"
+    },
+    {
+      "entity": "Interaction",
+      "label": "Likes",
+      "icon": "Heart"
+    },
+    {
+      "entity": "Comment",
+      "label": "Comments",
+      "icon": "MessageSquare"
+    }
+  ],
+  "home": "Video",
+  "entities": {
+    "Video": {
+      "label": "Short Video",
+      "plural": "Short Videos",
+      "displayField": "caption",
+      "listFields": [
+        "caption",
+        "status",
+        "durationSeconds",
+        "likesCount",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "caption",
+        "videoFile",
+        "status",
+        "durationSeconds",
+        "creatorId",
+        "errorMessage",
+        "createdAt",
+        "likesCount",
+        "updatedAt"
+      ],
+      "fieldLabels": {
+        "creatorId": "Creator",
+        "videoFile": "Video File",
+        "caption": "Caption",
+        "status": "Status",
+        "errorMessage": "Error Reason",
+        "durationSeconds": "Duration (seconds)",
+        "likesCount": "Likes",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      },
+      "help": {
+        "caption": "Caption describing the short video (max 2200 characters)",
+        "videoFile": "Short video media in MP4 or WebM format"
+      }
+    },
+    "Interaction": {
+      "label": "Interaction",
+      "plural": "Interactions",
+      "displayField": "interactionType",
+      "listFields": [
+        "videoId",
+        "interactionType",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "videoId",
+        "viewerId",
+        "interactionType",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "videoId": "Video",
+        "viewerId": "Viewer",
+        "interactionType": "Type",
+        "createdAt": "Interacted At"
+      },
+      "help": {}
+    },
+    "Comment": {
+      "label": "Comment",
+      "plural": "Comments",
+      "displayField": "commentText",
+      "listFields": [
+        "commentText",
+        "videoId",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "videoId",
+        "viewerId",
+        "commentText",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "videoId": "Video",
+        "viewerId": "Viewer",
+        "commentText": "Comment",
+        "createdAt": "Posted At"
+      },
+      "help": {
+        "commentText": "Comment text cannot be empty"
+      }
+    }
+  },
+  "design": {
+    "archetype": "feed",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "narrow",
+    "density": "compact",
+    "mainEntity": "Video",
+    "entities": {
+      "Video": {
+        "view": "feed",
+        "roles": {
+          "title": "caption",
+          "media": "videoFile",
+          "stat": "likesCount",
+          "duration": "durationSeconds",
+          "badge": "status",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "watch",
+        "filtersStyle": "chips",
+        "card": "overlay",
+        "aspect": "portrait"
+      },
+      "Interaction": {
+        "view": "cards",
+        "roles": {
+          "badge": "interactionType",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "card": "text-first"
+      },
+      "Comment": {
+        "view": "cards",
+        "roles": {
+          "subtitle": "commentText",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "card": "text-first"
+      }
+    },
+    "homeView": "feed",
+    "looks": [
+      {
+        "recipe": "cinema",
+        "reason": "Dark theme with media-first immersive playback mirrors vertical short-video apps.",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "glass",
+        "reason": "Translucent floating action overlays over video playback fit mobile media consumption.",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Minimalist distraction-free canvas lets full-screen video content take center stage.",
+        "fontPairing": "neutral"
+      }
+    ],
+    "seed": 1196576386,
+    "reason": "TikTok-style short video apps emphasize full-screen portrait vertical feeds with overlay interactions.",
+    "replaced": [
+      "area 'creators' moved first: sign-up gives the role 'Creator'"
+    ],
+    "fontPairing": "geometric"
+  },
+  "areas": [
+    {
+      "id": "creators",
+      "label": "Creator Studio",
+      "roles": [
+        "Creator"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "full",
+        "density": "comfortable",
+        "mainEntity": "Video",
+        "entities": {
+          "Video": {
+            "groupBy": "status",
+            "view": "board",
+            "roles": {
+              "media": "videoFile",
+              "duration": "durationSeconds"
+            },
+            "detailView": "record",
+            "filtersStyle": "toolbar",
+            "card": "text-first"
+          },
+          "Interaction": {
+            "view": "table",
+            "roles": {}
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "viewers",
+      "label": "Viewer Feed",
+      "roles": [
+        "Viewer"
+      ],
+      "prefix": "/viewers",
+      "design": {
+        "archetype": "feed",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "narrow",
+        "density": "compact",
+        "mainEntity": "Video",
+        "entities": {
+          "Video": {
+            "view": "cards",
+            "roles": {
+              "media": "videoFile",
+              "duration": "durationSeconds"
+            },
+            "detailView": "media",
+            "filtersStyle": "toolbar",
+            "card": "overlay"
+          },
+          "Interaction": {
+            "view": "table",
+            "roles": {}
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "feed"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Published Videos",
+      "kind": "figure",
+      "entity": "Video",
+      "fn": "count",
+      "filter": {
+        "status": "published"
+      }
+    },
+    {
+      "label": "Draft Videos",
+      "kind": "figure",
+      "entity": "Video",
+      "fn": "count",
+      "filter": {
+        "status": "draft"
+      }
+    },
+    {
+      "label": "Total Likes",
+      "kind": "figure",
+      "entity": "Interaction",
+      "fn": "count",
+      "filter": {
+        "interactionType": "liked"
+      }
+    },
+    {
+      "label": "Total Comments",
+      "kind": "figure",
+      "entity": "Comment",
+      "fn": "count",
+      "filter": {}
+    }
+  ],
+  "workflows": {
+    "version": "e6f974b02f1a",
+    "tours": [
+      {
+        "id": "publish_video",
+        "name": "Publish Short Video",
+        "outcome": "A short video is live and available in the feed for viewers",
+        "roles": [
+          "Creator"
+        ],
+        "steps": [
+          {
+            "id": "upload_file",
+            "role": "Creator",
+            "actor": "Creator",
+            "title": "Select and upload a video file (the video becomes draft). Rule: Video must meet supported media specs",
+            "operationId": "video.create",
+            "statusAfter": "draft",
+            "page": "videos-new",
+            "route": "/videos/new",
+            "target": {
+              "section": "video-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "video"
+          },
+          {
+            "id": "submit_video",
+            "role": "Creator",
+            "actor": "Creator",
+            "title": "Add caption and publish the video (the video becomes published). Rule: Caption must not exceed maximum length",
+            "operationId": "video.publish",
+            "statusAfter": "published",
+            "page": "videos-id",
+            "route": "/videos/[id]",
+            "target": {
+              "section": "videos-detail",
+              "action": "publish"
+            },
+            "kind": "do",
+            "record": "video",
+            "needs": {
+              "step": "upload_file",
+              "role": "Creator",
+              "status": "draft"
+            }
+          }
+        ]
+      },
+      {
+        "id": "watch_and_engage",
+        "name": "Watch and Engage with Feed",
+        "outcome": "Viewer watches videos and interacts with creators",
+        "roles": [
+          "Viewer"
+        ],
+        "steps": [
+          {
+            "id": "view_feed",
+            "role": "Viewer",
+            "actor": "Viewer",
+            "title": "Browse and watch videos in the vertical feed. Rule: Display only published videos",
+            "operationId": "video.list",
+            "page": "viewers-videos",
+            "route": "/viewers/videos",
+            "target": {
+              "section": "videos-list",
+              "action": null
+            },
+            "kind": "look",
+            "record": "video"
+          },
+          {
+            "id": "like_video",
+            "role": "Viewer",
+            "actor": "Viewer",
+            "title": "Like the current video (the interaction becomes liked). Rule: A user can like a video once",
+            "operationId": "interaction.like",
+            "statusAfter": "liked",
+            "page": "viewers-videos-id",
+            "route": "/viewers/videos/[id]",
+            "target": {
+              "section": "videos-detail",
+              "action": "add-interactions"
+            },
+            "kind": "do",
+            "record": "interaction"
+          },
+          {
+            "id": "post_comment",
+            "role": "Viewer",
+            "actor": "Viewer",
+            "title": "Post a comment on the video (the interaction becomes commented). Rule: Comment text cannot be empty",
+            "operationId": "comment.create",
+            "statusAfter": "commented",
+            "page": "viewers-videos-id-comments-new",
+            "route": "/viewers/videos/[id]/comments/new",
+            "target": {
+              "section": "comment-create-in-video-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "interaction",
+            "needs": {
+              "step": "like_video",
+              "role": "Viewer",
+              "status": "liked"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
