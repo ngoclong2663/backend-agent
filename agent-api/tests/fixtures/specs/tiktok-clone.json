@@ -1,0 +1,630 @@
+{
+  "auth": {
+    "roles": [
+      "Creator",
+      "Viewer"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "Short video clip uploaded by creators and watched by viewers",
+      "displayField": "caption",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "creatorId",
+          "nullable": false,
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "description": "Short video file",
+          "maxSize": 104857600,
+          "name": "videoFile",
+          "nullable": false,
+          "required": true,
+          "type": "video"
+        },
+        {
+          "description": "Video caption or description",
+          "maxLength": 300,
+          "name": "caption",
+          "nullable": true,
+          "required": false,
+          "type": "string"
+        },
+        {
+          "description": "Duration of video in seconds",
+          "min": 1,
+          "name": "durationSeconds",
+          "nullable": false,
+          "required": true,
+          "type": "integer",
+          "default": 1
+        },
+        {
+          "default": "draft",
+          "description": "Status flow of video",
+          "name": "status",
+          "nullable": false,
+          "required": true,
+          "type": "enum",
+          "values": [
+            "viewed",
+            "draft",
+            "published",
+            "rejected"
+          ]
+        },
+        {
+          "default": 0,
+          "description": "Total number of views",
+          "min": 0,
+          "name": "viewsCount",
+          "nullable": false,
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "nullable": false,
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "creatorId"
+          ]
+        },
+        {
+          "fields": [
+            "status"
+          ]
+        }
+      ],
+      "name": "Video"
+    },
+    {
+      "description": "Viewer interaction with a video such as like or unlike",
+      "displayField": "type",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "videoId",
+          "nullable": false,
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "viewerId",
+          "nullable": false,
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "like",
+          "name": "type",
+          "nullable": false,
+          "required": true,
+          "type": "enum",
+          "values": [
+            "like"
+          ]
+        },
+        {
+          "default": "liked",
+          "name": "status",
+          "nullable": false,
+          "required": true,
+          "type": "enum",
+          "values": [
+            "liked",
+            "revoked"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "nullable": false,
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "videoId"
+          ]
+        },
+        {
+          "fields": [
+            "viewerId"
+          ]
+        }
+      ],
+      "name": "Interaction",
+      "uniqueConstraints": [
+        [
+          "videoId",
+          "viewerId",
+          "type"
+        ]
+      ]
+    },
+    {
+      "description": "Comment posted by a viewer on a published video",
+      "displayField": "content",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "videoId",
+          "nullable": false,
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "authorId",
+          "nullable": false,
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 500,
+          "name": "content",
+          "nullable": false,
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "posted",
+          "name": "status",
+          "nullable": false,
+          "required": true,
+          "type": "enum",
+          "values": [
+            "posted"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "nullable": false,
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "videoId"
+          ]
+        },
+        {
+          "fields": [
+            "authorId"
+          ]
+        }
+      ],
+      "name": "Comment"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Creator uploads a short video file as draft",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.create",
+      "path": "/videos",
+      "policy": "creatorOnly",
+      "request": {
+        "entity": "Video",
+        "fields": [
+          "videoFile",
+          "caption",
+          "durationSeconds"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "description": "Get video details",
+      "entity": "Video",
+      "method": "GET",
+      "operationId": "video.get",
+      "path": "/videos/{id}",
+      "type": "crud",
+      "policy": "ownVideo"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List videos in feed or studio",
+      "entity": "Video",
+      "filters": [
+        "status",
+        "creatorId"
+      ],
+      "method": "GET",
+      "operationId": "video.list",
+      "pagination": true,
+      "path": "/videos",
+      "search": [
+        "caption"
+      ],
+      "sort": [
+        "createdAt",
+        "viewsCount"
+      ],
+      "type": "crud",
+      "policy": "ownVideo"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "description": "Creator updates video draft metadata",
+      "entity": "Video",
+      "method": "PATCH",
+      "operationId": "video.update",
+      "path": "/videos/{id}",
+      "policy": "ownVideo",
+      "request": {
+        "entity": "Video",
+        "fields": [
+          "caption"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Creator deletes their video",
+      "entity": "Video",
+      "method": "DELETE",
+      "operationId": "video.delete",
+      "path": "/videos/{id}",
+      "policy": "ownVideo",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Viewer views video in feed, changing video status to viewed or incrementing views",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.view",
+      "path": "/videos/{id}/view",
+      "policy": "viewerOnly",
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Creator publishes an existing draft video with caption",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.publish",
+      "path": "/videos/{id}/publish",
+      "policy": "ownVideo",
+      "rules": [
+        "videoFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Creator rejects video upload if format or duration is invalid",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.reject",
+      "path": "/videos/{id}/reject",
+      "policy": "ownVideo",
+      "rules": [
+        "videoFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Viewer likes a published video",
+      "entity": "Interaction",
+      "method": "POST",
+      "operationId": "interaction.create",
+      "path": "/interactions",
+      "policy": "viewerOnly",
+      "request": {
+        "entity": "Interaction",
+        "fields": [
+          "videoId",
+          "type"
+        ]
+      },
+      "rules": [
+        "oneActiveLikePerUser"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List interactions by video or viewer",
+      "entity": "Interaction",
+      "filters": [
+        "videoId",
+        "status",
+        "type"
+      ],
+      "method": "GET",
+      "operationId": "interaction.list",
+      "pagination": true,
+      "path": "/interactions",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud",
+      "policy": "ownInteraction"
+    },
+    {
+      "auth": "jwt",
+      "description": "Viewer unlikes a video, setting interaction status to revoked",
+      "entity": "Interaction",
+      "method": "POST",
+      "operationId": "interaction.unlike",
+      "path": "/interactions/{id}/unlike",
+      "policy": "ownInteraction",
+      "rules": [
+        "interactionFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Interaction"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Viewer posts a comment on a published video",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "viewerOnly",
+      "request": {
+        "entity": "Comment",
+        "fields": [
+          "videoId",
+          "content"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List comments on a video",
+      "entity": "Comment",
+      "filters": [
+        "videoId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "search": [
+        "content"
+      ],
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Author deletes comment",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "ownComment",
+      "type": "crud"
+    },
+    {
+      "operationId": "video.count",
+      "type": "aggregate",
+      "entity": "Video",
+      "method": "GET",
+      "path": "/videos/aggregate/count",
+      "summary": "Published Videos",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "interaction.countWhereStatusLiked",
+      "type": "aggregate",
+      "entity": "Interaction",
+      "method": "GET",
+      "path": "/interactions/aggregate/count-where-status-liked",
+      "summary": "Total Likes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "liked"
+        }
+      }
+    },
+    {
+      "operationId": "comment.countWhereStatusPosted",
+      "type": "aggregate",
+      "entity": "Comment",
+      "method": "GET",
+      "path": "/comments/aggregate/count-where-status-posted",
+      "summary": "Total Comments",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "posted"
+        }
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "creatorOnly",
+      "roles": [
+        "Creator"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "viewerOnly",
+      "roles": [
+        "Viewer"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownVideo",
+      "ownerField": "creatorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownInteraction",
+      "ownerField": "viewerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownComment",
+      "ownerField": "authorId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Video",
+      "name": "viewerPublishedOnly",
+      "roles": [
+        "Viewer"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "published"
+      }
+    }
+  ],
+  "project": {
+    "description": "TikTok-like short video platform with video upload, feed consumption, likes, and comments",
+    "name": "TikTok Clone",
+    "slug": "tiktok-clone"
+  },
+  "relationships": [
+    {
+      "foreignKey": "videoId",
+      "from": "Video",
+      "name": "videoInteractions",
+      "onDelete": "CASCADE",
+      "to": "Interaction",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "videoId",
+      "from": "Video",
+      "name": "videoComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Video status moves from draft to published or rejected, and published to viewed",
+      "entity": "Video",
+      "id": "videoFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "draft": [
+            "published",
+            "rejected"
+          ],
+          "published": [
+            "viewed"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Interaction status moves from liked to revoked",
+      "entity": "Interaction",
+      "id": "interactionFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "liked": [
+            "revoked"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Only one active like per user per video",
+      "entity": "Interaction",
+      "id": "oneActiveLikePerUser",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "videoId",
+          "viewerId",
+          "type"
+        ],
+        "where": {
+          "status": "liked"
+        }
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

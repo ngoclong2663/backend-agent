@@ -311,7 +311,7 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
                 seen.add(key)
                 kept.append(row)
             # leave at least one pair free: the evaluation's and the smoke check's first create must not collide
-            # (gen_01M6Z75NJYKSXNF4JGQPZ4XYF8: the seed filled every learner × lesson pair, so "mark watched" was 409)
+            # (a seed that fills every pair of parents answers the first create with 409)
             # (only when every field is a foreign key: a free text or enum field has no finite set of pairs)
             if all(field in options for field in fields):
                 capacity = 1

@@ -39,6 +39,7 @@ drafts on `antigravity_json` (gemini-3.8-flash-low, fast), generation on the `an
 | Ember Kitchen, a cooking video school (`.data/final/studio-lessons.md`: video lessons with captions in two languages, instructors and learners, questions handed from learner to instructor, a dark cinema look) | `gen_01M6Z75NJYKSXNF4JGQPZ4XYF8` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 10 min 14 s (03:55:59 → 04:06:13) | 4 calls, 70 s, $0 |
 | Lantern Audio, a podcast network (`.data/final/podcast-network.md`: audio episodes with transcripts under shows, a producer drafts then publishes, a warm paper look) | `gen_01M6Z81Z2TM5SFN3ZMD05TPW56` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 5 min 53 s (04:11:26 → 04:17:19) | 5 calls, 60 s, $0 |
 | TikTok Clone, the user's own requirement (`.data/final/tiktok-lite.md`: "a website with basic features look like tiktok"; videos, comments, likes as interactions, viewers and creators) | `gen_01M6ZAFZH8VYM36J6DWVQEYE36` | COMPLETED, all three lanes, no warnings, live API switched (rerun of finding 4 below) | 10 min 01 s (04:53:37 → 05:03:38) | 5 calls, 73 s, $0 |
+| TikTok, the same requirement again after findings 5 and 6 (videos published on creation, likes, comments, a viewer's visibility policy) | `gen_01M6ZFMEQSMCSEN4GXT0RAJEZ6` | COMPLETED, all three lanes, no warnings, live API switched; checked live: the creator adds a video, the viewer lists, opens and views it | 5 min 24 s (06:23:52 → 06:29:16) | 5 calls, 70 s, $0 |
 
 The only warning left on both is the migration check (a duplicated unique constraint, fixed afterwards, below). Three
 earlier rounds of the same two requirements failed and each failure became a fix with a regression test on the real
@@ -65,6 +66,24 @@ drafted spec (`tests/fixtures/specs/ember-kitchen*.json`, `lantern-audio*.json`)
    the free-pair trim of the `uniqueTogether` fixtures counted a free text field as one slot and cut the booking
    fixtures to two, which lost the overlap and duplicate scenarios; it now counts foreign keys only. Rerun as
    `gen_01M6ZAFZH8VYM36J6DWVQEYE36` (the table's third row: clean).
+
+5. `gen_01M6ZAFZH8VYM36J6DWVQEYE36` (completed, but a viewer saw no video after a creator published one, found by
+   the user in the UI): the draft wrote the creator's ownership policy for the creator's actions and a visibility
+   policy "viewers see only published videos" (Story 23.9), and the access rules still put the owner's policy on
+   `video.get` / `video.list`, so a viewer's feed listed only their own videos: none. An entity with a visibility
+   policy now keeps its reads as drafted (the policy says who sees what; `tests/fixtures/specs/tiktok-clone.json`).
+   The rerun `gen_01M6ZF872FJ83Q6CYZ6TTNT5PF` drafted differently and ended NEEDS_REVIEW (finding 6).
+6. `gen_01M6ZF872FJ83Q6CYZ6TTNT5PF` (the draft's FrontendSpec invalid, `FE_UNKNOWN_PAGE`): the draft added a
+   `FeedSession` a viewer starts with nothing to fill in (the owner from the signed-in user, the status and date
+   defaulted); the screen planner linked "New feed" on its list to a create page it never planned (a form with no
+   field is no form). Such a create is now a button in the list page's actions (the kit's collection action), and a
+   create link to a page that does not exist is dropped in any case (`tests/fixtures/drafts/tiktok-feed-sessions/`).
+   Rerun as the table's fourth row.
+
+Open after the fourth run: its draft models viewing as a *status* of the video (`published` → `viewed`, moved by
+`video.view`) next to the visibility policy "viewers see only published videos", so a video any viewer has opened
+leaves every viewer's feed (two of the three seeded videos were already `viewed` by the checks). A view is a viewer's
+event, not the record's state; a drafting rule for that is proposed, not made.
 
 Also found on the way: the access rules made instructor-made courses private to their instructor, so learners opened
 an empty course list (a record whose person field names the role that creates it is now readable by every other

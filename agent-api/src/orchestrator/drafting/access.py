@@ -166,8 +166,8 @@ def find_owned(spec: dict[str, Any], create: bool = True) -> dict[str, Owned]:
         owner_field, role = candidates[0]
         staff = _staff_of(spec, name, [role, *(r for f, r in fields.items() if f != owner_field)], roles)
         if not staff and role in creators:
-            # gen_01M6Z75NJYKSXNF4JGQPZ4XYF8 (2026-11-09): courses are created by instructors for learners; the record
-            # names its maker, not a person it is private to, so every other role reads it (writes stay the owner's)
+            # a record created by the role its person field names (an instructor's course, a seller's listing) names
+            # its maker, not a person it is private to, so every other role reads it (writes stay the owner's)
             staff = [r for r in roles if r != role]
         policy_name = f"{name[:1].lower()}{name[1:]}Own{''.join(w.title() for w in _words(role))}"
         body = {"type": "ownership", "ownerField": owner_field, "bypassRoles": staff}
@@ -244,6 +244,14 @@ def _secure(spec: dict[str, Any], owned: dict[str, Owned]) -> list[dict[str, Any
         return readers[item.entity]
 
     staff_figures: dict[str, str] = {}
+    # a visibility policy says who sees an entity's records (the roles it names see those matching its `where`, every
+    # other role sees every record, Story 23.9), so its reads are not the owner's alone: the owner's policy on them
+    # would leave the other roles an empty list
+    visible = {
+        policy["entity"]: policy["name"]
+        for policy in spec.get("policies") or []
+        if isinstance(policy, dict) and policy.get("type") == "visibility" and policy.get("entity")
+    }
     for index, op in enumerate(spec.get("operations") or []):
         item = owned.get(_entity(op))
         if item is None:
@@ -252,6 +260,9 @@ def _secure(spec: dict[str, Any], owned: dict[str, Owned]) -> list[dict[str, Any
         policy = policies.get(op.get("policy") or "")
         action, method = op.get("action"), str(op.get("method") or "").upper()
         op_id = op.get("operationId")
+        if policy is None and action in ("get", "list") and item.entity in visible:
+            note(index, f"{op_id}: who sees a record follows the visibility policy {visible[item.entity]}")
+            continue
         # 25.2: reads, edits and record actions without a policy get the owner's (an assigned worker opens a record
         # by its id: the worker's roles bypass the read, not the lists)
         if policy is None and (

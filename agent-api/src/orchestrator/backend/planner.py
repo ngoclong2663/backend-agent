@@ -134,9 +134,9 @@ def _relationships(spec: dict[str, Any]) -> tuple[dict[str, list], list[dict], l
     for rel in spec.get("relationships", []):
         if rel["type"] in ("one-to-many", "one-to-one"):
             pairs[(rel["from"], rel["to"])] = pairs.get((rel["from"], rel["to"]), 0) + 1
-    # gen_01M6Z75RG2H8YD1JT4XNZ5AMPP (2026-11-09): a draft with an explicit join entity (EpisodeGuest, a child of both
-    # ends) *and* a many-to-many between the ends: the link model's routes landed in the join entity's module and the
-    # app could not start. The join entity already models the relationship, so such a many-to-many adds nothing.
+    # a draft with an explicit join entity (a child of both ends) *and* a many-to-many between the ends: the link
+    # model's routes would land in the join entity's module and the app could not start. The join entity already
+    # models the relationship, so such a many-to-many adds nothing.
     children_of: dict[str, set[str]] = {}
     for rel in spec.get("relationships", []):
         if rel["type"] == "one-to-many":

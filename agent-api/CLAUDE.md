@@ -157,7 +157,8 @@ Agent-specific notes:
 - Access rules (Epic 25): `orchestrator/drafting/access.py` runs on every valid app draft (`drafting/app.apply_access_rules`,
   kept only when the BackendSpec stays valid, each change a note): records tied to a person (an ownership owner field or
   a `<role>Id` field) are private with the staff's bypass; owner actions lose the bypass; an assigned worker's actions
-  are theirs; a status with a flow changes only through its actions (no "Mark as" buttons then); a person's record that
+  are theirs; a status with a flow changes only through its actions (no "Mark as" buttons then); an entity with a `visibility`
+  policy keeps its reads as drafted (the policy says who sees which records; 2026-11-09); a person's record that
   only staff create names its person (a staff-only `user.list` directory, the policies plugin's `owner_from_request`);
   the fixtures point person fields at demo users of their role, two per person role (`person_roles`).
 - The requirement's look (Story 23.13): `draft_app@v5` writes what the requirement says about the look as values

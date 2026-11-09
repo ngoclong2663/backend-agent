@@ -1,0 +1,588 @@
+{
+  "auth": {
+    "roles": [
+      "Viewer",
+      "Creator"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "caption",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 280,
+          "name": "caption",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 2000,
+          "name": "description",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "name": "videoFile",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "name": "coverImage",
+          "required": false,
+          "type": "image"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "durationSeconds",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "viewsCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "draft",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "draft",
+            "published",
+            "rejected",
+            "viewed"
+          ]
+        },
+        {
+          "index": true,
+          "name": "ownerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Video"
+    },
+    {
+      "displayField": "status",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "ownerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "active",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "active"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "FeedSession"
+    },
+    {
+      "displayField": "status",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "videoId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "ownerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "liked",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "liked"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Interaction"
+    },
+    {
+      "displayField": "content",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "videoId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "ownerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 1000,
+          "name": "content",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "posted",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "posted"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Comment"
+    }
+  ],
+  "operations": [
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Video",
+      "filters": [
+        "status",
+        "ownerId"
+      ],
+      "method": "GET",
+      "operationId": "video.list",
+      "pagination": true,
+      "path": "/videos",
+      "search": [
+        "caption"
+      ],
+      "sort": [
+        "createdAt",
+        "viewsCount"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Video",
+      "method": "GET",
+      "operationId": "video.get",
+      "path": "/videos/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.create",
+      "path": "/videos",
+      "policy": "creatorOnly",
+      "request": {
+        "entity": "Video",
+        "fields": [
+          "caption",
+          "description",
+          "videoFile",
+          "coverImage",
+          "durationSeconds"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Video",
+      "method": "PATCH",
+      "operationId": "video.update",
+      "path": "/videos/{id}",
+      "policy": "ownVideos",
+      "request": {
+        "entity": "Video",
+        "fields": [
+          "caption",
+          "description",
+          "coverImage"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Video",
+      "method": "DELETE",
+      "operationId": "video.delete",
+      "path": "/videos/{id}",
+      "policy": "ownVideos",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Viewer watches a playable published video, recording the view and updating the video status to viewed.",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.play",
+      "path": "/videos/{id}/play",
+      "policy": "viewerOnly",
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "description": "Creator submits and uploads video, transitioning video status from draft to published upon successful upload.",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.publish",
+      "path": "/videos/{id}/publish",
+      "policy": "ownVideos",
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "description": "Rejects a video if format or length validation fails, transitioning video status from draft to rejected.",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.reject",
+      "path": "/videos/{id}/reject",
+      "policy": "ownVideos",
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "action": "create",
+      "entity": "FeedSession",
+      "method": "POST",
+      "operationId": "feedSession.create",
+      "path": "/feed-sessions",
+      "policy": "viewerOnly",
+      "request": {
+        "entity": "FeedSession",
+        "fields": []
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "FeedSession",
+      "method": "GET",
+      "operationId": "feedSession.list",
+      "pagination": true,
+      "path": "/feed-sessions",
+      "policy": "ownFeedSessions",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Interaction",
+      "method": "POST",
+      "operationId": "interaction.create",
+      "path": "/interactions",
+      "policy": "viewerOnly",
+      "request": {
+        "entity": "Interaction",
+        "fields": [
+          "videoId"
+        ]
+      },
+      "rules": [
+        "uniqueLikePerUser"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Interaction",
+      "filters": [
+        "videoId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "interaction.list",
+      "pagination": true,
+      "path": "/interactions",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Interaction",
+      "method": "DELETE",
+      "operationId": "interaction.delete",
+      "path": "/interactions/{id}",
+      "policy": "ownInteractions",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "viewerOnly",
+      "request": {
+        "entity": "Comment",
+        "fields": [
+          "videoId",
+          "content"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Comment",
+      "filters": [
+        "videoId"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "search": [
+        "content"
+      ],
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "ownComments",
+      "type": "crud"
+    },
+    {
+      "operationId": "video.count",
+      "type": "aggregate",
+      "entity": "Video",
+      "method": "GET",
+      "path": "/videos/aggregate/count",
+      "summary": "Published Videos",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "interaction.countWhereStatusLiked",
+      "type": "aggregate",
+      "entity": "Interaction",
+      "method": "GET",
+      "path": "/interactions/aggregate/count-where-status-liked",
+      "summary": "Total Likes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "liked"
+        }
+      }
+    },
+    {
+      "operationId": "comment.count",
+      "type": "aggregate",
+      "entity": "Comment",
+      "method": "GET",
+      "path": "/comments/aggregate/count",
+      "summary": "Total Comments",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "video.countThisWeek",
+      "type": "aggregate",
+      "entity": "Video",
+      "method": "GET",
+      "path": "/videos/aggregate/count-this-week",
+      "summary": "Videos Posted This Week",
+      "aggregate": {
+        "fn": "count",
+        "period": "week",
+        "dateField": "createdAt"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "creatorOnly",
+      "roles": [
+        "Creator"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "viewerOnly",
+      "roles": [
+        "Viewer"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownVideos",
+      "ownerField": "ownerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownFeedSessions",
+      "ownerField": "ownerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownInteractions",
+      "ownerField": "ownerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownComments",
+      "ownerField": "ownerId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Video",
+      "name": "viewerPublishedVideosOnly",
+      "roles": [
+        "Viewer"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "published"
+      }
+    }
+  ],
+  "project": {
+    "description": "Short-form video discovery and sharing platform inspired by TikTok",
+    "name": "TikTok Clone"
+  },
+  "relationships": [
+    {
+      "from": "Video",
+      "name": "videoInteractions",
+      "onDelete": "CASCADE",
+      "to": "Interaction",
+      "type": "one-to-many"
+    },
+    {
+      "from": "Video",
+      "name": "videoComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Video lifecycle state transitions from draft to published/rejected, and viewed during playback",
+      "entity": "Video",
+      "id": "videoTransition",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "draft": [
+            "published",
+            "rejected"
+          ],
+          "published": [
+            "viewed"
+          ],
+          "viewed": []
+        }
+      }
+    },
+    {
+      "description": "A user can only like a video once",
+      "entity": "Interaction",
+      "id": "uniqueLikePerUser",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "videoId",
+          "ownerId"
+        ]
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

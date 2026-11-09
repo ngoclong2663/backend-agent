@@ -879,16 +879,23 @@ class _Screens:
         parent = self.route_parent(entity)
         # create from the entity's own list: not for a child that needs its parent (it is created from there)
         standalone_create = "create" in crud and parent is None
+        create_fields = self.form_fields(entity, crud["create"]) if standalone_create else []
+        # a create with nothing to fill in (the owner from the signed-in user, the rest defaulted: "start a session")
+        # has no form page: it is a button on the list, like any other collection action
+        button = standalone_create and not create_fields
         list_sections: list[dict[str, Any]] = []
         list_sections += self.collection_sections(entity)
+        if button:
+            self.create_button(entity, list_sections)
         if "list" in crud:
-            create = {"create": {"page": f"{slug}-new", "label": self.w("new", label)}} if standalone_create else {}
-            list_sections.append(self.list_section(entity, crud["list"], f"{slug}-list", **create))
+            create = {"create": {"page": f"{slug}-new", "label": self.w("new", label)}}
+            linked = create if standalone_create and not button else {}
+            list_sections.append(self.list_section(entity, crud["list"], f"{slug}-list", **linked))
         if list_sections:
             self.page(slug, f"/{slug}", plural, list_sections)
-        if standalone_create:
+        if standalone_create and not button:
             after = f"{slug}-id" if "get" in crud else slug if list_sections else "home"
-            self.create_page(entity, f"{slug}-new", f"/{slug}/new", {}, after)
+            self.create_page(entity, f"{slug}-new", f"/{slug}/new", {}, after, create_fields)
         if parent and "create" in crud and not standalone_create:
             parent_slug = self.slug(parent["entity"])
             self.create_page(
@@ -906,14 +913,48 @@ class _Screens:
         if "update" in crud:
             self.edit_page(entity)
 
-    def create_page(self, entity: str, page_id: str, route: str, hidden: dict[str, str], after: str) -> None:
+    def create_button(self, entity: str, sections: list[dict[str, Any]]) -> None:
+        """The create of an entity with nothing to fill in: a button in the list page's actions."""
+        label, op_id = self.label(entity), self.crud[entity]["create"]
+        action = {
+            "id": "new",
+            "label": self.w("new", label),
+            "kind": "mutation",
+            "operationId": op_id,
+            "onSuccess": {"toast": self.w("created", label, lower=False)},
+        }
+        bar = next((s for s in sections if s["component"] == "AppActions"), None)
+        if bar is not None:
+            bar["content"]["actions"].insert(0, action)
+        else:
+            sections.append(
+                {
+                    "id": f"{self.slug(entity)}-actions",
+                    "component": "AppActions",
+                    "content": {"entity": entity, "actions": [action]},
+                }
+            )
+        self.place(op_id)
+        self.assumptions.append(
+            _note("/pages", f'{self.plural(entity)}: nothing to fill in, so "{self.w("new", label)}" is a button')
+        )
+
+    def create_page(
+        self,
+        entity: str,
+        page_id: str,
+        route: str,
+        hidden: dict[str, str],
+        after: str,
+        fields: list[dict[str, Any]] | None = None,
+    ) -> None:
         label, op_id = self.label(entity), self.crud[entity]["create"]
         suffix = "" if not hidden else f"_in_{to_camel(self.route_parent(entity)['entity'])}"  # type: ignore[index]
         form_id = self.add_form(
             {
                 "id": f"{to_camel(entity)}_create{suffix}",
                 "operationId": op_id,
-                "fields": self.form_fields(entity, op_id, hidden),
+                "fields": fields if fields is not None else self.form_fields(entity, op_id, hidden),
                 "submitLabel": self.w("create", label),
                 "onSuccess": {"toast": self.w("created", label, lower=False), "navigate": after},
             }
@@ -1242,6 +1283,14 @@ def app_frontend_spec(
         pages = screens.build(name)
         forms = screens.forms
         navigation = [{"label": item["label"][:60], "page": item["page"]} for item in screens.nav]
+    known = {page["id"] for page in pages}
+    for page in pages:  # a create link to a page that was not planned (its form had no field) is no link
+        for section in page.get("sections") or []:
+            content = section.get("content") or {}
+            link = content.get("create")
+            if isinstance(link, dict) and link.get("page") not in known:
+                content.pop("create")
+                screens.unresolved.append(_note("/pages", f"{page['id']}: no page to create from ({link['page']})"))
     spec = _spec(name, project, theme, app, pages, forms, navigation)
     if screens.auth and any(page["id"] == "login" for page in pages):  # Story 22.7: the app signs in
         spec["auth"] = {"signIn": "login", "signUp": "register", "login": "auth.login", "me": "auth.me"}

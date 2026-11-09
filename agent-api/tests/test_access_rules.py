@@ -305,3 +305,31 @@ def test_records_a_staff_role_makes_for_everyone_stay_readable_by_the_other_role
     assert listing["bypassRoles"] == ["learner"], "learners read every course"
     assert _policy(data, "course.get")["bypassRoles"] == ["learner"]
     assert _policy(data, "course.update") == {"name": "instructorsOnly", "type": "role", "roles": ["instructor"]}
+
+
+def test_an_entity_with_a_visibility_policy_keeps_its_reads_open():
+    """gen_01M6ZAFZH8VYM36J6DWVQEYE36 (2026-11-09, TikTok): the draft wrote `ownVideo` (creatorId) for the creator's
+    actions and a visibility policy "viewers see only published videos"; the rule still put the owner's policy on
+    `video.get` / `video.list`, so a viewer's feed was empty after a creator published. A visibility policy says who
+    sees the records: the reads stay as drafted, the owner's actions stay the owner's."""
+    import json
+    from pathlib import Path
+
+    from src.orchestrator.integration.contract import build_contract, contract_operations
+
+    data = json.loads((Path(__file__).parent / "fixtures" / "specs" / "tiktok-clone.json").read_text())
+    for op in data["operations"]:  # the stored spec is the secured one: the draft had no policy on these reads
+        if op["operationId"] in ("video.get", "video.list", "interaction.list"):
+            op.pop("policy")
+    notes = secure_access(data)
+    assert validate_spec_data(data).report.valid
+    ops = {op["operationId"]: op for op in data["operations"]}
+    assert "policy" not in ops["video.get"] and "policy" not in ops["video.list"]
+    followed = "video.list: who sees a record follows the visibility policy viewerPublishedOnly"
+    assert any(followed in n["message"] for n in notes)
+    assert _policy(data, "interaction.list")["ownerField"] == "viewerId", "a viewer's likes stay their own"
+    assert _policy(data, "video.update")["ownerField"] == "creatorId"
+    spec = validate_spec_data(data).normalized
+    listing = contract_operations(build_contract(spec))["video.list"]["operation"]["x-bga"]
+    assert listing["visibility"]["roles"] == ["Viewer"] and listing["visibility"]["where"] == {"status": "published"}
+    assert "ownership" not in listing or not listing["ownership"]

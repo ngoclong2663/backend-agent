@@ -117,7 +117,7 @@ def related_entities(plan: dict[str, Any], spec: dict[str, Any], module: dict[st
     for model in plan["models"]:
         name = model.get("entity")
         if not name:
-            continue  # a link table without an entity (gen_01M6Z6HPQQ0WMJ3ZSZGABM70NR, 2026-11-09: it crashed the lane)
+            continue  # a link table without an entity has no context of its own
         if re.search(rf"\b{re.escape(name)}s?\b", text) or re.search(rf"\b{re.escape(model['table'])}\b", text):
             related.add(name)
     related.discard(entity)

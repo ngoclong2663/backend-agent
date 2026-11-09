@@ -361,3 +361,31 @@ def test_the_dashboard_never_passes_its_cap_and_every_aggregate_has_a_screen():
     assert aggregates == on_dashboard, "an aggregate without a screen left the BackendSpec"
     assert validate_frontend_spec_data(screens.spec).report.valid
     assert uncovered_operations(screens.spec, build_contract(extended, build_plan(extended))) == []
+
+
+def test_a_create_with_nothing_to_fill_in_is_a_button_on_the_list():
+    """A recorded Antigravity draft (2026-11-09, a TikTok-like feed): `FeedSession` is created with no field a
+    viewer fills in (the owner from the signed-in user, the status and date defaulted) and listed. The list linked
+    "New feed" to a create page that was never planned (a form with no field is no form), so the FrontendSpec was
+    invalid (`FE_UNKNOWN_PAGE`). Such a create is a button in the list page's actions; a create link to a page that
+    does not exist is dropped in any case."""
+    recorded = Path(__file__).parent / "fixtures" / "drafts" / "tiktok-feed-sessions"
+    backend = validate_spec_data(json.loads((recorded / "backend-spec.json").read_text())).normalized
+    raw = json.loads((recorded / "app-outline.json").read_text())
+    extended, _, contract, screens = _plan(backend, raw)
+    spec = validate_frontend_spec_data(screens.spec)
+    assert spec.report.valid, [e.message for e in spec.report.errors]
+    assert check_spec_pair(spec.normalized, extended) == [] and uncovered_operations(screens.spec, contract) == []
+    routes = [page["route"] for page in screens.spec["pages"]]
+    assert "/feed-sessions/new" not in routes and "/feed-sessions" in routes
+    listing = next(page for page in screens.spec["pages"] if page["route"] == "/feed-sessions")
+    buttons = next(s for s in listing["sections"] if s["component"] == "AppActions")
+    assert [a["operationId"] for a in buttons["content"]["actions"]] == ["feedSession.create"]
+    assert buttons["content"]["actions"][0]["kind"] == "mutation"
+    table = next(s for s in listing["sections"] if s["component"] == "AppList")
+    assert "create" not in table["content"]
+    known = {page["id"] for page in screens.spec["pages"]}
+    for page in screens.spec["pages"]:
+        for section in page["sections"]:
+            link = (section.get("content") or {}).get("create")
+            assert not link or link["page"] in known
