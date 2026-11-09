@@ -94,6 +94,7 @@ lane, tracing, results, and an OpenAPI explorer that sends test calls to the run
 | 29 | [Media fields: video, audio and subtitles, uploaded and played](epic29_media_fields/epic29_media_fields.md) (done 2026-11-09) | Phase 5 | 6 |
 | 30 | [Design plugins: a registry of layouts and looks that grows every day](epic30_design_plugins/epic30_design_plugins.md) (done 2026-11-09; guide: [design-plugins.md](../docs/development/design-plugins.md)) | Phase 5 | 8 |
 | 31 | [Sample videos: YouTube embeds and stock video files](epic31_sample_videos/epic31_sample_videos.md) (done 2026-11-09) | Phase 5 | 5 |
+| 32 | [Product patterns: screens that behave like the product](epic32_product_patterns/epic32_product_patterns.md) (proposed 2026-11-09) | Phase 5 | 8 |
 
 ### Suggested delivery order
 
@@ -161,6 +162,10 @@ workflow to be built before real generation works.
    layouts after 29.3) → [Epic 31](epic31_sample_videos/epic31_sample_videos.md) (sample videos: YouTube embeds and Pixabay
    stock video files, credited; 31.3 for sites can start after the two providers). After Epic 30, design plugins are added one at a time
    with [the guide](../docs/development/design-plugins.md).
+16. **Proposed 2026-11-09 (after Epics 28–31), for review:**
+   [Epic 32](epic32_product_patterns/epic32_product_patterns.md) (product patterns: how each kind of product behaves,
+   as a design plugin kind the screen planner reads; UX checks measured first; `back-office` is today's screens, `feed`
+   and `storefront` the first new patterns). The other archetypes' patterns follow one at a time after the epic.
 
 ### Status (2026-10-30)
 

@@ -198,7 +198,8 @@ the report's number before and after when it lands.
   of on the video being watched (Story 28.7, finding 8). Code now makes a create with nothing to fill in a button on
   the record; the model still cannot say "on the parent record, as a button" or "when the record opens" (a view
   counted on open). Proposed: a per-operation `placement` (`where`: record / list / page; `trigger`: button / open)
-  in the outline, written by the draft from the business workflows, validated and rendered by code.
+  in the outline, written by the draft from the business workflows, validated and rendered by code. Now [Epic 32](../../pdm/epic32_product_patterns/epic32_product_patterns.md)
+  (product patterns; placement is Story 32.7).
 - **Plugin drafting** (the model writes code, gated): when the kit cannot express a screen, a drafting step could
   author a plugin folder (`make design-plugin-new`, then the gates) instead of per-generation code, so the result
   is reviewed once and reused by every later app. The gates are the safety net the engine-written frontends of

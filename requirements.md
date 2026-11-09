@@ -1023,6 +1023,19 @@ _Implemented 2026-11-07 (Epic 25)._
 - **Credit:** the title and channel (YouTube) or the author (Pixabay) with links next to each video, and in the README.
 - **Fallback:** no result, no quota or an unavailable video leaves the place as today and the draft goes on.
 
+### FR-46: Product Patterns (proposed, Epic 32)
+
+- **Behaviour by kind:** each kind of product (the archetype of an app's area: feed, storefront, booking, learning,
+  catalogue, workspace, back-office) has a pattern saying what its people see and where they act: the menu, where a
+  record's children go (on the record, in a sheet, a tab or a page), which children are public on their record, the
+  home flow, and what these people never get (staff dashboards, edit pages for other people's records).
+- **Same source:** a pattern is a design plugin read by the registry (FR-44); the back-office pattern is today's
+  screens; the model picks the archetype and, only where the requirement says so, an operation's placement; code
+  checks both against the contract and builds the screens. No model writes frontend code per generation.
+- **Measured:** per kind, UX checks and tasks (the clicks to the main task) are played on the mocks and reported
+  against a baseline taken before the patterns.
+- **Requirement first:** what the requirement says about placement or audience overrides the pattern, with a note.
+
 ---
 
 ## 5. BackendSpec Input Example
