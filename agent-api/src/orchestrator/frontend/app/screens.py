@@ -501,13 +501,13 @@ class _Screens:
         return self.never("edit-others") and "create" not in self.crud[entity]
 
     def cart(self) -> str | None:
-        """A storefront's cart: the person's own child of the main entity with a quantity."""
+        """A storefront's cart line (`patterns.cart_of`): the person's own child of the main entity with a quantity."""
         if not self.consumer or "cart" not in (self.pattern.menu or []):
             return None
-        from .patterns import child_shapes, children_of
+        from .patterns import cart_of, child_shapes
 
-        own = {c: info for c, info in child_shapes(self.contract).items() if info["owned"] and c in self.entities}
-        return next((c for c, info in children_of(own, self.main).items() if info["quantity"]), None)
+        shapes = {c: info for c, info in child_shapes(self.contract).items() if c in self.entities}
+        return cart_of(shapes, self.main)
 
     def on_mine(self, entity: str) -> bool:
         """A person's own reaction or contribution under a record, listed on the consumer pattern's Mine page."""
@@ -537,6 +537,8 @@ class _Screens:
         if drafted not in ("onRecord", "onOpen") and not self.on_record(entity) or "create" not in self.crud[entity]:
             return None
         parent = self.route_parent(entity)
+        if entity == self.cart():  # a shop's line is put in the cart from the product, whatever else it belongs to
+            parent = next((ref for ref in self.references(entity) if ref["entity"] == self.main), parent)
         if parent is None:
             return None
         fields = self.form_fields(entity, self.crud[entity]["create"], {parent["field"]: "$route.id"})
@@ -1472,18 +1474,21 @@ class _Screens:
             )
         from .patterns import child_shapes
 
-        own = {
-            child: info
-            for child, info in child_shapes(self.contract).items()
-            if info["owned"] and child in self.entities
-        }
+        shapes = child_shapes(self.contract)
+        own = {child: info for child, info in shapes.items() if info["owned"] and child in self.entities}
         cart = self.cart()
-        if cart and self.slug(cart) in pages:
+        # the cart in the menu: the person's container of its lines when there is one (a Cart of CartItems)
+        container = next(
+            (p for p in (shapes.get(cart or "") or {}).get("ownedVia") or [] if self.slug(p) in pages), None
+        )
+        shown = container or cart
+        if shown and self.slug(shown) in pages:
             menu.append(
-                by_page.get(self.slug(cart)) or {"label": self.plural(cart), "page": self.slug(cart), "entity": cart}
+                by_page.get(self.slug(shown))
+                or {"label": self.plural(shown), "page": self.slug(shown), "entity": shown}
             )
         for entity in self.entities:  # the person's own top-level records ("My orders"): a page of their own
-            if entity in (self.main, cart) or entity in own or self.slug(entity) not in pages:
+            if entity in (self.main, cart, container) or entity in own or self.slug(entity) not in pages:
                 continue
             listing = self.operations.get(self.crud[entity].get("list") or "")
             policy = ((listing or {}).get("operation", {}).get("x-bga") or {}).get("policy") or {}

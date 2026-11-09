@@ -52,8 +52,15 @@ def _actions(page: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
 
 
 def _cart(children: dict[str, dict[str, Any]]) -> str | None:
-    """A shopper's cart: an owned child of the main entity with a quantity."""
-    return next((child for child, info in children.items() if info["owned"] and info["quantity"]), None)
+    """A shopper's cart line (`patterns.cart_of`)."""
+    return next(
+        (
+            c
+            for c, info in children.items()
+            if info["quantity"] and info["create"] and (info["owned"] or info.get("ownedVia"))
+        ),
+        None,
+    )
 
 
 def _clicks(op_id: str | None, pages: list[dict[str, Any]], home: dict[str, Any] | None, forms: dict) -> int | None:
@@ -214,7 +221,10 @@ def ux_checks(spec: dict[str, Any], backend: dict[str, Any], contract: dict[str,
             )
             check(
                 "cart-in-menu",
-                [] if cart and any(_lists(page, cart) for page in area_menu) else [("menu", "no cart in the menu")],
+                []  # the cart's lines, or the person's container of them (a Cart of CartItems)
+                if cart
+                and any(_lists(page, e) for page in area_menu for e in [cart, *children[cart].get("ownedVia", [])])
+                else [("menu", "no cart in the menu")],
             )
             task, clicks = cart_create, _clicks(cart_create, pages, home, forms)
         elif area["kind"] == "back-office":

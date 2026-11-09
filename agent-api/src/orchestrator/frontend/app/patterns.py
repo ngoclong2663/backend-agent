@@ -76,7 +76,33 @@ def child_shapes(contract: dict[str, Any]) -> dict[str, dict[str, Any]]:
             elif any(prop.get("type") == "string" and not prop.get("enum") for prop in wanted.values()):
                 shape = "contribution"
         out[name] = {"parents": parents, "shape": shape, "owned": owned, "quantity": quantity, "create": op_id}
+    owners = _owned_entities(contract)
+    for info in out.values():  # a line of a person's own container (a cart's item: the cart is the shopper's)
+        info["ownedVia"] = [p["entity"] for p in info["parents"] if p["entity"] in owners]
     return out
+
+
+def _owned_entities(contract: dict[str, Any]) -> set[str]:
+    """Entities whose records are a person's own: the owner comes from the session, or the list shows one's own."""
+    out = set()
+    for op_id, found in contract_operations(contract).items():
+        meta = _meta(found)
+        if meta.get("action") == "list" and (meta.get("policy") or {}).get("type") == "ownership":
+            out.add(meta.get("entity"))
+        elif meta.get("action") == "create":
+            props, _ = create_request(contract, op_id)
+            if any(prop["x-bga"].get("source") == "currentUser" for prop in props.values()):
+                out.add(meta.get("entity"))
+    return out
+
+
+def cart_of(shapes: dict[str, dict[str, Any]], main: str | None) -> str | None:
+    """A shopper's cart line: a child of the main entity with a quantity and a create, the person's own directly or
+    through its container (a cart's item). Order items have no create of their own (the checkout makes them)."""
+    for child, info in children_of(shapes, main).items():
+        if info["quantity"] and info["create"] and (info["owned"] or info.get("ownedVia")):
+            return child
+    return None
 
 
 def children_of(shapes: dict[str, dict[str, Any]], entity: str | None) -> dict[str, dict[str, Any]]:
@@ -115,10 +141,8 @@ def pattern_fits(pattern: DesignPluginDescriptor, contract: dict[str, Any], main
     for need in pattern.needs:
         if need == "signIn" and not meta.get("auth"):
             return False
-        if need == "purchase" and not meta.get("payments"):
-            own = {c: info for c, info in child_shapes(contract).items() if info["owned"]}
-            if not any(info["quantity"] for info in children_of(own, main).values()):
-                return False
+        if need == "purchase" and not meta.get("payments") and cart_of(child_shapes(contract), main) is None:
+            return False
     return True
 
 

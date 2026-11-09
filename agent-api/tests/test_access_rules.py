@@ -446,3 +446,15 @@ def test_the_public_shapes_come_from_the_ready_patterns_of_the_drafted_areas():
     assert public_shapes({}, "feed") == frozenset({"contribution"}), "a single area takes code's hint"
     assert public_shapes({"design": {"archetype": "back-office"}}, "feed") == frozenset()
     assert public_shapes({"design": {"archetype": "booking"}}, None) == frozenset(), "no booking pattern yet"
+
+
+def test_a_role_with_a_space_still_gets_a_demo_login_that_signs_in():
+    """Story 32.8 (Thread & Needle, 2026-11-09): the role "Shop Owner" gave `demo-Shop Owner@example.com`, which the
+    sign-in form refuses as an address; the user could not sign in as the owner. Plain roles keep their login."""
+    from src.orchestrator.plugins.auth_jwt import _demo_login
+
+    assert _demo_login("email", "Shop Owner") == "demo-Shop-Owner@example.com"
+    assert _demo_login("email", "Shop Owner-2") == "demo-Shop-Owner-2@example.com"
+    assert _demo_login("email", "member") == "demo-member@example.com"
+    assert _demo_login("email", "front_desk") == "demo-front_desk@example.com"
+    assert _demo_login("username", "Head Chef") == "demo-Head-Chef"

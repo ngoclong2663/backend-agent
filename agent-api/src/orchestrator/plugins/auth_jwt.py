@@ -7,6 +7,7 @@ The spec names the user entity (`auth.userEntity`, default `User`; added when th
 (`src/modules/auth/`) is the plugin's own: codegen and the engine leave it alone.
 """
 
+import re
 import uuid
 from typing import Any
 
@@ -34,7 +35,11 @@ def _auth(spec: dict[str, Any]) -> dict[str, Any]:
 
 
 def _demo_login(login_field: str, role: str) -> str:
-    return f"demo-{role}@example.com" if "email" in login_field.lower() else f"demo-{role}"
+    """`demo-<role>@example.com` (or `demo-<role>`). A role is a name people read ("Shop Owner"): anything a login
+    cannot hold becomes a hyphen (`demo-Shop-Owner@example.com`), so the demo account can sign in (Story 32.8: a space
+    made the shop owner's address invalid in the sign-in form). Plain roles keep their login as it was."""
+    part = re.sub(r"[^A-Za-z0-9._-]+", "-", role).strip("-") or "user"
+    return f"demo-{part}@example.com" if "email" in login_field.lower() else f"demo-{part}"
 
 
 def _secured(op: dict[str, Any]) -> bool:
