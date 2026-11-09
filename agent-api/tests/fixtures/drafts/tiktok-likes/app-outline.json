@@ -1,0 +1,394 @@
+{
+  "name": "TokPulse",
+  "tagline": "Discover, watch, and share short-form videos",
+  "icon": "PlaySquare",
+  "nav": [
+    {
+      "entity": "Video",
+      "label": "Feed",
+      "icon": "Film"
+    },
+    {
+      "entity": "Like",
+      "label": "Likes",
+      "icon": "Heart"
+    },
+    {
+      "entity": "Comment",
+      "label": "Comments",
+      "icon": "MessageSquare"
+    }
+  ],
+  "home": "Video",
+  "entities": {
+    "Video": {
+      "label": "Video",
+      "plural": "Videos",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "durationSeconds",
+        "viewCount",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "videoFile",
+        "coverImage",
+        "durationSeconds",
+        "status",
+        "viewCount",
+        "createdAt",
+        "ownerId"
+      ],
+      "fieldLabels": {
+        "title": "Video Title",
+        "videoFile": "Video File",
+        "coverImage": "Thumbnail Cover",
+        "durationSeconds": "Duration (sec)",
+        "status": "Status",
+        "viewCount": "Views",
+        "ownerId": "Owner",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "durationSeconds": "Duration of video under maximum allowed limit (60 seconds)",
+        "videoFile": "Short-form MP4 or WebM video file"
+      }
+    },
+    "Like": {
+      "label": "Like",
+      "plural": "Likes",
+      "displayField": "id",
+      "listFields": [
+        "videoId",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "videoId",
+        "status",
+        "createdAt",
+        "ownerId"
+      ],
+      "fieldLabels": {
+        "videoId": "Video",
+        "ownerId": "Owner",
+        "status": "Status",
+        "createdAt": "Liked At"
+      },
+      "help": {}
+    },
+    "Comment": {
+      "label": "Comment",
+      "plural": "Comments",
+      "displayField": "content",
+      "listFields": [
+        "content",
+        "videoId",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "videoId",
+        "content",
+        "status",
+        "createdAt",
+        "ownerId"
+      ],
+      "fieldLabels": {
+        "videoId": "Video",
+        "ownerId": "Owner",
+        "content": "Comment Text",
+        "status": "Status",
+        "createdAt": "Posted At"
+      },
+      "help": {
+        "content": "Comment text must not be empty"
+      }
+    }
+  },
+  "design": {
+    "archetype": "feed",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "narrow",
+    "density": "spacious",
+    "mainEntity": "Video",
+    "entities": {
+      "Video": {
+        "view": "feed",
+        "roles": {
+          "title": "title",
+          "media": "coverImage",
+          "stat": "viewCount",
+          "duration": "durationSeconds",
+          "badge": "status",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "media",
+        "filtersStyle": "chips",
+        "card": "overlay",
+        "aspect": "portrait"
+      },
+      "Like": {
+        "view": "cards",
+        "roles": {
+          "subtitle": "videoId"
+        },
+        "detailView": "record",
+        "card": "stacked"
+      },
+      "Comment": {
+        "view": "cards",
+        "roles": {
+          "subtitle": "content"
+        },
+        "detailView": "record",
+        "card": "stacked"
+      }
+    },
+    "homeView": "feed",
+    "looks": [
+      {
+        "recipe": "neon",
+        "reason": "High contrast, vibrant accents, and dark OLED backgrounds echo modern mobile short-video platforms like TikTok.",
+        "fontPairing": "loud"
+      },
+      {
+        "recipe": "cinema",
+        "reason": "Dark surfaces keep focus strictly on portrait video playback and engagement overlays.",
+        "fontPairing": "humanist"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Minimal edge styling and clear typography maximize screen real estate for fast video scrolling.",
+        "fontPairing": "neutral"
+      }
+    ],
+    "requested": {
+      "scheme": "dark",
+      "photos": "prominent",
+      "words": "basic features look like tiktok"
+    },
+    "seed": 2403392822,
+    "reason": "The TikTok-like platform focuses on vertical short-form video streaming, quick reactions, and creator content uploads.",
+    "replaced": [
+      "Video: watch page (watch) needs a video or an audio field; shown as media first (media)",
+      "Like: title 'ownerId' left out (a uuid field is not a name)",
+      "Comment: title 'ownerId' left out (a uuid field is not a name)",
+      "area 'viewers': Video: watch page (watch) needs a video or an audio field; shown as media first (media)",
+      "area 'creators': Video: watch page (watch) needs a video or an audio field; shown as media first (media)",
+      "area 'creators' moved first: sign-up gives the role 'Creator'"
+    ],
+    "fontPairing": "loud"
+  },
+  "areas": [
+    {
+      "id": "creators",
+      "label": "Creator Studio",
+      "roles": [
+        "Creator"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "density": "comfortable",
+        "mainEntity": "Video",
+        "entities": {
+          "Video": {
+            "view": "media-grid",
+            "roles": {
+              "title": "title",
+              "media": "coverImage",
+              "stat": "viewCount",
+              "duration": "durationSeconds",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "media",
+            "filtersStyle": "toolbar",
+            "card": "stacked",
+            "aspect": "portrait"
+          },
+          "Like": {
+            "view": "table",
+            "roles": {}
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {},
+            "card": "stacked"
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "viewers",
+      "label": "Viewer Experience",
+      "roles": [
+        "Viewer"
+      ],
+      "prefix": "/viewers",
+      "design": {
+        "archetype": "feed",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "narrow",
+        "density": "spacious",
+        "mainEntity": "Video",
+        "entities": {
+          "Video": {
+            "view": "feed",
+            "roles": {
+              "title": "title",
+              "media": "coverImage",
+              "stat": "viewCount",
+              "duration": "durationSeconds",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "media",
+            "filtersStyle": "chips",
+            "card": "overlay",
+            "aspect": "portrait"
+          },
+          "Like": {
+            "view": "cards",
+            "roles": {},
+            "card": "stacked"
+          },
+          "Comment": {
+            "view": "cards",
+            "roles": {},
+            "card": "stacked"
+          }
+        },
+        "homeView": "feed"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Published Videos",
+      "kind": "figure",
+      "entity": "Video",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Videos Published This Week",
+      "kind": "figure",
+      "entity": "Video",
+      "fn": "count",
+      "filter": {},
+      "period": "week",
+      "dateField": "createdAt"
+    },
+    {
+      "label": "Comments This Week",
+      "kind": "figure",
+      "entity": "Comment",
+      "fn": "count",
+      "filter": {},
+      "period": "week",
+      "dateField": "createdAt"
+    },
+    {
+      "label": "Total Likes",
+      "kind": "figure",
+      "entity": "Like",
+      "fn": "count",
+      "filter": {},
+      "period": "week",
+      "dateField": "createdAt"
+    }
+  ],
+  "workflows": {
+    "version": "376501bacefa",
+    "tours": [
+      {
+        "id": "watch_and_engage_video",
+        "name": "Watch and Engage with Videos",
+        "outcome": "Viewer watches a video and interacts via like or comment",
+        "roles": [
+          "Viewer"
+        ],
+        "steps": [
+          {
+            "id": "step_browse_feed",
+            "role": "Viewer",
+            "actor": "Viewer",
+            "title": "Browse short video feed (the video becomes viewed). Rule: Only published videos are displayed",
+            "operationId": "video.view",
+            "statusAfter": "viewed",
+            "page": "viewers-videos",
+            "route": "/viewers/videos",
+            "target": {
+              "section": "videos-list",
+              "action": "view"
+            },
+            "kind": "do",
+            "record": "video"
+          },
+          {
+            "id": "step_like_video",
+            "role": "Viewer",
+            "actor": "Viewer",
+            "title": "Like video (the like becomes liked). Rule: A viewer can like a video only once",
+            "operationId": "like.create",
+            "statusAfter": "liked",
+            "page": "viewers-videos-id-likes-new",
+            "route": "/viewers/videos/[id]/likes/new",
+            "target": {
+              "section": "like-create-in-video-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "like"
+          }
+        ]
+      },
+      {
+        "id": "publish_video",
+        "name": "Publish Short Video",
+        "outcome": "Short video is published and visible on the feed",
+        "roles": [
+          "Creator"
+        ],
+        "steps": [
+          {
+            "id": "step_upload_video",
+            "role": "Creator",
+            "actor": "Creator",
+            "title": "Upload video file with title (the video becomes published). Rule: File must be a supported video format under maximum allowed duration",
+            "operationId": "video.create",
+            "statusAfter": "published",
+            "page": "videos-new",
+            "route": "/videos/new",
+            "target": {
+              "section": "video-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "video"
+          }
+        ]
+      }
+    ]
+  }
+}

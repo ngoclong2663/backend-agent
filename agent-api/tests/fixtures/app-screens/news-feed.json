@@ -17,6 +17,7 @@
         "actions": [
           "view",
           "edit",
+          "add-bookmarks",
           "upvote",
           "delete"
         ]
@@ -84,6 +85,7 @@
         "actions": [
           "view",
           "edit",
+          "add-bookmarks",
           "upvote",
           "delete"
         ]
@@ -113,6 +115,7 @@
         },
         "actions": [
           "edit",
+          "add-bookmarks",
           "upvote",
           "delete"
         ]
@@ -143,14 +146,6 @@
             "id": "$route.id"
           }
         },
-        "actions": []
-      }
-    ],
-    "/posts/[id]/bookmarks/new": [
-      {
-        "id": "bookmark-create-in-post-form",
-        "component": "AppForm",
-        "form": "bookmark_create_in_post",
         "actions": []
       }
     ],
@@ -229,6 +224,7 @@
         "actions": [
           "view",
           "edit",
+          "add-bookmarks",
           "upvote",
           "delete"
         ]
@@ -370,12 +366,6 @@
         "readingTime",
         "upvoteCount",
         "isHidden"
-      ]
-    },
-    "bookmark_create_in_post": {
-      "operationId": "bookmark.create",
-      "fields": [
-        "postId=$route.id"
       ]
     },
     "auth_login": {

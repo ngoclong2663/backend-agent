@@ -342,7 +342,10 @@ export function pageHref(page: string, params: Record<string, unknown> = {}, rou
 
 /** Whether a record allows an action (Story 10.0b `allowedActions`): the backend decides, the kit only reads. Links
  *  that only show a record are always allowed; records without the list allow everything. */
-export function allowed(record: TRecord | undefined, action: TAppAction): boolean {
+export function allowed(record: TRecord | undefined, action: TAppAction, session?: TSession): boolean {
+  // an action that does not address this record by id (a collection action; a child created from the record with one
+  // click, its body naming the record) is not among the record's own `allowedActions`: the operation's access decides
+  if (action.kind === "mutation" && action.operationId && !action.params) return !session || canUse(action.operationId, session);
   const list = record?.allowedActions;
   if (!Array.isArray(list)) return !action.allow; // a transition or a payment needs the record to allow it
   if (action.allow) return list.includes(action.allow);

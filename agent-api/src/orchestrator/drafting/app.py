@@ -44,7 +44,7 @@ from .answer_schema import app_answer_schema
 # v7 (Epic 30): the design choices from the plugin registry; v6 (Epic 29): the media field types; v5: the
 # requirement's own look (`design.requested`); v4 (Epic 25): the access rules; v3 (Story 23.6): the design brief and
 # areas; v2 (22.8): sign-in, roles, plugins
-PROMPT = ("draft_app", "v7")
+PROMPT = ("draft_app", "v8")
 OUTLINE_FILE = "app-outline.json"  # what the model drafts next to the BackendSpec (code folds it into the FrontendSpec)
 # Outline examples shown in the prompt, relative to EXAMPLES_DIR; they fit `specs/flashcards.json`,
 # `specs/two-entity.json` and `specs/workshop-bookings.json` (the fake engine drafts from them too).

@@ -40,6 +40,7 @@ drafts on `antigravity_json` (gemini-3.8-flash-low, fast), generation on the `an
 | Lantern Audio, a podcast network (`.data/final/podcast-network.md`: audio episodes with transcripts under shows, a producer drafts then publishes, a warm paper look) | `gen_01M6Z81Z2TM5SFN3ZMD05TPW56` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 5 min 53 s (04:11:26 → 04:17:19) | 5 calls, 60 s, $0 |
 | TikTok Clone, the user's own requirement (`.data/final/tiktok-lite.md`: "a website with basic features look like tiktok"; videos, comments, likes as interactions, viewers and creators) | `gen_01M6ZAFZH8VYM36J6DWVQEYE36` | COMPLETED, all three lanes, no warnings, live API switched (rerun of finding 4 below) | 10 min 01 s (04:53:37 → 05:03:38) | 5 calls, 73 s, $0 |
 | TikTok, the same requirement again after findings 5 and 6 (videos published on creation, likes, comments, a viewer's visibility policy) | `gen_01M6ZFMEQSMCSEN4GXT0RAJEZ6` | COMPLETED, all three lanes, no warnings, live API switched; checked live: the creator adds a video, the viewer lists, opens and views it | 5 min 24 s (06:23:52 → 06:29:16) | 5 calls, 70 s, $0 |
+| TikTok, the same requirement on `draft_app@v8` (findings 7 and 8: a video's status is its own, UPLOADED → PUBLISHED / REJECTED; watching is an action and a `VideoView` entity; likes once per person) | `gen_01M6ZGXFSDP3CPGVCP9C6BNV5X` | COMPLETED, all three lanes, no warnings, live API switched; checked live with a real upload: a new video is 404 to the viewer until published, then opened, watched and still in the feed; a second like is 409 | 7 min 04 s (06:46:17 → 06:53:21) | 4 calls, 57 s, $0 |
 
 The only warning left on both is the migration check (a duplicated unique constraint, fixed afterwards, below). Three
 earlier rounds of the same two requirements failed and each failure became a fix with a regression test on the real
@@ -80,10 +81,25 @@ drafted spec (`tests/fixtures/specs/ember-kitchen*.json`, `lantern-audio*.json`)
    create link to a page that does not exist is dropped in any case (`tests/fixtures/drafts/tiktok-feed-sessions/`).
    Rerun as the table's fourth row.
 
-Open after the fourth run: its draft models viewing as a *status* of the video (`published` → `viewed`, moved by
-`video.view`) next to the visibility policy "viewers see only published videos", so a video any viewer has opened
-leaves every viewer's feed (two of the three seeded videos were already `viewed` by the checks). A view is a viewer's
-event, not the record's state; a drafting rule for that is proposed, not made.
+7. `gen_01M6ZFMEQSMCSEN4GXT0RAJEZ6` (the user's video, created from the creator's studio, missing from the viewer's
+   list even with `status=published`): the draft modelled viewing as a *status* of the video (`published` → `viewed`,
+   moved by `video.view`) next to the visibility policy "viewers see only published videos", so a video any viewer
+   opened left every viewer's feed (two of the three seeded videos were already `viewed` by the checks; the same
+   draft family had `VIEWED` / `LIKED` statuses in finding 4's run). `draft_app@v8` adds one rule: a status is the
+   record's state; what a person does with a record (viewed, liked, saved) is an interaction entity or a counter,
+   never a status value or a transition. Rerun as the table's fifth row.
+8. The same run, from the user's hands-on review: a like was a tab on the video with a link to a form page of one
+   button, far from the video being watched. A child create with nothing visible to fill in (the parent from the
+   route, the owner from the signed-in user) is now an action on the parent's record, on its cards and rows and on
+   its page (`screens.quick_create`; the kit gates such an action by the operation's access and resolves the record
+   into its body); the news-feed golden app's bookmark takes the same shape (`tests/fixtures/drafts/tiktok-likes/`).
+   What the model never says is *where an interaction belongs* (a like while watching, a view when the record
+   opens): a placement input in the outline is proposed in the Epic 30 plugin backlog, not made.
+9. The fifth row's run, from the user's review: signed in as a viewer, the comment and like forms ask to *choose a
+   user*, and the viewer can browse the user list. The draft named the liker / commenter `creatorId` (the field of
+   the role that made the row was named after the other role), so the access rules read "a viewer creates a record
+   for a creator" and added the staff directory (`user.list` for viewers) and a picker. `draft_app@v8` now also
+   says a person field is named after that person's role; the code side is the next fix.
 
 Also found on the way: the access rules made instructor-made courses private to their instructor, so learners opened
 an empty course list (a record whose person field names the role that creates it is now readable by every other

@@ -389,3 +389,46 @@ def test_a_create_with_nothing_to_fill_in_is_a_button_on_the_list():
         for section in page["sections"]:
             link = (section.get("content") or {}).get("create")
             assert not link or link["page"] in known
+
+
+def test_a_child_with_nothing_to_fill_in_is_an_action_on_its_parent():
+    """A recorded Antigravity draft (2026-11-09, a TikTok-like feed): a Like has the video from the route and the
+    viewer from the session, nothing to fill in. The planner gave it a tab on the video with a link to a form page
+    of one button, far from the video. Such a create is an action on the parent's record: on its cards and rows,
+    and on its page, with the record's id in the body; no form page, no tab create link."""
+    recorded = Path(__file__).parent / "fixtures" / "drafts" / "tiktok-likes"
+    backend = validate_spec_data(json.loads((recorded / "backend-spec.json").read_text())).normalized
+    raw = json.loads((recorded / "app-outline.json").read_text())
+    extended, _, contract, screens = _plan(backend, raw)
+    spec = validate_frontend_spec_data(screens.spec)
+    assert spec.report.valid, [e.message for e in spec.report.errors]
+    assert check_spec_pair(spec.normalized, extended) == [] and uncovered_operations(screens.spec, contract) == []
+    routes = {page["route"]: page for page in screens.spec["pages"]}
+    assert not any(route.endswith("/likes/new") for route in routes), routes.keys()
+    details = [page for route, page in routes.items() if route.endswith("/videos/[id]")]  # one per area
+    likes = [
+        a
+        for page in details
+        for a in page["sections"][0]["content"]["actions"]
+        if a.get("operationId") == "like.create"
+    ]
+    assert len(likes) == 1, "the viewers' video page has it, the creators' (who may not like) has not"
+    like = likes[0]
+    assert like["kind"] == "mutation" and like["body"] == {"videoId": "$route.id"} and like["label"] == "Like"
+    assert "params" not in like, "it does not address the video by id: the operation's access gates it"
+    cards = [
+        s
+        for route, page in routes.items()
+        if route.endswith("/videos") and "[id]" not in route
+        for s in page["sections"]
+        if s["component"] == "AppList"
+    ]
+    assert any(
+        a.get("operationId") == "like.create" and a.get("body") == {"videoId": "$record.id"}
+        for s in cards
+        for a in s["content"]["actions"]
+    ), "the like is on the viewers' cards too"
+    for page in details:  # the likes tab, if any, has no create link
+        for section in page["sections"]:
+            if section["component"] == "AppList" and section["content"]["entity"] == "Like":
+                assert "create" not in section["content"]

@@ -175,6 +175,7 @@ def test_the_digest_describes_every_ready_plugin_for_the_ui():
 SCANNED = (
     API / "src",
     API / "prompts" / "draft_app" / "v7.md",
+    API / "prompts" / "draft_app" / "v8.md",
     KIT,
     REPO / "agent-ui" / "src" / "features" / "specs",
 )

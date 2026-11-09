@@ -29,7 +29,7 @@ import { allowed, pageHref, resolveParams, type TAppAction, type TRecord, type T
 import { useOperationMutation } from "./bindings";
 import { AppFormBody } from "./AppForm";
 import { errorMessage } from "./errors";
-import { PayAction } from "./plugins";
+import { PayAction, useSession } from "./plugins";
 import { t } from "./messages";
 import { recordOf, signal } from "./signals";
 
@@ -41,6 +41,7 @@ function useAction(action: TAppAction, record: TRecord | undefined, onClose?: ()
   const [confirming, setConfirming] = useState(false);
   const [editing, setEditing] = useState(false);
   const params = resolveParams(action.params, route, record);
+  const body = resolveParams(action.body, route, record); // `$record.id` / `$route.id` in a body (a like's video)
 
   function done() {
     if (action.onSuccess?.toast) toast.success(action.onSuccess.toast);
@@ -49,7 +50,7 @@ function useAction(action: TAppAction, record: TRecord | undefined, onClose?: ()
 
   function run() {
     mutation.mutate(
-      { params, body: action.body ?? {} },
+      { params, body },
       {
         onSuccess: (result) => {
           // Story 28.1: one signal per successful write (a failure sends none); the form path signals from AppForm
@@ -161,7 +162,8 @@ function PlainActionButton({ action, record }: { action: TAppAction; record?: TR
 
 /** The actions of a record's page, or of a collection, as buttons: only what the record allows. */
 export function ActionButtons({ actions, record }: { actions: TAppAction[]; record?: TRecord }) {
-  const shown = actions.filter((action) => allowed(record, action));
+  const session = useSession();
+  const shown = actions.filter((action) => allowed(record, action, session));
   if (shown.length === 0) return null;
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -187,8 +189,9 @@ export function RowActions({ actions, record, label }: { actions: TAppAction[]; 
   const route = (useParams() ?? {}) as TRouteParams;
   const router = useRouter();
   const [chosen, setChosen] = useState<TAppAction | null>(null);
+  const session = useSession();
   // a payment leaves the page for the checkout: on the record's page, not in a row menu
-  const shown = actions.filter((action) => action.kind !== "pay" && allowed(record, action));
+  const shown = actions.filter((action) => action.kind !== "pay" && allowed(record, action, session));
   if (shown.length === 0) return null;
   return (
     <>

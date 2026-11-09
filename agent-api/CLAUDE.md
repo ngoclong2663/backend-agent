@@ -217,7 +217,7 @@ Agent-specific notes:
   `make video-keys` checks the keys. `FRONTEND_MAX_PHOTOS` now caps paid photos only (`STOCK_PHOTO_LIMIT` for stock).
 - Design plugins (Epic 30): every value of the app design space (shell, list view, detail view, home, filters, card,
   recipe, font pairing) is a folder `templates/design/<kind>/<name>/` (`plugin.json` + kit files), read once by
-  `frontend_spec/design_registry.py`; the literals in `frontend_spec/app.py`, the `draft_app@v7` choice lists
+  `frontend_spec/design_registry.py`; the literals in `frontend_spec/app.py`, the `draft_app@v8` choice lists
   (`design.design_choices`, only the ranked archetypes' candidates), `complete_design`'s checks (`needs` → the
   descriptor's `fallback` chain, `_Data.lacks`), the recipes (`recipes.py`), the kit's generated
   `design-registry.ts` (the plugins the app uses; `AppShell`, `RecordsView`, `AppDetail` dispatch through it) and the
@@ -281,7 +281,9 @@ Agent-specific notes:
   The app draft is one `draft_app@v2` call (BackendSpec + `app-outline.json`); code fixes the outline
   (`complete_outline`, notes instead of repairs), adds the dashboard's aggregate operations (`ensure_aggregates`) and
   plans every screen (`app_frontend_spec`): one binding per section, so `check_spec_pair` and `uncovered_operations`
-  see them all; a child is created from its parent's page (parent from the route).
+  see them all; a child is created from its parent's page (parent from the route); a create with nothing visible to
+  fill in is a button (on its list page, or on the parent's cards, rows and page when it is a child: a like, a
+  bookmark), never a form page.
   The kit (Story 22.4: `AppShell`, `AppPage` (figures in a grid, a parent's children in tabs), `AppList`, `AppDetail`,
   `AppForm`, `AppDashboard`, `AppActions`) reads `src/content/app.json` (`frontend/app/files.py`: pages, routes, forms,
   per-entity field types, references and list operations, the contract's errors) and calls the API through the

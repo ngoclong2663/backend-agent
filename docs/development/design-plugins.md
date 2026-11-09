@@ -105,7 +105,7 @@ plugin on its own fixture (its `needs` are not met there).
 | From the descriptors | Where |
 |---|---|
 | the literals `Shell`, `HomeView`, `ListView`, `DetailView`, `FiltersStyle`, `Recipe` (and the answer schema, the JSON schema snapshot) | `frontend_spec/app.py` (`Literal[plugin_names(kind)]`) |
-| the prompt's choice lists, only the candidates of the ranked archetypes | `frontend/app/design.design_choices` → `draft_app@v7` `{{ design_choices.<kind> }}` |
+| the prompt's choice lists, only the candidates of the ranked archetypes | `frontend/app/design.design_choices` → `draft_app@v8` `{{ design_choices.<kind> }}` |
 | the checks: a choice whose `needs` the contract lacks falls back along the chain, one note | `frontend/app/design._Completion.choose` |
 | the recipes' families, guards and CSS | `frontend/app/recipes.py` |
 | the kit's dispatch table, importing only what the app uses | `frontend/app/files.design_registry_ts` → `src/components/app/design-registry.ts` |
@@ -193,3 +193,13 @@ the report's number before and after when it lands.
 - **An `inbox` home** for workspaces: the records assigned to the signed-in user first (the tour's "mine" lists).
 - **Font pairings in the review**: the panel switches the look; switching the type alone (a pairing per look is set
   by code) needs a second control.
+- **Where an interaction belongs** (a placement input): the draft says what the app is, code decides where every
+  operation appears (a form page per create, a tab per child), so a like landed on a tab with a form page instead
+  of on the video being watched (Story 28.7, finding 8). Code now makes a create with nothing to fill in a button on
+  the record; the model still cannot say "on the parent record, as a button" or "when the record opens" (a view
+  counted on open). Proposed: a per-operation `placement` (`where`: record / list / page; `trigger`: button / open)
+  in the outline, written by the draft from the business workflows, validated and rendered by code.
+- **Plugin drafting** (the model writes code, gated): when the kit cannot express a screen, a drafting step could
+  author a plugin folder (`make design-plugin-new`, then the gates) instead of per-generation code, so the result
+  is reviewed once and reused by every later app. The gates are the safety net the engine-written frontends of
+  Epic 13 lacked; keep per-generation handwritten frontends out.

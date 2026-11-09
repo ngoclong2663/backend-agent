@@ -1,0 +1,599 @@
+{
+  "auth": {
+    "roles": [
+      "Creator",
+      "Viewer"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "caption",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "creatorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 300,
+          "name": "caption",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "maxSize": 52428800,
+          "name": "videoFile",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "min": 1,
+          "name": "durationSeconds",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "UPLOADED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "UPLOADED",
+            "PUBLISHED",
+            "REJECTED"
+          ]
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "viewsCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "likesCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "commentsCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Video"
+    },
+    {
+      "displayField": "content",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "videoId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "creatorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 500,
+          "name": "content",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Comment"
+    },
+    {
+      "displayField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "videoId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "creatorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Like",
+      "uniqueConstraints": [
+        [
+          "videoId",
+          "creatorId"
+        ]
+      ]
+    },
+    {
+      "displayField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "videoId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "creatorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "VideoView"
+    },
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "unique": true,
+          "maxLength": 255
+        },
+        {
+          "name": "role",
+          "type": "enum",
+          "values": [
+            "Creator",
+            "Viewer"
+          ],
+          "default": "Creator"
+        }
+      ],
+      "displayField": "email"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.create",
+      "path": "/videos",
+      "policy": "creatorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Video",
+      "method": "GET",
+      "operationId": "video.get",
+      "path": "/videos/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Video",
+      "filters": [
+        "creatorId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "video.list",
+      "pagination": true,
+      "path": "/videos",
+      "search": [
+        "caption"
+      ],
+      "sort": [
+        "createdAt",
+        "likesCount"
+      ],
+      "type": "crud"
+    },
+    {
+      "description": "Creator publishes an uploaded video with a caption under character limit to make it visible in the public feed.",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.publish",
+      "path": "/videos/{id}/publish",
+      "policy": "ownVideos",
+      "rules": [
+        "videoStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "description": "Mark an uploaded video as rejected when format is unsupported or file exceeds size limits.",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.reject",
+      "path": "/videos/{id}/reject",
+      "policy": "ownVideos",
+      "rules": [
+        "videoStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "action": "delete",
+      "entity": "Video",
+      "method": "DELETE",
+      "operationId": "video.delete",
+      "path": "/videos/{id}",
+      "policy": "ownVideos",
+      "type": "crud"
+    },
+    {
+      "description": "Viewer watches a short-form video; registers video view interaction and increments viewsCount.",
+      "entity": "Video",
+      "method": "POST",
+      "operationId": "video.watch",
+      "path": "/videos/{id}/watch",
+      "policy": "viewerOnly",
+      "type": "custom",
+      "response": {
+        "entity": "Video"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "viewerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Comment",
+      "filters": [
+        "videoId",
+        "creatorId"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud",
+      "policy": "ownComments"
+    },
+    {
+      "action": "delete",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "ownComments",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Like",
+      "method": "POST",
+      "operationId": "like.create",
+      "path": "/likes",
+      "policy": "viewerOnly",
+      "rules": [
+        "uniqueLikePerUser"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Like",
+      "filters": [
+        "videoId",
+        "creatorId"
+      ],
+      "method": "GET",
+      "operationId": "like.list",
+      "pagination": true,
+      "path": "/likes",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud",
+      "policy": "ownLikes"
+    },
+    {
+      "action": "delete",
+      "entity": "Like",
+      "method": "DELETE",
+      "operationId": "like.delete",
+      "path": "/likes/{id}",
+      "policy": "ownLikes",
+      "type": "crud"
+    },
+    {
+      "operationId": "user.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "User",
+      "method": "GET",
+      "path": "/users",
+      "summary": "Find a user",
+      "policy": "userDirectory",
+      "pagination": {
+        "defaultLimit": 20,
+        "maxLimit": 100
+      },
+      "search": [
+        "email"
+      ],
+      "filters": [
+        "role"
+      ]
+    },
+    {
+      "operationId": "user.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "User",
+      "method": "GET",
+      "path": "/users/{id}",
+      "summary": "A user",
+      "policy": "userDirectory"
+    },
+    {
+      "operationId": "video.count",
+      "type": "aggregate",
+      "entity": "Video",
+      "method": "GET",
+      "path": "/videos/aggregate/count",
+      "summary": "Published Videos",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "video.countWhereStatusPublished",
+      "type": "aggregate",
+      "entity": "Video",
+      "method": "GET",
+      "path": "/videos/aggregate/count-where-status-published",
+      "summary": "Active Videos",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "PUBLISHED"
+        }
+      }
+    },
+    {
+      "operationId": "like.count",
+      "type": "aggregate",
+      "entity": "Like",
+      "method": "GET",
+      "path": "/likes/aggregate/count",
+      "summary": "Total Likes",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "comment.count",
+      "type": "aggregate",
+      "entity": "Comment",
+      "method": "GET",
+      "path": "/comments/aggregate/count",
+      "summary": "Total Comments",
+      "aggregate": {
+        "fn": "count"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "creatorOnly",
+      "roles": [
+        "Creator"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "viewerOnly",
+      "roles": [
+        "Viewer"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownVideos",
+      "ownerField": "creatorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownComments",
+      "ownerField": "creatorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownLikes",
+      "ownerField": "creatorId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Video",
+      "name": "viewersSeePublishedOnly",
+      "roles": [
+        "Viewer"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "name": "videoViewOwnCreator",
+      "type": "ownership",
+      "ownerField": "creatorId",
+      "bypassRoles": []
+    },
+    {
+      "name": "userDirectory",
+      "type": "role",
+      "roles": [
+        "Viewer"
+      ]
+    }
+  ],
+  "project": {
+    "description": "A short-form video platform where creators upload and publish videos, and viewers watch, like, and comment on feed content.",
+    "name": "TikTok Short Videos",
+    "slug": "tiktok-short-videos"
+  },
+  "relationships": [
+    {
+      "foreignKey": "videoId",
+      "from": "Video",
+      "name": "videoComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "videoId",
+      "from": "Video",
+      "name": "videoLikes",
+      "onDelete": "CASCADE",
+      "to": "Like",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "videoId",
+      "from": "Video",
+      "name": "videoViews",
+      "onDelete": "CASCADE",
+      "to": "VideoView",
+      "type": "one-to-many"
+    },
+    {
+      "name": "commentCreatorId",
+      "type": "one-to-many",
+      "from": "User",
+      "to": "Comment",
+      "foreignKey": "creatorId",
+      "onDelete": "CASCADE"
+    },
+    {
+      "name": "likeCreatorId",
+      "type": "one-to-many",
+      "from": "User",
+      "to": "Like",
+      "foreignKey": "creatorId",
+      "onDelete": "CASCADE"
+    }
+  ],
+  "rules": [
+    {
+      "entity": "Video",
+      "id": "videoStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PUBLISHED": [],
+          "REJECTED": [],
+          "UPLOADED": [
+            "PUBLISHED",
+            "REJECTED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Viewer can only like each video once",
+      "entity": "Like",
+      "id": "uniqueLikePerUser",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "videoId",
+          "creatorId"
+        ]
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

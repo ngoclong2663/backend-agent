@@ -308,7 +308,7 @@ def test_a_draft_with_business_workflows_has_them_bound_and_a_tour(client, user_
     draft = _draft(client, user_headers, tmp_path, "A workshop booking site for our studio.", business=True)
     assert draft["status"] in ("SUCCEEDED", "NEEDS_REVIEW"), draft["error"]
     prompts = [call["prompt"] for call in draft["usage"]["calls"]]
-    assert prompts == ["discover_workflows@v1", "expect_workflows@v1", "draft_app@v7", "bind_workflows@v1"]
+    assert prompts == ["discover_workflows@v1", "expect_workflows@v1", "draft_app@v8", "bind_workflows@v1"]
     data = draft["business"]
     assert data["provider"] == "fake" and data["business"]["workflows"][0]["id"] == "main"
     assert data["expected"]["paths"][0]["steps"][0]["allowed"] == ["member"]
@@ -322,5 +322,5 @@ def test_a_draft_with_business_workflows_has_them_bound_and_a_tour(client, user_
 def test_with_the_option_off_the_draft_is_todays(client, user_headers, tmp_path, cleanup_drafts):
     draft = _draft(client, user_headers, tmp_path, "A workshop booking site for our studio.", business=None)
     assert draft["business"] is None
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v8"]
     assert "workflows" not in (draft["frontend_spec"]["app"] or {})

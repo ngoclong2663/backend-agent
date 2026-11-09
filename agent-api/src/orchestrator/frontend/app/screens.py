@@ -426,6 +426,27 @@ class _Screens:
     def children_of(self, entity: str) -> list[tuple[str, dict[str, Any]]]:
         return [(name, ref) for name in self.entities if (ref := self.parent_of(name)) and ref["entity"] == entity]
 
+    def quick_create(self, entity: str) -> dict[str, Any] | None:
+        """A child whose create has nothing visible to fill in (the parent from the route, the owner from the signed-in
+        user, the rest defaulted: a like, a follow, a bookmark): its parent reference, else None. Such a create is an
+        action on the parent's record, not a form page of its own."""
+        if "create" not in self.crud[entity]:
+            return None
+        parent = self.route_parent(entity)
+        if parent is None:
+            return None
+        fields = self.form_fields(entity, self.crud[entity]["create"], {parent["field"]: "$route.id"})
+        return parent if fields and all(field.get("hidden") for field in fields) else None
+
+    def quick_children(self, entity: str) -> list[tuple[str, dict[str, Any]]]:
+        """The children created from this entity's records with one click."""
+        out = []
+        for child in self.entities:
+            parent = self.quick_create(child)
+            if parent is not None and parent["entity"] == entity:
+                out.append((child, parent))
+        return out
+
     def w(self, key: str, x: str | None = None, lower: bool = True) -> str:
         """The planner's own words in the outline's language (Story 23.8): English, or Japanese for `ja`."""
         english, japanese = WORDS[key]
@@ -737,6 +758,19 @@ class _Screens:
                     "params": {"id": record},
                 }
             )
+        for child, parent in self.quick_children(entity):  # a like, a follow: one click on the record
+            op_id = self.crud[child]["create"]
+            actions.append(
+                {
+                    "id": f"add-{self.slug(child)}",
+                    "label": self.label(child),  # "Like", "Bookmark": the noun reads as the verb
+                    "kind": "mutation",
+                    "operationId": op_id,
+                    "body": {parent["field"]: record},
+                    "onSuccess": {"toast": self.w("created", self.label(child), lower=False)},
+                }
+            )
+            self.place(op_id)
         for op_id in self.custom[entity]:
             found = self.operations[op_id]
             if found["method"] == "GET" or self.path_params(op_id) != ["id"] or self.required_query(op_id):
@@ -896,7 +930,7 @@ class _Screens:
         if standalone_create and not button:
             after = f"{slug}-id" if "get" in crud else slug if list_sections else "home"
             self.create_page(entity, f"{slug}-new", f"/{slug}/new", {}, after, create_fields)
-        if parent and "create" in crud and not standalone_create:
+        if parent and "create" in crud and not standalone_create and self.quick_create(entity) is None:
             parent_slug = self.slug(parent["entity"])
             self.create_page(
                 entity,
@@ -1029,6 +1063,8 @@ class _Screens:
             reference = self.route_parent(child)
             if child in listed or not reference or reference["entity"] != entity or "create" not in self.crud[child]:
                 continue
+            if self.quick_create(child) is not None:
+                continue  # already an action of the record
             sections[0]["content"]["actions"].insert(
                 0,
                 {
@@ -1042,7 +1078,9 @@ class _Screens:
         for child, reference in self.children_of(entity):
             child_slug, child_crud = self.slug(child), self.crud[child]
             create = {}
-            if (
+            if self.quick_create(child) is not None:
+                pass  # the create is an action of this record
+            elif (
                 "create" in child_crud
                 and child_crud["create"]
                 and reference["field"] in self.required_inputs(child_crud["create"])

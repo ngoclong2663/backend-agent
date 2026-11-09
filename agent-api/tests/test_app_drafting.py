@@ -112,6 +112,24 @@ def _prompt_v3(inline: bool, requirement: str, version: str = "v3", **extra: obj
     return PromptLibrary().render("draft_app", version, **context).text
 
 
+def test_draft_app_v8_prompt_keeps_what_people_do_out_of_a_status():
+    """A real draft (2026-11-09, a TikTok-like feed) made "viewed" a video status moved by the viewer's own action,
+    next to a visibility policy "viewers see only published videos": a video any viewer opened left every viewer's
+    feed. v8 is v7 plus one rule: a status is the record's state; what people do with a record is an interaction
+    entity or a counter, never a status value or a transition."""
+    from src.orchestrator.frontend.app.design import design_choices
+
+    requirement = "A short video app: creators post clips, viewers watch, like and comment on them."
+    choices = design_choices(["feed", "catalogue"])
+    for inline in (False, True):
+        text = _prompt_v3(inline, requirement, version="v8", design_choices=choices)
+        _snapshot(f"draft_app.v8{'.inline' if inline else ''}.md", text)
+        assert "What a person does with a" in text and "never a status value or a transition" in text
+        assert "named after that person's role" in text
+        v7 = _prompt_v3(inline, requirement, version="v7", design_choices=choices)
+        assert 0 < len(text) - len(v7) < 800
+
+
 def test_draft_app_v7_prompt_lists_the_registry_choices():
     """Epic 30 (Story 30.2): the design brief's choice lists come from the design plugin registry, only the candidates
     for the ranked archetypes; a new plugin folder is offered without a prompt change."""
@@ -288,7 +306,7 @@ def test_an_app_draft_is_one_call_and_bad_outlines_cost_no_repair(
     }
     draft = _draft(client, user_headers, tmp_path, "Vocabulary decks to learn new words", scenario)
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v8"]
     messages = {note["path"]: note["message"] for note in draft["assumptions"]}
     assert messages["/app/nav"] == "Decks first", "the model's own notes point into the FrontendSpec"
     assert "names no entity" in messages["/app/nav/0"] and "/app/entities/Card/listStyle" in messages
@@ -305,7 +323,7 @@ def test_an_invalid_backend_spec_gets_one_repair(client, user_headers, tmp_path,
     }
     draft = _draft(client, user_headers, tmp_path, "A team's projects and their tasks", scenario)
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7", "repair_spec@v3"]
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v8", "repair_spec@v3"]
     assert draft["frontend_spec"]["app"]["tagline"] == "Projects and their tasks, in one place"
 
 
@@ -338,7 +356,7 @@ def test_a_real_antigravity_draft_becomes_an_app(client, user_headers, tmp_path,
         {"draft_app": [FakeStep(write=files)]},
     )
     assert draft["status"] == "SUCCEEDED", draft["validation"]
-    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v7"], "no repair round"
+    assert [call["prompt"] for call in draft["usage"]["calls"]] == ["draft_app@v8"], "no repair round"
     assert any("default 'today' is written 'now'" in note["message"] for note in draft["assumptions"])
     assert draft["validation"]["pair"]["errors"] == [] and draft["validation"]["pair"]["warnings"] == []
     spec = draft["frontend_spec"]
