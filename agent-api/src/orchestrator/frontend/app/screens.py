@@ -534,10 +534,13 @@ class _Screens:
         parent = self.quick_create(entity)
         if parent is not None:
             return {"parent": parent, "form": None}
-        if drafted not in ("onRecord", "onOpen") and not self.on_record(entity) or "create" not in self.crud[entity]:
+        cart = entity == self.cart()  # a shop's cart line is put in the cart from the product, whatever its shape
+        if drafted not in ("onRecord", "onOpen") and not cart and not self.on_record(entity):
+            return None
+        if "create" not in self.crud[entity]:
             return None
         parent = self.route_parent(entity)
-        if entity == self.cart():  # a shop's line is put in the cart from the product, whatever else it belongs to
+        if cart:  # a shop's line is put in the cart from the product, whatever else it belongs to
             parent = next((ref for ref in self.references(entity) if ref["entity"] == self.main), parent)
         if parent is None:
             return None

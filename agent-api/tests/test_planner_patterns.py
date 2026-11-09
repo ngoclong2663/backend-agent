@@ -217,3 +217,17 @@ def test_a_catalogue_area_of_members_behaves_like_one():
     assert not {"Edit", "Publish", "Delete", "Record view"} & {a["label"] for a in detail["content"]["actions"]}
     members = next(a for a in ux_checks(spec, backend, contract) if a["area"] == "members")
     assert members["kind"] == "catalogue" and members["failed"] == []
+
+
+def test_a_shops_cart_line_is_added_from_the_product_whatever_its_shape():
+    """Story 32.8 (Thread & Needle, gen_01M6ZQJ4T9CME2BD44EQG2R6VP): the cart item requires a quantity, so it is a
+    `part`, which the storefront places in a tab: adding to the cart was a form page three clicks away. A shop's cart
+    line is made on the product (its quantity in the dialog), whatever its shape."""
+    spec, backend, contract = recorded_app("thread-and-needle")
+    _valid(spec, backend, contract)
+    product = next(page for page in spec["pages"] if page["route"] == "/products/[id]")
+    detail = next(s for s in product["sections"] if s["component"] == "AppDetail")
+    add = next(a for a in detail["content"]["actions"] if a.get("operationId") == "cartItem.create")
+    assert add["label"] == "Add to cart" and add.get("form")
+    shopper = next(a for a in ux_checks(spec, backend, contract) if a["area"] == "shopper-area")
+    assert shopper["failed"] == [] and shopper["task"]["clicks"] == 2

@@ -93,7 +93,7 @@ def golden_app(name: str, locale: str | None = None) -> tuple[dict[str, Any], di
 
 # Epic 32 (Story 32.1): real drafts recorded from the user's runs, planned from their fixtures for the UX checks
 RECORDED = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "drafts"
-RECORDED_APPS = ["tiktok-likes", "tiktok-feed-sessions", "tiktok-viewer-ids", "pocket-chefs"]
+RECORDED_APPS = ["tiktok-likes", "tiktok-feed-sessions", "tiktok-viewer-ids", "pocket-chefs", "thread-and-needle"]
 
 
 def recorded_app(name: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:

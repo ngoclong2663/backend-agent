@@ -1,0 +1,554 @@
+{
+  "name": "Thread & Needle",
+  "tagline": "Online shop for a small yarn and fabric store",
+  "icon": "Scissors",
+  "nav": [
+    {
+      "entity": "Product",
+      "label": "Catalogue",
+      "icon": "Package"
+    },
+    {
+      "entity": "CartItem",
+      "label": "My Cart",
+      "icon": "ShoppingCart"
+    },
+    {
+      "entity": "Order",
+      "label": "My Orders",
+      "icon": "ShoppingBag"
+    }
+  ],
+  "home": "Product",
+  "entities": {
+    "Product": {
+      "label": "Product",
+      "plural": "Products",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "category",
+        "colour",
+        "dimension",
+        "price"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "photo",
+        "name",
+        "category",
+        "colour",
+        "dimension",
+        "price",
+        "stockQuantity",
+        "description",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "name": "Product Name",
+        "category": "Category",
+        "colour": "Colour",
+        "dimension": "Weight / Width",
+        "price": "Price",
+        "stockQuantity": "In Stock",
+        "photo": "Photo",
+        "description": "Description",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "dimension": "Yarn weight (e.g. DK, Fingering) or fabric width (e.g. 140cm)",
+        "stockQuantity": "Units currently available in inventory"
+      },
+      "create": "page"
+    },
+    "CartItem": {
+      "label": "Cart item",
+      "plural": "Cart Items",
+      "displayField": "productId",
+      "listFields": [
+        "productId",
+        "quantity",
+        "unitPrice",
+        "cartStatus"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "shopperId",
+        "productId",
+        "quantity",
+        "unitPrice",
+        "cartStatus",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "shopperId": "Shopper",
+        "productId": "Product",
+        "quantity": "Quantity",
+        "unitPrice": "Unit Price",
+        "cartStatus": "Cart Status",
+        "createdAt": "Added At"
+      },
+      "help": {
+        "quantity": "Item quantity in cart (must not exceed available stock)"
+      }
+    },
+    "Order": {
+      "label": "Order",
+      "plural": "Orders",
+      "displayField": "orderNumber",
+      "listFields": [
+        "orderNumber",
+        "status",
+        "totalAmount",
+        "paymentStatus",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "shopperId",
+        "orderNumber",
+        "totalAmount",
+        "status",
+        "paymentStatus",
+        "shippingAddress",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "shopperId": "Customer",
+        "orderNumber": "Order #",
+        "totalAmount": "Total Amount",
+        "status": "Order Status",
+        "paymentStatus": "Payment",
+        "shippingAddress": "Shipping Address",
+        "createdAt": "Placed At"
+      },
+      "help": {
+        "status": "Order fulfillment lifecycle status"
+      }
+    },
+    "OrderItem": {
+      "label": "Order item",
+      "plural": "Order Items",
+      "displayField": "productId",
+      "listFields": [
+        "productId",
+        "quantity",
+        "unitPrice",
+        "subtotal"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "orderId",
+        "productId",
+        "quantity",
+        "unitPrice",
+        "subtotal"
+      ],
+      "fieldLabels": {
+        "orderId": "Order",
+        "productId": "Product",
+        "quantity": "Quantity",
+        "unitPrice": "Unit Price",
+        "subtotal": "Subtotal"
+      },
+      "help": {}
+    }
+  },
+  "design": {
+    "archetype": "storefront",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "wide",
+    "density": "spacious",
+    "mainEntity": "Product",
+    "entities": {
+      "Product": {
+        "view": "media-grid",
+        "roles": {
+          "title": "name",
+          "media": "photo",
+          "price": "price",
+          "stat": "stockQuantity",
+          "badge": "category",
+          "meta": [
+            "colour",
+            "dimension"
+          ]
+        },
+        "detailView": "media-side",
+        "filtersStyle": "chips",
+        "card": "stacked"
+      },
+      "CartItem": {
+        "view": "cards",
+        "roles": {
+          "title": "productId",
+          "price": "unitPrice",
+          "badge": "cartStatus",
+          "meta": [
+            "quantity"
+          ]
+        },
+        "card": "stacked"
+      },
+      "Order": {
+        "view": "cards",
+        "roles": {
+          "title": "orderNumber",
+          "price": "totalAmount",
+          "badge": "status",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "split-panel",
+        "filtersStyle": "chips",
+        "card": "stacked"
+      },
+      "OrderItem": {
+        "view": "cards",
+        "roles": {
+          "title": "productId",
+          "price": "unitPrice",
+          "meta": [
+            "quantity"
+          ]
+        },
+        "card": "stacked"
+      }
+    },
+    "homeView": "catalogue",
+    "looks": [
+      {
+        "recipe": "minimal",
+        "reason": "The requirement asks for it",
+        "fontPairing": "workshop"
+      },
+      {
+        "recipe": "soft",
+        "reason": "Warm, tactile soft-elevation design echoing physical fabrics and yarns.",
+        "fontPairing": "humanist"
+      },
+      {
+        "recipe": "editorial",
+        "reason": "Sophisticated craft catalog styling highlighting textures, palettes, and material weights.",
+        "fontPairing": "editorial"
+      }
+    ],
+    "requested": {
+      "accent": "#2e5a44",
+      "background": "#fafafa",
+      "scheme": "light",
+      "corners": "rounded",
+      "photos": "prominent",
+      "words": "crisp, minimal and Scandinavian; white space, soft grey and a single moss green accent"
+    },
+    "seed": 858766011,
+    "replaced": [
+      "CartItem: side needs an image, a video or an audio field; shown as stacked",
+      "OrderItem: side needs an image, a video or an audio field; shown as stacked",
+      "area 'shopper-area': CartItem: side needs an image, a video or an audio field; shown as stacked",
+      "area 'shopper-area': OrderItem: side needs an image, a video or an audio field; shown as stacked"
+    ],
+    "fontPairing": "workshop"
+  },
+  "areas": [
+    {
+      "id": "shopper-area",
+      "label": "Shop",
+      "roles": [
+        "Shopper"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "storefront",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "wide",
+        "density": "spacious",
+        "mainEntity": "Product",
+        "entities": {
+          "Product": {
+            "view": "media-grid",
+            "roles": {
+              "title": "name",
+              "media": "photo",
+              "price": "price",
+              "stat": "stockQuantity",
+              "badge": "category",
+              "meta": [
+                "colour",
+                "dimension"
+              ]
+            },
+            "detailView": "media-side",
+            "filtersStyle": "chips",
+            "card": "stacked"
+          },
+          "CartItem": {
+            "view": "cards",
+            "roles": {},
+            "card": "stacked"
+          },
+          "Order": {
+            "view": "cards",
+            "roles": {},
+            "card": "stacked"
+          },
+          "OrderItem": {
+            "view": "cards",
+            "roles": {},
+            "card": "stacked"
+          }
+        },
+        "homeView": "catalogue"
+      }
+    },
+    {
+      "id": "owner-area",
+      "label": "Store Management",
+      "roles": [
+        "Shop Owner"
+      ],
+      "prefix": "/owner-area",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "wide",
+        "density": "comfortable",
+        "mainEntity": "Order",
+        "entities": {
+          "Product": {
+            "view": "media-grid",
+            "roles": {
+              "title": "name",
+              "media": "photo",
+              "price": "price",
+              "stat": "stockQuantity",
+              "badge": "category",
+              "meta": [
+                "colour",
+                "dimension"
+              ]
+            },
+            "detailView": "split-panel",
+            "filtersStyle": "toolbar"
+          },
+          "CartItem": {
+            "view": "table",
+            "roles": {}
+          },
+          "Order": {
+            "view": "table",
+            "roles": {
+              "title": "orderNumber",
+              "price": "totalAmount",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "split-panel",
+            "filtersStyle": "toolbar",
+            "card": "text-first"
+          },
+          "OrderItem": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Orders to Fulfill",
+      "kind": "figure",
+      "entity": "Order",
+      "fn": "count",
+      "filter": {
+        "status": "PAID"
+      }
+    },
+    {
+      "label": "Shipped Orders",
+      "kind": "figure",
+      "entity": "Order",
+      "fn": "count",
+      "filter": {
+        "status": "SHIPPED"
+      }
+    },
+    {
+      "label": "Total Products",
+      "kind": "figure",
+      "entity": "Product",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Total Revenue",
+      "kind": "figure",
+      "entity": "Order",
+      "fn": "sum",
+      "field": "totalAmount",
+      "filter": {}
+    },
+    {
+      "label": "Orders by Status",
+      "kind": "bar",
+      "entity": "Order",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    }
+  ],
+  "workflows": {
+    "version": "b772e58f6f44",
+    "tours": [
+      {
+        "id": "purchase_order",
+        "name": "Purchase Products",
+        "outcome": "Order is placed and paid, and product inventory is updated",
+        "roles": [
+          "Shopper"
+        ],
+        "steps": [
+          {
+            "id": "browse_products",
+            "role": "Shopper",
+            "actor": "Shopper",
+            "title": "Browse yarn and fabric products. Rule: Displays photo, colour, weight or width, price, and available stock",
+            "operationId": "product.get",
+            "page": "products-id",
+            "route": "/products/[id]",
+            "target": {
+              "section": "products-detail",
+              "action": null
+            },
+            "kind": "look",
+            "record": "product"
+          },
+          {
+            "id": "add_to_cart",
+            "role": "Shopper",
+            "actor": "Shopper",
+            "title": "Add items with quantity to shopping cart (the cart becomes open). Rule: Quantity must not exceed available stock",
+            "operationId": "cartItem.create",
+            "statusAfter": "open",
+            "page": "products-id-cart-items-new",
+            "route": "/products/[id]/cart-items/new",
+            "target": {
+              "section": "cart-item-create-in-product-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "cart"
+          },
+          {
+            "id": "adjust_cart",
+            "role": "Shopper",
+            "actor": "Shopper",
+            "title": "Adjust item quantities in cart (the cart becomes open). Rule: Quantity must be greater than zero and within stock limit",
+            "operationId": "cartItem.update",
+            "statusAfter": "open",
+            "page": "cart-items-id-edit",
+            "route": "/cart-items/[id]/edit",
+            "target": {
+              "section": "cart-items-edit-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "cart",
+            "needs": {
+              "step": "add_to_cart",
+              "role": "Shopper",
+              "status": "open"
+            }
+          },
+          {
+            "id": "checkout_and_pay",
+            "role": "Shopper",
+            "actor": "Shopper",
+            "title": "Check out and pay for cart items (the order becomes paid). Rule: Payment confirms order and decrements product stock",
+            "operationId": "order.checkout",
+            "statusAfter": "paid",
+            "page": "orders",
+            "route": "/orders",
+            "target": {
+              "section": "orders-actions",
+              "action": "checkout"
+            },
+            "kind": "do",
+            "record": "order"
+          }
+        ]
+      },
+      {
+        "id": "fulfill_order",
+        "name": "Fulfill Customer Order",
+        "outcome": "Order is fulfilled and marked delivered to the shopper",
+        "roles": [
+          "Shop Owner"
+        ],
+        "steps": [
+          {
+            "id": "review_paid_order",
+            "role": "Shop Owner",
+            "actor": "Shop Owner",
+            "title": "Review paid customer order (the order becomes paid). Rule: Order must be in paid status",
+            "operationId": "order.get",
+            "statusAfter": "paid",
+            "page": "owner-area-orders-id",
+            "route": "/owner-area/orders/[id]",
+            "target": {
+              "section": "orders-detail",
+              "action": null
+            },
+            "kind": "look",
+            "record": "order"
+          },
+          {
+            "id": "mark_shipped",
+            "role": "Shop Owner",
+            "actor": "Shop Owner",
+            "title": "Mark order as shipped (the order becomes shipped). Rule: Order must be packaged for shipment",
+            "operationId": "order.ship",
+            "statusAfter": "shipped",
+            "page": "owner-area-orders-id",
+            "route": "/owner-area/orders/[id]",
+            "target": {
+              "section": "orders-detail",
+              "action": "ship"
+            },
+            "kind": "do",
+            "record": "order"
+          },
+          {
+            "id": "mark_delivered",
+            "role": "Shop Owner",
+            "actor": "Shop Owner",
+            "title": "Mark order as delivered (the order becomes delivered). Rule: Order package has been delivered to customer",
+            "operationId": "order.deliver",
+            "statusAfter": "delivered",
+            "page": "owner-area-orders-id",
+            "route": "/owner-area/orders/[id]",
+            "target": {
+              "section": "orders-detail",
+              "action": "deliver"
+            },
+            "kind": "do",
+            "record": "order",
+            "needs": {
+              "step": "mark_shipped",
+              "role": "Shop Owner",
+              "status": "shipped"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -181,6 +181,21 @@
       "kind": "catalogue",
       "failed": [],
       "task": null
+    },
+    "thread-and-needle/shopper-area": {
+      "archetype": "storefront",
+      "kind": "storefront",
+      "failed": [],
+      "task": {
+        "operationId": "cartItem.create",
+        "clicks": 2
+      }
+    },
+    "thread-and-needle/owner-area": {
+      "archetype": "back-office",
+      "kind": "back-office",
+      "failed": [],
+      "task": null
     }
   }
 }

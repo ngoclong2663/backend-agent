@@ -1,0 +1,751 @@
+{
+  "auth": {
+    "loginField": "email",
+    "roles": [
+      "Shopper",
+      "Shop Owner"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "Yarn and fabric products offered by the store",
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 120,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Type of craft product: yarn or fabric",
+          "name": "category",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "Yarn",
+            "Fabric"
+          ]
+        },
+        {
+          "description": "Colour name or shade",
+          "maxLength": 60,
+          "name": "colour",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Yarn weight or fabric width",
+          "maxLength": 80,
+          "name": "dimension",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "min": 0,
+          "name": "price",
+          "required": true,
+          "type": "decimal"
+        },
+        {
+          "description": "Number of units in stock",
+          "min": 0,
+          "name": "stockQuantity",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "photo",
+          "nullable": true,
+          "required": false,
+          "type": "image"
+        },
+        {
+          "maxLength": 2000,
+          "name": "description",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Product"
+    },
+    {
+      "description": "Items placed in an active shopper shopping cart",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "shopperId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "productId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "min": 1,
+          "name": "quantity",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "description": "Snapshot unit price when added",
+          "min": 0,
+          "name": "unitPrice",
+          "required": true,
+          "type": "decimal"
+        },
+        {
+          "default": "OPEN",
+          "name": "cartStatus",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "OPEN"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "CartItem",
+      "uniqueConstraints": [
+        [
+          "shopperId",
+          "productId",
+          "cartStatus"
+        ]
+      ]
+    },
+    {
+      "description": "Customer purchase order",
+      "displayField": "orderNumber",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "shopperId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "orderNumber",
+          "required": true,
+          "type": "string",
+          "unique": true
+        },
+        {
+          "min": 0,
+          "name": "totalAmount",
+          "required": true,
+          "type": "decimal"
+        },
+        {
+          "default": "PAID",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PAID",
+            "SHIPPED",
+            "DELIVERED"
+          ]
+        },
+        {
+          "default": "PAID",
+          "name": "paymentStatus",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "UNPAID",
+            "PAID",
+            "FAILED"
+          ]
+        },
+        {
+          "maxLength": 300,
+          "name": "shippingAddress",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Order"
+    },
+    {
+      "description": "Purchased line items belonging to an order",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "orderId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "productId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "min": 1,
+          "name": "quantity",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "min": 0,
+          "name": "unitPrice",
+          "required": true,
+          "type": "decimal"
+        },
+        {
+          "min": 0,
+          "name": "subtotal",
+          "required": true,
+          "type": "decimal"
+        }
+      ],
+      "name": "OrderItem"
+    }
+  ],
+  "operations": [
+    {
+      "action": "list",
+      "auth": "none",
+      "entity": "Product",
+      "filters": [
+        "category",
+        "colour"
+      ],
+      "method": "GET",
+      "operationId": "product.list",
+      "pagination": {
+        "defaultLimit": 20,
+        "maxLimit": 100
+      },
+      "path": "/products",
+      "search": [
+        "name",
+        "colour",
+        "dimension"
+      ],
+      "sort": [
+        "createdAt",
+        "price",
+        "name"
+      ],
+      "summary": "List yarn and fabric products",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "none",
+      "entity": "Product",
+      "method": "GET",
+      "operationId": "product.get",
+      "path": "/products/{id}",
+      "summary": "Get product details",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Product",
+      "method": "POST",
+      "operationId": "product.create",
+      "path": "/products",
+      "policy": "ownerOnly",
+      "request": {
+        "fields": [
+          "name",
+          "category",
+          "colour",
+          "dimension",
+          "price",
+          "stockQuantity",
+          "photo",
+          "description"
+        ],
+        "entity": "Product"
+      },
+      "summary": "Add a new product to catalogue",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Product",
+      "method": "PATCH",
+      "operationId": "product.update",
+      "path": "/products/{id}",
+      "policy": "ownerOnly",
+      "request": {
+        "fields": [
+          "name",
+          "category",
+          "colour",
+          "dimension",
+          "price",
+          "stockQuantity",
+          "photo",
+          "description"
+        ],
+        "entity": "Product"
+      },
+      "summary": "Update product details or stock",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Product",
+      "method": "DELETE",
+      "operationId": "product.delete",
+      "path": "/products/{id}",
+      "policy": "ownerOnly",
+      "summary": "Remove a product from catalogue",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "CartItem",
+      "filters": [
+        "cartStatus",
+        "productId"
+      ],
+      "method": "GET",
+      "operationId": "cartItem.list",
+      "pagination": {
+        "defaultLimit": 50,
+        "maxLimit": 100
+      },
+      "path": "/cart-items",
+      "policy": "ownCart",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List items in shopper cart",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "CartItem",
+      "method": "POST",
+      "operationId": "cartItem.create",
+      "path": "/cart-items",
+      "policy": "ownCart",
+      "request": {
+        "fields": [
+          "productId",
+          "quantity",
+          "unitPrice"
+        ],
+        "entity": "CartItem"
+      },
+      "rules": [
+        "cartItemWithinStock"
+      ],
+      "summary": "Add item with quantity to cart",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "CartItem",
+      "method": "PATCH",
+      "operationId": "cartItem.update",
+      "path": "/cart-items/{id}",
+      "policy": "ownCart",
+      "request": {
+        "fields": [
+          "quantity"
+        ],
+        "entity": "CartItem"
+      },
+      "rules": [
+        "cartItemWithinStock"
+      ],
+      "summary": "Adjust item quantity in cart",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "CartItem",
+      "method": "DELETE",
+      "operationId": "cartItem.delete",
+      "path": "/cart-items/{id}",
+      "policy": "ownCart",
+      "summary": "Remove item from cart",
+      "type": "crud"
+    },
+    {
+      "description": "Checks out all OPEN cart items for the signed-in shopper, verifies stock availability, creates an Order with status PAID and paymentStatus PAID, generates corresponding OrderItem rows, decrements Product stockQuantity for each purchased item, and clears the cart items. Returns the created Order.",
+      "entity": "Order",
+      "method": "POST",
+      "operationId": "order.checkout",
+      "path": "/orders/checkout",
+      "policy": "ownOrders",
+      "request": {
+        "fields": [
+          "shippingAddress"
+        ],
+        "entity": "Order"
+      },
+      "summary": "Check out and pay for cart items",
+      "type": "custom"
+    },
+    {
+      "action": "list",
+      "entity": "Order",
+      "filters": [
+        "status",
+        "paymentStatus"
+      ],
+      "method": "GET",
+      "operationId": "order.list",
+      "pagination": {
+        "defaultLimit": 20,
+        "maxLimit": 100
+      },
+      "path": "/orders",
+      "policy": "ownOrders",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List orders",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Order",
+      "method": "GET",
+      "operationId": "order.get",
+      "path": "/orders/{id}",
+      "policy": "ownOrders",
+      "summary": "Get order details",
+      "type": "crud"
+    },
+    {
+      "description": "Marks a paid order as shipped by the shop owner after packaging. Sets status to SHIPPED.",
+      "entity": "Order",
+      "method": "POST",
+      "operationId": "order.ship",
+      "path": "/orders/{id}/ship",
+      "policy": "ownerOnly",
+      "rules": [
+        "orderFlow"
+      ],
+      "summary": "Mark order as shipped",
+      "type": "custom",
+      "response": {
+        "entity": "Order"
+      }
+    },
+    {
+      "description": "Marks a shipped order as delivered by the shop owner once package has arrived. Sets status to DELIVERED.",
+      "entity": "Order",
+      "method": "POST",
+      "operationId": "order.deliver",
+      "path": "/orders/{id}/deliver",
+      "policy": "ownerOnly",
+      "rules": [
+        "orderFlow"
+      ],
+      "summary": "Mark order as delivered",
+      "type": "custom",
+      "response": {
+        "entity": "Order"
+      }
+    },
+    {
+      "action": "list",
+      "entity": "OrderItem",
+      "filters": [
+        "orderId",
+        "productId"
+      ],
+      "method": "GET",
+      "operationId": "orderItem.list",
+      "pagination": {
+        "defaultLimit": 50,
+        "maxLimit": 100
+      },
+      "path": "/order-items",
+      "sort": [
+        "id"
+      ],
+      "summary": "List items of an order",
+      "type": "crud",
+      "policy": "ownerOnly"
+    },
+    {
+      "operationId": "order.countWhereStatusPaid",
+      "type": "aggregate",
+      "entity": "Order",
+      "method": "GET",
+      "path": "/orders/aggregate/count-where-status-paid",
+      "summary": "Orders to Fulfill",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "PAID"
+        }
+      }
+    },
+    {
+      "operationId": "order.countWhereStatusShipped",
+      "type": "aggregate",
+      "entity": "Order",
+      "method": "GET",
+      "path": "/orders/aggregate/count-where-status-shipped",
+      "summary": "Shipped Orders",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "SHIPPED"
+        }
+      }
+    },
+    {
+      "operationId": "product.count",
+      "type": "aggregate",
+      "entity": "Product",
+      "method": "GET",
+      "path": "/products/aggregate/count",
+      "summary": "Total Products",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "order.sumTotalAmount",
+      "type": "aggregate",
+      "entity": "Order",
+      "method": "GET",
+      "path": "/orders/aggregate/sum-total-amount",
+      "summary": "Total Revenue",
+      "aggregate": {
+        "fn": "sum",
+        "field": "totalAmount"
+      }
+    },
+    {
+      "operationId": "order.countByStatus",
+      "type": "aggregate",
+      "entity": "Order",
+      "method": "GET",
+      "path": "/orders/aggregate/count-by-status",
+      "summary": "Orders by Status",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "status"
+      }
+    }
+  ],
+  "payments": {
+    "amountField": "totalAmount",
+    "currency": "EUR",
+    "entity": "Order",
+    "failedStatus": "FAILED",
+    "paidStatus": "PAID",
+    "provider": "fake",
+    "statusField": "paymentStatus"
+  },
+  "policies": [
+    {
+      "name": "ownerOnly",
+      "roles": [
+        "Shop Owner"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "Shop Owner"
+      ],
+      "name": "ownOrders",
+      "ownerField": "shopperId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownCart",
+      "ownerField": "shopperId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "Shop Owner"
+      ],
+      "name": "orderItemAccess",
+      "ownerField": "shopperId",
+      "type": "ownership"
+    }
+  ],
+  "project": {
+    "description": "Online shop for a small yarn and fabric store with product catalogue, cart, checkout, and order fulfillment.",
+    "name": "Thread & Needle",
+    "slug": "thread-and-needle"
+  },
+  "relationships": [
+    {
+      "foreignKey": "productId",
+      "from": "Product",
+      "name": "productCartItems",
+      "onDelete": "CASCADE",
+      "to": "CartItem",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "orderId",
+      "from": "Order",
+      "name": "orderItems",
+      "onDelete": "CASCADE",
+      "to": "OrderItem",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "productId",
+      "from": "Product",
+      "name": "productOrderItems",
+      "onDelete": "RESTRICT",
+      "to": "OrderItem",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Cart item quantity must be greater than zero and must not exceed available product inventory stock.",
+      "entity": "CartItem",
+      "id": "cartItemWithinStock",
+      "kind": "custom",
+      "params": {
+        "field": "quantity",
+        "stockField": "stockQuantity"
+      }
+    },
+    {
+      "description": "Order progression from PAID to SHIPPED to DELIVERED.",
+      "entity": "Order",
+      "id": "orderFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PAID": [
+            "SHIPPED"
+          ],
+          "SHIPPED": [
+            "DELIVERED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Delivered orders cannot transition further.",
+      "entity": "Order",
+      "id": "deliveredIsFinal",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "DELIVERED"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Product",
+      "records": [
+        {
+          "category": "Yarn",
+          "colour": "Moss Green",
+          "createdAt": "2026-11-01T10:00:00Z",
+          "description": "100% Merino wool yarn in an earthy moss green shade, soft and breathable.",
+          "dimension": "DK (100g / 225m)",
+          "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+          "name": "Nordic Meadow Merino Yarn",
+          "photo": "https://images.unsplash.com/photo-1668072587819-7b393944b426?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Tm9yZGljJTIwTWVhZG93JTIwTWVyaW5vJTIwWWFybiUyMFByb2R1Y3R8ZW58MXwwfHx8MTc5NDIxMzc5N3ww&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "price": 14.5,
+          "stockQuantity": 32
+        },
+        {
+          "category": "Fabric",
+          "colour": "Slate Grey",
+          "createdAt": "2026-11-01T10:30:00Z",
+          "description": "Medium-weight washed linen fabric, ideal for garments and minimal home textiles.",
+          "dimension": "140cm width",
+          "id": "b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e",
+          "name": "Scandinavian Washed Linen Fabric",
+          "photo": "https://images.unsplash.com/photo-1524404794194-16bae22718c0?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8U2NhbmRpbmF2aWFuJTIwV2FzaGVkJTIwTGluZW4lMjBGYWJyaWMlMjBQcm9kdWN0fGVufDF8MHx8fDE3OTQyMTM3OTh8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "price": 24,
+          "stockQuantity": 18
+        },
+        {
+          "category": "Yarn",
+          "colour": "Natural Chalk White",
+          "createdAt": "2026-11-01T11:00:00Z",
+          "description": "Chunky organic wool yarn in undyed natural chalk white, perfect for warm winter knits.",
+          "dimension": "Chunky (100g / 100m)",
+          "id": "c3d4e5f6-a7b8-4c5d-0e1f-2a3b4c5d6e7f",
+          "name": "Highland Chunky Wool Yarn",
+          "photo": "https://images.unsplash.com/photo-1654346576881-04709800bb23?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8SGlnaGxhbmQlMjBDaHVua3klMjBXb29sJTIwWWFybiUyMFByb2R1Y3R8ZW58MXwwfHx8MTc5NDIxMzc5OXww&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "price": 12,
+          "stockQuantity": 25
+        },
+        {
+          "category": "Fabric",
+          "colour": "Soft Sage",
+          "createdAt": "2026-11-01T11:15:00Z",
+          "description": "Fine organic cotton twill in muted sage, durable and smooth to the touch.",
+          "dimension": "150cm width",
+          "id": "d4e5f6a7-b8c9-4d5e-1f2a-3b4c5d6e7f8a",
+          "name": "Organic Cotton Twill Fabric",
+          "photo": "https://images.unsplash.com/photo-1593250816874-8edf4f732edb?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8T3JnYW5pYyUyMENvdHRvbiUyMFR3aWxsJTIwRmFicmljJTIwUHJvZHVjdHxlbnwxfDB8fHwxNzk0MjEzODAwfDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "price": 19.5,
+          "stockQuantity": 14
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}
