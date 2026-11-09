@@ -1,0 +1,704 @@
+{
+  "auth": {
+    "emailVerification": false,
+    "loginField": "email",
+    "passwordReset": false,
+    "roles": [
+      "cook",
+      "member"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "A short video recipe shared by a cook.",
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 160,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Cover photo of the dish",
+          "name": "coverPhoto",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "description": "Short video of the dish being made",
+          "name": "videoUrl",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "description": "Cooking time in minutes",
+          "min": 1,
+          "name": "cookingTimeMinutes",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "description": "Ingredients and measurements as text",
+          "maxLength": 5000,
+          "name": "ingredients",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": 0,
+          "description": "Total number of views recorded",
+          "min": 0,
+          "name": "viewCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "PUBLISHED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PUBLISHED",
+            "DELETED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "createdAt"
+          ],
+          "name": "idx_recipe_created_at"
+        }
+      ],
+      "name": "Recipe",
+      "table": "recipes"
+    },
+    {
+      "description": "Interaction recording that a member opened and viewed a recipe.",
+      "displayField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "viewerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "recipeId",
+            "createdAt"
+          ],
+          "name": "idx_recipeview_recipe_created"
+        }
+      ],
+      "name": "RecipeView",
+      "table": "recipe_views"
+    },
+    {
+      "description": "A like or saved recipe reaction by a member.",
+      "displayField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "memberId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "description": "Reaction type: like or save to cook later",
+          "name": "type",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "LIKE",
+            "SAVE"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "recipeId",
+            "type"
+          ],
+          "name": "idx_reaction_recipe_type"
+        }
+      ],
+      "name": "Reaction",
+      "table": "reactions"
+    },
+    {
+      "description": "Comments written directly under a recipe by community members.",
+      "displayField": "content",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "memberId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 2000,
+          "min": 1,
+          "name": "content",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "recipeId",
+            "createdAt"
+          ],
+          "name": "idx_comment_recipe_created"
+        }
+      ],
+      "name": "Comment",
+      "table": "comments"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "method": "POST",
+      "operationId": "recipe.create",
+      "path": "/recipes",
+      "policy": "cooksOnly",
+      "request": {
+        "fields": [
+          "title",
+          "coverPhoto",
+          "videoUrl",
+          "cookingTimeMinutes",
+          "ingredients"
+        ],
+        "entity": "Recipe"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "method": "GET",
+      "operationId": "recipe.get",
+      "path": "/recipes/{id}",
+      "summary": "Get recipe details",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "filters": [
+        "cookId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "recipe.list",
+      "pagination": true,
+      "path": "/recipes",
+      "search": [
+        "title",
+        "ingredients"
+      ],
+      "sort": [
+        "createdAt",
+        "viewCount",
+        "cookingTimeMinutes"
+      ],
+      "summary": "List newest recipes or filter by cook",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "method": "PATCH",
+      "operationId": "recipe.update",
+      "path": "/recipes/{id}",
+      "policy": "cookOwnRecipe",
+      "request": {
+        "fields": [
+          "title",
+          "coverPhoto",
+          "videoUrl",
+          "cookingTimeMinutes",
+          "ingredients"
+        ],
+        "entity": "Recipe"
+      },
+      "rules": [
+        "recipeNotDeleted"
+      ],
+      "summary": "Update recipe details",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Recipe",
+      "method": "DELETE",
+      "operationId": "recipe.delete",
+      "path": "/recipes/{id}",
+      "policy": "cookOwnRecipe",
+      "rules": [
+        "recipeFlow",
+        "recipeNotDeleted"
+      ],
+      "summary": "Soft delete or remove recipe",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "RecipeView",
+      "method": "POST",
+      "operationId": "recipeView.create",
+      "path": "/recipe-views",
+      "policy": "membersOnly",
+      "request": {
+        "fields": [
+          "recipeId"
+        ],
+        "entity": "RecipeView"
+      },
+      "summary": "Record recipe view and increment view count",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "RecipeView",
+      "filters": [
+        "recipeId"
+      ],
+      "method": "GET",
+      "operationId": "recipeView.list",
+      "pagination": true,
+      "path": "/recipe-views",
+      "policy": "cooksOnly",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List views for cook studio metrics",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Reaction",
+      "method": "POST",
+      "operationId": "reaction.create",
+      "path": "/reactions",
+      "policy": "membersOnly",
+      "request": {
+        "fields": [
+          "recipeId",
+          "type"
+        ],
+        "entity": "Reaction"
+      },
+      "rules": [
+        "uniqueMemberReaction"
+      ],
+      "summary": "Like or save a recipe to cook later",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Reaction",
+      "filters": [
+        "recipeId",
+        "memberId",
+        "type"
+      ],
+      "method": "GET",
+      "operationId": "reaction.list",
+      "pagination": true,
+      "path": "/reactions",
+      "policy": "ownReactions",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List member likes and saved recipes",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Reaction",
+      "method": "DELETE",
+      "operationId": "reaction.delete",
+      "path": "/reactions/{id}",
+      "policy": "ownReactions",
+      "summary": "Remove like or saved recipe",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "membersOnly",
+      "request": {
+        "fields": [
+          "recipeId",
+          "content"
+        ],
+        "entity": "Comment"
+      },
+      "summary": "Post a comment on a recipe",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Comment",
+      "filters": [
+        "recipeId"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List comments for a recipe",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "ownComments",
+      "summary": "Delete comment",
+      "type": "crud"
+    },
+    {
+      "operationId": "recipe.count",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/count",
+      "summary": "Total Recipes",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "recipeView.count",
+      "type": "aggregate",
+      "entity": "RecipeView",
+      "method": "GET",
+      "path": "/recipe-views/aggregate/count",
+      "summary": "Total Dish Views",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "reaction.countWhereTypeLike",
+      "type": "aggregate",
+      "entity": "Reaction",
+      "method": "GET",
+      "path": "/reactions/aggregate/count-where-type-like",
+      "summary": "Total Likes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "type": "LIKE"
+        }
+      }
+    },
+    {
+      "operationId": "reaction.countWhereTypeSave",
+      "type": "aggregate",
+      "entity": "Reaction",
+      "method": "GET",
+      "path": "/reactions/aggregate/count-where-type-save",
+      "summary": "Saved Recipes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "type": "SAVE"
+        }
+      }
+    },
+    {
+      "operationId": "recipeView.countThisWeek",
+      "type": "aggregate",
+      "entity": "RecipeView",
+      "method": "GET",
+      "path": "/recipe-views/aggregate/count-this-week",
+      "summary": "Views This Week",
+      "aggregate": {
+        "fn": "count",
+        "period": "week",
+        "dateField": "createdAt"
+      }
+    },
+    {
+      "operationId": "recipeView.countByRecipeId",
+      "type": "aggregate",
+      "entity": "RecipeView",
+      "method": "GET",
+      "path": "/recipe-views/aggregate/count-by-recipe-id",
+      "summary": "Views by Recipe",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "recipeId"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "cooksOnly",
+      "roles": [
+        "cook"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "membersOnly",
+      "roles": [
+        "member"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [],
+      "name": "cookOwnRecipe",
+      "ownerField": "cookId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "cook"
+      ],
+      "name": "ownReactions",
+      "ownerField": "memberId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "cook"
+      ],
+      "name": "ownComments",
+      "ownerField": "memberId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Recipe",
+      "name": "publishedRecipeVisibility",
+      "roles": [
+        "member"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    }
+  ],
+  "project": {
+    "description": "A community where home cooks share short recipe videos.",
+    "name": "Pocket Chefs",
+    "slug": "pocket-chefs"
+  },
+  "relationships": [
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeViews",
+      "onDelete": "CASCADE",
+      "to": "RecipeView",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeReactions",
+      "onDelete": "CASCADE",
+      "to": "Reaction",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Recipe status flow from PUBLISHED to DELETED",
+      "entity": "Recipe",
+      "id": "recipeFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PUBLISHED": [
+            "DELETED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Deleted recipes cannot be changed",
+      "entity": "Recipe",
+      "id": "recipeNotDeleted",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "DELETED"
+        ]
+      }
+    },
+    {
+      "description": "Member can like and/or save a recipe at most once per reaction type",
+      "entity": "Reaction",
+      "id": "uniqueMemberReaction",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "recipeId",
+          "memberId",
+          "type"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Recipe",
+      "records": [
+        {
+          "cookingTimeMinutes": 15,
+          "coverPhoto": "https://images.unsplash.com/photo-1764586119076-61711e8ed25a?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Q2xhc3NpYyUyMFJvbWFuJTIwQ2FyYm9uYXJhJTIwUmVjaXBlfGVufDF8MHx8fDE3OTQyMTM3OTV8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+          "ingredients": "200g Spaghetti, 2 large egg yolks, 50g Pecorino Romano, 80g Guanciale, Freshly cracked black pepper, Salt for pasta water",
+          "status": "PUBLISHED",
+          "title": "Classic Roman Carbonara",
+          "videoUrl": "https://cdn.pixabay.com/video/2019/10/31/28544-370332703_small.mp4",
+          "viewCount": 142,
+          "cookId": "c1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c"
+        },
+        {
+          "cookingTimeMinutes": 25,
+          "coverPhoto": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8R29sZGVuJTIwRWdnJTIwRnJpZWQlMjBSaWNlJTIwUmVjaXBlfGVufDF8MHx8fDE3OTQyMTM3OTZ8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "id": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
+          "ingredients": "2 cups cold cooked Jasmine rice, 2 eggs, 2 scallions sliced, 1 tbsp soy sauce, 1 tsp sesame oil, 2 tbsp cooking oil",
+          "status": "PUBLISHED",
+          "title": "Golden Egg Fried Rice",
+          "videoUrl": "https://cdn.pixabay.com/video/2017/08/30/11695-231758964_small.mp4",
+          "viewCount": 98,
+          "cookId": "c1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

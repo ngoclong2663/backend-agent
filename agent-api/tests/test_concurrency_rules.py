@@ -313,3 +313,32 @@ def test_a_read_only_module_with_a_unique_together_rule_starts():
             text=True,
         )
     assert result.returncode == 0, result.stdout
+
+
+def test_a_success_moves_to_a_free_enum_value_when_every_parent_is_taken():
+    """gen_01M6ZQHZXHBYTH5ADA1YWWYSRM (2026-11-09, Pocket Chefs): a member reacts once per recipe and type
+    (`uniqueTogether` recipeId + memberId + type, the member from the session); the seed had the demo member's LIKE on
+    both recipes, so the success scenario's pair was a duplicate (the mock answered 409 for an expected 201) and no
+    other recipe was free. The success takes the type's other value (SAVE); the other scenarios never prefix an enum
+    ("s2-LIKE")."""
+    import json
+    from pathlib import Path
+
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.backend.planner import build_plan
+    from src.orchestrator.integration.contract import build_contract, contract_operations
+
+    raw = json.loads((Path(__file__).parent / "fixtures" / "specs" / "pocket-chefs-reactions.json").read_text())
+    spec = validate_spec_data(raw).normalized
+    contract = build_contract(spec, build_plan(spec))
+    rows = contract["x-bga"]["fixtures"]["Reaction"]
+    users = {u["email"]: u["id"] for u in contract["x-bga"]["fixtures"]["User"]}
+    meta = contract_operations(contract)["reaction.create"]["operation"]["x-bga"]
+    success = next(s for s in meta["scenarios"] if s["name"] == "success")
+    caller = users[success["user"]]
+    taken = {(r["recipeId"], r["memberId"], r["type"]) for r in rows}
+    assert (success["body"]["recipeId"], caller, success["body"]["type"]) not in taken, success["body"]
+    values = {"LIKE", "SAVE"}
+    for scenario in meta["scenarios"]:
+        kind = (scenario.get("body") or {}).get("type")
+        assert kind is None or kind in values, (scenario["name"], kind)

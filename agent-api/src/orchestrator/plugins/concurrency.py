@@ -403,24 +403,39 @@ def contract_scenarios(
             mine = tuple(caller if f in server_set else success["body"].get(f) for f in fields)
             varied = next((f for f in fields if f not in server_set and f in success["body"]), None)
             if mine in pairs and varied is not None:  # the success would be a duplicate of a seeded record
-                at = fields.index(varied)
-                column = columns[varied]
-                if column.get("foreignKey"):
-                    table = column["foreignKey"]["references"].partition(".")[0]
-                    parent = next(m for m in plan["models"] if m["table"] == table)
-                    pk = next(c["apiName"] for c in parent["columns"] if c["primaryKey"])
-                    options = [p[pk] for p in meta["fixtures"].get(parent["entity"]) or []]
+                # each field the caller sets may move it to a free pair: a parent from the fixtures, an enum's
+                # other value (a member's LIKE taken on every recipe: a SAVE is free), else a text made new
+                moved = False
+                for name in (f for f in fields if f not in server_set and f in success["body"]):
+                    at, column = fields.index(name), columns[name]
+                    options: list[Any] = []
+                    if column.get("foreignKey"):
+                        table = column["foreignKey"]["references"].partition(".")[0]
+                        parent = next(m for m in plan["models"] if m["table"] == table)
+                        pk = next(c["apiName"] for c in parent["columns"] if c["primaryKey"])
+                        options = [p[pk] for p in meta["fixtures"].get(parent["entity"]) or []]
+                    elif column.get("enum"):
+                        options = list(column["enum"].get("values") or [])
                     free = next((o for o in options if (*mine[:at], o, *mine[at + 1 :]) not in pairs), None)
                     if free is not None:
-                        before = success["body"][varied]
+                        before = success["body"][name]
                         for scenario in scenarios:  # the creates built from the success's body move with it (else
                             body = scenario.get("body")  # their seeded pair is a second conflict, answered first)
-                            if isinstance(body, dict) and body.get(varied) == before:
-                                body[varied] = free
-                elif isinstance(success["body"].get(varied), str):
+                            if isinstance(body, dict) and body.get(name) == before:
+                                body[name] = free
+                        moved = True
+                        break
+                if not moved and isinstance(success["body"].get(varied), str) and not columns[varied].get("enum"):
                     success["body"][varied] = f"{success['body'][varied]} (new)"
-            text_field = next(
-                (f for f in rule["fields"] if isinstance(success["body"].get(f), str) and not f.endswith("Id")), None
+            text_field = next(  # a free text the other scenarios make their own (never an enum: "s2-LIKE")
+                (
+                    f
+                    for f in rule["fields"]
+                    if isinstance(success["body"].get(f), str)
+                    and not f.endswith("Id")
+                    and not (columns.get(f) or {}).get("enum")
+                ),
+                None,
             )
             for index, scenario in enumerate(scenarios):  # the success creates its pair: the others get their own
                 body = scenario.get("body")

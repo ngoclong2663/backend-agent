@@ -154,6 +154,9 @@ Agent-specific notes:
   again once with its errors. `LLM_PROVIDER` picks it (`build_llm_provider` / `get_llm_provider`); `DRAFT_ENGINE`
   defaults to its draft engine (`antigravity` → `antigravity_json`). The account / subscription logins cost $0
   (`costSource: account`). `antigravity_json` runs on the host worker with `ANTIGRAVITY_AUTH=account`.
+  `claude_code` / `claude_code_json` log in with `ANTHROPIC_API_KEY`, else `CLAUDE_CODE_OAUTH_TOKEN` (`claude setup-token`:
+  the subscription for headless runs; on macOS the desktop login is in the keychain, which a container and the
+  engines' private `CLAUDE_CONFIG_DIR` cannot read), else `CLAUDE_CREDENTIALS_FILE`.
 - Access rules (Epic 25): `orchestrator/drafting/access.py` runs on every valid app draft (`drafting/app.apply_access_rules`,
   kept only when the BackendSpec stays valid, each change a note): records tied to a person (an ownership owner field or
   a `<role>Id` field) are private with the staff's bypass; owner actions lose the bypass; an assigned worker's actions

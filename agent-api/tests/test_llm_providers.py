@@ -320,3 +320,13 @@ def test_the_fake_provider_answers_the_schema_skeleton(tmp_path):
     answer = _ask(provider, tmp_path)
     assert answer.data == skeleton(SCHEMA) and schema_errors(answer.data, SCHEMA) == []
     assert provider.calls[0]["step"] == "draft_app"
+
+
+def test_the_claude_json_provider_runs_on_a_setup_token(tmp_path):
+    token = "sk-ant-oat01-test-token-abcdef"
+    provider = _cli("claude", tmp_path, oauth_token=token)
+    health = asyncio.run(provider.health())
+    assert health.available and "subscription" in (health.reason or "")
+    call = provider.call("prompt", None, tmp_path / "s", tmp_path / "home", [], None, 60)
+    assert call.env["CLAUDE_CODE_OAUTH_TOKEN"] == token and "--bare" not in call.argv
+    assert provider.redactor.redact(token) != token

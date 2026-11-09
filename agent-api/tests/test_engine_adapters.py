@@ -479,3 +479,20 @@ def test_antigravity_may_read_the_skills_it_is_given(root, tmp_path):
     settings = json.loads((home / ".gemini" / "antigravity-cli" / "settings.json").read_text())
     assert f"read_file({skill.resolve()})" in settings["permissions"]["allow"]
     assert not any(rule.startswith("write_file") and "skills" in rule for rule in settings["permissions"]["allow"])
+
+
+def test_claude_code_runs_on_a_setup_token_where_the_keychain_cannot_reach(tmp_path):
+    """macOS keeps the desktop's Claude login in the keychain, which a container (and a private CLAUDE_CONFIG_DIR)
+    cannot read: `claude setup-token` gives a token for headless runs (`CLAUDE_CODE_OAUTH_TOKEN`). The engine is
+    healthy with it alone, hands it to the CLI, keeps an API key first when both are set, and never logs it."""
+    token = "sk-ant-oat01-test-token-abcdef"
+    engine = _claude(tmp_path, api_key=None, oauth_token=token)
+    assert asyncio.run(engine.health()).available
+    request = _request(tmp_path)
+    request.workdir.mkdir(parents=True)
+    invocation = engine.build_invocation(request, tmp_path / "home", 5, 60)
+    assert invocation.env["CLAUDE_CODE_OAUTH_TOKEN"] == token
+    assert engine.redactor.redact(f"token {token}") != f"token {token}"
+    keyed = _claude(tmp_path, oauth_token=token).build_invocation(request, tmp_path / "home2", 5, 60)
+    assert "CLAUDE_CODE_OAUTH_TOKEN" not in keyed.env or not keyed.env["CLAUDE_CODE_OAUTH_TOKEN"]
+    assert not asyncio.run(_claude(tmp_path, api_key=None).health()).available

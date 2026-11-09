@@ -44,20 +44,29 @@ class ClaudeCodeEngine(CliEngine):
         max_output_bytes: int,
         purpose_models: dict[str, str] | None = None,
         runner: SubprocessRunner | None = None,
+        oauth_token: str | None = None,
     ):
         super().__init__(allowed_root, redactor, default_timeout_s, default_max_turns, max_output_bytes, runner)
         self.binary = binary
         self.api_key = api_key
         self.credentials_file = Path(credentials_file) if credentials_file else None
+        self.oauth_token = oauth_token
+        self.redactor = self.redactor.with_secrets(api_key, oauth_token)  # never in a run's logs
         self.model = model
         self.purpose_models = purpose_models or {}
 
     async def health(self) -> EngineHealth:
         if shutil.which(self.binary) is None:
             return EngineHealth(name=self.name, available=False, reason=f"'{self.binary}' not found on PATH")
-        if not self.api_key and not (self.credentials_file and self.credentials_file.is_file()):
+        if (
+            not self.api_key
+            and not self.oauth_token
+            and not (self.credentials_file and self.credentials_file.is_file())
+        ):
             return EngineHealth(
-                name=self.name, available=False, reason="Set ANTHROPIC_API_KEY or CLAUDE_CREDENTIALS_FILE"
+                name=self.name,
+                available=False,
+                reason="Set ANTHROPIC_API_KEY, CLAUDE_CODE_OAUTH_TOKEN or CLAUDE_CREDENTIALS_FILE",
             )
         return EngineHealth(name=self.name, available=True)
 
@@ -104,6 +113,7 @@ class ClaudeCodeEngine(CliEngine):
             HOME=str(home),
             CLAUDE_CONFIG_DIR=str(config_dir),
             ANTHROPIC_API_KEY=self.api_key,
+            CLAUDE_CODE_OAUTH_TOKEN=None if self.api_key else self.oauth_token,
             CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1",
             DISABLE_AUTOUPDATER="1",
         )

@@ -393,14 +393,16 @@ class ClaudeJsonProvider(CliJsonProvider):
         credentials_file: str | None,
         effort: str | None = None,
         max_budget_usd: float | None = None,
+        oauth_token: str | None = None,
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
         self.api_key = api_key
+        self.oauth_token = oauth_token
         self.credentials_file = Path(credentials_file) if credentials_file else None
         self.effort = effort
         self.max_budget_usd = max_budget_usd
-        self.redactor = self.redactor.with_secrets(api_key)
+        self.redactor = self.redactor.with_secrets(api_key, oauth_token)
 
     async def health(self) -> EngineHealth:
         if shutil.which(self.binary) is None:
@@ -411,11 +413,15 @@ class ClaudeJsonProvider(CliJsonProvider):
                 drafts_only=True,
                 drafts=True,
             )
-        if not self.api_key and not (self.credentials_file and self.credentials_file.is_file()):
+        if (
+            not self.api_key
+            and not self.oauth_token
+            and not (self.credentials_file and self.credentials_file.is_file())
+        ):
             return EngineHealth(
                 name=self.engine_name,
                 available=False,
-                reason="Set ANTHROPIC_API_KEY or CLAUDE_CREDENTIALS_FILE",
+                reason="Set ANTHROPIC_API_KEY, CLAUDE_CODE_OAUTH_TOKEN or CLAUDE_CREDENTIALS_FILE",
                 drafts_only=True,
                 drafts=True,
             )
@@ -456,6 +462,7 @@ class ClaudeJsonProvider(CliJsonProvider):
             HOME=str(home),
             CLAUDE_CONFIG_DIR=str(config_dir),
             ANTHROPIC_API_KEY=self.api_key,
+            CLAUDE_CODE_OAUTH_TOKEN=None if self.api_key else self.oauth_token,
             CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1",
             DISABLE_AUTOUPDATER="1",
         )

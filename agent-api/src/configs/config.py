@@ -54,6 +54,9 @@ class Config(BaseSettings):
     claude_code_purpose_models: Annotated[dict[str, str], NoDecode] = {}
     anthropic_api_key: str | None = None
     claude_credentials_file: str | None = None
+    # The Claude subscription login for headless runs (`claude setup-token` prints it): works where the desktop's
+    # keychain login cannot reach (containers, a private CLAUDE_CONFIG_DIR); used when no ANTHROPIC_API_KEY is set
+    claude_code_oauth_token: str | None = None
 
     antigravity_bin: str = "agy"
     antigravity_model: str = "gemini-3.8-flash-medium"  # `agy models` lists the choices
