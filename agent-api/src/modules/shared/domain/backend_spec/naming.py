@@ -59,3 +59,20 @@ def table_name(entity_name: str) -> str:
     snake = to_snake(entity_name)
     head, _, last = snake.rpartition("_")
     return f"{head}_{pluralize(last)}" if head else pluralize(last)
+
+
+# Epic 32: actions that record a person opening a record (a view counted, a watch logged). The screens run them once
+# when the record opens; the access rules leave them to the record's readers, never its owner alone.
+OPEN_WORDS = frozenset(
+    {"view", "views", "watch", "watched", "play", "plays", "open", "opened", "read", "visit", "visited"}
+)
+
+
+def name_words(name: str) -> set[str]:
+    """`VideoView` → {"video", "view"}; `recordView` → {"record", "view"}."""
+    return {word.lower() for word in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])", name)}
+
+
+def is_open_action(op_id: str) -> bool:
+    """`recipe.recordView`, `video.watch`: an operation named like a view of a record."""
+    return bool(name_words(op_id.split(".", 1)[-1]) & OPEN_WORDS)

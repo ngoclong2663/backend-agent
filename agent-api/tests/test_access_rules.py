@@ -458,3 +458,37 @@ def test_a_role_with_a_space_still_gets_a_demo_login_that_signs_in():
     assert _demo_login("email", "member") == "demo-member@example.com"
     assert _demo_login("email", "front_desk") == "demo-front_desk@example.com"
     assert _demo_login("username", "Head Chef") == "demo-Head-Chef"
+
+
+def test_a_view_of_a_record_is_open_to_whoever_reads_it():
+    """Story 32.8 (Pocket Chefs, gen_01M6ZTH3KM639CANCP5X58V40C): the draft left `recipe.recordView` open; the rules
+    gave it the cook's ownership (a record action without a policy), so a viewer's view of a cook's recipe was refused
+    (404) and the count never moved. A view of a record (named like one, nothing to fill in) follows the record's
+    read: open when the read is open, the readers' policy when it is not; the owner's actions stay the owner's."""
+    import json
+    from pathlib import Path
+
+    data = json.loads((Path(__file__).parent / "fixtures" / "specs" / "pocket-chefs-views.json").read_text())
+    view = next(op for op in data["operations"] if op["operationId"] == "recipe.recordView")
+    view.pop("policy")  # as drafted
+    notes = secure_access(data)
+    assert validate_spec_data(data).report.valid
+    assert "policy" not in view, "everyone who can read the recipe counts a view"
+    assert any("recipe.recordView: a view of the record" in n["message"] for n in notes)
+    assert _policy(data, "recipe.publish")["ownerField"] == "cookId", "the cook's own action stays the cook's"
+
+    private = _feed_spec(comment_policy=False)
+    private["operations"].append(
+        {
+            "operationId": "video.watch",
+            "type": "custom",
+            "method": "POST",
+            "path": "/videos/{id}/watch",
+            "entity": "Video",
+        }
+    )
+    for op in private["operations"]:
+        if op["operationId"] == "video.get":
+            op["policy"] = "creatorsOnly"  # only creators read videos here
+    secure_access(private)
+    assert _ops(private)["video.watch"]["policy"] == "creatorsOnly", "the readers' policy"

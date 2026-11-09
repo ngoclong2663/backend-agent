@@ -23,6 +23,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from src.modules.shared.domain.backend_spec.naming import is_open_action
+
 MUTATING = ("POST", "PUT", "PATCH", "DELETE")
 
 
@@ -324,6 +326,17 @@ def _secure(spec: dict[str, Any], owned: dict[str, Owned], public: set[str] | No
         if policy is None and action in ("get", "list") and item.entity in public:
             # Epic 32 (32.4): what a person writes on a shared record is read with it; writes stay the author's
             note(index, f"{op_id}: readable by everyone who can read the record it is written on")
+            continue
+        # Epic 32: a view of a record (`recipe.recordView`, `video.watch`, nothing to fill in) is its readers': it
+        # follows the record's read, never the owner alone (a viewer's view of a cook's recipe was refused, 404)
+        if policy is None and _record_op(op) and op.get("type") == "custom" and is_open_action(str(op_id)):
+            read = next(
+                (o for o in spec.get("operations") or [] if _entity(o) == item.entity and o.get("action") == "get"),
+                None,
+            )
+            if read is not None and read.get("policy"):
+                op["policy"] = read["policy"]
+            note(index, f"{op_id}: a view of the record, open to whoever can read it")
             continue
         # 25.2: reads, edits and record actions without a policy get the owner's (an assigned worker opens a record
         # by its id: the worker's roles bypass the read, not the lists)

@@ -24,7 +24,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from src.modules.shared.domain.backend_spec import validate_spec_data
-from src.modules.shared.domain.backend_spec.naming import pluralize, to_camel, to_kebab, to_pascal
+from src.modules.shared.domain.backend_spec.naming import OPEN_WORDS, pluralize, to_camel, to_kebab, to_pascal
+from src.modules.shared.domain.backend_spec.naming import name_words as _name_words
 from src.modules.shared.domain.frontend_spec.app import MAX_DASHBOARD
 from src.modules.shared.domain.frontend_spec.coverage import uncovered_operations
 from src.orchestrator.integration.contract import build_contract, contract_operations, resolve
@@ -35,18 +36,6 @@ from .outline import humanize
 
 SPEC_VERSION = "1.0"
 # The planner's own words (Story 23.8): (English, Japanese); `{x}` is a label, lowercased in English.
-# Epic 32 (Story 32.5): actions that record a person opening a record (a view counted, a watch logged); in a consumer
-# pattern they run once when the record opens, never as a button
-OPEN_WORDS = frozenset(
-    {"view", "views", "watch", "watched", "play", "plays", "open", "opened", "read", "visit", "visited"}
-)
-
-
-def _name_words(name: str) -> set[str]:
-    """`VideoView` → {"video", "view"}; `recordView` → {"record", "view"}."""
-    return {word.lower() for word in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])", name)}
-
-
 WORDS = {
     "view": ("View", "表示"),
     "edit": ("Edit", "編集"),

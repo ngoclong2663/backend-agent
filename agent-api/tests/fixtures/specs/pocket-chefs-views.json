@@ -1,0 +1,709 @@
+{
+  "auth": {
+    "roles": [
+      "cook",
+      "viewer"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "cookId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 160,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "coverImage",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "name": "video",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "max": 1440,
+          "min": 1,
+          "name": "cookingMinutes",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "maxLength": 5000,
+          "name": "ingredients",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "draft",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "draft",
+            "published",
+            "deleted"
+          ]
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "viewCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "likeCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "status",
+            "createdAt"
+          ]
+        },
+        {
+          "fields": [
+            "cookId",
+            "status"
+          ]
+        }
+      ],
+      "name": "Recipe"
+    },
+    {
+      "displayField": "text",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "viewerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 1000,
+          "name": "text",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Comment"
+    },
+    {
+      "displayField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "viewerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Like",
+      "uniqueConstraints": [
+        [
+          "recipeId",
+          "viewerId"
+        ]
+      ]
+    },
+    {
+      "displayField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "viewerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "SavedRecipe",
+      "uniqueConstraints": [
+        [
+          "recipeId",
+          "viewerId"
+        ]
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Cook creates a new recipe in draft status with title, video, cover photo, cooking time, and ingredients. cookId is populated from auth user.",
+      "entity": "Recipe",
+      "method": "POST",
+      "operationId": "recipe.create",
+      "path": "/recipes",
+      "policy": "cooksOnly",
+      "request": {
+        "fields": [
+          "title",
+          "coverImage",
+          "video",
+          "cookingMinutes",
+          "ingredients"
+        ],
+        "entity": "Recipe"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "none",
+      "description": "Get recipe details. Increments viewCount when opened.",
+      "entity": "Recipe",
+      "method": "GET",
+      "operationId": "recipe.get",
+      "path": "/recipes/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "none",
+      "description": "List newest recipes. Public and viewers see only published recipes via visibility policy. Cooks can filter their own recipes.",
+      "entity": "Recipe",
+      "filters": [
+        "status",
+        "cookId"
+      ],
+      "method": "GET",
+      "operationId": "recipe.list",
+      "pagination": true,
+      "path": "/recipes",
+      "search": [
+        "title",
+        "ingredients"
+      ],
+      "sort": [
+        "createdAt",
+        "viewCount",
+        "likeCount"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "description": "Update draft or published recipe details. Allowed only to recipe author.",
+      "entity": "Recipe",
+      "method": "PATCH",
+      "operationId": "recipe.update",
+      "path": "/recipes/{id}",
+      "policy": "ownRecipe",
+      "request": {
+        "fields": [
+          "title",
+          "coverImage",
+          "video",
+          "cookingMinutes",
+          "ingredients"
+        ],
+        "entity": "Recipe"
+      },
+      "rules": [
+        "recipeCannotBeEditedWhenDeleted"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Delete recipe from studio by setting status to deleted. Allowed only to recipe author.",
+      "entity": "Recipe",
+      "method": "DELETE",
+      "operationId": "recipe.delete",
+      "path": "/recipes/{id}",
+      "policy": "ownRecipe",
+      "rules": [
+        "recipeCannotBeEditedWhenDeleted"
+      ],
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Cook publishes a draft recipe to the community feed. Changes status from draft to published.",
+      "entity": "Recipe",
+      "method": "POST",
+      "operationId": "recipe.publish",
+      "path": "/recipes/{id}/publish",
+      "policy": "ownRecipe",
+      "rules": [
+        "recipeStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Recipe"
+      }
+    },
+    {
+      "auth": "none",
+      "description": "Increment recipe view count by 1 upon viewing recipe details.",
+      "entity": "Recipe",
+      "method": "POST",
+      "operationId": "recipe.recordView",
+      "path": "/recipes/{id}/view",
+      "type": "custom",
+      "response": {
+        "entity": "Recipe"
+      },
+      "policy": "ownRecipe"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Signed-in viewer or cook writes and posts a comment under a recipe. viewerId set to auth user.",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "signedInUser",
+      "request": {
+        "fields": [
+          "recipeId",
+          "text"
+        ],
+        "entity": "Comment"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "none",
+      "description": "List comments for a recipe, newest first.",
+      "entity": "Comment",
+      "filters": [
+        "recipeId"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Delete a comment. Only the commenter can delete their comment.",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "ownComment",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Signed-in viewer likes a recipe. viewerId is set from auth user and increments recipe likeCount.",
+      "entity": "Like",
+      "method": "POST",
+      "operationId": "like.create",
+      "path": "/likes",
+      "policy": "signedInUser",
+      "request": {
+        "fields": [
+          "recipeId"
+        ],
+        "entity": "Like"
+      },
+      "rules": [
+        "oneLikePerViewer"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Remove a like from a recipe and decrement recipe likeCount.",
+      "entity": "Like",
+      "method": "DELETE",
+      "operationId": "like.delete",
+      "path": "/likes/{id}",
+      "policy": "ownLike",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List likes for a recipe or by viewer.",
+      "entity": "Like",
+      "filters": [
+        "recipeId",
+        "viewerId"
+      ],
+      "method": "GET",
+      "operationId": "like.list",
+      "pagination": true,
+      "path": "/likes",
+      "policy": "signedInUser",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Signed-in viewer saves a recipe to cook later. viewerId set to auth user.",
+      "entity": "SavedRecipe",
+      "method": "POST",
+      "operationId": "savedRecipe.create",
+      "path": "/saved-recipes",
+      "policy": "signedInUser",
+      "request": {
+        "fields": [
+          "recipeId"
+        ],
+        "entity": "SavedRecipe"
+      },
+      "rules": [
+        "oneSavedRecipePerViewer"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Remove recipe from saved list. Only owner may delete.",
+      "entity": "SavedRecipe",
+      "method": "DELETE",
+      "operationId": "savedRecipe.delete",
+      "path": "/saved-recipes/{id}",
+      "policy": "ownSavedRecipe",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List saved recipes for the signed-in viewer.",
+      "entity": "SavedRecipe",
+      "filters": [
+        "recipeId",
+        "viewerId"
+      ],
+      "method": "GET",
+      "operationId": "savedRecipe.list",
+      "pagination": true,
+      "path": "/saved-recipes",
+      "policy": "ownSavedRecipe",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "operationId": "recipe.count",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/count",
+      "summary": "My Recipes",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "recipe.sumViewCount",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/sum-view-count",
+      "summary": "Total Views",
+      "aggregate": {
+        "fn": "sum",
+        "field": "viewCount"
+      }
+    },
+    {
+      "operationId": "recipe.sumLikeCount",
+      "type": "aggregate",
+      "entity": "Recipe",
+      "method": "GET",
+      "path": "/recipes/aggregate/sum-like-count",
+      "summary": "Total Likes",
+      "aggregate": {
+        "fn": "sum",
+        "field": "likeCount"
+      }
+    },
+    {
+      "operationId": "comment.count",
+      "type": "aggregate",
+      "entity": "Comment",
+      "method": "GET",
+      "path": "/comments/aggregate/count",
+      "summary": "Community Comments",
+      "aggregate": {
+        "fn": "count"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "cooksOnly",
+      "roles": [
+        "cook"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "viewersOnly",
+      "roles": [
+        "viewer"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "signedInUser",
+      "roles": [
+        "cook",
+        "viewer"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "ownRecipe",
+      "ownerField": "cookId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownComment",
+      "ownerField": "viewerId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownLike",
+      "ownerField": "viewerId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownSavedRecipe",
+      "ownerField": "viewerId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Recipe",
+      "name": "viewerRecipeVisibility",
+      "roles": [
+        "viewer"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "published"
+      }
+    }
+  ],
+  "project": {
+    "description": "A community where home cooks share short recipe videos, discover dishes, like, save, and comment.",
+    "name": "Pocket Chefs",
+    "slug": "pocket-chefs"
+  },
+  "relationships": [
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeLikes",
+      "onDelete": "CASCADE",
+      "to": "Like",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "recipeId",
+      "from": "Recipe",
+      "name": "recipeSaves",
+      "onDelete": "CASCADE",
+      "to": "SavedRecipe",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Recipe status transitions from draft to published, and published to deleted.",
+      "entity": "Recipe",
+      "id": "recipeStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "draft": [
+            "published"
+          ],
+          "published": [
+            "deleted"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Deleted recipes cannot be modified.",
+      "entity": "Recipe",
+      "id": "recipeCannotBeEditedWhenDeleted",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "deleted"
+        ]
+      }
+    },
+    {
+      "description": "A viewer can only like a recipe once.",
+      "entity": "Like",
+      "id": "oneLikePerViewer",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "recipeId",
+          "viewerId"
+        ]
+      }
+    },
+    {
+      "description": "A viewer can only save a recipe once.",
+      "entity": "SavedRecipe",
+      "id": "oneSavedRecipePerViewer",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "recipeId",
+          "viewerId"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Recipe",
+      "records": [
+        {
+          "cookingMinutes": 15,
+          "coverImage": "https://images.unsplash.com/photo-1764586119076-61711e8ed25a?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Q2xhc3NpYyUyMFJvbWFuJTIwQ2FyYm9uYXJhJTIwUmVjaXBlfGVufDF8MHx8fDE3OTQyMTM3OTV8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "createdAt": "2026-11-01T12:00:00Z",
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "ingredients": "200g spaghetti, 2 egg yolks, 50g pecorino romano, 100g guanciale, freshly ground black pepper",
+          "likeCount": 42,
+          "status": "published",
+          "title": "Classic Roman Carbonara",
+          "updatedAt": "2026-11-01T12:00:00Z",
+          "video": "https://cdn.pixabay.com/video/2019/10/31/28544-370332703_small.mp4",
+          "viewCount": 310,
+          "cookId": "11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "cookingMinutes": 25,
+          "coverImage": "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8UnVzdGljJTIwTWFyZ2hlcml0YSUyMEZsYXRicmVhZCUyMFJlY2lwZXxlbnwxfDB8fHwxNzk0MjE2OTE4fDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "createdAt": "2026-11-03T14:30:00Z",
+          "id": "7cb85f64-5717-4562-b3fc-2c963f66afb7",
+          "ingredients": "San Marzano tomatoes, fresh mozzarella di bufala, fresh basil leaves, extra virgin olive oil, sea salt",
+          "likeCount": 78,
+          "status": "published",
+          "title": "Rustic Margherita Flatbread",
+          "updatedAt": "2026-11-03T14:30:00Z",
+          "video": "https://cdn.pixabay.com/video/2017/08/29/11638-231758689_small.mp4",
+          "viewCount": 520,
+          "cookId": "11111111-1111-4111-8111-111111111111"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}
