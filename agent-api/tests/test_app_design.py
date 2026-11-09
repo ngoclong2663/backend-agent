@@ -366,7 +366,7 @@ def test_a_featured_home_sorts_the_main_list_newest_first():
 def test_font_pairings_follow_the_script_and_the_requested_heading_kind():
     from src.orchestrator.frontend.app.design import assign_pairings, pairing_candidates
 
-    assert "japanese-gothic" in pairing_candidates("en", None, "catalogue")
+    assert "japanese-gothic" not in pairing_candidates("en", None, "catalogue"), "Japanese faces are for Japanese apps"
     japanese = pairing_candidates("ja", None, "catalogue")
     assert japanese and all(name.startswith("japanese-") for name in japanese), (
         "a Japanese app needs a pairing that sets Japanese"

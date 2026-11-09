@@ -19,14 +19,25 @@
   --background: oklch(0.12 0.008 60);
   --foreground: oklch(0.96 0.005 80);
   --card: oklch(0.15 0.008 60);
+  --card-foreground: oklch(0.96 0.005 80);
+  --popover: oklch(0.15 0.008 60);
+  --popover-foreground: oklch(0.96 0.005 80);
   --muted: oklch(0.2 0.008 60);
   --muted-foreground: oklch(0.72 0.008 80);
+  --accent: oklch(0.22 0.01 60);
+  --accent-foreground: oklch(0.96 0.005 80);
   --border: oklch(0.3 0.008 60);
   --input: oklch(0.3 0.008 60);
   --primary: oklch(0.92 0.02 80);
   --primary-foreground: oklch(0.14 0.008 60);
+  --secondary: oklch(0.22 0.01 60);
+  --secondary-foreground: oklch(0.96 0.005 80);
   --sidebar: oklch(0.1 0.008 60);
+  --sidebar-foreground: oklch(0.96 0.005 80);
+  --sidebar-accent: oklch(0.2 0.01 60);
+  --sidebar-accent-foreground: oklch(0.96 0.005 80);
   --sidebar-border: oklch(0.26 0.008 60);
+  --destructive: oklch(0.74 0.18 25);
 }
 @root h1, @root h2, @root h3 { font-family: var(--font-display), ui-serif, Georgia, serif; font-weight: 400; letter-spacing: 0.01em; }
 @root h1 { font-size: 2.5rem; line-height: 1.1; }

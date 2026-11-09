@@ -1,0 +1,20 @@
+{
+  "requirement": "lantern-audio.md",
+  "seconds": 59.6,
+  "repairs": 0,
+  "costUsd": 0.0,
+  "costSource": "account",
+  "engine": "antigravity_json",
+  "draftId": "3b990126-a5b7-4f54-89eb-f26bd426c965",
+  "generationId": "gen_01M6Z75RG2H8YD1JT4XNZ5AMPP",
+  "date": "2026-11-09",
+  "calls": [
+    "discover_workflows@v1",
+    "expect_workflows@v1",
+    "draft_app@v7",
+    "repair_spec@v3",
+    "bind_workflows@v1"
+  ],
+  "archetypeCandidates": null,
+  "productTypes": null
+}

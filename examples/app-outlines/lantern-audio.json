@@ -1,0 +1,252 @@
+{
+  "name": "Lantern Audio",
+  "tagline": "A small podcast network",
+  "icon": "Radio",
+  "nav": [
+    {
+      "entity": "Show",
+      "label": "Shows",
+      "icon": "Radio"
+    },
+    {
+      "entity": "Episode",
+      "label": "Episodes",
+      "icon": "Headphones"
+    },
+    {
+      "entity": "Guest",
+      "label": "Guests",
+      "icon": "Users"
+    }
+  ],
+  "home": "Show",
+  "entities": {
+    "Show": {
+      "label": "Show",
+      "plural": "Shows",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "category",
+        "hostName",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "coverArt",
+        "name",
+        "category",
+        "hostName",
+        "status",
+        "description",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "name": "Show Name",
+        "description": "Description",
+        "coverArt": "Cover Art",
+        "category": "Category",
+        "hostName": "Host Name",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "coverArt": "Square artwork image representing the podcast show"
+      }
+    },
+    "Episode": {
+      "label": "Episode",
+      "plural": "Episodes",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "showId",
+        "episodeNumber",
+        "durationMinutes",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "showId",
+        "episodeNumber",
+        "publishDate",
+        "durationMinutes",
+        "status",
+        "audio",
+        "transcript",
+        "showNotes",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "showId": "Show",
+        "title": "Title",
+        "showNotes": "Show Notes",
+        "audio": "Audio File",
+        "transcript": "Transcript",
+        "durationMinutes": "Duration (minutes)",
+        "episodeNumber": "Episode Number",
+        "publishDate": "Publish Date",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "audio": "Episode audio stream filled with duration upon upload",
+        "status": "Draft episodes are private to producers; published episodes are available for listeners",
+        "transcript": "Subtitle file (WebVTT or SRT) enabling read-along while listening"
+      }
+    },
+    "Guest": {
+      "label": "Guest",
+      "plural": "Guests",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "bio",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "photo",
+        "name",
+        "bio",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "name": "Name",
+        "bio": "Biography",
+        "photo": "Photo",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "bio": "Short biography of the guest",
+        "photo": "Guest headshot image"
+      }
+    },
+    "EpisodeGuest": {
+      "label": "Episode guest",
+      "plural": "Episode guests",
+      "displayField": "episodeId",
+      "listFields": [
+        "episodeId",
+        "guestId",
+        "createdAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "episodeId",
+        "guestId",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "episodeId": "Episode",
+        "guestId": "Guest",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    }
+  },
+  "design": {
+    "archetype": "catalogue",
+    "shell": "sidebar",
+    "mobileNav": "bottom-tabs",
+    "frame": "wide",
+    "mainEntity": "Show",
+    "entities": {
+      "Show": {
+        "view": "cards",
+        "roles": {
+          "media": "coverArt"
+        },
+        "detailView": "media-side",
+        "filtersStyle": "facets",
+        "card": "side",
+        "aspect": "square"
+      },
+      "Episode": {
+        "view": "cards",
+        "roles": {
+          "media": "audio",
+          "duration": "durationMinutes"
+        },
+        "card": "stacked"
+      },
+      "Guest": {
+        "view": "cards",
+        "roles": {
+          "media": "photo"
+        },
+        "card": "stacked"
+      },
+      "EpisodeGuest": {
+        "view": "table",
+        "roles": {}
+      }
+    },
+    "homeView": "catalogue",
+    "looks": [
+      {
+        "recipe": "editorial",
+        "reason": "The requirement asks for it",
+        "fontPairing": "editorial"
+      },
+      {
+        "recipe": "neon",
+        "reason": "Recommended: Dark Mode (OLED) for Podcast Platform",
+        "fontPairing": "loud"
+      },
+      {
+        "recipe": "swiss",
+        "reason": "Recommended: Minimalism & Swiss Style for Podcast Platform",
+        "fontPairing": "workshop"
+      }
+    ],
+    "seed": 3138754629,
+    "replaced": [],
+    "fontPairing": "editorial"
+  },
+  "dashboard": [
+    {
+      "label": "Total Shows",
+      "kind": "figure",
+      "entity": "Show",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Published Episodes",
+      "kind": "figure",
+      "entity": "Episode",
+      "fn": "count",
+      "filter": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "label": "Draft Episodes",
+      "kind": "figure",
+      "entity": "Episode",
+      "fn": "count",
+      "filter": {
+        "status": "DRAFT"
+      }
+    },
+    {
+      "label": "Total Guests",
+      "kind": "figure",
+      "entity": "Guest",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Episodes by Status",
+      "kind": "pie",
+      "entity": "Episode",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    }
+  ]
+}

@@ -999,7 +999,7 @@ _Implemented 2026-11-07 (Epic 25)._
   play affordances in lists; audio that keeps playing across pages.
 - **Samples:** mocks, seeds and the evaluation use small sample media of our own.
 
-### FR-44: Design Plugins (proposed, Epic 30)
+### FR-44: Design Plugins (Epic 30, done 2026-11-09)
 
 - **Plugins:** every option of the app design space (shell, list view, detail view, home, filters, card, recipe, font
   pairing) is a folder with a descriptor (when to choose it, what it needs from the contract, its fallback) and its kit

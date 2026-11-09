@@ -280,9 +280,11 @@ async def check(plugin: DesignPluginDescriptor, fast: bool, out: Path, recipes_a
     (out / "check.json").write_text(
         json.dumps({"plugin": f"{plugin.kind}/{plugin.name}", "gates": results, "recipes": recipes}, indent=2) + "\n"
     )
-    # the preview: the first area's main list (else its home) at 1440 light in the first recipe
+    # the preview: the first area's main list (a home or shell plugin: its home; a detail plugin: its record) at 1440
+    # light in the first recipe
     first = passes[0]
-    route = first["routes"][1] if len(first["routes"]) > 1 else first["routes"][0]
+    index = {"home": 0, "shell": 0, "detail-view": 2}.get(plugin.kind, 1)
+    route = first["routes"][min(index, len(first["routes"]) - 1)]
     base = "home" if route == "/" else route.strip("/").replace("/", "-")
     shot = out / first["name"] / f"{base}-1440-light-{recipes[0]}.png"
     if shot.is_file():

@@ -92,3 +92,7 @@ limits, videos in sites (the `Video` section, hero background clips, the facade 
 trees) and in apps (seeded video fields, the kit's facade and credits). `FRONTEND_MAX_PHOTOS` now caps paid photos
 only (the user's note, 2026-11-09): with Unsplash the hour's requests and the search cache are the bound. 31.5 runs
 with the other epics' final checks.
+
+**Done 2026-11-09** (commit 96584c6; final check in Story 31.5): the providers, the site assets, the Video
+section and background video, the seeded video fields and the credits are in; the final check ran with both providers
+on (Story 31.5's Status: the app drafts seeded no video rows, one incidental static site showed four credited videos).

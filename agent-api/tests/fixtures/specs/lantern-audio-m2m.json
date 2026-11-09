@@ -1,0 +1,666 @@
+{
+  "auth": {
+    "roles": [
+      "producer",
+      "listener"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 160,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "description": "Square cover art image",
+          "name": "coverArt",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "name": "category",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "culture",
+            "science",
+            "history",
+            "business",
+            "comedy"
+          ]
+        },
+        {
+          "maxLength": 120,
+          "name": "hostName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "category"
+          ]
+        }
+      ],
+      "name": "Show"
+    },
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "showId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 200,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "showNotes",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "accept": [
+            "audio/mpeg",
+            "audio/mp4",
+            "audio/ogg",
+            "audio/wav"
+          ],
+          "description": "The episode audio file",
+          "name": "audio",
+          "required": true,
+          "type": "audio"
+        },
+        {
+          "accept": [
+            "text/vtt",
+            "application/x-subrip"
+          ],
+          "description": "Read-along transcript / subtitle file",
+          "name": "transcript",
+          "required": true,
+          "type": "subtitles"
+        },
+        {
+          "description": "Duration in minutes calculated from uploaded audio",
+          "min": 0,
+          "name": "durationMinutes",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "min": 1,
+          "name": "episodeNumber",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "publishDate",
+          "nullable": true,
+          "required": false,
+          "type": "date"
+        },
+        {
+          "default": "draft",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "draft",
+            "published"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "showId",
+            "episodeNumber"
+          ]
+        },
+        {
+          "fields": [
+            "status"
+          ]
+        },
+        {
+          "fields": [
+            "publishDate"
+          ]
+        }
+      ],
+      "name": "Episode"
+    },
+    {
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 120,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 1000,
+          "name": "bio",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "name": "photo",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Guest"
+    },
+    {
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "episodeId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "guestId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "episodeId",
+            "guestId"
+          ],
+          "unique": true
+        }
+      ],
+      "name": "EpisodeGuest"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "entity": "Show",
+      "method": "POST",
+      "operationId": "show.create",
+      "path": "/shows",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Show",
+      "method": "GET",
+      "operationId": "show.get",
+      "path": "/shows/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Show",
+      "filters": [
+        "category"
+      ],
+      "method": "GET",
+      "operationId": "show.list",
+      "pagination": true,
+      "path": "/shows",
+      "search": [
+        "name",
+        "description",
+        "hostName"
+      ],
+      "sort": [
+        "createdAt",
+        "name"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Show",
+      "method": "PATCH",
+      "operationId": "show.update",
+      "path": "/shows/{id}",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Show",
+      "method": "DELETE",
+      "operationId": "show.delete",
+      "path": "/shows/{id}",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Episode",
+      "method": "POST",
+      "operationId": "episode.create",
+      "path": "/episodes",
+      "policy": "producerOnly",
+      "request": {
+        "entity": "Episode",
+        "fields": [
+          "showId",
+          "title",
+          "showNotes",
+          "audio",
+          "transcript",
+          "durationMinutes",
+          "episodeNumber",
+          "publishDate"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Episode",
+      "method": "GET",
+      "operationId": "episode.get",
+      "path": "/episodes/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Episode",
+      "filters": [
+        "showId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "episode.list",
+      "pagination": true,
+      "path": "/episodes",
+      "search": [
+        "title",
+        "showNotes"
+      ],
+      "sort": [
+        "publishDate",
+        "episodeNumber",
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Episode",
+      "method": "PATCH",
+      "operationId": "episode.update",
+      "path": "/episodes/{id}",
+      "policy": "producerOnly",
+      "request": {
+        "entity": "Episode",
+        "fields": [
+          "showId",
+          "title",
+          "showNotes",
+          "audio",
+          "transcript",
+          "durationMinutes",
+          "episodeNumber",
+          "publishDate"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Episode",
+      "method": "DELETE",
+      "operationId": "episode.delete",
+      "path": "/episodes/{id}",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "description": "Producer publishes an episode, transitioning status from draft to published and setting publishDate to now if not set. Published episodes become publicly visible to listeners.",
+      "entity": "Episode",
+      "method": "POST",
+      "operationId": "episode.publish",
+      "path": "/episodes/{id}/publish",
+      "policy": "producerOnly",
+      "rules": [
+        "episodeStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Episode"
+      }
+    },
+    {
+      "description": "Producer unpublishes an episode, transitioning status from published back to draft. Unpublishes episode from public listener visibility.",
+      "entity": "Episode",
+      "method": "POST",
+      "operationId": "episode.unpublish",
+      "path": "/episodes/{id}/unpublish",
+      "policy": "producerOnly",
+      "rules": [
+        "episodeStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Episode"
+      }
+    },
+    {
+      "action": "create",
+      "entity": "Guest",
+      "method": "POST",
+      "operationId": "guest.create",
+      "path": "/guests",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Guest",
+      "method": "GET",
+      "operationId": "guest.get",
+      "path": "/guests/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Guest",
+      "method": "GET",
+      "operationId": "guest.list",
+      "pagination": true,
+      "path": "/guests",
+      "search": [
+        "name",
+        "bio"
+      ],
+      "sort": [
+        "name",
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Guest",
+      "method": "PATCH",
+      "operationId": "guest.update",
+      "path": "/guests/{id}",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Guest",
+      "method": "DELETE",
+      "operationId": "guest.delete",
+      "path": "/guests/{id}",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "EpisodeGuest",
+      "method": "POST",
+      "operationId": "episodeGuest.create",
+      "path": "/episode-guests",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "EpisodeGuest",
+      "filters": [
+        "episodeId",
+        "guestId"
+      ],
+      "method": "GET",
+      "operationId": "episodeGuest.list",
+      "pagination": true,
+      "path": "/episode-guests",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "EpisodeGuest",
+      "method": "DELETE",
+      "operationId": "episodeGuest.delete",
+      "path": "/episode-guests/{id}",
+      "policy": "producerOnly",
+      "type": "crud"
+    },
+    {
+      "operationId": "show.count",
+      "type": "aggregate",
+      "entity": "Show",
+      "method": "GET",
+      "path": "/shows/aggregate/count",
+      "summary": "Total Shows",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "episode.countWhereStatusDraft",
+      "type": "aggregate",
+      "entity": "Episode",
+      "method": "GET",
+      "path": "/episodes/aggregate/count-where-status-draft",
+      "summary": "Draft Episodes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "draft"
+        }
+      }
+    },
+    {
+      "operationId": "episode.countWhereStatusPublished",
+      "type": "aggregate",
+      "entity": "Episode",
+      "method": "GET",
+      "path": "/episodes/aggregate/count-where-status-published",
+      "summary": "Published Episodes",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "published"
+        }
+      }
+    },
+    {
+      "operationId": "guest.count",
+      "type": "aggregate",
+      "entity": "Guest",
+      "method": "GET",
+      "path": "/guests/aggregate/count",
+      "summary": "Guests on File",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "episode.countByStatus",
+      "type": "aggregate",
+      "entity": "Episode",
+      "method": "GET",
+      "path": "/episodes/aggregate/count-by-status",
+      "summary": "Episodes by Status",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "status"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "producerOnly",
+      "roles": [
+        "producer"
+      ],
+      "type": "role"
+    },
+    {
+      "entity": "Episode",
+      "name": "publicPublishedEpisodesOnly",
+      "roles": [
+        "listener"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "published"
+      }
+    }
+  ],
+  "project": {
+    "description": "A small podcast network producing shows, episodes with read-along transcripts, and guest profiles.",
+    "name": "Lantern Audio",
+    "slug": "lantern-audio"
+  },
+  "relationships": [
+    {
+      "foreignKey": "showId",
+      "from": "Show",
+      "name": "showEpisodes",
+      "onDelete": "CASCADE",
+      "to": "Episode",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "episodeId",
+      "from": "Episode",
+      "name": "episodeGuestsLink",
+      "onDelete": "CASCADE",
+      "to": "EpisodeGuest",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "guestId",
+      "from": "Guest",
+      "name": "guestEpisodesLink",
+      "onDelete": "CASCADE",
+      "to": "EpisodeGuest",
+      "type": "one-to-many"
+    },
+    {
+      "from": "Episode",
+      "name": "episodeGuests",
+      "through": "EpisodeGuest",
+      "to": "Guest",
+      "type": "many-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Episodes transition between draft and published states only via dedicated producer actions.",
+      "entity": "Episode",
+      "id": "episodeStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "draft": [
+            "published"
+          ],
+          "published": [
+            "draft"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Each guest can be linked to an episode at most once.",
+      "entity": "EpisodeGuest",
+      "id": "uniqueEpisodeGuest",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "episodeId",
+          "guestId"
+        ]
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

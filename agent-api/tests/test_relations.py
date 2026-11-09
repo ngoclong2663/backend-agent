@@ -118,3 +118,24 @@ def test_the_crud_tests_still_seed_and_compile(tmp_path):
     for module in (m for m in plan["modules"] if not m.get("plugin")):
         for relative, source in module_tests(plan, spec, module).items():
             compile(source, relative, "exec")
+
+
+def test_a_many_to_many_already_modelled_by_a_join_entity_adds_no_link():
+    """gen_01M6Z75RG2H8YD1JT4XNZ5AMPP (2026-11-09, Lantern Audio): the draft had an `EpisodeGuest` entity (a child of
+    Episode and of Guest) and a many-to-many Episode–Guest; the plugin's link routes landed in the entity's module
+    and the app could not start (`episode_guests_router` missing). The join entity is the relationship."""
+    import json
+    from pathlib import Path
+
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+
+    spec = validate_spec_data(
+        json.loads((Path(__file__).parent / "fixtures" / "specs" / "lantern-audio-m2m.json").read_text())
+    ).normalized
+    assert any(rel["type"] == "many-to-many" for rel in spec["relationships"])
+    plan = build_plan(spec)
+    assert all(model.get("entity") for model in plan["models"]), "no link model"
+    assert not plan.get("relations") and not any(m.get("plugin") == "relations" for m in plan["modules"])
+    names = [m["name"] for m in plan["modules"]]
+    assert len(names) == len(set(names)) and "episode_guests" in names
+    assert all(not entry.get("kind") == "relationships" for entry in plan["unresolved"])

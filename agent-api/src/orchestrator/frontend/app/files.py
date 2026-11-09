@@ -409,6 +409,13 @@ def design_registry_ts(used: dict[str, list[str]]) -> str:
     whole = [name for name in used.get("list-view") or [] if "whole" in (registry().get("list-view", name).tags)]
     tables.append("  /** list views that load the whole list at once (a board's columns, shelves) */")
     tables.append(f"  whole: {json.dumps(whole)} as string[],")
+    columns = {
+        name: int(plugin.prefers["columns"])
+        for name in used.get("card") or []
+        if (plugin := registry().get("card", name)) is not None and str(plugin.prefers.get("columns", "")).isdigit()
+    }
+    tables.append("  /** the grid columns a card anatomy wants on wide screens (its descriptor's `prefers.columns`) */")
+    tables.append(f"  cardColumns: {json.dumps(columns)} as Record<string, number>,")
     lines.append("\nexport const designRegistry = {\n" + "\n".join(tables) + "\n};\n")
     return "".join(lines)
 

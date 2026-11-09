@@ -1,0 +1,59 @@
+{
+  "archetype": "catalogue",
+  "shell": "sidebar",
+  "mobileNav": "bottom-tabs",
+  "frame": "wide",
+  "mainEntity": "Show",
+  "entities": {
+    "Show": {
+      "view": "cards",
+      "roles": {
+        "media": "coverArt"
+      },
+      "detailView": "media-side",
+      "filtersStyle": "facets",
+      "card": "side",
+      "aspect": "square"
+    },
+    "Episode": {
+      "view": "cards",
+      "roles": {
+        "media": "audio",
+        "duration": "durationMinutes"
+      },
+      "card": "stacked"
+    },
+    "Guest": {
+      "view": "cards",
+      "roles": {
+        "media": "photo"
+      },
+      "card": "stacked"
+    },
+    "EpisodeGuest": {
+      "view": "table",
+      "roles": {}
+    }
+  },
+  "homeView": "catalogue",
+  "looks": [
+    {
+      "recipe": "editorial",
+      "reason": "The requirement asks for it",
+      "fontPairing": "editorial"
+    },
+    {
+      "recipe": "neon",
+      "reason": "Recommended: Dark Mode (OLED) for Podcast Platform",
+      "fontPairing": "loud"
+    },
+    {
+      "recipe": "swiss",
+      "reason": "Recommended: Minimalism & Swiss Style for Podcast Platform",
+      "fontPairing": "workshop"
+    }
+  ],
+  "seed": 3138754629,
+  "replaced": [],
+  "fontPairing": "editorial"
+}

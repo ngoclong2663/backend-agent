@@ -165,6 +165,10 @@ def find_owned(spec: dict[str, Any], create: bool = True) -> dict[str, Owned]:
             continue
         owner_field, role = candidates[0]
         staff = _staff_of(spec, name, [role, *(r for f, r in fields.items() if f != owner_field)], roles)
+        if not staff and role in creators:
+            # gen_01M6Z75NJYKSXNF4JGQPZ4XYF8 (2026-11-09): courses are created by instructors for learners; the record
+            # names its maker, not a person it is private to, so every other role reads it (writes stay the owner's)
+            staff = [r for r in roles if r != role]
         policy_name = f"{name[:1].lower()}{name[1:]}Own{''.join(w.title() for w in _words(role))}"
         body = {"type": "ownership", "ownerField": owner_field, "bypassRoles": staff}
         policy = _new_policy(spec, policy_name, body) if create else policy_name
@@ -254,7 +258,11 @@ def _secure(spec: dict[str, Any], owned: dict[str, Owned]) -> list[dict[str, Any
             action in ("get", "list", "update", "delete") or (_record_op(op) and op.get("type") == "custom")
         ):
             op["policy"] = reader_policy(item) if action == "get" and item.workers else item.policy
-            note(index, f"{op_id}: private to its {'/'.join(item.roles)} (the staff read every record)")
+            every_role = [str(r) for r in (spec.get("auth") or {}).get("roles") or []]
+            if set(item.staff) >= set(every_role) - set(item.roles):
+                note(index, f"{op_id}: made by its {'/'.join(item.roles)} for everyone (every other role reads it)")
+            else:
+                note(index, f"{op_id}: private to its {'/'.join(item.roles)} (the staff read every record)")
             continue
         # 25.2: figures over private records are the staff's
         if op.get("type") == "aggregate" and policy is None and item.staff:

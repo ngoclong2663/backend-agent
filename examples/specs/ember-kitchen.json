@@ -1,0 +1,902 @@
+{
+  "auth": {
+    "roles": [
+      "learner",
+      "instructor"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 160,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 1000,
+          "name": "summary",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "name": "coverImage",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "name": "cuisine",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "Japanese",
+            "Italian",
+            "Mexican",
+            "Indian",
+            "French"
+          ]
+        },
+        {
+          "name": "level",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "beginner",
+            "intermediate",
+            "advanced"
+          ]
+        },
+        {
+          "index": true,
+          "name": "instructorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "ACTIVE",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "ACTIVE"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Course"
+    },
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "courseId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 160,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 4000,
+          "name": "description",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "name": "video",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "name": "posterImage",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "min": 1,
+          "name": "durationSeconds",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "topic",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "knife skills",
+            "sauces",
+            "baking",
+            "grilling",
+            "plating"
+          ]
+        },
+        {
+          "default": "DRAFT",
+          "index": true,
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "DRAFT",
+            "PUBLISHED",
+            "ARCHIVED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Lesson"
+    },
+    {
+      "displayField": "language",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "lessonId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "accept": [
+            "text/vtt",
+            "application/x-subrip"
+          ],
+          "name": "file",
+          "required": true,
+          "type": "subtitles"
+        },
+        {
+          "name": "language",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "en",
+            "ja"
+          ]
+        },
+        {
+          "default": "READY",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "READY"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Caption"
+    },
+    {
+      "displayField": "text",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "lessonId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "learnerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 2000,
+          "name": "text",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "maxLength": 4000,
+          "name": "answer",
+          "nullable": true,
+          "required": false,
+          "type": "text"
+        },
+        {
+          "default": "OPEN",
+          "index": true,
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "OPEN",
+            "ANSWERED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "name": "answeredAt",
+          "nullable": true,
+          "required": false,
+          "type": "datetime"
+        }
+      ],
+      "name": "Question"
+    },
+    {
+      "displayField": "status",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "learnerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "lessonId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "COMPLETED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "COMPLETED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "completedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Progress",
+      "uniqueConstraints": [
+        [
+          "learnerId",
+          "lessonId"
+        ]
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "POST",
+      "operationId": "course.create",
+      "path": "/courses",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Course",
+        "fields": [
+          "title",
+          "summary",
+          "coverImage",
+          "cuisine",
+          "level"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "GET",
+      "operationId": "course.get",
+      "path": "/courses/{id}",
+      "type": "crud",
+      "policy": "courseOwnInstructor"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Course",
+      "filters": [
+        "cuisine",
+        "level",
+        "instructorId"
+      ],
+      "method": "GET",
+      "operationId": "course.list",
+      "pagination": true,
+      "path": "/courses",
+      "search": [
+        "title",
+        "summary"
+      ],
+      "sort": [
+        "createdAt",
+        "title"
+      ],
+      "type": "crud",
+      "policy": "courseOwnInstructor"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "PATCH",
+      "operationId": "course.update",
+      "path": "/courses/{id}",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Course",
+        "fields": [
+          "title",
+          "summary",
+          "coverImage",
+          "cuisine",
+          "level"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "DELETE",
+      "operationId": "course.delete",
+      "path": "/courses/{id}",
+      "policy": "instructorsOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "POST",
+      "operationId": "lesson.create",
+      "path": "/lessons",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Lesson",
+        "fields": [
+          "courseId",
+          "title",
+          "description",
+          "video",
+          "posterImage",
+          "durationSeconds",
+          "topic"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "GET",
+      "operationId": "lesson.get",
+      "path": "/lessons/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "filters": [
+        "courseId",
+        "topic",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "lesson.list",
+      "pagination": true,
+      "path": "/lessons",
+      "search": [
+        "title",
+        "description"
+      ],
+      "sort": [
+        "createdAt",
+        "title"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "PATCH",
+      "operationId": "lesson.update",
+      "path": "/lessons/{id}",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Lesson",
+        "fields": [
+          "title",
+          "description",
+          "video",
+          "posterImage",
+          "durationSeconds",
+          "topic"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "DELETE",
+      "operationId": "lesson.delete",
+      "path": "/lessons/{id}",
+      "policy": "instructorsOnly",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Publish a draft cooking lesson, making it visible to learners.",
+      "entity": "Lesson",
+      "method": "POST",
+      "operationId": "lesson.publish",
+      "path": "/lessons/{id}/publish",
+      "policy": "instructorsOnly",
+      "rules": [
+        "lessonPublishFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Lesson"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Archive an existing published lesson so it is retired.",
+      "entity": "Lesson",
+      "method": "POST",
+      "operationId": "lesson.archive",
+      "path": "/lessons/{id}/archive",
+      "policy": "instructorsOnly",
+      "rules": [
+        "lessonPublishFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Lesson"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Caption",
+      "method": "POST",
+      "operationId": "caption.create",
+      "path": "/captions",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Caption",
+        "fields": [
+          "lessonId",
+          "file",
+          "language"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Caption",
+      "method": "GET",
+      "operationId": "caption.get",
+      "path": "/captions/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Caption",
+      "filters": [
+        "lessonId",
+        "language"
+      ],
+      "method": "GET",
+      "operationId": "caption.list",
+      "pagination": true,
+      "path": "/captions",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Caption",
+      "method": "PATCH",
+      "operationId": "caption.update",
+      "path": "/captions/{id}",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Caption",
+        "fields": [
+          "file",
+          "language"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Caption",
+      "method": "DELETE",
+      "operationId": "caption.delete",
+      "path": "/captions/{id}",
+      "policy": "instructorsOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Question",
+      "method": "POST",
+      "operationId": "question.create",
+      "path": "/questions",
+      "policy": "learnersOnly",
+      "request": {
+        "entity": "Question",
+        "fields": [
+          "lessonId",
+          "text"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Question",
+      "method": "GET",
+      "operationId": "question.get",
+      "path": "/questions/{id}",
+      "policy": "ownQuestions",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Question",
+      "filters": [
+        "lessonId",
+        "status",
+        "learnerId"
+      ],
+      "method": "GET",
+      "operationId": "question.list",
+      "pagination": true,
+      "path": "/questions",
+      "policy": "ownQuestions",
+      "search": [
+        "text",
+        "answer"
+      ],
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Instructor provides an answer to an open learner question and marks the question answered.",
+      "entity": "Question",
+      "method": "POST",
+      "operationId": "question.answer",
+      "path": "/questions/{id}/answer",
+      "policy": "instructorsOnly",
+      "request": {
+        "entity": "Question",
+        "fields": [
+          "answer"
+        ]
+      },
+      "rules": [
+        "questionFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Question"
+      }
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Question",
+      "method": "DELETE",
+      "operationId": "question.delete",
+      "path": "/questions/{id}",
+      "policy": "ownQuestions",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Progress",
+      "method": "POST",
+      "operationId": "progress.create",
+      "path": "/progress",
+      "policy": "learnersOnly",
+      "request": {
+        "entity": "Progress",
+        "fields": [
+          "lessonId"
+        ]
+      },
+      "rules": [
+        "uniqueProgressPerLearnerLesson"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Progress",
+      "method": "GET",
+      "operationId": "progress.get",
+      "path": "/progress/{id}",
+      "policy": "ownProgress",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Progress",
+      "filters": [
+        "lessonId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "progress.list",
+      "pagination": true,
+      "path": "/progress",
+      "policy": "ownProgress",
+      "sort": [
+        "completedAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "operationId": "course.count",
+      "type": "aggregate",
+      "entity": "Course",
+      "method": "GET",
+      "path": "/courses/aggregate/count",
+      "summary": "Active Courses",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "lesson.countByStatus",
+      "type": "aggregate",
+      "entity": "Lesson",
+      "method": "GET",
+      "path": "/lessons/aggregate/count-by-status",
+      "summary": "Lessons by Status",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "status"
+      }
+    },
+    {
+      "operationId": "question.countWhereStatusOpen",
+      "type": "aggregate",
+      "entity": "Question",
+      "method": "GET",
+      "path": "/questions/aggregate/count-where-status-open",
+      "summary": "Open Questions",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "OPEN"
+        }
+      }
+    },
+    {
+      "operationId": "progress.count",
+      "type": "aggregate",
+      "entity": "Progress",
+      "method": "GET",
+      "path": "/progresses/aggregate/count",
+      "summary": "Lessons Completed",
+      "aggregate": {
+        "fn": "count"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "instructorsOnly",
+      "roles": [
+        "instructor"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "learnersOnly",
+      "roles": [
+        "learner"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "instructor"
+      ],
+      "name": "ownQuestions",
+      "ownerField": "learnerId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownProgress",
+      "ownerField": "learnerId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Lesson",
+      "name": "learnersSeePublishedLessonsOnly",
+      "roles": [
+        "learner"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "name": "courseOwnInstructor",
+      "type": "ownership",
+      "ownerField": "instructorId",
+      "bypassRoles": []
+    }
+  ],
+  "project": {
+    "description": "Ember Kitchen teaches home cooks through short video lessons with bilingual captions, progress tracking, and instructor Q&A.",
+    "name": "Ember Kitchen",
+    "slug": "ember-kitchen"
+  },
+  "relationships": [
+    {
+      "foreignKey": "courseId",
+      "from": "Course",
+      "name": "courseLessons",
+      "onDelete": "CASCADE",
+      "to": "Lesson",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "lessonId",
+      "from": "Lesson",
+      "name": "lessonCaptions",
+      "onDelete": "CASCADE",
+      "to": "Caption",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "lessonId",
+      "from": "Lesson",
+      "name": "lessonQuestions",
+      "onDelete": "CASCADE",
+      "to": "Question",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "lessonId",
+      "from": "Lesson",
+      "name": "lessonProgress",
+      "onDelete": "CASCADE",
+      "to": "Progress",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "A lesson begins as draft, can be published, and published lessons can be archived.",
+      "entity": "Lesson",
+      "id": "lessonPublishFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "DRAFT": [
+            "PUBLISHED"
+          ],
+          "PUBLISHED": [
+            "ARCHIVED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Questions start open and transition to answered when an instructor responds.",
+      "entity": "Question",
+      "id": "questionFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "OPEN": [
+            "ANSWERED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "One progress completion record per learner and lesson, never twice.",
+      "entity": "Progress",
+      "id": "uniqueProgressPerLearnerLesson",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "learnerId",
+          "lessonId"
+        ]
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

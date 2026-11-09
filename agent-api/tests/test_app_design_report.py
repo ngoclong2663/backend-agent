@@ -93,7 +93,7 @@ def test_golden_apps_have_a_requirement_a_recorded_draft_and_a_brief():
             continue
         assert (EXAMPLES / "requirements" / f"{name}.md").read_text().startswith("# ")
         draft = draft_cost(name)
-        assert draft["calls"] >= 1 and draft["costUsd"] > 0
+        assert draft["calls"] >= 1 and draft["costUsd"] >= 0  # Epic 30's drafts ran on the account login ($0)
         assert json.loads((GOLDEN / name / "design-brief.json").read_text())["mainEntity"]
 
 

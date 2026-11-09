@@ -210,3 +210,58 @@ def test_a_pair_with_the_signed_in_owner_is_checked_for_the_scenarios_user(tmp_p
     assert (caller(success), success["body"]["seriesId"]) not in pairs, "the success is no duplicate"
     assert (caller(duplicate), duplicate["body"]["seriesId"]) in pairs, "the duplicate is one of the user's own"
     assert "ownerId" not in duplicate["body"], "the server sets the owner"
+
+
+def test_synthesized_fixtures_respect_a_unique_together_rule():
+    """gen_01M6Z6HKT859PCNTAGVK2WEY4Z (2026-11-09, Ember Kitchen): a learner marks a lesson watched once
+    (`uniqueTogether` lessonId + learnerId); the synthesized Progress rows cycled two lessons and two demo learners
+    over three rows, so the seed hit the rule's unique index and the smoke calls could not run."""
+    import json
+    from pathlib import Path
+
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.backend.planner import build_plan
+    from src.orchestrator.integration.contract import build_fixtures
+
+    spec = validate_spec_data(
+        json.loads((Path(__file__).parent / "fixtures" / "specs" / "ember-kitchen-2.json").read_text())
+    ).normalized
+    rule = next(r for r in spec["rules"] if r["kind"] == "uniqueTogether" and r["entity"] == "Progress")
+    fields = rule["params"]["fields"]
+    fixtures, _ = build_fixtures(spec, build_plan(spec))
+    keys = [tuple(str(row[f]) for f in fields) for row in fixtures["Progress"]]
+    assert len(keys) == len(set(keys)) and len(keys) >= 2, keys
+    assert all(row["learnerId"] and row["lessonId"] for row in fixtures["Progress"])
+
+
+def test_a_unique_together_rule_on_a_pair_the_entity_already_declares_unique_reuses_its_constraint():
+    """gen_01M6Z81Z2TM5SFN3ZMD05TPW56 (2026-11-09, Lantern Audio): `uniqueConstraints` and a `uniqueTogether` rule on
+    the same two fields gave the model two identical constraints; Alembic's check then reported one as new and every
+    generation carried a migration warning. The rule answers through the entity's own constraint."""
+    import copy
+    import json
+    from pathlib import Path
+
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.backend.planner import build_plan
+
+    raw = json.loads((Path(__file__).parent / "fixtures" / "specs" / "lantern-audio-m2m.json").read_text())
+    link = next(e for e in raw["entities"] if e["name"] == "EpisodeGuest")
+    link["uniqueConstraints"] = [["episodeId", "guestId"]]
+    spec = validate_spec_data(raw).normalized
+    plan = build_plan(spec)
+    model = next(m for m in plan["models"] if m.get("entity") == "EpisodeGuest")
+    assert model["uniqueConstraints"] == [["episode_id", "guest_id"]]
+    assert not [a for a in model.get("tableArgs") or [] if "UniqueConstraint" in a["code"]], "no second constraint"
+    assert "uq_episode_guests_episode_id_guest_id" in model["constraintErrors"], "the rule's 409 maps to the entity's"
+    plain = build_plan(
+        validate_spec_data(
+            copy.deepcopy(
+                json.loads((Path(__file__).parent / "fixtures" / "specs" / "lantern-audio-m2m.json").read_text())
+            )
+        ).normalized
+    )
+    model = next(m for m in plain["models"] if m.get("entity") == "EpisodeGuest")
+    assert [a for a in model.get("tableArgs") or [] if "UniqueConstraint" in a["code"]], (
+        "without one, the rule adds its own"
+    )

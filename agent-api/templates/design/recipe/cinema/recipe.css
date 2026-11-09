@@ -22,6 +22,7 @@
   --sidebar-accent-foreground: oklch(0.95 0.005 260);
   --sidebar-border: oklch(0.24 0.01 260);
   --radius: 0.5rem;
+  --destructive: oklch(0.74 0.18 25);  /* reads on the recipe's dark surfaces and a destructive item's hover tint */
   color-scheme: dark;
 }
 @root h1, @root h2, @root h3 { letter-spacing: -0.015em; }

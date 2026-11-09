@@ -41,6 +41,8 @@ APPS = [
     "event-tickets",
     "workshop-bookings",
     "media-library",  # Epic 29: the synthetic media app (video lessons, caption tracks, a podcast)
+    "ember-kitchen",  # Epic 30 (Story 30.8): a real antigravity draft, a cooking video school (learning, two areas)
+    "lantern-audio",  # Epic 30 (Story 30.8): a real antigravity draft, a podcast network (catalogue)
 ]
 # Hand-written examples (no recorded draft, no cost): Epic 22's every-plugin app and Epic 29's media app
 HAND_WRITTEN = ("workshop-bookings", "media-library")

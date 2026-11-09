@@ -71,7 +71,8 @@ const GRID_COLUMNS: Record<number, string> = {
   6: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6",
 };
 export function gridColumns(design: TEntityDesign, fallback: number): string {
-  return GRID_COLUMNS[design.columns ?? fallback] ?? GRID_COLUMNS[fallback];
+  const wanted = design.columns ?? designRegistry.cardColumns[design.card ?? ""] ?? fallback;
+  return GRID_COLUMNS[wanted] ?? GRID_COLUMNS[fallback];
 }
 
 /** Story 30.4: one record drawn by the entity's card plugin (`design-registry.ts`), or null for the view's own card. */

@@ -79,3 +79,7 @@ types through the schema, the validator, the planner, the storage plugin, the co
 seeds' sample objects (also in previews), the kit's players, uploads and listening bar, the design brief's `duration`
 role and video media, and the v6 drafting prompt with code fixes. 29.6 (real drafts, uploads on the live backend)
 runs with the other epics' final checks.
+
+**Done 2026-11-09** (commit ea5aa73; final check in Story 29.6): video, audio and subtitles fields, their samples,
+players and tracks are in; the two real drafts typed their media fields without a repair and seeded the samples;
+manual live uploads were not part of this session's run (Story 29.6's deviations).

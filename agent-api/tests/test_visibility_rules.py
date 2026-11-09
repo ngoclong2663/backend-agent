@@ -127,3 +127,40 @@ def test_without_a_rule_nothing_changes():
     joined = "\n".join(module_files(plan, spec, module).values())
     assert "visible_only" not in joined
     assert not any("visibility" in (op.get("auth") or {}) for op in module["operations"])
+
+
+# -- 2026-11-09: two real drafts (Epic 30's final check) whose mocks broke the contract's scenarios -------------------
+
+SPECS = Path(__file__).parent / "fixtures" / "specs"
+
+
+def _scenarios(name: str, operation_id: str) -> tuple[list[dict], dict]:
+    spec = validate_spec_data(json.loads((SPECS / name).read_text())).normalized
+    contract = build_contract(spec, build_plan(spec))
+    for item in contract["paths"].values():
+        for op in item.values():
+            if isinstance(op, dict) and op.get("operationId") == operation_id:
+                return op["x-bga"]["scenarios"], contract
+    raise AssertionError(operation_id)
+
+
+def test_the_no_token_scenario_of_a_secured_read_with_a_rule_stays_unauthenticated():
+    """gen_01M6Z63NYZ0EFVPZG0YJK659R8 (Ember Kitchen): learners see only published lessons, every read is signed in;
+    the rule's scenario pass made the auth plugin's "no token" call run as an instructor, so the mock answered 200
+    where the contract expects 401."""
+    scenarios, _ = _scenarios("ember-kitchen.json", "lesson.get")
+    no_token = next(s for s in scenarios if s["name"] == "no token")
+    assert no_token["auth"] is False and "user" not in no_token and no_token["expect"]["status"] == 401
+    success = next(s for s in scenarios if s["name"] == "success")
+    assert success["auth"] is True and success["user"].startswith("demo-instructor"), "a user who sees drafts"
+
+
+def test_a_public_read_with_a_rule_reads_a_visible_record_in_its_success_scenario():
+    """gen_01M6Z63RXKVZN823Y6RY74CNYV (Lantern Audio): anyone reads published episodes, drafts are never public; the
+    success scenario pointed at the first seeded episode, a draft, so the signed-out mock answered 404."""
+    scenarios, contract = _scenarios("lantern-audio.json", "episode.get")
+    success = next(s for s in scenarios if s["name"] == "success")
+    episodes = {str(row["id"]): row for row in contract["x-bga"]["fixtures"]["Episode"]}
+    assert episodes[str(success["params"]["id"])]["status"] == "published"
+    assert not success.get("auth") and not success.get("user"), "a public read stays signed out"
+    assert not any(s["name"] == "no token" for s in scenarios)

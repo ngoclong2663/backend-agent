@@ -614,6 +614,8 @@ def pairing_candidates(locale: str | None, requested: dict[str, Any] | None, arc
     for plugin in registry().candidates("font-pairing", archetype):
         if script and script not in plugin.scripts:
             continue
+        if not script and len(plugin.scripts) > 1:
+            continue  # a pairing made for another script (Japanese faces) is not offered to a Latin-only app
         if kind and not heading_kind_fits(kind, plugin.heading):
             continue
         out.append(plugin.name)

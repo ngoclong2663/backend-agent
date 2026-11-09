@@ -214,3 +214,19 @@ def test_type_errors_only_in_test_files_are_a_warning():
     assert not only_in_tests(app, typescript_errors(app))
     unparsed = only_tests + "next-env.d.ts(1,1): error TS1005: w\n"  # not parsed: it may be anywhere
     assert not only_in_tests(unparsed, typescript_errors(unparsed))
+
+
+def test_related_entities_skip_a_link_table_without_an_entity():
+    """gen_01M6Z6HPQQ0WMJ3ZSZGABM70NR (2026-11-09, Lantern Audio): the draft had an `EpisodeGuest` entity and a
+    many-to-many Episode–Guest relationship, so the relations plugin added a link table with no entity; the context
+    pack escaped its None name and the backend lane crashed."""
+    spec = normalized(Path(__file__).parent / "fixtures" / "specs" / "lantern-audio-m2m.json")
+    plan = build_plan(spec)
+    # the planner now drops such a many-to-many (the join entity is the relationship); the context pack must still
+    # take a plan with an entity-less model, as a many-to-many without a join entity plans one
+    plan["models"].append({"entity": None, "table": "episodes_guests", "class": "EpisodeGuestLinkModel", "columns": []})
+    for module in plan["modules"]:
+        related = related_entities(plan, spec, module)
+        assert None not in related and all(isinstance(name, str) for name in related)
+    episodes = _module(plan, "episodes")
+    assert "Guest" in related_entities(plan, spec, episodes) or "Show" in related_entities(plan, spec, episodes)

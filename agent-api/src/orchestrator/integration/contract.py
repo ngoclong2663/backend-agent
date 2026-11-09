@@ -270,6 +270,54 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
                     row[name] = parent_rows[index % len(parent_rows)][pk]
                 else:
                     row[name] = None
+    for model in models:  # a `uniqueTogether` rule (Story 10.10): no two synthesized rows share the fields' values
+        if model["entity"] in seeds:
+            continue  # the spec's own seed rows are inserted as written (a duplicate there is the spec's to fix)
+        for rule in spec.get("rules", []):
+            if rule.get("kind") != "uniqueTogether" or rule.get("entity") != model["entity"]:
+                continue
+            fields = list((rule.get("params") or {}).get("fields") or [])
+            if not fields:
+                continue
+            options: dict[str, list[Any]] = {}  # a foreign key among the fields → the parent keys it may take
+            for column in model["columns"]:
+                fk = column.get("foreignKey")
+                if column["apiName"] not in fields or not fk:
+                    continue
+                parent = by_table.get(fk["references"].partition(".")[0])
+                parent_rows = records.get(parent["entity"]) if parent else None
+                roles = person.get((model["entity"], column["apiName"]))
+                if roles and parent_rows and parent and parent["entity"] == user_entity:
+                    parent_rows = [r for r in parent_rows if r.get("role") in roles] or parent_rows
+                if parent_rows:
+                    pk = next(c["apiName"] for c in parent["columns"] if c["primaryKey"])
+                    options[column["apiName"]] = [r[pk] for r in parent_rows]
+            kept: list[dict[str, Any]] = []
+            seen: set[tuple] = set()
+            for row in records[model["entity"]]:
+                key = tuple(str(row.get(f)) for f in fields)
+                if key in seen:  # re-point one foreign key at another parent, else drop the row
+                    for field, values in options.items():
+                        for value in values:
+                            trial = {**row, field: value}
+                            trial_key = tuple(str(trial.get(f)) for f in fields)
+                            if trial_key not in seen:
+                                row, key = trial, trial_key
+                                break
+                        if key not in seen:
+                            break
+                if key in seen:
+                    continue
+                seen.add(key)
+                kept.append(row)
+            # leave at least one pair free: the evaluation's and the smoke check's first create must not collide
+            # (gen_01M6Z75NJYKSXNF4JGQPZ4XYF8: the seed filled every learner × lesson pair, so "mark watched" was 409)
+            capacity = 1
+            for field in fields:
+                capacity *= len(options.get(field) or [1])
+            if options and len(kept) >= capacity > 1:
+                kept = kept[: capacity - 1]
+            records[model["entity"]] = kept
     for model in models:  # Story 10.5: a file field holds an object key under its prefix, per owner when there is one
         owner = next((c["apiName"] for c in model["columns"] if c.get("source") == "currentUser"), None)
         language = (tracks.get(model["entity"]) or {}).get("language")

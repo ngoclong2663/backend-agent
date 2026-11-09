@@ -173,3 +173,23 @@ contract feature first; split that out.
 Tests to extend: `agent-api/tests/test_design_registry.py` (the registry), `test_app_design.py` (choices and
 fallbacks), `test_app_recipes.py` (recipes), plus the kit's `tsc` and vitest files (`make kit-test`). A change to
 shared frontend code must keep `tests/test_static_golden.py` passing.
+
+## Plugin backlog
+
+What to add next, from the signed-in report and the first real drafts (Story 30.8). One line per entry: what, why,
+the report's number before and after when it lands.
+
+- **Chips with counts** (filters): the `chips` style showing how many records each value has (needs the list's
+  aggregate per filter). Story 30.5 step 4, not done.
+- **Dashboard charts at 375 px**: four golden screens scroll sideways on phones (learning-platform home, event-tickets
+  organizers, plant-shop management, agency-projects courses); a kit defect in the chart tiles, not a plugin.
+- **Thumbnails in the Design panel**: `preview.png` is written per plugin and served through the registry digest's
+  `preview` path; the review panel still shows labels and `choose` texts only (Story 30.7 step 4).
+- **Children in the split panel**: `split-panel` shows the parents and facts; the record's children stay in the
+  page's tabs (AppPage) — a detail plugin that takes the child sections over would need the page to hand them in.
+- **Reduced transparency**: no browser switch to emulate it in the gates; `glass` and `cinema` are checked by eye.
+- **A `people` card and a `portrait` detail**: round avatars with a name and a role, for members, staff and guests
+  (the reports' person entities still render as stacked cards).
+- **An `inbox` home** for workspaces: the records assigned to the signed-in user first (the tour's "mine" lists).
+- **Font pairings in the review**: the panel switches the look; switching the type alone (a pairing per look is set
+  by code) needs a second control.

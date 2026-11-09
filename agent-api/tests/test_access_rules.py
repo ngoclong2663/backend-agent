@@ -264,3 +264,44 @@ def test_pagination_true_on_a_custom_list_means_the_default_limits():
     assert mine["pagination"] == {"defaultLimit": 20, "maxLimit": 100}
     contract = build_contract(normalized, build_plan(normalized))  # no crash on the paginated custom list
     assert contract["paths"]["/cases/mine"]["get"]["operationId"] == "case.listMine"
+
+
+def test_records_a_staff_role_makes_for_everyone_stay_readable_by_the_other_roles():
+    """gen_01M6Z75NJYKSXNF4JGQPZ4XYF8 (2026-11-09, Ember Kitchen): courses name their instructor; the rule made them
+    private to that instructor, so learners opened an empty course list. A record whose person field names the role
+    that creates it is made for the other roles: they read every record, the owner alone writes it."""
+    data = {
+        "specVersion": "1.0",
+        "project": {"name": "Courses", "description": "Instructors publish courses that learners browse"},
+        "stack": STACK,
+        "auth": {"type": "jwt", "roles": ["learner", "instructor"]},
+        "policies": [{"name": "instructorsOnly", "type": "role", "roles": ["instructor"]}],
+        "entities": [
+            {
+                "name": "Course",
+                "fields": [
+                    {"name": "id", "type": "uuid", "primary": True},
+                    {"name": "title", "type": "string", "required": True},
+                    {"name": "instructorId", "type": "uuid", "required": True},
+                ],
+            }
+        ],
+        "operations": _crud(
+            "Course",
+            "/courses",
+            {
+                "create": "instructorsOnly",
+                "get": None,
+                "list": None,
+                "update": "instructorsOnly",
+                "delete": "instructorsOnly",
+            },
+        ),
+    }
+    secure_access(data)
+    assert validate_spec_data(data).report.valid
+    listing = _policy(data, "course.list")
+    assert listing["type"] == "ownership" and listing["ownerField"] == "instructorId"
+    assert listing["bypassRoles"] == ["learner"], "learners read every course"
+    assert _policy(data, "course.get")["bypassRoles"] == ["learner"]
+    assert _policy(data, "course.update") == {"name": "instructorsOnly", "type": "role", "roles": ["instructor"]}

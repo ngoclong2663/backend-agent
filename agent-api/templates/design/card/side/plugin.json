@@ -22,5 +22,8 @@
     "SideCard.tsx"
   ],
   "marker": "side",
-  "order": 30
+  "order": 30,
+  "prefers": {
+    "columns": "2"
+  }
 }

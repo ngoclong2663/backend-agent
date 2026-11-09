@@ -48,6 +48,8 @@ STYLE_RECIPES: tuple[tuple[str, str], ...] = (
     ("minimalism", "minimal"),
     ("flat design", "minimal"),
     ("minimal", "minimal"),
+    ("cinematic", "cinema"),  # Epic 30 (Story 30.6): the four new recipes
+    ("luxury", "luxe"),
 )
 # Words in a requirement that ask for a look (whole words or phrases).
 STYLE_WORDS: tuple[tuple[str, str], ...] = (
@@ -75,6 +77,15 @@ STYLE_WORDS: tuple[tuple[str, str], ...] = (
     ("magazine", "editorial"),
     ("minimalist", "minimal"),
     ("minimal", "minimal"),
+    # Epic 30 (Story 30.6): the new recipes in the requirement's own words about the look (never a bare domain word:
+    # a cinema booking app or a paper shop is not asking for the recipe)
+    ("cinematic", "cinema"),
+    ("like a cinema", "cinema"),
+    ("paper-like", "paper"),
+    ("like paper", "paper"),
+    ("terminal-like", "terminal"),
+    ("luxe", "luxe"),
+    ("luxurious", "luxe"),
 )
 # Products whose users expect calm (the recipe descriptors' `guards`: styles.csv "Do Not Use For", in short).
 GUARDED: dict[str, tuple[str, ...]] = {

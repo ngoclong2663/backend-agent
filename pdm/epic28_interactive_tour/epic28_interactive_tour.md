@@ -84,3 +84,8 @@ where real users drop out.
 ## Status
 
 Proposed 2026-11-08, for review.
+
+**Done 2026-11-09** (branch `feat/epic28-interactive-tour`, commit e3cdd2d; final check in Story 28.7 on the
+Epic 30 branch): the kit's signals, do-steps, form help, ready records, the checklist and the walker's tour play are
+in; the two real runs of the final check (Ember Kitchen, Lantern Audio) generated end to end after three rounds of
+fixes to the contract's scenarios, the fixtures and the planner (Story 28.7's Status).

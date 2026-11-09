@@ -1,0 +1,428 @@
+{
+  "name": "Ember Kitchen",
+  "tagline": "Short cooking video lessons taught by professional instructors",
+  "icon": "Utensils",
+  "nav": [
+    {
+      "entity": "Course",
+      "label": "Courses",
+      "icon": "BookOpen"
+    },
+    {
+      "entity": "Lesson",
+      "label": "Lessons",
+      "icon": "Video"
+    },
+    {
+      "entity": "Question",
+      "label": "Questions",
+      "icon": "HelpCircle"
+    },
+    {
+      "entity": "Progress",
+      "label": "My Progress",
+      "icon": "CheckCircle"
+    }
+  ],
+  "home": "Course",
+  "entities": {
+    "Course": {
+      "label": "Course",
+      "plural": "Courses",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "cuisine",
+        "level",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "summary",
+        "coverImage",
+        "cuisine",
+        "level",
+        "instructorId",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "title": "Course Title",
+        "summary": "Summary",
+        "coverImage": "Cover Image",
+        "cuisine": "Cuisine",
+        "level": "Difficulty Level",
+        "instructorId": "Instructor",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "coverImage": "Cover visual representing the culinary course",
+        "cuisine": "Culinary style: Japanese, Italian, Mexican, Indian, or French",
+        "level": "Skill level: beginner, intermediate, or advanced"
+      }
+    },
+    "Lesson": {
+      "label": "Lesson",
+      "plural": "Lessons",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "courseId",
+        "topic",
+        "durationSeconds",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "courseId",
+        "topic",
+        "status",
+        "durationSeconds",
+        "posterImage",
+        "video",
+        "description",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "title": "Lesson Title",
+        "description": "Description",
+        "video": "Video File",
+        "posterImage": "Poster Still Image",
+        "durationSeconds": "Duration (sec)",
+        "topic": "Culinary Topic",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "durationSeconds": "Filled automatically from uploaded video duration",
+        "posterImage": "Visual still poster used when browsing lessons",
+        "topic": "Knife skills, sauces, baking, grilling, or plating",
+        "video": "Lesson instructional video file"
+      }
+    },
+    "Caption": {
+      "label": "Caption",
+      "plural": "Captions",
+      "displayField": "language",
+      "listFields": [
+        "lessonId",
+        "language",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "lessonId",
+        "language",
+        "file",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "lessonId": "Lesson",
+        "file": "Subtitle File",
+        "language": "Language",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "file": "WebVTT or SubRip subtitle caption file",
+        "language": "Caption language (English or Japanese)"
+      }
+    },
+    "Question": {
+      "label": "Question",
+      "plural": "Questions",
+      "displayField": "text",
+      "listFields": [
+        "lessonId",
+        "text",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "lessonId",
+        "learnerId",
+        "text",
+        "answer",
+        "status",
+        "createdAt",
+        "answeredAt"
+      ],
+      "fieldLabels": {
+        "lessonId": "Lesson",
+        "learnerId": "Learner",
+        "text": "Question",
+        "answer": "Instructor Answer",
+        "status": "Status",
+        "createdAt": "Created at",
+        "answeredAt": "Answered At"
+      },
+      "help": {
+        "answer": "Instructor explanation or clarification",
+        "text": "Learner question regarding the lesson technique"
+      }
+    },
+    "Progress": {
+      "label": "Progress",
+      "plural": "Progress Records",
+      "displayField": "lessonId",
+      "listFields": [
+        "lessonId",
+        "status",
+        "completedAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "learnerId",
+        "lessonId",
+        "status",
+        "completedAt"
+      ],
+      "fieldLabels": {
+        "learnerId": "Learner",
+        "lessonId": "Lesson",
+        "status": "Status",
+        "completedAt": "Completed At"
+      },
+      "help": {
+        "status": "Completed status once watched"
+      }
+    }
+  },
+  "design": {
+    "archetype": "learning",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "wide",
+    "mainEntity": "Course",
+    "entities": {
+      "Course": {
+        "view": "cards",
+        "roles": {
+          "media": "coverImage"
+        },
+        "detailView": "split-panel",
+        "filtersStyle": "toolbar",
+        "card": "stacked",
+        "aspect": "square"
+      },
+      "Lesson": {
+        "view": "cards",
+        "roles": {
+          "media": "video",
+          "duration": "durationSeconds"
+        },
+        "detailView": "watch",
+        "card": "stacked"
+      },
+      "Caption": {
+        "view": "table",
+        "roles": {}
+      },
+      "Question": {
+        "view": "cards",
+        "roles": {},
+        "card": "text-first"
+      },
+      "Progress": {
+        "view": "cards",
+        "roles": {},
+        "card": "text-first"
+      }
+    },
+    "homeView": "catalogue",
+    "looks": [
+      {
+        "recipe": "clay",
+        "reason": "Recommended: Claymorphism for Recipe & Cooking App",
+        "fontPairing": "humanist"
+      },
+      {
+        "recipe": "playful",
+        "reason": "Recommended: Vibrant & Block-based for Recipe & Cooking App",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "soft",
+        "reason": "Recommended: Soft UI Evolution for Recipe & Cooking App",
+        "fontPairing": "geometric"
+      }
+    ],
+    "seed": 144614532,
+    "replaced": [
+      "area 'learners': Lesson: meta 'topic' left out (already the badge)",
+      "area 'learners': Lesson: watch page (watch) needs a video or an audio field; shown as media first (media)"
+    ],
+    "fontPairing": "humanist"
+  },
+  "areas": [
+    {
+      "id": "learners",
+      "label": "Learner Experience",
+      "roles": [
+        "learner"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "learning",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "wide",
+        "density": "comfortable",
+        "mainEntity": "Course",
+        "entities": {
+          "Course": {
+            "view": "media-grid",
+            "roles": {
+              "title": "title",
+              "media": "coverImage",
+              "badge": "level",
+              "subtitle": "summary",
+              "meta": [
+                "cuisine"
+              ]
+            },
+            "detailView": "media",
+            "filtersStyle": "search-first",
+            "card": "stacked",
+            "aspect": "square"
+          },
+          "Lesson": {
+            "view": "media-grid",
+            "roles": {
+              "title": "title",
+              "media": "posterImage",
+              "duration": "durationSeconds",
+              "badge": "topic"
+            },
+            "detailView": "media",
+            "card": "overlay",
+            "aspect": "portrait"
+          },
+          "Caption": {
+            "view": "table",
+            "roles": {}
+          },
+          "Question": {
+            "view": "cards",
+            "roles": {
+              "title": "text",
+              "badge": "status",
+              "subtitle": "answer"
+            },
+            "card": "text-first"
+          },
+          "Progress": {
+            "view": "cards",
+            "roles": {},
+            "card": "text-first"
+          }
+        },
+        "homeView": "catalogue"
+      }
+    },
+    {
+      "id": "instructors",
+      "label": "Instructor Studio",
+      "roles": [
+        "instructor"
+      ],
+      "prefix": "/instructors",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "density": "comfortable",
+        "mainEntity": "Lesson",
+        "entities": {
+          "Course": {
+            "view": "table",
+            "roles": {
+              "title": "title",
+              "media": "coverImage",
+              "badge": "level",
+              "subtitle": "summary",
+              "meta": [
+                "cuisine"
+              ]
+            }
+          },
+          "Lesson": {
+            "view": "table",
+            "roles": {
+              "title": "title",
+              "media": "posterImage",
+              "duration": "durationSeconds",
+              "badge": "status",
+              "meta": [
+                "topic"
+              ]
+            },
+            "detailView": "media-side",
+            "filtersStyle": "chips",
+            "card": "stacked",
+            "aspect": "portrait"
+          },
+          "Caption": {
+            "view": "table",
+            "roles": {}
+          },
+          "Question": {
+            "view": "table",
+            "roles": {
+              "title": "text",
+              "badge": "status",
+              "subtitle": "answer"
+            },
+            "card": "text-first"
+          },
+          "Progress": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Active Courses",
+      "kind": "figure",
+      "entity": "Course",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Lessons by Status",
+      "kind": "pie",
+      "entity": "Lesson",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    },
+    {
+      "label": "Open Questions",
+      "kind": "figure",
+      "entity": "Question",
+      "fn": "count",
+      "filter": {
+        "status": "OPEN"
+      }
+    },
+    {
+      "label": "Lessons Completed",
+      "kind": "figure",
+      "entity": "Progress",
+      "fn": "count",
+      "filter": {}
+    }
+  ]
+}

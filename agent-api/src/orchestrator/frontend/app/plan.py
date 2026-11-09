@@ -11,7 +11,7 @@ from src.modules.shared.domain.frontend_spec.design_registry import registry
 
 from ...samples import has_media
 from ..planner import _UI_IMPORT, FRONTEND_PLAN_VERSION, _Planner, primitive_closure
-from ..theme import build_theme
+from ..theme import _readable, build_theme, mix
 from .design import kit_design
 from .files import design_plugins_used, frontend_plugins
 from .recipes import first_recipe
@@ -44,6 +44,31 @@ def kit_primitives(
             if source.suffix in (".ts", ".tsx"):
                 wanted |= set(_UI_IMPORT.findall(source.read_text()))
     return primitive_closure(wanted)
+
+
+def readable_muted(theme: dict[str, Any]) -> dict[str, Any]:
+    """Story 30.3's contrast gate: the kit's muted text is small (12–14 px) and a destructive button's label is text
+    in the destructive colour, so `--muted-foreground` and `--destructive` are moved toward the background's opposite
+    until they reach AA (4.5) on the background, in both schemes. Apps only: static sites keep their palette."""
+    out = dict(theme)
+    for scheme in ("light", "dark"):
+        palette = out.get(scheme)
+        if not isinstance(palette, dict) or not palette.get("background"):
+            continue
+        fixed = dict(palette)
+        # the text also sits on cards and menus (a destructive item in a record's menu is on the popover)
+        surfaces = [fixed[key] for key in ("background", "card", "popover", "sidebar") if fixed.get(key)]
+        for token in ("muted-foreground", "destructive"):
+            if not fixed.get(token):
+                continue
+            own = list(surfaces)
+            if token == "destructive":  # a destructive menu item is on a red-tinted hover surface (destructive/10)
+                own += [mix(surface, fixed[token], 0.1) or surface for surface in surfaces]
+            for _ in range(3):  # until it reads on every surface (each pass moves it further from the surfaces)
+                for surface in own:
+                    fixed[token] = _readable(fixed[token], surface, 4.5)
+        out[scheme] = fixed
+    return out
 
 
 def pairing_theme(theme: dict[str, Any], outline: dict[str, Any]) -> dict[str, Any]:
@@ -205,7 +230,7 @@ def plan_app(spec: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]:
         "routes": routes,
         "components": [],
         "shadcn": kit_primitives(plugins=frontend_plugins(contract), design=design_plugins(outline)),
-        "theme": build_theme(pairing_theme(spec["theme"], outline)),  # Story 30.6: the look's font pairing
+        "theme": readable_muted(build_theme(pairing_theme(spec["theme"], outline))),  # Story 30.6: the look's pairing
         "data": planner.data(routes),
         "forms": forms,
         "content": [],

@@ -92,3 +92,10 @@ third-party plugins.
 ## Status
 
 Proposed 2026-11-08, for review.
+
+**Done 2026-11-09** (branch `feat/epic30-design-plugins`): Stories 30.1–30.8. The registry
+(`frontend_spec/design_registry.py`, `templates/design/<kind>/<name>/`) is the single source of the design space;
+today's values are plugin folders; 4 cards, 4 detail layouts, shelves, a featured home, a watch page, 4 recipes and 9
+font pairings were added and pass the gates; the seed and the candidates pick among them; the signed-in report
+measures the golden set (two real Antigravity drafts added). Deviations per story in their Status notes; the plugin
+backlog in the guide.

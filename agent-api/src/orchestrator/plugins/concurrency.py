@@ -130,13 +130,21 @@ def plan_rule(plan: dict[str, Any], rule: dict[str, Any], module: dict[str, Any]
         columns = [by_api[f] for f in params["fields"]]
         where = where_sql(params.get("where"), by_api)
         quoted = ", ".join(f'"{c["attr"]}"' for c in columns)
-        if where:
+        attrs = sorted(c["attr"] for c in columns)
+        own = next((g for g in model.get("uniqueConstraints") or [] if sorted(g) == attrs), None) if not where else None
+        if own is not None:
+            # gen_01M6Z81Z2TM5SFN3ZMD05TPW56 (2026-11-09): the entity already declares this unique pair
+            # (`uniqueConstraints`); a second identical constraint made Alembic's check report one as new. The rule
+            # answers through the entity's own constraint instead.
+            name = f"uq_{model['table']}_{'_'.join(own)}"[:63]
+        elif where:
             code_text = f'Index("{name}", {quoted}, unique=True, postgresql_where=text({where!r}))'
             imports = [["sqlalchemy", ["Index", "text"]]]
+            model.setdefault("tableArgs", []).append({"code": code_text, "imports": imports})
         else:
             code_text = f'UniqueConstraint({quoted}, name="{name}")'
             imports = [["sqlalchemy", ["UniqueConstraint"]]]
-        model.setdefault("tableArgs", []).append({"code": code_text, "imports": imports})
+            model.setdefault("tableArgs", []).append({"code": code_text, "imports": imports})
         definition |= {
             "name": name,
             "fields": [c["apiName"] for c in columns],

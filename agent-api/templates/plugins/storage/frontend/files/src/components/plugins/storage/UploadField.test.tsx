@@ -26,6 +26,13 @@ const found = Object.entries(app.forms)
   .flatMap(([formId, form]) => form.fields.map((field) => ({ formId, field })))
   .find(({ field }) => field.upload && (field.upload.kind === "video" || field.upload.kind === "audio"));
 
+/** A file of the field's own kind (an audio field refuses a video, so the upload would never start). */
+function sampleFile(field: { upload?: { kind?: string } | null }): File {
+  return field.upload?.kind === "audio"
+    ? new File([new Uint8Array(8)], "clip.mp3", { type: "audio/mpeg" })
+    : new File([new Uint8Array(8)], "clip.mp4", { type: "video/mp4" });
+}
+
 class FakeXhr {
   static instances: FakeXhr[] = [];
   upload = { onprogress: null as ((event: { lengthComputable: boolean; loaded: number; total: number }) => void) | null };
@@ -110,7 +117,7 @@ describe("a media upload", () => {
     server.use(http.post("*/files/presign", () => HttpResponse.json({ key: "k", uploadUrl: "http://localhost/u", method: "PUT", headers: {}, expiresIn: 60 })));
     const { container } = mount(field, formId);
     const input = container.querySelector<HTMLInputElement>('input[type="file"]')!;
-    fireEvent.change(input, { target: { files: [new File([new Uint8Array(8)], "clip.mp4", { type: "video/mp4" })] } });
+    fireEvent.change(input, { target: { files: [sampleFile(field)] } });
     await waitFor(() => expect(setValue).toHaveBeenCalled(), { timeout: 4000 });
     const expected = /min/i.test(durationField.name) || durationField.unit === "min" ? 6 : 372;
     expect(values[durationField.name]).toBe(expected);

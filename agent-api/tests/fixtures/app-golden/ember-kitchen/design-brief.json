@@ -1,0 +1,66 @@
+{
+  "archetype": "learning",
+  "shell": "topbar",
+  "mobileNav": "bottom-tabs",
+  "frame": "wide",
+  "mainEntity": "Course",
+  "entities": {
+    "Course": {
+      "view": "cards",
+      "roles": {
+        "media": "coverImage"
+      },
+      "detailView": "split-panel",
+      "filtersStyle": "toolbar",
+      "card": "stacked",
+      "aspect": "square"
+    },
+    "Lesson": {
+      "view": "cards",
+      "roles": {
+        "media": "video",
+        "duration": "durationSeconds"
+      },
+      "detailView": "watch",
+      "card": "stacked"
+    },
+    "Caption": {
+      "view": "table",
+      "roles": {}
+    },
+    "Question": {
+      "view": "cards",
+      "roles": {},
+      "card": "text-first"
+    },
+    "Progress": {
+      "view": "cards",
+      "roles": {},
+      "card": "text-first"
+    }
+  },
+  "homeView": "catalogue",
+  "looks": [
+    {
+      "recipe": "clay",
+      "reason": "Recommended: Claymorphism for Recipe & Cooking App",
+      "fontPairing": "humanist"
+    },
+    {
+      "recipe": "playful",
+      "reason": "Recommended: Vibrant & Block-based for Recipe & Cooking App",
+      "fontPairing": "geometric"
+    },
+    {
+      "recipe": "soft",
+      "reason": "Recommended: Soft UI Evolution for Recipe & Cooking App",
+      "fontPairing": "geometric"
+    }
+  ],
+  "seed": 144614532,
+  "replaced": [
+    "area 'learners': Lesson: meta 'topic' left out (already the badge)",
+    "area 'learners': Lesson: watch page (watch) needs a video or an audio field; shown as media first (media)"
+  ],
+  "fontPairing": "humanist"
+}

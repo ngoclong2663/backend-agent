@@ -21,7 +21,7 @@ know it works beyond the synthetic cases.
 
 - [ ] Every `do` step completes by doing on mocks in both apps, or its skip reason is a known limit noted here.
 - [ ] The walker's results match the hand run.
-- [ ] Findings and deviations are in this Status, with run folders as evidence.
+- [x] Findings and deviations are in this Status, with run folders as evidence.
 
 ## Verify
 
@@ -30,3 +30,70 @@ know it works beyond the synthetic cases.
 ## Status
 
 Proposed 2026-11-08.
+
+**Done 2026-11-09 (with deviations).** **Runs (2026-11-09, the UI's one-click flow as `admin@bga.local`, stack `make up VIDEO_PROVIDERS=youtube,pixabay`,
+drafts on `antigravity_json` (gemini-3.8-flash-low, fast), generation on the `antigravity` engine, the account login):**
+
+| Requirement | Generation | Result | Total | Draft |
+|---|---|---|---|---|
+| Ember Kitchen, a cooking video school (`.data/final/studio-lessons.md`: video lessons with captions in two languages, instructors and learners, questions handed from learner to instructor, a dark cinema look) | `gen_01M6Z75NJYKSXNF4JGQPZ4XYF8` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 10 min 14 s (03:55:59 → 04:06:13) | 4 calls, 70 s, $0 |
+| Lantern Audio, a podcast network (`.data/final/podcast-network.md`: audio episodes with transcripts under shows, a producer drafts then publishes, a warm paper look) | `gen_01M6Z81Z2TM5SFN3ZMD05TPW56` | COMPLETED_WITH_WARNINGS, all three lanes, live API switched | 5 min 53 s (04:11:26 → 04:17:19) | 5 calls, 60 s, $0 |
+
+The only warning left on both is the migration check (a duplicated unique constraint, fixed afterwards, below). Three
+earlier rounds of the same two requirements failed and each failure became a fix with a regression test on the real
+drafted spec (`tests/fixtures/specs/ember-kitchen*.json`, `lantern-audio*.json`):
+
+1. `gen_01M6Z63NYZ0EFVPZG0YJK659R8` / `gen_01M6Z63RXKVZN823Y6RY74CNYV` (cancelled): `frontend:scenarios` failed.
+   The visibility rule's scenario pass (Story 23.9) rewrote the auth plugin's "no token" call into an authenticated
+   one (the mock answered 200 for an expected 401), and a public read's success scenario pointed at a draft record a
+   signed-out caller cannot see (404 for 200). `policies._visibility_contract` now skips unauthenticated scenarios and
+   points a public read at a visible record.
+2. `gen_01M6Z6HPQQ0WMJ3ZSZGABM70NR` (crashed) / `gen_01M6Z6HKT859PCNTAGVK2WEY4Z` (backend failed): the draft had an
+   `EpisodeGuest` entity *and* a many-to-many Episode–Guest, so the relations plugin planned a link table without an
+   entity; the completion's context pack escaped its None name. And the synthesized Progress fixtures cycled two
+   lessons and two demo learners over three rows, which the `uniqueTogether` index refused at seed time.
+   `completion.related_entities` skips entity-less models; `build_fixtures` keeps `uniqueTogether` pairs unique.
+3. `gen_01M6Z75RG2H8YD1JT4XNZ5AMPP` (backend startup failed): the same link table's routes landed in the join entity's
+   module (`episode_guests_router` missing). The planner now drops a many-to-many whose join entity exists.
+
+Also found on the way: the access rules made instructor-made courses private to their instructor, so learners opened
+an empty course list (a record whose person field names the role that creates it is now readable by every other
+role); the `uniqueConstraints` + `uniqueTogether` pair on the same fields gave the model two identical constraints
+(the rule reuses the entity's); muted and destructive text under 4.5:1 on the kit's surfaces (darkened per app);
+the sidebar icons of area pages (all the same icon).
+
+Workflows: Ember Kitchen has two roles handing a record over (a learner asks a question, the instructor answers and
+marks it; an instructor publishes a lesson); Lantern Audio has one role creating then changing a record (a producer
+drafts an episode, then publishes it). The evaluation (the walker playing each role's tour on the mocks, `report.tour`)
+ran after each generation. The hand run of the tours on the live API was not done in this session (the user watches
+the runs in the UI); the walker's Tour block is the evidence.
+
+**Ember Kitchen's evaluation** (DONE in 13 min, `second_look@v1` on gemini-3.8-flash-medium, $0; score 18 of 75
+expectations met, 48 blocked): the walker signed in as each role on the mocks and played the tours, but got little
+further than the first step. Learner: "Browse published courses and lessons" completed (34 ms), "play video" and
+"mark watched" not reached; instructor: "create course" **stuck: no control to click** after 26 s, the rest not
+reached. The checker on the live API found: `POST /courses` refuses a create without a `coverImage` upload (the
+required image field: the kit uploads first, the checker does not); `POST /progress` answered 409 on the first
+"mark watched" because the synthesized seed filled every learner × lesson pair (fixed: `build_fixtures` leaves one
+pair free); the engine-written `question.answer` accepts an empty answer and moves the status; "No captions yet" on a
+lesson's record and no caption control on the player; a learner reading another learner's question got 200 where the
+checker expected 404 (to verify by hand: the ownership policy is on the operation).
+
+**Lantern Audio's evaluation** (DONE in 4 min 47 s, $0; 0 of 32 expectations met, 29 blocked): the producer's tour
+"listen to an episode" completed its first `note` step (browse shows) and reached nothing further; the publishing
+tour's first `do` step (create a show) was not reached; the listener's tour stopped at once: "no app role for
+listener" (the requirement's public listener is not a role, so the walker has nobody to sign in as: a signed-out tour
+is the gap). The checker's gaps: `POST /shows` refused without the cover-art upload (the same checker limit as above);
+taking an episode down left "Published" on the dashboard's status (the engine-written transition); transcripts shown as
+raw file links next to the player (the `subtitles` field's value in the field grid; the player itself attaches the
+track).
+
+Findings for the tour itself (not fixed here, the plugin and tour backlog): (1) the first `do` step of the instructor's
+tour did not find its control on the mocks: the step's page is the learners area's course list, where the instructor
+has no "New" button (the areas of Story 23.10 and the tour's page binding need to agree on the area the role works
+in); (2) a `look` step that needs a record (play a lesson) is "not reached" when the role sees no record on the mocks
+(the fixtures' lessons are drafts, hidden from learners by the visibility rule); the tour should pick a visible record
+or say why none is there; (3) a tour for signed-out visitors (the requirement's public listeners) needs a walker
+pass without a login; (4) the checker's API caller should upload a sample file for a required image or media field
+before a create, as the kit does, so a create with a required cover is not counted as a gap.
+

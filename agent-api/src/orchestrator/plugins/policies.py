@@ -424,10 +424,23 @@ class PoliciesPlugin(Plugin):
         hidden = lambda row: any(row.get(name) != value for name, value in where.items())  # noqa: E731
         restricted = next((u for u in demo if u["role"] in visibility["roles"]), None)
         seeing = next((u for u in demo if u["role"] not in visibility["roles"]), None)
+        visible_row = next((row for row in records if not hidden(row)), None)
+        secured = bool(xbga.get("auth"))
         for scenario in scenarios:
+            if scenario.get("auth") is False:
+                continue  # the auth plugin's "no token" call stays unauthenticated: its 401 is the point
             row = by_id.get(str(scenario["params"].get(own)))
-            user = next((u for u in demo if u["login"] == scenario.get("user")), demo[0] if demo else None)
-            if row is not None and hidden(row) and user and user["role"] in visibility["roles"] and seeing:
+            if row is None or not hidden(row):
+                continue
+            user = next((u for u in demo if u["login"] == scenario.get("user")), None)
+            signed_out = user is None and not scenario.get("auth")
+            # signed-out callers are treated like the restricted roles (Epic 25); a scenario reading a hidden record
+            # as one of them would get 404 where it expects 200
+            if not (signed_out or (user and user["role"] in visibility["roles"])):
+                continue
+            if visible_row is not None and (signed_out and not secured or seeing is None):
+                scenario["params"] = {**scenario["params"], own: visible_row[pk]}  # a public read: a visible record
+            elif seeing is not None:
                 scenario["user"] = seeing["login"]
                 scenario["auth"] = True
         target = next((row for row in records if hidden(row)), None)
