@@ -41,6 +41,7 @@ drafts on `antigravity_json` (gemini-3.8-flash-low, fast), generation on the `an
 | TikTok Clone, the user's own requirement (`.data/final/tiktok-lite.md`: "a website with basic features look like tiktok"; videos, comments, likes as interactions, viewers and creators) | `gen_01M6ZAFZH8VYM36J6DWVQEYE36` | COMPLETED, all three lanes, no warnings, live API switched (rerun of finding 4 below) | 10 min 01 s (04:53:37 → 05:03:38) | 5 calls, 73 s, $0 |
 | TikTok, the same requirement again after findings 5 and 6 (videos published on creation, likes, comments, a viewer's visibility policy) | `gen_01M6ZFMEQSMCSEN4GXT0RAJEZ6` | COMPLETED, all three lanes, no warnings, live API switched; checked live: the creator adds a video, the viewer lists, opens and views it | 5 min 24 s (06:23:52 → 06:29:16) | 5 calls, 70 s, $0 |
 | TikTok, the same requirement on `draft_app@v8` (findings 7 and 8: a video's status is its own, UPLOADED → PUBLISHED / REJECTED; watching is an action and a `VideoView` entity; likes once per person) | `gen_01M6ZGXFSDP3CPGVCP9C6BNV5X` | COMPLETED, all three lanes, no warnings, live API switched; checked live with a real upload: a new video is 404 to the viewer until published, then opened, watched and still in the feed; a second like is 409 | 7 min 04 s (06:46:17 → 06:53:21) | 4 calls, 57 s, $0 |
+| TikTok again after finding 9 (person fields `viewerId` as v8 asks; likes through `interaction.like`) | `gen_01M6ZJ7D91VHY0Z6RE83FMX7DZ` | COMPLETED, all three lanes, live API switched; checked live as the demo viewer: no user picker in any form, no user directory (`/users` 404), a comment with its text alone, a like with the video alone (owner set by the server), a second like 409 | 5 min 04 s (07:09:10 → 07:14:14) | n/a |
 
 The only warning left on both is the migration check (a duplicated unique constraint, fixed afterwards, below). Three
 earlier rounds of the same two requirements failed and each failure became a fix with a regression test on the real
@@ -103,7 +104,7 @@ drafted spec (`tests/fixtures/specs/ember-kitchen*.json`, `lantern-audio*.json`)
    creating roles to manage those records too (a role policy on another of its operations, or an ownership bypass:
    staff update and assign a member's case); a role that only creates a record makes it for itself and owns it,
    whatever its person field is called (`_maker_owns`). No picker, no viewers' user directory; a like with nothing
-   left to fill in becomes the one-click button of finding 8. Rerun as the table's sixth row.
+   left to fill in becomes the one-click button of finding 8. Rerun as the table's sixth row (a run before it, `gen_01M6ZJ0ABG3C8XF93BRTV495HN`, failed with no generated code: the sandbox images had been removed from Docker outside the session; `make runner runner-node` rebuilt them).
 
 Also found on the way: the access rules made instructor-made courses private to their instructor, so learners opened
 an empty course list (a record whose person field names the role that creates it is now readable by every other

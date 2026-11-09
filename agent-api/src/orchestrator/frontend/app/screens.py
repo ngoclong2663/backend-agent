@@ -763,7 +763,8 @@ class _Screens:
             actions.append(
                 {
                     "id": f"add-{self.slug(child)}",
-                    "label": self.label(child),  # "Like", "Bookmark": the noun reads as the verb
+                    # the operation's own verb ("interaction.like" → "Like"), else the noun reads as one ("Bookmark")
+                    "label": self.label(child) if op_id.split(".", 1)[-1] == "create" else self.op_label(op_id),
                     "kind": "mutation",
                     "operationId": op_id,
                     "body": {parent["field"]: record},

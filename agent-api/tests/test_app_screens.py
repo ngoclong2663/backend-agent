@@ -453,3 +453,20 @@ def test_a_viewers_like_and_comment_ask_for_nothing_but_the_comment():
     assert [f["name"] for f in comment["fields"] if not f.get("hidden")] == ["content"]
     video = next(page for page in screens.spec["pages"] if page["route"] == "/videos/[id]")
     assert any(a.get("operationId") == "like.create" for a in video["sections"][0]["content"]["actions"])
+
+
+def test_a_one_click_create_named_by_its_operation_takes_its_verb():
+    """A recorded draft (2026-11-09) created a like through `interaction.like` on an `Interaction` entity: the button
+    read "Interaction". A create operation with a verb of its own is labelled with it."""
+    from src.orchestrator.drafting.access import secure_access
+    from tests.test_access_rules import _feed_spec
+
+    raw = _feed_spec(comment_policy=True)
+    for op in raw["operations"]:
+        if op["operationId"] == "like.create":
+            op["operationId"], op["path"] = "like.tap", "/likes/tap"
+    secure_access(raw)
+    _, _, _, screens = _plan(validate_spec_data(raw).normalized, {})
+    video = next(page for page in screens.spec["pages"] if page["route"] == "/videos/[id]")
+    tap = next(a for a in video["sections"][0]["content"]["actions"] if a.get("operationId") == "like.tap")
+    assert tap["label"] == "Tap"
