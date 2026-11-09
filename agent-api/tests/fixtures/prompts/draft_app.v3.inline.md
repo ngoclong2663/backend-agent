@@ -127,6 +127,7 @@ type AppEntity = {
   detailFields?: string[];
   fieldLabels?: Record<string, string>;
   help?: Record<string, string>;
+  create?: "onRecord" | "onOpen" | "page" | null;
 };
 
 // How one entity's records are shown (Stories 23.3–23.5).

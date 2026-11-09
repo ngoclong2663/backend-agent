@@ -93,6 +93,7 @@ type AppEntity = {
   detailFields?: string[];
   fieldLabels?: Record<string, string>;
   help?: Record<string, string>;
+  create?: "onRecord" | "onOpen" | "page" | null;
 };
 
 type AppHighlight = {

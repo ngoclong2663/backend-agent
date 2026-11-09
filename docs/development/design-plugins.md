@@ -107,7 +107,7 @@ plugin on its own fixture (its `needs` are not met there).
 | From the descriptors | Where |
 |---|---|
 | the literals `Shell`, `HomeView`, `ListView`, `DetailView`, `FiltersStyle`, `Recipe` (and the answer schema, the JSON schema snapshot) | `frontend_spec/app.py` (`Literal[plugin_names(kind)]`) |
-| the prompt's choice lists, only the candidates of the ranked archetypes | `frontend/app/design.design_choices` → `draft_app@v8` `{{ design_choices.<kind> }}` |
+| the prompt's choice lists, only the candidates of the ranked archetypes | `frontend/app/design.design_choices` → `draft_app@v9` `{{ design_choices.<kind> }}` |
 | the checks: a choice whose `needs` the contract lacks falls back along the chain, one note | `frontend/app/design._Completion.choose` |
 | the recipes' families, guards and CSS | `frontend/app/recipes.py` |
 | the kit's dispatch table, importing only what the app uses | `frontend/app/files.design_registry_ts` → `src/components/app/design-registry.ts` |

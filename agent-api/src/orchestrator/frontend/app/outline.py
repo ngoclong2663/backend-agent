@@ -50,12 +50,16 @@ def _note(path: str, message: str) -> dict[str, Any]:
 class _Entity:
     """What the BackendSpec and the contract say about one entity."""
 
-    def __init__(self, entity: dict[str, Any], info: dict[str, Any]):
+    def __init__(self, entity: dict[str, Any], info: dict[str, Any], user_entity: str = "User"):
         self.name = entity["name"]
         self.fields = {field["name"]: field for field in entity.get("fields") or []}
         self.label_field = info.get("labelField")
         # foreign key → the parent's API name (`deckId` → `deck`)
         self.references = {ref["field"]: ref["apiName"] for ref in info.get("references") or []}
+        # the records it is made on (Epic 32): its referenced entities but the signed-in user's
+        self.parents = [
+            ref["entity"] for ref in info.get("references") or [] if ref.get("entity") not in (user_entity, self.name)
+        ]
 
     def shown(self) -> list[str]:
         """Fields a screen can show, in the spec's order."""
@@ -107,7 +111,8 @@ def complete_outline(
     requirement when the brief names no archetype)."""
     notes: list[dict[str, Any]] = []
     info = ((contract.get("x-bga") or {}).get("entities")) or {}
-    entities = {e["name"]: _Entity(e, info.get(e["name"]) or {}) for e in backend.get("entities") or []}
+    user_entity = (((contract.get("x-bga") or {}).get("auth")) or {}).get("userEntity") or "User"
+    entities = {e["name"]: _Entity(e, info.get(e["name"]) or {}, user_entity) for e in backend.get("entities") or []}
     raw = dict(raw) if isinstance(raw, dict) else {}
     raw_design, raw_areas = raw.pop("design", None), raw.pop("areas", None)
     outline = _parse(_capped(raw, notes), notes)
@@ -282,6 +287,10 @@ def _entity(name: str, entity: _Entity, drafted: AppEntity, notes: list[dict[str
     style = drafted.list_style or (
         "cards" if any(entity.fields[f].get("type") in IMAGE_TYPES for f in list_fields) else "table"
     )
+    create = drafted.create
+    if create in ("onRecord", "onOpen") and not entity.parents:
+        notes.append(_note(f"{path}/create", f"{name} has no parent record to be made on; placed by default"))
+        create = None
     return AppEntity(
         label=label,
         plural=drafted.plural or plural(label),
@@ -291,6 +300,7 @@ def _entity(name: str, entity: _Entity, drafted: AppEntity, notes: list[dict[str
         detail_fields=detail_fields + rest,
         field_labels=labels,
         help={field: text for field, text in drafted.help.items() if field in entity.fields},
+        create=create,
     )
 
 

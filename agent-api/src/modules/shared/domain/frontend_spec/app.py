@@ -53,6 +53,10 @@ class AppEntity(SpecModel):
     detail_fields: list[Annotated[str, Field(pattern=IDENTIFIER)]] = []  # their order on the detail page
     field_labels: dict[str, Annotated[str, Field(max_length=60)]] = {}
     help: dict[str, Annotated[str, Field(max_length=200)]] = {}  # a hint under a form field
+    # Epic 32 (Story 32.7): where this entity's records are made, written only when the requirement says it differs
+    # from what the app's kind does by default: on its parent's record (a button, or its form in a dialog), when its
+    # parent opens (a view, nothing to fill in), or on a form page of its own
+    create: Literal["onRecord", "onOpen", "page"] | None = None
 
 
 class AppDashboardItem(SpecModel):

@@ -229,6 +229,9 @@ def action_targets(frontend_spec: dict[str, Any]) -> dict[str, list[dict[str, An
             data = (section.get("data") or {}).get("operationId")
             if data:
                 out.setdefault(data, []).append({**base, "action": None})
+            opened = (section.get("content") or {}).get("onOpen")  # Epic 32: done by opening the record (a view)
+            if isinstance(opened, dict) and opened.get("operationId"):
+                out.setdefault(opened["operationId"], []).append({**base, "action": None})
     return out
 
 

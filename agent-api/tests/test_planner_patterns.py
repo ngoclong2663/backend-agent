@@ -143,3 +143,61 @@ def test_a_back_office_keeps_a_view_action_as_a_button():
     assert any(a.get("operationId") == "video.view" for page in screens.spec["pages"] for a in _actions(page)), (
         "a button in a back-office"
     )
+
+
+def _feed_with(archetype: str, creates: dict[str, str]):
+    """The synthetic feed spec (videos, comments, likes) planned with the draft's `entities.<Entity>.create`."""
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.drafting.access import secure_access
+    from src.orchestrator.drafting.app import public_shapes
+    from tests.test_access_rules import _feed_spec
+    from tests.test_app_screens import _plan
+
+    outline = {
+        "design": {"archetype": archetype, "mainEntity": "Video"},
+        "entities": {entity: {"create": where} for entity, where in creates.items()},
+    }
+    raw = _feed_spec(comment_policy=True)
+    secure_access(raw, public_shapes(outline, None))
+    backend = validate_spec_data(raw).normalized
+    extended, completed, contract, screens = _plan(backend, outline)
+    _valid(screens.spec, extended, contract)
+    return completed, screens
+
+
+def _video(screens) -> list[dict]:
+    record = next(page for page in screens.spec["pages"] if page["route"] == "/videos/[id]")
+    return next(s for s in record["sections"] if s["component"] == "AppDetail")
+
+
+def test_the_drafts_placement_wins_over_the_pattern():
+    """Story 32.7: what the requirement says about where a record is made reaches the screens, in any area: a
+    back-office's comment on the video (`onRecord`), a feed's comment on a page of its own (`page`), a like made when
+    the video opens (`onOpen`, nothing to fill in); a placement for an entity without a parent is dropped."""
+    _, screens = _feed_with("back-office", {"Comment": "onRecord"})
+    routes = {page["route"] for page in screens.spec["pages"]}
+    assert "/videos/[id]/comments/new" not in routes
+    assert any(
+        a.get("operationId") == "comment.create" and a.get("form") for a in _video(screens)["content"]["actions"]
+    )
+
+    _, screens = _feed_with("feed", {"Comment": "page"})
+    routes = {page["route"] for page in screens.spec["pages"]}
+    assert "/videos/[id]/comments/new" in routes
+    assert not any(a.get("operationId") == "comment.create" for a in _video(screens)["content"]["actions"])
+
+    _, screens = _feed_with("feed", {"Like": "onOpen"})
+    detail = _video(screens)
+    assert detail["content"]["onOpen"] == {"operationId": "like.create", "body": {"videoId": "$route.id"}}
+    assert not any(a.get("operationId") == "like.create" for a in detail["content"]["actions"])
+
+    completed, _ = _feed_with("feed", {"Video": "onRecord"})
+    assert "create" not in completed["entities"]["Video"], "a video has no parent record to be made on"
+
+
+def test_the_tour_finds_a_step_done_by_opening_the_record():
+    from src.orchestrator.business.binding import action_targets
+
+    _, screens = _feed_with("feed", {"Like": "onOpen"})
+    places = action_targets(screens.spec)["like.create"]
+    assert {(p["route"], p["action"]) for p in places} == {("/videos/[id]", None)}

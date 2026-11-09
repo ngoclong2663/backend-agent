@@ -30,8 +30,8 @@ product, not only its kind.
 
 ## Acceptance criteria
 
-- [ ] A placement in the draft changes where an operation appears, within what the contract and roles allow.
-- [ ] The tour's steps point at placed actions.
+- [x] A placement in the draft changes where an operation appears, within what the contract and roles allow.
+- [x] The tour's steps point at placed actions.
 
 ## Verify
 
@@ -40,3 +40,20 @@ product, not only its kind.
 ## Status
 
 Proposed 2026-11-09.
+
+**Done 2026-11-09 (with deviations).** The placement is the outline entity's **`create`** (`AppEntity.create`:
+`onRecord`, `onOpen`, `page`), not an operation-level `placement`: the outline names entities, never operations (Epic
+22's rule), and where a record is made is the question the requirement answers ("comments are written on the post",
+"a view is counted when the video opens"). `complete_outline` drops `onRecord` / `onOpen` for an entity without a parent
+record (the signed-in user's entity left out), with a note. The planner reads it first, in any area (D8: the
+requirement wins): `page` keeps a form page of its own, `onRecord` puts the create on the parent's record (one click
+or its dialog), `onOpen` makes it when the parent opens when nothing is left to fill in (`screens.drafted_create`,
+`on_parent`, `on_open`). `draft_app@v9` is v8 plus one rule in the outline's entities paragraph (the defaults by kind
+in a line; `create` only when the requirement says otherwise); the older versions' snapshots gain the schema's one
+line, as Epic 30's did. The tour finds a placed action by its operation as before, and a step done by opening a record
+(`onOpen`) is a look at that record's page (`binding.action_targets`). Tests: `test_planner_patterns.py` (each
+placement, a dropped one, the tour's target), `test_app_drafting.py` (the v9 prompt).
+
+Deviations: no `where: home | list` (a collection action stays where the contract places it); step 3 (the business
+workflows proposing placements) is left to the model reading its own brief, since the brief replaces the requirement
+in the draft prompt.

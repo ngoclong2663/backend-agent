@@ -217,7 +217,7 @@ Agent-specific notes:
   `make video-keys` checks the keys. `FRONTEND_MAX_PHOTOS` now caps paid photos only (`STOCK_PHOTO_LIMIT` for stock).
 - Design plugins (Epic 30): every value of the app design space (shell, list view, detail view, home, filters, card,
   recipe, font pairing) is a folder `templates/design/<kind>/<name>/` (`plugin.json` + kit files), read once by
-  `frontend_spec/design_registry.py`; the literals in `frontend_spec/app.py`, the `draft_app@v8` choice lists
+  `frontend_spec/design_registry.py`; the literals in `frontend_spec/app.py`, the `draft_app@v9` choice lists
   (`design.design_choices`, only the ranked archetypes' candidates), `complete_design`'s checks (`needs` → the
   descriptor's `fallback` chain, `_Data.lacks`), the recipes (`recipes.py`), the kit's generated
   `design-registry.ts` (the plugins the app uses; `AppShell`, `RecordsView`, `AppDetail` dispatch through it) and the
@@ -239,6 +239,8 @@ Agent-specific notes:
   `storefront` is ready (Story 32.6: Plants, Cart, My Orders; Add to cart on the product).
   `feed` is ready (Story 32.5): a view-like record action with nothing to fill in (or a view child) is the record
   page's `onOpen`, run once by `AppDetail` (`useOnOpen`), never a button. `ux-before.json` keeps the pre-pattern measure.
+  The draft may say where an entity's records are made (`entities.<Entity>.create`: `onRecord`, `onOpen`, `page`;
+  `draft_app@v9`); the planner reads it first, in any area (Story 32.7).
   The access rules take the patterns' public shapes (`secure_access(spec, public)`, `drafting/app.public_shapes`): a
   person's text on a record (a comment, a review) keeps the record's readers, writes stay the author's.
   `frontend/app/ux_checks.py` judges a planned app per area

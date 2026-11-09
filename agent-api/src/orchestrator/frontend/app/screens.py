@@ -477,7 +477,11 @@ class _Screens:
     def on_open(self, entity: str) -> dict[str, Any] | None:
         """In a consumer area, what runs once when a record of the entity opens: its own action named like a view
         (`video.view`, `video.watch`) with nothing to fill in, else a child view created with nothing to fill in
-        (`VideoView`); None in a back-office, where such an action stays a button."""
+        (`VideoView`); None in a back-office, where such an action stays a button. A child the draft says is made
+        when its parent opens (`entities.<child>.create: onOpen`, Story 32.7) is, in any area."""
+        for child, found in self.on_parent_children(entity):
+            if self.drafted_create(child) == "onOpen" and found["form"] is None:
+                return {"operationId": self.crud[child]["create"], "body": {found["parent"]["field"]: "$route.id"}}
         if not self.consumer:
             return None
         for op_id in self.custom[entity]:
@@ -521,17 +525,26 @@ class _Screens:
 
     def on_parent(self, entity: str) -> dict[str, Any] | None:
         """A child's create as an action on its parent's record: when it has nothing to fill in (every pattern), or
-        when the area's pattern places its shape there; `form` is None for one click, else the fields of its dialog."""
+        when the area's pattern places its shape there; `form` is None for one click, else the fields of its dialog.
+        Story 32.7: the draft's `entities.<child>.create` decides first (`page`: a form page; `onRecord` / `onOpen`:
+        on the record, in any area)."""
+        drafted = self.drafted_create(entity)
+        if drafted == "page":
+            return None
         parent = self.quick_create(entity)
         if parent is not None:
             return {"parent": parent, "form": None}
-        if not self.on_record(entity) or "create" not in self.crud[entity]:
+        if drafted not in ("onRecord", "onOpen") and not self.on_record(entity) or "create" not in self.crud[entity]:
             return None
         parent = self.route_parent(entity)
         if parent is None:
             return None
         fields = self.form_fields(entity, self.crud[entity]["create"], {parent["field"]: "$route.id"})
         return {"parent": parent, "form": fields} if fields else None
+
+    def drafted_create(self, entity: str) -> str | None:
+        """Where the draft says the entity's records are made (`onRecord`, `onOpen`, `page`), else None."""
+        return ((self.outline.get("entities") or {}).get(entity) or {}).get("create")
 
     def on_parent_children(self, entity: str) -> list[tuple[str, dict[str, Any]]]:
         """The children created from this entity's records (`on_parent`)."""
