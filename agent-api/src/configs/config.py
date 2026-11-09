@@ -85,7 +85,10 @@ class Config(BaseSettings):
     # entry (a pet adoption draft: 85 s instead of 15.6 min, with fewer of the requirement's rules). A draft request's
     # `draftSpeed` overrides it.
     draft_speed: Literal["fast", "thorough"] = "thorough"
-    fast_draft_models: Annotated[dict[str, str], NoDecode] = {"antigravity": "gemini-3.8-flash-low"}
+    fast_draft_models: Annotated[dict[str, str], NoDecode] = {
+        "antigravity": "gemini-3.8-flash-low",
+        "claude_code": "claude-haiku-5-5",  # 2026-11-09: a draft in about 2 min at CLAUDE_CODE_JSON_EFFORT=low
+    }
     # Story 26.5: how long an evaluation waits for the generation's previews, and whether it takes screenshots
     evaluation_preview_wait_seconds: int = 900
     evaluation_screenshots: bool = True
@@ -254,13 +257,18 @@ class Config(BaseSettings):
 
     @property
     def draft_engine_name(self) -> str:
-        """The engine that drafts specs (Story 18.10; Epic 24: the LLM provider's draft engine when one is chosen)."""
+        """The engine that drafts specs (Story 18.10; Epic 24: the LLM provider's draft engine when one is chosen).
+        One switch (2026-11-09): with neither DRAFT_ENGINE nor LLM_PROVIDER set, drafting follows DEFAULT_ENGINE
+        (`claude_code` → `claude_code_json`, `antigravity` → `antigravity_json`), so changing DEFAULT_ENGINE moves
+        generation, drafts and every LLM-only step together; the explicit variables stay as overrides."""
+        from src.engines.llm import DRAFT_ENGINE_OF
+
         if self.draft_engine:
             return self.draft_engine
         if self.llm_provider:
-            from src.engines.llm import DRAFT_ENGINE_OF
-
             return DRAFT_ENGINE_OF[self.llm_provider]
+        if self.default_engine in DRAFT_ENGINE_OF:
+            return DRAFT_ENGINE_OF[self.default_engine]
         return "gemini_api" if self.gemini_api_key else self.default_engine
 
     @property

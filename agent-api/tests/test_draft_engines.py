@@ -89,3 +89,20 @@ def test_the_engine_list_says_which_engines_draft(client, user_headers):
     }
     assert engines["fake"]["drafts"] is True
     assert all(not engines[name]["drafts"] for name in ("claude_code", "antigravity") if name in engines)
+
+
+def test_one_switch_moves_generation_drafts_and_the_llm_steps_together():
+    """DEFAULT_ENGINE alone picks every engine: `claude_code` drafts on `claude_code_json` and runs the LLM-only steps
+    on `claude_code`, `antigravity` on `antigravity_json` / `antigravity`, even with a Gemini key in the env; the
+    explicit DRAFT_ENGINE / LLM_PROVIDER stay as overrides; an engine without a drafting twin keeps the old fallback."""
+    from src.configs.config import Config
+
+    base = {"db_url": "postgresql+psycopg://u:p@localhost/db", "jwt_secret": "x" * 40, "gemini_api_key": "key"}
+    for engine, drafts in (("claude_code", "claude_code_json"), ("antigravity", "antigravity_json")):
+        cfg = Config(**base, default_engine=engine)
+        assert (cfg.draft_engine_name, cfg.llm_provider_name) == (drafts, engine)
+        assert cfg.fast_draft_models.get(engine), "a fast drafting model of its own"
+    pinned = Config(**base, default_engine="claude_code", llm_provider="antigravity")
+    assert (pinned.draft_engine_name, pinned.llm_provider_name) == ("antigravity_json", "antigravity")
+    assert Config(**base, default_engine="claude_code", draft_engine="gemini_api").draft_engine_name == "gemini_api"
+    assert Config(**base, default_engine="fake").draft_engine_name == "gemini_api", "no twin: the API engine"

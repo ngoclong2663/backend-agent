@@ -152,7 +152,9 @@ Agent-specific notes:
   `claude_code` (`claude -p --output-format json --json-schema --tools ""`) or `gemini_api`; tests pass their own
   (`tests/fake_llm.py`, never imported by `src/`). The answer is checked against the schema in code (`libs/json_schema_check.py`) and asked
   again once with its errors. `LLM_PROVIDER` picks it (`build_llm_provider` / `get_llm_provider`); `DRAFT_ENGINE`
-  defaults to its draft engine (`antigravity` → `antigravity_json`). The account / subscription logins cost $0
+  defaults to its draft engine (`antigravity` → `antigravity_json`). **One switch** (2026-11-09): with neither set,
+  both follow `DEFAULT_ENGINE` (`claude_code` → `claude_code_json`, `antigravity` → `antigravity_json`), and
+  `FAST_DRAFT_MODELS` has an entry per provider (`claude-haiku-5-5`, `gemini-3.8-flash-low`). The account / subscription logins cost $0
   (`costSource: account`). `antigravity_json` runs on the host worker with `ANTIGRAVITY_AUTH=account`.
   `claude_code` / `claude_code_json` log in with `ANTHROPIC_API_KEY`, else `CLAUDE_CODE_OAUTH_TOKEN` (`claude setup-token`:
   the subscription for headless runs; on macOS the desktop login is in the keychain, which a container and the
