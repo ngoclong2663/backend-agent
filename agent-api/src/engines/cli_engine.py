@@ -232,3 +232,33 @@ def classify_error_text(text: str) -> EngineErrorReason:
     if any(hint in text for hint in ("rate limit", "rate_limit", "429", "overloaded", "quota", "resource_exhausted")):
         return EngineErrorReason.RATE_LIMIT
     return EngineErrorReason.CRASH
+
+
+# A model call that never got its answer: the network or the provider's API failed, not the engine's work. agy, for
+# one, ends a run with `API error (attempt 1): request failed: Post "…": read tcp …: read: operation timed out` when a
+# call drops, even after the model has written its files and its summary.
+NETWORK_HINTS = (
+    "request failed",
+    "timed out",
+    "connection reset",
+    "connection refused",
+    "broken pipe",
+    "unexpected eof",
+    "tls handshake",
+    "no such host",
+    "deadline exceeded",
+    "service unavailable",
+    "socket hang up",
+    "econnreset",
+    " 502 ",
+    " 503 ",
+    " 504 ",
+)
+
+
+def is_network_failure(result: EngineResult) -> bool:
+    """Whether a failed run died on the network or the provider's API (worth running once more), not on its work."""
+    if result.status != EngineStatus.CLI_ERROR or result.error_reason != EngineErrorReason.CRASH:
+        return False
+    text = f" {(result.error_message or '').lower()} "
+    return any(hint in text for hint in NETWORK_HINTS)

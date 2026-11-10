@@ -41,6 +41,8 @@ class Config(BaseSettings):
     engine_max_turns: int = 40
     engine_max_output_bytes: int = 20_000_000
     engine_concurrency: int = 3  # parallel custom component generation (Story 17.3)
+    # An engine run that died on the network or the provider's API runs again, in the same workdir, this many times
+    engine_network_retries: int = 1
     # Story 23.11: engine-written view slots for apps (`off` | `engine`); an opt-in experiment, off by default
     app_view_slots: str = "off"
     engine_skills_dir: str = "/opt/bga/skills"

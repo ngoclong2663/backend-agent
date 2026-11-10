@@ -33,6 +33,11 @@ was run on 2026-10-26 with the account login (see *Real run* below).
 - A denied permission ends the turn (2026-11-08): headless agy auto-denies what it cannot ask for, prints
   `no output produced — a tool required the "…" permission …` on stderr and still reports `status: SUCCESS` with an
   empty response. The adapter turns such a run into `CLI_ERROR` (a module was "completed" with nothing written).
+- A dropped model call (2026-11-10): agy ends a run with `status: ERROR` and `API error (attempt 1): request failed:
+  … read: operation timed out` when a call to Google drops, even after the model wrote its files and its summary.
+  `JobContext.run_engine` runs such a network failure (`cli_engine.is_network_failure`) once more in the same workdir
+  (`ENGINE_NETWORK_RETRIES`, default 1), so the second run finds the first one's files. A denied permission is not
+  retried: the run's own doing.
 - Model per purpose (Story 18.5): `ANTIGRAVITY_PURPOSE_MODELS` overrides the model for specific calls (default: `generate_assets` runs on `gemini-3.8-flash-low`), while other purposes use `ANTIGRAVITY_MODEL`.
 - Usage: `input_tokens + cache_read_tokens` → input, `output_tokens + thinking_tokens` → output, cost estimated against model pricing.
 

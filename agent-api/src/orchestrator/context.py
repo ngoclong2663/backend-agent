@@ -20,6 +20,7 @@ from src.engines import (
     PromptLibrary,
     RenderedPrompt,
 )
+from src.engines.cli_engine import is_network_failure
 from src.libs.redaction import default_redactor
 from src.modules.generations.infrastructure.adapters import EventPublisher
 from src.modules.shared.domain.entities import CliInvocationEntity, ModelCallEntity, SandboxExecEntity
@@ -272,7 +273,36 @@ class JobContext:
         workdir_override: Path | None = None,
     ) -> EngineResult:
         """One engine call in the backend project (`repo="project"`) or the frontend (`repo="frontend"`), each
-        with its own skill and project rules."""
+        with its own skill and project rules. A run that died on the network or the provider's API (not on its work)
+        runs again in the same workdir, so it finds what the first one wrote (`config.engine_network_retries`)."""
+        for attempt in range(config.engine_network_retries + 1):
+            try:
+                return await self._run_engine_once(node, purpose, prompt, repo, workdir_override)
+            except EngineFailure as failure:
+                if attempt >= config.engine_network_retries or not is_network_failure(failure.result):
+                    raise
+                logger.info(
+                    "engine run lost its connection; running it again",
+                    extra={"engine": self.engine.name, "purpose": purpose, "attempt": attempt + 2},
+                )
+                await self.emit(
+                    "engine.retry",
+                    step=node,
+                    engine=self.engine.name,
+                    purpose=purpose,
+                    attempt=attempt + 2,
+                    reason=failure.result.error_message,
+                )
+        raise AssertionError("unreachable")
+
+    async def _run_engine_once(
+        self,
+        node: str,
+        purpose: str,
+        prompt: RenderedPrompt,
+        repo: str,
+        workdir_override: Path | None,
+    ) -> EngineResult:
         await self.check_cancel()
         workdir = workdir_override if workdir_override is not None else self.workspace.repo(repo)
         context = self.frontend_engine_context if repo == "frontend" else self.engine_context
