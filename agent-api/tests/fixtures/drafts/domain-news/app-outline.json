@@ -1,0 +1,652 @@
+{
+  "name": "The Harbour Ledger",
+  "tagline": "A trusted city news daily covering City, Business, Culture, and Sport",
+  "icon": "Newspaper",
+  "nav": [
+    {
+      "entity": "Article",
+      "label": "Front Page & News",
+      "icon": "Newspaper"
+    },
+    {
+      "entity": "Bookmark",
+      "label": "Reading List",
+      "icon": "Bookmark"
+    },
+    {
+      "entity": "Follow",
+      "label": "Followed Sections",
+      "icon": "Compass"
+    },
+    {
+      "entity": "User"
+    }
+  ],
+  "home": "Article",
+  "entities": {
+    "Article": {
+      "label": "Article",
+      "plural": "Articles",
+      "displayField": "headline",
+      "listFields": [
+        "headline",
+        "section",
+        "status",
+        "publishedAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "headline",
+        "subheading",
+        "section",
+        "leadImage",
+        "body",
+        "status",
+        "editorFeedback",
+        "scheduledFor",
+        "publishedAt",
+        "isLeadStory",
+        "createdAt",
+        "writerId",
+        "editorId",
+        "updatedAt"
+      ],
+      "fieldLabels": {
+        "headline": "Headline",
+        "subheading": "Subheading",
+        "section": "Section",
+        "body": "Article Body",
+        "leadImage": "Lead Image",
+        "isLeadStory": "Lead Story",
+        "status": "Status",
+        "editorFeedback": "Editorial Feedback",
+        "scheduledFor": "Scheduled Release Time",
+        "publishedAt": "Publication Date",
+        "writerId": "Writer",
+        "editorId": "Editor",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      },
+      "help": {
+        "editorFeedback": "Notes and required revisions provided by the editor",
+        "isLeadStory": "Highlight this article as the front-page lead story",
+        "scheduledFor": "Future time when the article will automatically or manually be released",
+        "section": "City, Business, Culture, or Sport"
+      },
+      "create": "page"
+    },
+    "Comment": {
+      "label": "Comment",
+      "plural": "Comments",
+      "displayField": "readerName",
+      "listFields": [
+        "articleId",
+        "readerName",
+        "body",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "articleId",
+        "readerName",
+        "body",
+        "status",
+        "createdAt",
+        "readerId"
+      ],
+      "fieldLabels": {
+        "articleId": "Article",
+        "readerId": "Reader",
+        "readerName": "Reader Name",
+        "body": "Comment",
+        "status": "Status",
+        "createdAt": "Posted At"
+      },
+      "help": {
+        "body": "Join the discussion on this story"
+      },
+      "create": "onRecord"
+    },
+    "Bookmark": {
+      "label": "Bookmark",
+      "plural": "Bookmarks",
+      "displayField": "articleId",
+      "listFields": [
+        "articleId",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "articleId",
+        "status",
+        "createdAt",
+        "readerId"
+      ],
+      "fieldLabels": {
+        "articleId": "Saved Article",
+        "readerId": "Reader",
+        "status": "Bookmark Status",
+        "createdAt": "Bookmarked At"
+      },
+      "help": {
+        "articleId": "The published article saved to your reading list"
+      },
+      "create": "onRecord"
+    },
+    "Follow": {
+      "label": "Section Follow",
+      "plural": "Section Follows",
+      "displayField": "section",
+      "listFields": [
+        "section",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "section",
+        "status",
+        "createdAt",
+        "readerId"
+      ],
+      "fieldLabels": {
+        "readerId": "Reader",
+        "section": "Followed Section",
+        "status": "Status",
+        "createdAt": "Followed At"
+      },
+      "help": {
+        "section": "Follow sections you care about to receive curated updates"
+      }
+    },
+    "User": {
+      "label": "User",
+      "plural": "Users",
+      "displayField": "email",
+      "listFields": [
+        "email",
+        "role"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "email",
+        "role"
+      ],
+      "fieldLabels": {
+        "email": "Email",
+        "role": "Role"
+      },
+      "help": {}
+    }
+  },
+  "design": {
+    "archetype": "feed",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "standard",
+    "density": "comfortable",
+    "mainEntity": "Article",
+    "entities": {
+      "Article": {
+        "view": "feed",
+        "roles": {
+          "title": "headline",
+          "media": "leadImage",
+          "badge": "section",
+          "subtitle": "subheading",
+          "meta": [
+            "status",
+            "publishedAt"
+          ]
+        },
+        "detailView": "reader",
+        "filtersStyle": "chips",
+        "card": "stacked"
+      },
+      "Comment": {
+        "view": "cards",
+        "roles": {
+          "title": "readerName",
+          "badge": "status",
+          "subtitle": "body",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "filtersStyle": "toolbar",
+        "card": "text-first"
+      },
+      "Bookmark": {
+        "view": "cards",
+        "roles": {
+          "title": "articleId",
+          "badge": "status",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "filtersStyle": "toolbar",
+        "card": "text-first"
+      },
+      "Follow": {
+        "view": "cards",
+        "roles": {
+          "badge": "section",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "filtersStyle": "toolbar",
+        "card": "text-first"
+      },
+      "User": {
+        "view": "table",
+        "roles": {}
+      }
+    },
+    "homeView": "feed",
+    "looks": [
+      {
+        "recipe": "editorial",
+        "reason": "The requirement asks for it",
+        "fontPairing": "editorial"
+      },
+      {
+        "recipe": "swiss",
+        "reason": "Clean Swiss grid emphasizes journalistic objectivity, legibility, and high-density content hierarchy.",
+        "fontPairing": "bookish"
+      },
+      {
+        "recipe": "soft",
+        "reason": "A bolder option (added by code)",
+        "fontPairing": "editorial"
+      }
+    ],
+    "requested": {
+      "accent": "#1e3a8a",
+      "background": "#faf8f5",
+      "scheme": "light",
+      "headingFont": "serif",
+      "corners": "sharp",
+      "words": "editorial and trustworthy, a classic serif for headlines, off-white paper and a navy accent"
+    },
+    "seed": 3885258191,
+    "fontPairing": "editorial",
+    "reason": "Editorial news publication emphasizing curated front-page reading, section-based discovery, and structured editorial workflows.",
+    "replaced": [
+      "Follow: title 'section' left out (a enum field is not a name)",
+      "look 'minimal' replaced by 'soft': three quiet looks offer no choice"
+    ]
+  },
+  "areas": [
+    {
+      "id": "readers",
+      "label": "Readers",
+      "roles": [
+        "Reader"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "catalogue",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "standard",
+        "density": "comfortable",
+        "mainEntity": "Article",
+        "entities": {
+          "Article": {
+            "groupBy": "section",
+            "view": "shelves",
+            "roles": {
+              "media": "leadImage"
+            },
+            "detailView": "reader",
+            "filtersStyle": "toolbar",
+            "card": "stacked"
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          },
+          "Bookmark": {
+            "view": "table",
+            "roles": {}
+          },
+          "Follow": {
+            "view": "table",
+            "roles": {}
+          },
+          "User": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "feed"
+      }
+    },
+    {
+      "id": "writers",
+      "label": "Writers",
+      "roles": [
+        "Writer"
+      ],
+      "prefix": "/writers",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "wide",
+        "density": "comfortable",
+        "mainEntity": "Article",
+        "entities": {
+          "Article": {
+            "view": "cards",
+            "roles": {
+              "media": "leadImage"
+            },
+            "detailView": "profile",
+            "filtersStyle": "chips",
+            "card": "stacked"
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          },
+          "Bookmark": {
+            "view": "table",
+            "roles": {}
+          },
+          "Follow": {
+            "view": "table",
+            "roles": {}
+          },
+          "User": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "editors",
+      "label": "Editors",
+      "roles": [
+        "Editor"
+      ],
+      "prefix": "/editors",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "wide",
+        "density": "compact",
+        "mainEntity": "Article",
+        "entities": {
+          "Article": {
+            "groupBy": "status",
+            "view": "board",
+            "roles": {
+              "media": "leadImage"
+            },
+            "detailView": "record",
+            "filtersStyle": "facets",
+            "card": "side"
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {}
+          },
+          "Bookmark": {
+            "view": "table",
+            "roles": {}
+          },
+          "Follow": {
+            "view": "table",
+            "roles": {}
+          },
+          "User": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Published Articles",
+      "kind": "figure",
+      "entity": "Article",
+      "fn": "count",
+      "filter": {
+        "status": "published"
+      }
+    },
+    {
+      "label": "Drafts Awaiting Review",
+      "kind": "figure",
+      "entity": "Article",
+      "fn": "count",
+      "filter": {
+        "status": "submitted"
+      }
+    },
+    {
+      "label": "Articles Under Review",
+      "kind": "figure",
+      "entity": "Article",
+      "fn": "count",
+      "filter": {
+        "status": "under_review"
+      }
+    },
+    {
+      "label": "Scheduled Articles",
+      "kind": "figure",
+      "entity": "Article",
+      "fn": "count",
+      "filter": {
+        "status": "scheduled"
+      }
+    },
+    {
+      "label": "Comments Posted",
+      "kind": "figure",
+      "entity": "Comment",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Articles by Section",
+      "kind": "pie",
+      "entity": "Article",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "section"
+    }
+  ],
+  "workflows": {
+    "version": "0c045cf852a0",
+    "tours": [
+      {
+        "id": "publish_article",
+        "name": "Publish Article",
+        "outcome": "An article is reviewed and published for public readership",
+        "roles": [
+          "Editor",
+          "Writer"
+        ],
+        "steps": [
+          {
+            "id": "draft_article",
+            "role": "Writer",
+            "actor": "Writer",
+            "title": "Draft article in section (the article becomes draft). Rule: Section must be City, Business, Culture, or Sport",
+            "operationId": "article.create",
+            "statusAfter": "draft",
+            "page": "writers-articles-new",
+            "route": "/writers/articles/new",
+            "target": {
+              "section": "article-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "article"
+          },
+          {
+            "id": "submit_draft",
+            "role": "Writer",
+            "actor": "Writer",
+            "title": "Submit draft for review (the article becomes submitted). Rule: Headline, section, and body cannot be empty",
+            "operationId": "article.submit",
+            "statusAfter": "submitted",
+            "page": "writers-articles-id",
+            "route": "/writers/articles/[id]",
+            "target": {
+              "section": "articles-detail",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "article",
+            "needs": {
+              "step": "draft_article",
+              "role": "Writer",
+              "status": "draft"
+            }
+          },
+          {
+            "id": "review_draft",
+            "role": "Editor",
+            "actor": "Editor",
+            "title": "Review submitted draft (the article becomes under_review). Rule: Must verify factual integrity and editorial tone",
+            "operationId": "article.review",
+            "statusAfter": "under_review",
+            "page": "editors-articles-id",
+            "route": "/editors/articles/[id]",
+            "target": {
+              "section": "articles-detail",
+              "action": "review"
+            },
+            "kind": "do",
+            "record": "article",
+            "needs": {
+              "step": "submit_draft",
+              "role": "Writer",
+              "status": "submitted"
+            }
+          },
+          {
+            "id": "publish_article_step",
+            "role": "Editor",
+            "actor": "Editor",
+            "title": "Publish article (the article becomes published). Rule: Only submitted or reviewed drafts can be published",
+            "operationId": "article.publish",
+            "statusAfter": "published",
+            "page": "editors-articles-id",
+            "route": "/editors/articles/[id]",
+            "target": {
+              "section": "articles-detail",
+              "action": "publish"
+            },
+            "kind": "do",
+            "record": "article",
+            "needs": {
+              "step": "review_draft",
+              "role": "Editor",
+              "status": "under_review"
+            }
+          }
+        ]
+      },
+      {
+        "id": "read_and_comment",
+        "name": "Read and Comment on Article",
+        "outcome": "A reader reads a story and adds their perspective to the article discussion",
+        "roles": [
+          "Reader"
+        ],
+        "steps": [
+          {
+            "id": "view_article",
+            "role": "Reader",
+            "actor": "Reader",
+            "title": "View front page and select article. Rule: Only published articles are visible",
+            "operationId": "article.get",
+            "page": "articles-id",
+            "route": "/articles/[id]",
+            "target": {
+              "section": "articles-detail",
+              "action": null
+            },
+            "kind": "look",
+            "record": "article"
+          },
+          {
+            "id": "post_comment",
+            "role": "Reader",
+            "actor": "Reader",
+            "title": "Post comment on article (the comment becomes posted). Rule: Comments can only be posted on published articles",
+            "operationId": "comment.create",
+            "statusAfter": "posted",
+            "page": "articles-id",
+            "route": "/articles/[id]",
+            "target": {
+              "section": "articles-detail",
+              "action": "add-comments"
+            },
+            "kind": "do",
+            "record": "comment"
+          }
+        ]
+      },
+      {
+        "id": "bookmark_and_follow",
+        "name": "Bookmark Article and Follow Section",
+        "outcome": "Articles are saved for later reading and sections are followed for curated discovery",
+        "roles": [
+          "Reader"
+        ],
+        "steps": [
+          {
+            "id": "bookmark_article",
+            "role": "Reader",
+            "actor": "Reader",
+            "title": "Bookmark article to read later (the bookmark becomes bookmarked). Rule: Only published articles can be bookmarked",
+            "operationId": "bookmark.create",
+            "statusAfter": "bookmarked",
+            "page": "articles-id",
+            "route": "/articles/[id]",
+            "target": {
+              "section": "articles-detail",
+              "action": "add-bookmarks"
+            },
+            "kind": "do",
+            "record": "bookmark"
+          },
+          {
+            "id": "follow_section",
+            "role": "Reader",
+            "actor": "Reader",
+            "title": "Follow section (the follow becomes active). Rule: Section must be an existing active section",
+            "operationId": "follow.create",
+            "statusAfter": "active",
+            "page": "follows-new",
+            "route": "/follows/new",
+            "target": {
+              "section": "follow-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "follow"
+          }
+        ]
+      }
+    ]
+  }
+}

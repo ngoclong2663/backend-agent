@@ -254,6 +254,9 @@ def secure_access(spec: dict[str, Any], public: frozenset[str] | set[str] = froz
     infer_entities(spec)
     try:
         owned = find_owned(spec)
+        # Epic 33: a feature's entities keep the access the feature wrote (comments readable by the post's readers)
+        featured = {name for attached in spec.get("features") or [] for name in attached.get("entities") or []}
+        owned = {name: item for name, item in owned.items() if name not in featured}
         if owned:
             notes += _secure(spec, owned, contributions(spec, owned) if "contribution" in public else set())
     finally:

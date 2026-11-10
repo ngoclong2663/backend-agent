@@ -36,6 +36,10 @@ def covered_operations(frontend_spec: dict[str, Any]) -> set[str]:
             for action in content.get("actions") or []:
                 if action.get("operationId"):
                     covered.add(action["operationId"])
+                if action.get("undoOperationId"):  # Epic 33: a toggle's second tap (unlike, unfollow)
+                    covered.add(action["undoOperationId"])
+            # Epic 33: a feature's section calls its own operations (a comment thread lists, writes, edits, deletes)
+            covered.update(op for op in content.get("operations") or [] if isinstance(op, str))
             # Epic 32 (Story 32.5): an operation run when a record opens (a view counted)
             if isinstance(content.get("onOpen"), dict) and content["onOpen"].get("operationId"):
                 covered.add(content["onOpen"]["operationId"])

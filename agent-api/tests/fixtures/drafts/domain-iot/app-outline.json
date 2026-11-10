@@ -1,0 +1,660 @@
+{
+  "name": "Verdant Greenhouse Monitor",
+  "tagline": "Commercial greenhouse telemetry, climate excursion alerting, pest detection review, and hardware device health",
+  "icon": "Sprout",
+  "nav": [
+    {
+      "entity": "Alert",
+      "label": "Alerts",
+      "icon": "BellAlert"
+    },
+    {
+      "entity": "SensorReading",
+      "label": "Climate Readings",
+      "icon": "Activity"
+    },
+    {
+      "entity": "PestDetection",
+      "label": "Pest Detections",
+      "icon": "Bug"
+    },
+    {
+      "entity": "Device",
+      "label": "Devices",
+      "icon": "Cpu"
+    },
+    {
+      "entity": "Zone",
+      "label": "Zones",
+      "icon": "Warehouse"
+    }
+  ],
+  "home": "dashboard",
+  "entities": {
+    "Zone": {
+      "label": "Greenhouse Zone",
+      "plural": "Greenhouse Zones",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "code",
+        "targetTempMin",
+        "targetTempMax",
+        "targetCo2Max"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "name",
+        "code",
+        "description",
+        "targetTempMin",
+        "targetTempMax",
+        "targetHumidityMin",
+        "targetHumidityMax",
+        "targetCo2Min",
+        "targetCo2Max",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "name": "Zone Name",
+        "code": "Zone Code",
+        "description": "Description",
+        "targetTempMin": "Min Target Temp (°C)",
+        "targetTempMax": "Max Target Temp (°C)",
+        "targetHumidityMin": "Min Target Humidity (%)",
+        "targetHumidityMax": "Max Target Humidity (%)",
+        "targetCo2Min": "Min Target CO2 (ppm)",
+        "targetCo2Max": "Max Target CO2 (ppm)",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "code": "Short greenhouse bay or zone code (e.g. ZONE-A)",
+        "name": "Name of the greenhouse production zone"
+      },
+      "create": "page"
+    },
+    "Device": {
+      "label": "Device",
+      "plural": "Devices",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "zoneId",
+        "type",
+        "status",
+        "batteryPercent"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "name",
+        "deviceUid",
+        "zoneId",
+        "type",
+        "status",
+        "batteryPercent",
+        "isOnline",
+        "lastSeenAt",
+        "firmwareVersion",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "zoneId": "Assigned Zone",
+        "name": "Device Name",
+        "deviceUid": "Device Identifier",
+        "type": "Device Type",
+        "status": "Health Status",
+        "batteryPercent": "Battery Level (%)",
+        "isOnline": "Online Status",
+        "lastSeenAt": "Last Heartbeat",
+        "firmwareVersion": "Firmware Version",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "batteryPercent": "Current device battery charge percentage",
+        "deviceUid": "Hardware identifier or MAC address",
+        "isOnline": "Whether the device is transmitting heartbeats",
+        "status": "Health monitoring status (flagged when offline or battery is low)"
+      },
+      "create": "page"
+    },
+    "SensorReading": {
+      "label": "Sensor Reading",
+      "plural": "Sensor Readings",
+      "displayField": "recordedAt",
+      "listFields": [
+        "zoneId",
+        "temperature",
+        "humidity",
+        "co2",
+        "recordedAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "zoneId",
+        "deviceId",
+        "temperature",
+        "humidity",
+        "co2",
+        "soilMoisture",
+        "status",
+        "recordedAt",
+        "reviewedAt"
+      ],
+      "fieldLabels": {
+        "zoneId": "Greenhouse Zone",
+        "deviceId": "Sensor Device",
+        "temperature": "Temperature (°C)",
+        "humidity": "Relative Humidity (%)",
+        "co2": "CO2 Level (ppm)",
+        "soilMoisture": "Soil Moisture (%)",
+        "status": "Review Status",
+        "recordedAt": "Timestamp",
+        "reviewedAt": "Reviewed At"
+      },
+      "help": {
+        "co2": "Carbon dioxide concentration in parts per million",
+        "soilMoisture": "Volumetric soil water content percentage",
+        "temperature": "Ambient temperature in degrees Celsius"
+      }
+    },
+    "Alert": {
+      "label": "Alert",
+      "plural": "Alerts",
+      "displayField": "ruleName",
+      "listFields": [
+        "ruleName",
+        "zoneId",
+        "status",
+        "severity",
+        "triggeredAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "ruleName",
+        "zoneId",
+        "readingId",
+        "status",
+        "severity",
+        "message",
+        "triggeredAt",
+        "acknowledgedAt",
+        "acknowledgedBy"
+      ],
+      "fieldLabels": {
+        "zoneId": "Zone",
+        "readingId": "Sensor Reading",
+        "ruleName": "Rule Name",
+        "status": "Status",
+        "severity": "Severity",
+        "message": "Alert Message",
+        "triggeredAt": "Triggered At",
+        "acknowledgedAt": "Acknowledged At",
+        "acknowledgedBy": "Acknowledged By"
+      },
+      "help": {
+        "acknowledgedAt": "Timestamp when the operator acknowledged this alert",
+        "readingId": "Sensor reading that triggered the alert threshold excursion",
+        "ruleName": "Configured rule definition that was violated"
+      }
+    },
+    "PestDetection": {
+      "label": "Pest Detection",
+      "plural": "Pest Detections",
+      "displayField": "pestType",
+      "listFields": [
+        "pestType",
+        "zoneId",
+        "confidence",
+        "status",
+        "detectedAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "zoneId",
+        "benchLocation",
+        "snapshotUrl",
+        "pestType",
+        "confidence",
+        "status",
+        "detectedAt",
+        "reviewedAt",
+        "confirmedAt",
+        "notes",
+        "deviceId"
+      ],
+      "fieldLabels": {
+        "zoneId": "Zone",
+        "deviceId": "Device",
+        "benchLocation": "Bench / Position",
+        "pestType": "Suspected Pest",
+        "confidence": "Model Confidence (%)",
+        "snapshotUrl": "Bench Snapshot",
+        "status": "Detection Status",
+        "notes": "Operator Notes",
+        "detectedAt": "Detection Time",
+        "reviewedAt": "Review Time",
+        "confirmedAt": "Confirmation Time"
+      },
+      "help": {
+        "benchLocation": "Specific bench or zone quadrant where camera detected suspected pest",
+        "confidence": "Computer vision model detection certainty score (0-100)",
+        "snapshotUrl": "Snapshot image captured by bench camera"
+      }
+    }
+  },
+  "design": {
+    "archetype": "back-office",
+    "shell": "sidebar",
+    "mobileNav": "drawer",
+    "frame": "wide",
+    "density": "compact",
+    "mainEntity": "Alert",
+    "entities": {
+      "Zone": {
+        "view": "table",
+        "roles": {
+          "title": "name",
+          "subtitle": "code"
+        },
+        "detailView": "record",
+        "filtersStyle": "toolbar",
+        "card": "text-first"
+      },
+      "Device": {
+        "view": "table",
+        "roles": {
+          "title": "name",
+          "badge": "status",
+          "subtitle": "zoneId",
+          "meta": [
+            "type",
+            "batteryPercent",
+            "lastSeenAt"
+          ]
+        },
+        "detailView": "split-panel",
+        "filtersStyle": "chips",
+        "card": "text-first"
+      },
+      "SensorReading": {
+        "view": "table",
+        "roles": {
+          "title": "deviceId",
+          "stat": "temperature",
+          "badge": "status",
+          "subtitle": "zoneId",
+          "meta": [
+            "recordedAt"
+          ]
+        },
+        "detailView": "record",
+        "filtersStyle": "toolbar",
+        "card": "text-first"
+      },
+      "Alert": {
+        "view": "table",
+        "roles": {
+          "title": "ruleName",
+          "badge": "status",
+          "subtitle": "message",
+          "meta": [
+            "zoneId",
+            "triggeredAt"
+          ]
+        },
+        "detailView": "split-panel",
+        "filtersStyle": "chips",
+        "card": "text-first"
+      },
+      "PestDetection": {
+        "view": "cards",
+        "roles": {
+          "title": "pestType",
+          "media": "snapshotUrl",
+          "stat": "confidence",
+          "badge": "status",
+          "subtitle": "benchLocation",
+          "meta": [
+            "zoneId",
+            "detectedAt"
+          ]
+        },
+        "detailView": "media-side",
+        "filtersStyle": "chips",
+        "card": "stacked"
+      }
+    },
+    "homeView": "dashboard",
+    "looks": [
+      {
+        "recipe": "swiss",
+        "reason": "Swiss style provides precise high-density typography and clear information grids suited for commercial IoT telemetry monitoring.",
+        "fontPairing": "workshop"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Minimal recipe highlights critical sensor excursions and clear operational status with hairline dividers.",
+        "fontPairing": "humanist"
+      },
+      {
+        "recipe": "glass",
+        "reason": "A bolder option (added by code)",
+        "fontPairing": "geometric"
+      }
+    ],
+    "requested": {
+      "accent": "#2e7d32",
+      "background": "#f8faf8",
+      "scheme": "light",
+      "words": "clean and technical, light background, a leaf green accent"
+    },
+    "seed": 796179174,
+    "reason": "Verdant Greenhouse Monitor requires dense, actionable telemetry tables and cards for fast review of environmental excursions and device health.",
+    "replaced": [
+      "Zone: meta 'location' left out (no such field)",
+      "look 'neon' left out: a neon look does not suit this product",
+      "look 'enterprise' replaced by 'glass': three quiet looks offer no choice"
+    ],
+    "fontPairing": "workshop"
+  },
+  "areas": [
+    {
+      "id": "operators",
+      "label": "Operator Workspace",
+      "roles": [
+        "operator"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "back-office",
+        "shell": "rail",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "mainEntity": "Alert",
+        "entities": {
+          "Zone": {
+            "view": "table",
+            "roles": {}
+          },
+          "Device": {
+            "view": "table",
+            "roles": {}
+          },
+          "SensorReading": {
+            "view": "table",
+            "roles": {}
+          },
+          "Alert": {
+            "groupBy": "status",
+            "view": "board",
+            "roles": {},
+            "detailView": "record",
+            "filtersStyle": "toolbar",
+            "card": "text-first"
+          },
+          "PestDetection": {
+            "view": "cards",
+            "roles": {
+              "media": "snapshotUrl"
+            },
+            "card": "stacked"
+          }
+        },
+        "homeView": "bento"
+      }
+    },
+    {
+      "id": "admins",
+      "label": "Admin Console",
+      "roles": [
+        "admin"
+      ],
+      "prefix": "/admins",
+      "design": {
+        "archetype": "back-office",
+        "shell": "topbar",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "mainEntity": "Alert",
+        "entities": {
+          "Zone": {
+            "view": "table",
+            "roles": {}
+          },
+          "Device": {
+            "view": "table",
+            "roles": {}
+          },
+          "SensorReading": {
+            "view": "table",
+            "roles": {}
+          },
+          "Alert": {
+            "view": "cards",
+            "roles": {},
+            "detailView": "record",
+            "filtersStyle": "chips",
+            "card": "text-first"
+          },
+          "PestDetection": {
+            "view": "cards",
+            "roles": {
+              "media": "snapshotUrl"
+            },
+            "card": "stacked"
+          }
+        },
+        "homeView": "bento"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Active Alerts",
+      "kind": "figure",
+      "entity": "Alert",
+      "fn": "count",
+      "filter": {
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "label": "Pending Pest Detections",
+      "kind": "figure",
+      "entity": "PestDetection",
+      "fn": "count",
+      "filter": {
+        "status": "REVIEWED"
+      }
+    },
+    {
+      "label": "Flagged Devices",
+      "kind": "figure",
+      "entity": "Device",
+      "fn": "count",
+      "filter": {
+        "status": "FLAGGED"
+      }
+    },
+    {
+      "label": "Offline Devices",
+      "kind": "figure",
+      "entity": "Device",
+      "fn": "count",
+      "filter": {
+        "isOnline": false
+      }
+    },
+    {
+      "label": "Alerts by Severity",
+      "kind": "pie",
+      "entity": "Alert",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "severity"
+    }
+  ],
+  "workflows": {
+    "version": "9f95355a2363",
+    "tours": [
+      {
+        "id": "monitor_climate_and_acknowledge_alerts",
+        "name": "Monitor Climate and Acknowledge Alerts",
+        "outcome": "Zone environmental excursions are identified and acknowledged by an operator",
+        "roles": [
+          "operator"
+        ],
+        "steps": [
+          {
+            "id": "inspect_telemetry",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Inspect zone dashboard and 24-hour sensor trends (the reading becomes reviewed). Rule: Readings must display latest values and 24-hour historical charts",
+            "operationId": "sensorReading.review",
+            "statusAfter": "reviewed",
+            "page": "sensor-readings-id",
+            "route": "/sensor-readings/[id]",
+            "target": {
+              "section": "sensor-readings-detail",
+              "action": "review"
+            },
+            "kind": "do",
+            "record": "reading"
+          },
+          {
+            "id": "generate_alert",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Trigger alert on rule violation (the alert becomes active). Rule: Alert triggers when conditions exceed configured threshold duration",
+            "operationId": "alert.trigger",
+            "statusAfter": "active",
+            "page": "alerts",
+            "route": "/alerts",
+            "target": {
+              "section": "alerts-actions",
+              "action": "trigger"
+            },
+            "kind": "do",
+            "record": "alert"
+          },
+          {
+            "id": "acknowledge_alert",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Acknowledge active alert (the alert becomes acknowledged). Rule: Only active alerts can be acknowledged",
+            "operationId": "alert.acknowledge",
+            "statusAfter": "acknowledged",
+            "page": "alerts-id",
+            "route": "/alerts/[id]",
+            "target": {
+              "section": "alerts-detail",
+              "action": "acknowledge"
+            },
+            "kind": "do",
+            "record": "alert",
+            "needs": {
+              "step": "generate_alert",
+              "role": "operator",
+              "status": "active"
+            }
+          }
+        ]
+      },
+      {
+        "id": "review_pest_detections",
+        "name": "Review Pest Detections",
+        "outcome": "Camera pest detections are validated to guide greenhouse pest interventions",
+        "roles": [
+          "operator"
+        ],
+        "steps": [
+          {
+            "id": "review_detection",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Inspect pest detection snapshot and confidence score (the detection becomes reviewed). Rule: Detections must include snapshot image and model confidence score",
+            "operationId": "pestDetection.review",
+            "statusAfter": "reviewed",
+            "page": "pest-detections-id",
+            "route": "/pest-detections/[id]",
+            "target": {
+              "section": "pest-detections-detail",
+              "action": "review"
+            },
+            "kind": "do",
+            "record": "detection"
+          },
+          {
+            "id": "confirm_detection",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Confirm pest detection (the detection becomes confirmed). Rule: Confirmed detections validate pest presence on bench",
+            "operationId": "pestDetection.confirm",
+            "statusAfter": "confirmed",
+            "page": "pest-detections-id",
+            "route": "/pest-detections/[id]",
+            "target": {
+              "section": "pest-detections-detail",
+              "action": "confirm"
+            },
+            "kind": "do",
+            "record": "detection",
+            "needs": {
+              "step": "review_detection",
+              "role": "operator",
+              "status": "reviewed"
+            }
+          }
+        ]
+      },
+      {
+        "id": "manage_device_health",
+        "name": "Manage Device Health",
+        "outcome": "Unhealthy or offline monitoring devices are restored to maintain telemetry",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "steps": [
+          {
+            "id": "inspect_devices",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Review device connectivity and battery status (the device becomes flagged). Rule: Flags devices that are offline or have low battery",
+            "operationId": "device.flag",
+            "statusAfter": "flagged",
+            "page": "devices-id",
+            "route": "/devices/[id]",
+            "target": {
+              "section": "devices-detail",
+              "action": "flag"
+            },
+            "kind": "do",
+            "record": "device"
+          },
+          {
+            "id": "reboot_device",
+            "role": "admin",
+            "actor": "Greenhouse Admin",
+            "title": "Send reboot command to device (the device becomes rebooting). Rule: Only admins can issue remote device reboot commands",
+            "operationId": "device.reboot",
+            "statusAfter": "rebooting",
+            "page": "admins-devices-id",
+            "route": "/admins/devices/[id]",
+            "target": {
+              "section": "devices-detail",
+              "action": "reboot"
+            },
+            "kind": "do",
+            "record": "device",
+            "needs": {
+              "step": "inspect_devices",
+              "role": "operator",
+              "status": "flagged"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

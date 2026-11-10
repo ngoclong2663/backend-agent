@@ -1,0 +1,74 @@
+{
+  "domain": "iot",
+  "tasks": [
+    {
+      "id": "ack-alert",
+      "role": "operator",
+      "goal": "Acknowledge the newest alert",
+      "budget": 1,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "acknowledge",
+          "ack"
+        ]
+      }
+    },
+    {
+      "id": "chart-24h",
+      "role": "operator",
+      "goal": "See a sensor's last 24 h as a chart",
+      "budget": 2,
+      "check": {
+        "kind": "section",
+        "components": [
+          "AppChart"
+        ]
+      }
+    },
+    {
+      "id": "find-offline",
+      "role": "operator",
+      "goal": "Find offline devices",
+      "budget": 2,
+      "check": {
+        "kind": "filter",
+        "entity_words": [
+          "device"
+        ],
+        "field_words": [
+          "status",
+          "online",
+          "offline"
+        ]
+      }
+    },
+    {
+      "id": "review-detection",
+      "role": "operator",
+      "goal": "Confirm or dismiss a detection",
+      "budget": 2,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "confirm",
+          "dismiss",
+          "review"
+        ]
+      }
+    },
+    {
+      "id": "reboot-device",
+      "role": "admin",
+      "goal": "Send a reboot command",
+      "budget": 2,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "reboot",
+          "command"
+        ]
+      }
+    }
+  ]
+}

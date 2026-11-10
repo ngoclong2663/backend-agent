@@ -153,11 +153,17 @@ def _relationships(spec: dict[str, Any]) -> tuple[dict[str, list], list[dict], l
         if rel["type"] in ("one-to-many", "one-to-one"):
             fk_field = rel["foreignKey"]
             keyed: dict[str, Any] = {}
-            if pairs[(rel["from"], rel["to"])] > 1:
+            remote: dict[str, Any] = {}
+            itself = rel["from"] == rel["to"]
+            if pairs[(rel["from"], rel["to"])] > 1 or itself:
                 stem = to_snake(fk_field).removesuffix("_id") or parent_attr
                 parent_attr = py_name(stem)
                 child_collection = f"{child_collection}_as_{stem}"
                 keyed = {"foreignKeys": f"{rel['to']}Model.{to_snake(fk_field)}"}
+            if itself:
+                # a record pointing at another of its kind (a comment's parent comment): both sides live on one model,
+                # so the many-to-one side names the parent's key as its remote side, else SQLAlchemy can't tell them
+                remote = {"remoteSide": f"{rel['from']}Model.{to_snake(parent_pk['name'])}"}
             fks.setdefault(rel["to"], []).append(
                 {
                     "field": fk_field,
@@ -188,6 +194,7 @@ def _relationships(spec: dict[str, Any]) -> tuple[dict[str, list], list[dict], l
                         "annotation": f'"{rel["from"]}Model"',
                         "backPopulates": child_collection if many else py_name(to_snake(rel["to"])),
                         **keyed,
+                        **remote,
                     },
                 }
             )
@@ -244,6 +251,39 @@ def _relationships(spec: dict[str, Any]) -> tuple[dict[str, list], list[dict], l
                 }
             )
     return fks, attributes, links
+
+
+def _computed(models: list[dict[str, Any]], spec: dict[str, Any]) -> None:
+    """Epic 33: the read-only fields features add to their targets (`likeCount`, `myLikeId`), as model entries the
+    repository's `references()` fills per page of records: a grouped count, or the caller's own row id."""
+    by_entity = {model["entity"]: model for model in models if model.get("entity")}
+    for attached in spec.get("features") or []:
+        target = by_entity.get(attached["on"])
+        if target is None:
+            continue
+        for computed in attached.get("computed") or []:
+            rows = by_entity.get(computed["entity"])
+            if rows is None:
+                continue
+            target.setdefault("computed", []).append(
+                {
+                    "field": computed["field"],
+                    "attr": to_snake(computed["field"]),
+                    "kind": computed["kind"],
+                    "entity": computed["entity"],
+                    "model": rows["class"],
+                    "key": to_snake(computed["key"]),
+                    "keyField": computed["key"],
+                    "where": {to_snake(name): value for name, value in (computed.get("where") or {}).items()},
+                    "whereFields": dict(computed.get("where") or {}),
+                    **(
+                        {"owner": to_snake(computed["owner"]), "ownerField": computed["owner"]}
+                        if computed.get("owner")
+                        else {}
+                    ),
+                    "pkType": next(c for c in rows["columns"] if c["primaryKey"])["type"],
+                }
+            )
 
 
 def _models(spec: dict[str, Any]) -> list[dict[str, Any]]:
@@ -610,6 +650,7 @@ def build_plan(spec: dict[str, Any]) -> dict[str, Any]:
         label = _label_column(entity, by_entity[entity["name"]])
         by_entity[entity["name"]]["label"] = {"attr": label["attr"], "apiName": label["apiName"]} if label else None
     _references(models)
+    _computed(models, spec)
     modules, unresolved = [], []
     for entity in spec.get("entities", []):
         model = by_entity[entity["name"]]
@@ -656,7 +697,8 @@ def build_plan(spec: dict[str, Any]) -> dict[str, Any]:
             "testFile": f"tests/modules/{name}/test_{entity_snake}_api.py",
         }
         module["recordActions"] = record_actions(module, model)
-        shown = model.get("references") or model.get("children")  # parents' labels, a one-to-one child (10.11)
+        # parents' labels, a one-to-one child (10.11), fields a feature computes per record (Epic 33)
+        shown = model.get("references") or model.get("children") or model.get("computed")
         if shown and {"create", "get", "list", "update"} & {op.get("action") for op in ops}:
             module["port"]["methods"].append("references")  # Story 10.0b: parents' labels for the responses
         module["tests"] = _tests(module, model)

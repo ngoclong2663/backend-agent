@@ -1,0 +1,238 @@
+{
+  "draftId": "a70207bd-3c8e-446e-822c-91720c13db11",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T04:24:38.002059Z",
+  "finishedAt": "2026-11-10T04:25:55.517589Z",
+  "assumptions": [
+    {
+      "path": "/auth/roles/0",
+      "message": "Default signup role is Reader since public users sign up primarily to read, bookmark, follow sections, and comment.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0/fields/6",
+      "message": "Added isLeadStory boolean flag on Article to support the requirement that readers see a front page with the lead story.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0/fields/5",
+      "message": "Articles have an optional leadImage to support visual editorial cards and front page layout.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/1/fields/3",
+      "message": "Comments include readerName string to display commenter identity alongside comments.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/areas",
+      "message": "Separate areas defined for readers, writers, and editors with custom prefixes and design configurations reflecting their distinct role workflows.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "Configured requested style with off-white background (#faf8f5), deep navy accent (#1e3a8a), classic serif headings, and sharp editorial corners per design brief.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Bookmark & Read-Later (Minimal & Direct + Demo); palette Paper warm white + ink neutral + minimal accent + tag colors; fonts Minimalist Monochrome Editorial (Playfair Display / Source Serif 4); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/operations/5/response",
+      "message": "article.submit: it answers the Article",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6/response",
+      "message": "article.review: it answers the Article",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7/response",
+      "message": "article.requestChanges: it answers the Article",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/8/response",
+      "message": "article.schedule: it answers the Article",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/9/response",
+      "message": "article.releaseScheduled: it answers the Article",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "article.publish: it answers the Article",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/1",
+      "message": "article.get: who sees a record follows the visibility policy readerArticleVisibility",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/2",
+      "message": "article.list: who sees a record follows the visibility policy readerArticleVisibility",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5",
+      "message": "article.submit: only the record's own Writer may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6",
+      "message": "article.review: only the Editor assigned to the record may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7",
+      "message": "article.requestChanges: only the Editor assigned to the record may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/8",
+      "message": "article.schedule: only the Editor assigned to the record may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/9",
+      "message": "article.releaseScheduled: only the Editor assigned to the record may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10",
+      "message": "article.publish: only the Editor assigned to the record may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/12",
+      "message": "comment.get: readable by everyone who can read the record it is written on",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/13",
+      "message": "comment.list: readable by everyone who can read the record it is written on",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/entities/Follow/create",
+      "message": "Follow has no parent record to be made on; placed by default",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Follow: title 'section' left out (a enum field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'minimal' replaced by 'soft': three quiet looks offer no choice",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Published Articles' is computed by article.countWhereStatusPublished (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Drafts Awaiting Review' is computed by article.countWhereStatusSubmitted (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Articles Under Review' is computed by article.countWhereStatusUnderReview (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Scheduled Articles' is computed by article.countWhereStatusScheduled (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/4",
+      "message": "'Comments Posted' is computed by comment.count (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/5",
+      "message": "'Articles by Section' is computed by article.countBySection (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (editorial and trustworthy, a classic serif for headlines, off-white paper and a navy accent): accent #1e3a8a; background #faf8f5; serif headings (Playfair Display); sharp corners",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/assets",
+      "message": "3 seeded record photo(s) from Unsplash, credited where they show",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/assets",
+      "message": "No Unsplash photo for: Article.leadImage 'Grand Dock Theatre Reopens After Meticulous Restoration' (no Unsplash photo for 'Grand Dock Theatre Reopens After Meticulous Restoration Article')",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations/14/policy",
+      "message": "Can an editor delete comments posted by readers for moderation purposes, or only the original commenter?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/rules/0/params/transitions",
+      "message": "Can published articles ever be unpublished or archived by editors, or is publication permanent in this version?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/3",
+      "message": "Should readers receive in-app notifications when an editor publishes an article in a followed section?",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

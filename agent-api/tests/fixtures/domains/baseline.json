@@ -1,0 +1,241 @@
+{
+  "date": "2026-11-10",
+  "domains": {
+    "drivers": {
+      "summary": {
+        "tasks": 5,
+        "passed": 2
+      },
+      "tasks": [
+        {
+          "id": "accept-offer",
+          "role": "driver",
+          "goal": "Accept the newest offer",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        },
+        {
+          "id": "deliver-with-photo",
+          "role": "driver",
+          "goal": "Mark a delivery delivered with a photo",
+          "passed": false,
+          "clicks": null,
+          "why": "the action takes no photo"
+        },
+        {
+          "id": "go-online",
+          "role": "driver",
+          "goal": "Go online",
+          "passed": false,
+          "clicks": null,
+          "why": "no action for online/available/availability in the driver area"
+        },
+        {
+          "id": "see-earnings",
+          "role": "driver",
+          "goal": "See today's earnings",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        },
+        {
+          "id": "track-delivery",
+          "role": "customer",
+          "goal": "Follow a delivery's steps",
+          "passed": false,
+          "clicks": null,
+          "why": "no area for the role 'customer'"
+        }
+      ]
+    },
+    "iot": {
+      "summary": {
+        "tasks": 5,
+        "passed": 4
+      },
+      "tasks": [
+        {
+          "id": "ack-alert",
+          "role": "operator",
+          "goal": "Acknowledge the newest alert",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        },
+        {
+          "id": "chart-24h",
+          "role": "operator",
+          "goal": "See a sensor's last 24 h as a chart",
+          "passed": false,
+          "clicks": null,
+          "why": "no AppChart section in the area"
+        },
+        {
+          "id": "find-offline",
+          "role": "operator",
+          "goal": "Find offline devices",
+          "passed": true,
+          "clicks": 2,
+          "why": ""
+        },
+        {
+          "id": "review-detection",
+          "role": "operator",
+          "goal": "Confirm or dismiss a detection",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        },
+        {
+          "id": "reboot-device",
+          "role": "admin",
+          "goal": "Send a reboot command",
+          "passed": true,
+          "clicks": 2,
+          "why": ""
+        }
+      ]
+    },
+    "learning": {
+      "summary": {
+        "tasks": 5,
+        "passed": 2
+      },
+      "tasks": [
+        {
+          "id": "resume-lesson",
+          "role": "learner",
+          "goal": "Resume the last lesson from home",
+          "passed": false,
+          "clicks": null,
+          "why": "the home has no way back to the last lesson"
+        },
+        {
+          "id": "see-progress",
+          "role": "learner",
+          "goal": "See progress per course",
+          "passed": false,
+          "clicks": null,
+          "why": "no progress shown in the area"
+        },
+        {
+          "id": "complete-lesson",
+          "role": "learner",
+          "goal": "Mark a lesson complete",
+          "passed": true,
+          "clicks": 2,
+          "why": ""
+        },
+        {
+          "id": "answer-question",
+          "role": "learner",
+          "goal": "Reply to a question under a lesson",
+          "passed": false,
+          "clicks": null,
+          "why": "comments have no reply: nothing creates a comment under another comment"
+        },
+        {
+          "id": "submit-quiz",
+          "role": "learner",
+          "goal": "Submit a quiz",
+          "passed": true,
+          "clicks": 2,
+          "why": ""
+        }
+      ]
+    },
+    "news": {
+      "summary": {
+        "tasks": 4,
+        "passed": 1
+      },
+      "tasks": [
+        {
+          "id": "bookmark-article",
+          "role": "reader",
+          "goal": "Bookmark an article and see it's saved",
+          "passed": false,
+          "clicks": null,
+          "why": "the button shows no state (the person can't see they already did it)"
+        },
+        {
+          "id": "follow-section",
+          "role": "reader",
+          "goal": "Follow a section",
+          "passed": false,
+          "clicks": null,
+          "why": "the button shows no state (the person can't see they already did it)"
+        },
+        {
+          "id": "publish-reviewed",
+          "role": "editor",
+          "goal": "Publish an article in review",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        },
+        {
+          "id": "reply-to-comment",
+          "role": "reader",
+          "goal": "Reply to a comment under an article",
+          "passed": false,
+          "clicks": null,
+          "why": "comments have no reply: nothing creates a comment under another comment"
+        }
+      ]
+    },
+    "socials": {
+      "summary": {
+        "tasks": 5,
+        "passed": 2
+      },
+      "tasks": [
+        {
+          "id": "like-shows-state",
+          "role": "member",
+          "goal": "Like a clip and see it's liked",
+          "passed": false,
+          "clicks": null,
+          "why": "the button shows no state (the person can't see they already did it)"
+        },
+        {
+          "id": "like-in-one-click",
+          "role": "member",
+          "goal": "Like the first clip from the feed",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        },
+        {
+          "id": "reply-to-comment",
+          "role": "member",
+          "goal": "Reply to a comment under a clip",
+          "passed": false,
+          "clicks": null,
+          "why": "the parent comment is picked from a list on the add-comment form, not replied to"
+        },
+        {
+          "id": "follow-creator",
+          "role": "member",
+          "goal": "Follow a clip's creator and see it",
+          "passed": false,
+          "clicks": null,
+          "why": "no follow action"
+        },
+        {
+          "id": "moderate-report",
+          "role": "moderator",
+          "goal": "Hide a reported clip",
+          "passed": true,
+          "clicks": 1,
+          "why": ""
+        }
+      ]
+    }
+  },
+  "summary": {
+    "tasks": 24,
+    "passed": 11
+  }
+}

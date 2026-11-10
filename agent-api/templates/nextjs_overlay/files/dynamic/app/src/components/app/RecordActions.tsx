@@ -32,6 +32,7 @@ import { errorMessage } from "./errors";
 import { PayAction, useSession } from "./plugins";
 import { t } from "./messages";
 import { recordOf, signal } from "./signals";
+import { ReactionButton } from "./features/ReactionButton";
 
 /** A mutation action: confirms first when it says so, opens its form in a dialog when it has one (Story 22.3). */
 function useAction(action: TAppAction, record: TRecord | undefined, onClose?: () => void) {
@@ -135,6 +136,7 @@ function useAction(action: TAppAction, record: TRecord | undefined, onClose?: ()
 
 function ActionButton({ action, record }: { action: TAppAction; record?: TRecord }) {
   if (action.kind === "pay") return <PayAction action={action} record={record} variant={action.variant ?? "default"} />;
+  if (action.kind === "reaction") return <ReactionButton action={action} record={record} />;
   return <PlainActionButton action={action} record={record} />;
 }
 
@@ -190,11 +192,19 @@ export function RowActions({ actions, record, label }: { actions: TAppAction[]; 
   const router = useRouter();
   const [chosen, setChosen] = useState<TAppAction | null>(null);
   const session = useSession();
-  // a payment leaves the page for the checkout: on the record's page, not in a row menu
-  const shown = actions.filter((action) => action.kind !== "pay" && allowed(record, action, session));
-  if (shown.length === 0) return null;
+  // a payment leaves the page for the checkout: on the record's page, not in a row menu; a reaction is a toggle
+  // shown beside the menu (its state is the point), never a menu item
+  const reactions = actions.filter((action) => action.kind === "reaction" && allowed(record, action, session));
+  const shown = actions.filter(
+    (action) => action.kind !== "pay" && action.kind !== "reaction" && allowed(record, action, session),
+  );
+  if (shown.length === 0 && reactions.length === 0) return null;
   return (
     <>
+      {reactions.map((action) => (
+        <ReactionButton key={action.id} action={action} record={record} />
+      ))}
+      {shown.length > 0 && (
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -225,6 +235,7 @@ export function RowActions({ actions, record, label }: { actions: TAppAction[]; 
           })}
         </DropdownMenuContent>
       </DropdownMenu>
+      )}
       {chosen && <ChosenAction key={chosen.id} action={chosen} record={record} onClose={() => setChosen(null)} />}
     </>
   );

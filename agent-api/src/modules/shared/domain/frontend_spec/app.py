@@ -27,6 +27,8 @@ APP_SECTIONS: dict[str, str] = {
     "AppAuth": "Sign-in or sign-up on the auth operations (auth-jwt)",
     "AppLinks": "A record's many-to-many links: chips, added with a picker and removed (relations)",
     "AppPayment": "The return from the checkout: the payment's status, polled until it settles (payments)",
+    # Epic 33: feature plugins' sections
+    "CommentThread": "A record's comments with replies, written and answered in place (comments feature)",
 }
 
 
@@ -202,6 +204,15 @@ class AppArea(SpecModel):
     design: AppDesign = AppDesign()
 
 
+class AppDomain(SpecModel):
+    """Epic 33: the kind of product the model recognized (a domain plugin), as `draft_app@v10` writes it."""
+
+    name: str = Field(pattern=r"^[a-z][a-z0-9-]*$", max_length=40)
+    roles: dict[str, Annotated[str, Field(pattern=ENTITY_NAME)]] = {}  # core role → the entity playing it
+    types: dict[str, Annotated[str, Field(pattern=r"^[a-z][a-z0-9-]*$")]] = {}  # area id → its type
+    features: list[Annotated[str, Field(pattern=r"^[a-z][a-z0-9-]*$")]] = []  # optional features turned on
+
+
 class AppOutline(SpecModel):
     """What the app is, as the model drafts it: entities, navigation, labels and figures, never layout, routes,
     operations or parameters (code binds every screen, Story 22.3)."""
@@ -221,6 +232,7 @@ class AppOutline(SpecModel):
     # Story 26.4: the guided tour of the core business workflows (written by code from the draft's binding, never by
     # the model): `{"version", "tours": [{"id", "name", "roles", "steps": [...]}]}`; none: no tour
     workflows: dict[str, Any] | None = None
+    domain: AppDomain | None = None  # Epic 33: the domain plugin the app is built on; none: the generic flow
 
 
 def is_app_spec(spec: dict[str, Any]) -> bool:
@@ -246,6 +258,7 @@ _APP_ONLY_DEFS = (
     "FormFieldUpload",
 )
 DESIGN_DEFS = ("AppDesign", "AppEntityDesign", "AppFieldRoles", "AppLook", "AppArea", "AppRequestedStyle")  # Epic 23
+DESIGN_DEFS += ("AppDomain",)  # Epic 33
 _APP_ONLY_DEFS += DESIGN_DEFS
 _APP_ONLY_DEFS += ("AssetCredit", "AssetVideo")
 # Epic 23: the outline's parts the `draft_app@v2` prompt does not explain; its outline digest and answer schema leave
@@ -257,11 +270,15 @@ CODE_PARTS = ("workflows",)  # Story 26.4: outline parts only code writes; no dr
 DESIGN_CODE_FIELDS = ("seed", "replaced")  # Story 30.7: design fields only code writes
 
 
-def outline_schema(design: bool = True) -> dict[str, Any]:
-    """The AppOutline JSON schema (camelCase), without the design parts unless asked."""
+def outline_schema(design: bool = True, domain: bool = False) -> dict[str, Any]:
+    """The AppOutline JSON schema (camelCase), without the design parts unless asked; `domain` (Epic 33) only for
+    the prompt that offers domains (`draft_app@v10`)."""
     schema = AppOutline.model_json_schema(by_alias=True)
-    schema = {**schema, "properties": {k: v for k, v in schema["properties"].items() if k not in CODE_PARTS}}
+    hidden = set(CODE_PARTS) | (set() if domain else {"domain"})
+    schema = {**schema, "properties": {k: v for k, v in schema["properties"].items() if k not in hidden}}
     defs = dict(schema.get("$defs") or {})
+    if not domain:
+        defs.pop("AppDomain", None)
     if "AppDesign" in defs:
         design_def = {**defs["AppDesign"], "properties": dict(defs["AppDesign"].get("properties") or {})}
         for name in DESIGN_CODE_FIELDS:

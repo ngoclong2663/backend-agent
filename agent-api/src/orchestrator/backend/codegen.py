@@ -292,7 +292,8 @@ def model_file(model: dict[str, Any], plan: dict[str, Any]) -> str:
     for relation in model.get("relationships", []):
         imports.add("sqlmodel", "Relationship")
         target = re.findall(r'"(\w+)"', relation["annotation"])[0]
-        referenced.append(target)
+        if target != model["class"]:  # a model never imports itself (a self-relationship)
+            referenced.append(target)
         extra = ', passive_deletes="all"' if relation["annotation"].startswith("list[") else ""
         if relation.get("link"):  # Story 10.11: many-to-many through its link model (imported: SQLAlchemy needs it)
             link = by_link[relation["link"]]
@@ -304,6 +305,8 @@ def model_file(model: dict[str, Any], plan: dict[str, Any]) -> str:
                 kwargs.append('"uselist": False')
             if relation.get("foreignKeys"):  # one of several keys to the same model: the one it follows
                 kwargs.append(f'"foreign_keys": "[{relation["foreignKeys"]}]"')
+            if relation.get("remoteSide"):  # a record's parent of its own kind: the parent's key is the remote side
+                kwargs.append(f'"remote_side": "{relation["remoteSide"]}"')
             if kwargs:
                 extra = (extra if relation["annotation"].startswith("list[") else "") + (
                     f", sa_relationship_kwargs={{{', '.join(kwargs)}}}"
@@ -454,7 +457,9 @@ class _Module:
         self.references = (self.model.get("references") or []) if "references" in module["port"]["methods"] else []
         # Story 10.11: one-to-one children, shown as summaries in this record's response
         self.children = (self.model.get("children") or []) if "references" in module["port"]["methods"] else []
-        self.shows = bool(self.references or self.children)
+        # Epic 33: fields a feature computes per record (a count, the caller's own row), filled with the references
+        self.computed = (self.model.get("computed") or []) if "references" in module["port"]["methods"] else []
+        self.shows = bool(self.references or self.children or self.computed)
         self.unique = [column for column in self.model["columns"] if column["unique"] and not column["primaryKey"]]
         # Story 10.3: columns the server fills from the signed-in user on create (`x-bga.source: currentUser`)
         self.from_user = [column for column in self.model["columns"] if column.get("source") == "currentUser"]
@@ -502,8 +507,11 @@ class _Module:
                 methods.append(f"    def delete(self, {self.snake}_id: {pk}) -> None:\n        pass")
             elif method == "references":
                 imports.add(SUMMARIES_PKG, "References")
+                viewer = ", viewer: Any = None" if self.computed else ""
+                if self.computed:
+                    imports.add("typing", "Any")
                 methods.append(
-                    f"    def references(self, records: list[{entity}]) -> References:\n"
+                    f"    def references(self, records: list[{entity}]{viewer}) -> References:\n"
                     '        """Labels of the records these refer to, one query per reference (Story 10.0b)."""'
                 )
             elif method in self.aggregates:
@@ -702,8 +710,11 @@ class _Module:
     def _references_method(self, imports: Imports) -> str:
         """Story 10.0b: one `IN` query per reference for a page of records; labels as strings."""
         imports.add(SUMMARIES_PKG, "References").add("sqlmodel", "col", "select")
+        viewer = ", viewer: Any = None" if self.computed else ""
+        if self.computed:
+            imports.add("typing", "Any")
         lines = [
-            f"    def references(self, records: list[{self.entity_class}]) -> References:",
+            f"    def references(self, records: list[{self.entity_class}]{viewer}) -> References:",
             "        found: References = {}",
         ]
         for reference in self.references:
@@ -722,7 +733,7 @@ class _Module:
                 " for key, label in self.session.exec(query).all()",
                 "            }",
             ]
-        if self.children:
+        if self.children or self.computed:
             lines.append(f"        own_ids = {{record.{self.pk['attr']} for record in records}}")
         for child in self.children:
             model = child["model"]
@@ -741,8 +752,36 @@ class _Module:
                 "                for key, child_id, label in self.session.exec(query).all()",
                 "            }",
             ]
+        lines += self._computed_lines(imports)
         lines.append("        return found")
         return "\n".join(lines)
+
+    def _computed_lines(self, imports: Imports) -> list[str]:
+        """Epic 33: a feature's computed fields for a page of records: one grouped count, or the caller's own row."""
+        lines: list[str] = []
+        for item in self.computed:
+            model = item["model"]
+            imports.add(MODELS_PKG.replace("/", "."), model)
+            key = f"col({model}.{item['key']})"
+            where = [f"{key}.in_(own_ids)"] + [
+                f"col({model}.{attr}) == {value!r}" for attr, value in item["where"].items()
+            ]
+            lines.append(f'        found["{item["attr"]}"] = {{}}')
+            if item["kind"] == "count":
+                imports.add("sqlmodel", "func")
+                lines += [
+                    "        if own_ids:",
+                    f"            query = select({key}, func.count()).where({', '.join(where)}).group_by({key})",
+                    f'            found["{item["attr"]}"] = dict(self.session.exec(query).all())',
+                ]
+            else:
+                where.append(f"col({model}.{item['owner']}) == viewer")
+                lines += [
+                    "        if own_ids and viewer is not None:",
+                    f"            query = select({key}, col({model}.id)).where({', '.join(where)})",
+                    f'            found["{item["attr"]}"] = dict(self.session.exec(query).all())',
+                ]
+        return lines
 
     # -- aggregates (Epic 21) ------------------------------------------------------------------------------------
 
@@ -932,6 +971,14 @@ class _Module:
             imports.add(SUMMARIES_PKG, summary_dto(child["entity"]))
             fields.append(f"    {child['attr']}: {summary_dto(child['entity'])} | None")
             entries.append(f'"{child["attr"]}": refs.get("{child["attr"]}", {{}}).get(entity.{self.pk["attr"]})')
+        for item in self.computed:  # Epic 33: what a feature computes per record
+            pk = f"entity.{self.pk['attr']}"
+            if item["kind"] == "count":
+                fields.append(f"    {item['attr']}: int = 0")
+                entries.append(f'"{item["attr"]}": refs.get("{item["attr"]}", {{}}).get({pk}, 0)')
+            else:
+                fields.append(f"    {item['attr']}: {_type({'type': item['pkType']}, imports)} | None = None")
+                entries.append(f'"{item["attr"]}": refs.get("{item["attr"]}", {{}}).get({pk})')
         for item in self._response_fields():  # Story 10.1: what plugins add to a record
             self._imports(imports, item.imports)
             fields.append(f"    {item.attr}: {item.annotation}")
@@ -1131,12 +1178,23 @@ class _Module:
         names = {param.name for param in self._router_params(op) if param.usecase_annotation}
         return f", user={checks[0].user_param}" if checks and checks[0].user_param in names else ""
 
+    def _viewer(self, op: dict[str, Any]) -> str:
+        """Epic 33: `, viewer=<the caller's id>` when a feature computes the caller's own row and the use case knows
+        the caller (the policies plugin's `current_user`)."""
+        if not any(item["kind"] == "mine" for item in self.computed):
+            return ""
+        names = {param.name for param in self._router_params(op) if param.usecase_annotation}
+        if "current_user" not in names:
+            return ""
+        return ", viewer=current_user.id if current_user else None"
+
     def _present(self, var: str, op: dict[str, Any]) -> str:
         """The response for one record; with references, their labels loaded too (Story 10.0b)."""
         user = self._caller(op)
         if not self.shows:
             return f"{self.response_dto}.from_entity({var}{user})"
-        return f"{self.response_dto}.from_entity({var}, self.{self.repo_var}.references([{var}]){user})"
+        viewer = self._viewer(op)
+        return f"{self.response_dto}.from_entity({var}, self.{self.repo_var}.references([{var}]{viewer}){user})"
 
     def _raise_not_found(self) -> str:
         return (
@@ -1287,7 +1345,11 @@ class _Module:
                 else "        order = None\n"
             )
             + f"        {plural}, total = self.{self.repo_var}.list(filters, {q_arg}order, limit, offset{scoped})\n"
-            + (f"        references = self.{self.repo_var}.references({plural})\n" if self.shows else "")
+            + (
+                f"        references = self.{self.repo_var}.references({plural}{self._viewer(op)})\n"
+                if self.shows
+                else ""
+            )
             + f"        return {op['responseDto']}(\n"
             f"            items=[{self.response_dto}.from_entity(item{', references' if self.shows else ''}{user})"
             f" for item in {plural}],\n"

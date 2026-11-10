@@ -7,6 +7,7 @@ import { AppDetail } from "./AppDetail";
 import { AppForm } from "./AppForm";
 import { AppList } from "./AppList";
 import { AppAuth, AppLinks, AppPayment, useSession } from "./plugins";
+import { CommentThread } from "./features/CommentThread";
 
 type AppSectionProps = {
   pageId: string;
@@ -48,6 +49,9 @@ export function AppSection({ pageId, section, title, heading, hideTitle }: AppSe
       break;
     case "AppPayment":
       body = <AppPayment section={section} title={title} />;
+      break;
+    case "CommentThread": // Epic 33: the comments feature
+      body = <CommentThread section={section} />;
       break;
   }
   return (

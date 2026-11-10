@@ -50,6 +50,7 @@ WORDS = {
     "dashboard": ("Dashboard", "ダッシュボード"),
     "mine": ("Mine", "マイページ"),
     "addToCart": ("Add to cart", "カートに追加"),
+    "comments": ("Comments", "コメント"),
     "created": ("{x} created", "{x}を作成しました"),
     "signIn": ("Sign in", "ログイン"),
     "createAccount": ("Create an account", "アカウントを作成"),
@@ -386,6 +387,17 @@ class _Screens:
                 self.crud[entity].setdefault(op["action"], op["operationId"])
             elif op.get("type") == "custom":
                 self.custom[entity].append(op["operationId"])
+        # Epic 33: a feature's entities get no screens of their own; their target shows the feature's parts (a like
+        # toggle on its cards and page, a comment thread on its page)
+        self.features: dict[str, list[dict[str, Any]]] = {}
+        self.feature_crud: dict[str, dict[str, str]] = {}
+        for attached in backend.get("features") or []:
+            self.features.setdefault(attached["on"], []).append(attached)
+            for name in attached.get("entities") or []:
+                if name in self.entities:
+                    self.feature_crud[name] = self.crud.pop(name)
+                    self.custom.pop(name, None)
+                    del self.entities[name]
 
     # -- names and lookups
 
@@ -856,7 +868,7 @@ class _Screens:
     def record_actions(self, entity: str, record: str, detail: bool) -> list[dict[str, Any]]:
         """Actions on one record (`$record` in a list, `$route` on its page): view, edit, delete, custom ones."""
         crud, label, slug = self.crud[entity], self.label(entity), self.slug(entity)
-        actions: list[dict[str, Any]] = []
+        actions: list[dict[str, Any]] = self.reaction_actions(entity, record)
         if not detail and "get" in crud:
             actions.append(
                 {"id": "view", "label": self.w("view"), "kind": "link", "page": f"{slug}-id", "params": {"id": record}}
@@ -1275,7 +1287,76 @@ class _Screens:
                 section["content"]["title"] = self.op_label(op_id)
                 sections.append(section)
         sections += self.link_sections(entity)
+        sections += self.feature_sections(entity)
         self.page(f"{slug}-id", f"/{slug}/[id]", label, sections)
+
+    # -- feature plugins (Epic 33)
+
+    def _attached(self, entity: str, feature: str) -> list[dict[str, Any]]:
+        return [attached for attached in self.features.get(entity, []) if attached["feature"] == feature]
+
+    def reaction_actions(self, entity: str, record: str) -> list[dict[str, Any]]:
+        """The reactions feature: one toggle per kind, showing whether the person did it and the count."""
+        out: list[dict[str, Any]] = []
+        for attached in self._attached(entity, "reactions"):
+            owned = next(iter(attached.get("entities") or []), None)
+            crud = self.feature_crud.get(owned or "", {})
+            create, delete = crud.get("create"), crud.get("delete")
+            if not create or create not in self.operations:
+                continue
+            target_field = entity[:1].lower() + entity[1:] + "Id"
+            for kind in (attached.get("options") or {}).get("kinds") or ["like"]:
+                kind = str(kind)
+                title = kind[:1].upper() + kind[1:]
+                out.append(
+                    {
+                        "id": f"react-{kind}",
+                        "label": title,
+                        "kind": "reaction",
+                        "reaction": kind,
+                        "operationId": create,
+                        **({"undoOperationId": delete} if delete in self.operations else {}),
+                        "state": f"my{title}Id",
+                        "count": f"{kind}Count",
+                        "body": {target_field: record, "kind": kind},
+                    }
+                )
+            self.place(create)
+            if delete in self.operations:
+                self.place(delete)
+        return out
+
+    def feature_sections(self, entity: str) -> list[dict[str, Any]]:
+        """The comments feature: the record's thread, written and answered on its page."""
+        out: list[dict[str, Any]] = []
+        for attached in self._attached(entity, "comments"):
+            owned = next(iter(attached.get("entities") or []), None)
+            crud = self.feature_crud.get(owned or "", {})
+            listing, create = crud.get("list"), crud.get("create")
+            if not listing or listing not in self.operations:
+                continue
+            thread = {
+                "list": listing,
+                "target": entity[:1].lower() + entity[1:] + "Id",
+                "parent": "parentId",
+                "text": "text",
+                "owner": "authorId",
+                "maxLimit": 100,
+                **({"create": create} if create in self.operations else {"create": ""}),
+                **({"update": crud["update"]} if crud.get("update") in self.operations else {}),
+                **({"remove": crud["delete"]} if crud.get("delete") in self.operations else {}),
+            }
+            used = [op for op in (listing, create, crud.get("update"), crud.get("delete")) if op in self.operations]
+            for op_id in used:
+                self.place(op_id)
+            out.append(
+                {
+                    "id": f"{self.slug(entity)}-comments",
+                    "component": "CommentThread",
+                    "content": {"entity": owned, "title": self.w("comments"), "thread": thread, "operations": used},
+                }
+            )
+        return out
 
     def collection_sections(self, entity: str) -> list[dict[str, Any]]:
         """The entity's custom operations on the whole collection, on its list page: summaries and buttons. Custom

@@ -495,11 +495,12 @@ class PoliciesPlugin(Plugin):
     def router_params(self, plan, module, op) -> list[RouterParam]:
         """The current user, narrowed to one with a role (role policies), and given to the use case when it checks
         ownership, sets the owner or lists the record's actions for the caller."""
-        if module.get("plugin") or not _policed(module):
+        if module.get("plugin") or not (_policed(module) or _computes_mine(plan, module, op)):
             return []
         user = plan["auth"]["entityClass"]
         presents = op.get("action") in ("create", "get", "update", "list") and bool(self.action_checks(plan, module))
         presents = presents or bool(_visibility(op))  # Story 23.9: what the caller may see depends on who it is
+        presents = presents or _computes_mine(plan, module, op)  # Epic 33: the caller's own like, save, follow
         if not _secured(op):
             # Story 22.7: a public read of records whose actions depend on the caller: the signed-in user, if any
             if not presents:
@@ -755,3 +756,11 @@ class PoliciesPlugin(Plugin):
             "answers 404 (`NotFoundException`, or 403 when the policy's `denyStatus` says so), lists show the "
             "caller's records only, and create sets the owner from `current_user`, never from the request."
         )
+
+
+def _computes_mine(plan: dict[str, Any], module: dict[str, Any], op: dict[str, Any]) -> bool:
+    """Epic 33: a read of records carrying a feature's `mine` field (`myLikeId`) needs to know the caller."""
+    if op.get("action") not in ("create", "get", "update", "list"):
+        return False
+    model = next((m for m in plan.get("models", []) if m.get("entity") == module.get("entity")), None)
+    return any(item["kind"] == "mine" for item in (model or {}).get("computed") or [])

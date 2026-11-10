@@ -1,0 +1,190 @@
+{
+  "draftId": "7676b555-4e91-4356-a75b-2ba6075c3c2d",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T04:54:33.233333Z",
+  "finishedAt": "2026-11-10T04:55:32.155826Z",
+  "assumptions": [
+    {
+      "path": "/app/domain",
+      "message": "Used domain 'socials' with brings 'comments' and 'reactions' to handle comment/like interactions without extra entity bloat as prescribed by specifications.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/policies/4",
+      "message": "Notification recipients can view only their own notifications.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/policies/5",
+      "message": "Default status for new clips is PUBLISHED, and visibility policy hides HIDDEN clips from Members.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "Hot pink accent represented as hex #ec4899 with dark background #0f172a based on design guidelines.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Forum / Discussion Board (Feed + Thread View); palette Dark neutral + topic accent colors + unread indicator + reputation badge; fonts Accessibility First (Atkinson Hyperlegible / Atkinson Hyperlegible); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/entities/0/fields",
+      "message": "Clip has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5/response",
+      "message": "clip.hide: it answers the Clip",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/15/response",
+      "message": "report.review: it answers the Report",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/16/response",
+      "message": "report.dismiss: it answers the Report",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features",
+      "message": "Built on the Socials domain",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/comments",
+      "message": "Comments added to Clip",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/reactions",
+      "message": "Reactions added to Clip",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0/fields",
+      "message": "Clip has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/1",
+      "message": "clip.get: who sees a record follows the visibility policy visibleClipsOnly",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/2",
+      "message": "clip.list: who sees a record follows the visibility policy visibleClipsOnly",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/entities/Follow/create",
+      "message": "Follow has no parent record to be made on; placed by default",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/entities/Notification/create",
+      "message": "Notification has no parent record to be made on; placed by default",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Clip: subtitle 'caption' left out (already the title)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Follow: title 'followerId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Notification: title 'type' left out (a enum field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Report: title 'itemType' left out (a enum field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'members': Clip: subtitle 'caption' left out (already the title)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'moderators': Report: title 'itemType' left out (a enum field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Pending Reports' cannot be computed; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Published Clips' cannot be computed; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Delivered Notifications' cannot be computed; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (bold and playful, dark background, a hot pink accent): accent #ec4899; background #0f172a; a dark theme",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/workflows",
+      "message": "1 workflow step(s) could not be bound to the app; see the Business tab",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations/3",
+      "message": "Should members be able to edit clip captions after posting or is content immutable?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/3/fields/3",
+      "message": "Can members report other members directly or only clips and comments?",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

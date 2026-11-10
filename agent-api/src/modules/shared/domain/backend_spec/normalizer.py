@@ -45,4 +45,7 @@ def normalize_spec(spec: BackendSpecV1) -> dict[str, Any]:
             kind, _, value = job.trigger.partition(":")
             if kind in ("cron", "event", "operation") and value:
                 job.trigger = JobTrigger(**{kind: value.strip()})
-    return normalized.model_dump(by_alias=True, mode="json", exclude_none=True)
+    data = normalized.model_dump(by_alias=True, mode="json", exclude_none=True)
+    if not data.get("features"):  # Epic 33: only specs with merged features carry the block
+        data.pop("features", None)
+    return data

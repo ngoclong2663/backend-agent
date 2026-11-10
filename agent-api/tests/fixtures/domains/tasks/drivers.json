@@ -1,0 +1,69 @@
+{
+  "domain": "drivers",
+  "tasks": [
+    {
+      "id": "accept-offer",
+      "role": "driver",
+      "goal": "Accept the newest offer",
+      "budget": 1,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "accept"
+        ]
+      }
+    },
+    {
+      "id": "deliver-with-photo",
+      "role": "driver",
+      "goal": "Mark a delivery delivered with a photo",
+      "budget": 3,
+      "check": {
+        "kind": "action_with_file",
+        "verbs": [
+          "deliver",
+          "complete"
+        ]
+      }
+    },
+    {
+      "id": "go-online",
+      "role": "driver",
+      "goal": "Go online",
+      "budget": 1,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "online",
+          "available",
+          "availability"
+        ]
+      }
+    },
+    {
+      "id": "see-earnings",
+      "role": "driver",
+      "goal": "See today's earnings",
+      "budget": 1,
+      "check": {
+        "kind": "field_shown",
+        "words": [
+          "earning",
+          "earned",
+          "fee"
+        ]
+      }
+    },
+    {
+      "id": "track-delivery",
+      "role": "customer",
+      "goal": "Follow a delivery's steps",
+      "check": {
+        "kind": "section",
+        "components": [
+          "AppTimeline"
+        ]
+      }
+    }
+  ]
+}

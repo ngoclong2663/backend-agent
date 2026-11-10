@@ -1,0 +1,63 @@
+{
+  "domain": "socials",
+  "tasks": [
+    {
+      "id": "like-shows-state",
+      "role": "member",
+      "goal": "Like a clip and see it's liked",
+      "check": {
+        "kind": "reaction_state",
+        "verbs": [
+          "like"
+        ]
+      }
+    },
+    {
+      "id": "like-in-one-click",
+      "role": "member",
+      "goal": "Like the first clip from the feed",
+      "budget": 1,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "like"
+        ]
+      }
+    },
+    {
+      "id": "reply-to-comment",
+      "role": "member",
+      "goal": "Reply to a comment under a clip",
+      "budget": 3,
+      "check": {
+        "kind": "reply"
+      }
+    },
+    {
+      "id": "follow-creator",
+      "role": "member",
+      "goal": "Follow a clip's creator and see it",
+      "budget": 2,
+      "check": {
+        "kind": "reaction_state",
+        "verbs": [
+          "follow"
+        ]
+      }
+    },
+    {
+      "id": "moderate-report",
+      "role": "moderator",
+      "goal": "Hide a reported clip",
+      "budget": 2,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "hide",
+          "resolve",
+          "dismiss"
+        ]
+      }
+    }
+  ]
+}

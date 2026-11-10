@@ -1,0 +1,947 @@
+{
+  "name": "Brightpath Academy",
+  "tagline": "Self-paced online course platform for curious minds",
+  "icon": "GraduationCap",
+  "nav": [
+    {
+      "entity": "Course",
+      "label": "Courses",
+      "icon": "BookOpen"
+    },
+    {
+      "entity": "Enrollment",
+      "label": "My Learning",
+      "icon": "Compass"
+    },
+    {
+      "entity": "Category",
+      "label": "Categories",
+      "icon": "FolderTree"
+    },
+    {
+      "entity": "Review",
+      "label": "Reviews",
+      "icon": "Star"
+    }
+  ],
+  "home": "Course",
+  "entities": {
+    "Category": {
+      "label": "Category",
+      "plural": "Categories",
+      "displayField": "name",
+      "listFields": [
+        "name"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "name",
+        "description"
+      ],
+      "fieldLabels": {
+        "name": "Category Name",
+        "description": "Description"
+      },
+      "help": {}
+    },
+    "Course": {
+      "label": "Course",
+      "plural": "Courses",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "categoryId",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "summary",
+        "categoryId",
+        "instructorId",
+        "status",
+        "coverImage",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "categoryId": "Category",
+        "instructorId": "Instructor",
+        "title": "Course Title",
+        "summary": "Summary",
+        "coverImage": "Cover Image",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "summary": "A concise overview of the course subject and learning goals"
+      },
+      "create": "page"
+    },
+    "Lesson": {
+      "label": "Lesson",
+      "plural": "Lessons",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "courseId",
+        "order",
+        "type"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "courseId",
+        "order",
+        "type",
+        "durationMinutes",
+        "textContent",
+        "videoUrl",
+        "status"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "title": "Lesson Title",
+        "order": "Order Sequence",
+        "type": "Lesson Type",
+        "textContent": "Reading Content",
+        "videoUrl": "Video URL",
+        "durationMinutes": "Duration (min)",
+        "status": "Status"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "Quiz": {
+      "label": "Quiz",
+      "plural": "Quizes",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "lessonId",
+        "passingScore"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "title",
+        "lessonId",
+        "passingScore",
+        "status"
+      ],
+      "fieldLabels": {
+        "lessonId": "Lesson",
+        "title": "Quiz Title",
+        "passingScore": "Passing Score (%)",
+        "status": "Status"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "QuizQuestion": {
+      "label": "Quiz question",
+      "plural": "Quiz questions",
+      "displayField": "prompt",
+      "listFields": [
+        "prompt",
+        "quizId",
+        "order"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "quizId",
+        "prompt",
+        "options",
+        "order"
+      ],
+      "fieldLabels": {
+        "quizId": "Quiz",
+        "prompt": "Question Prompt",
+        "options": "Choices / Options",
+        "order": "Order"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "Enrollment": {
+      "label": "Enrollment",
+      "plural": "Enrollments",
+      "displayField": "courseId",
+      "listFields": [
+        "courseId",
+        "status",
+        "currentLessonId",
+        "enrolledAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "courseId",
+        "learnerId",
+        "status",
+        "currentLessonId",
+        "enrolledAt",
+        "completedAt"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "learnerId": "Learner",
+        "status": "Status",
+        "currentLessonId": "Current Lesson",
+        "enrolledAt": "Enrolled Date",
+        "completedAt": "Completed Date"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "LessonProgress": {
+      "label": "Lesson progress",
+      "plural": "Lesson progresses",
+      "displayField": "lessonId",
+      "listFields": [
+        "lessonId",
+        "status",
+        "completedAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "enrollmentId",
+        "lessonId",
+        "learnerId",
+        "status",
+        "completedAt"
+      ],
+      "fieldLabels": {
+        "enrollmentId": "Enrollment",
+        "lessonId": "Lesson",
+        "learnerId": "Learner",
+        "status": "Status",
+        "completedAt": "Completed At"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "QuizSubmission": {
+      "label": "Quiz submission",
+      "plural": "Quiz submissions",
+      "displayField": "quizId",
+      "listFields": [
+        "quizId",
+        "score",
+        "status",
+        "submittedAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "quizId",
+        "learnerId",
+        "score",
+        "status",
+        "submittedAt",
+        "answers"
+      ],
+      "fieldLabels": {
+        "quizId": "Quiz",
+        "learnerId": "Learner",
+        "score": "Score (%)",
+        "answers": "Answers",
+        "status": "Status",
+        "submittedAt": "Submitted At"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "Review": {
+      "label": "Review",
+      "plural": "Reviews",
+      "displayField": "courseId",
+      "listFields": [
+        "courseId",
+        "rating",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "courseId",
+        "learnerId",
+        "rating",
+        "content",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "learnerId": "Learner",
+        "rating": "Star Rating",
+        "content": "Review Comments",
+        "status": "Status",
+        "createdAt": "Submitted At"
+      },
+      "help": {},
+      "create": "onRecord"
+    }
+  },
+  "design": {
+    "archetype": "learning",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "wide",
+    "density": "spacious",
+    "mainEntity": "Course",
+    "entities": {
+      "Category": {
+        "view": "table",
+        "roles": {
+          "title": "name"
+        },
+        "filtersStyle": "toolbar"
+      },
+      "Course": {
+        "view": "cards",
+        "roles": {
+          "title": "title",
+          "media": "coverImage",
+          "badge": "status",
+          "subtitle": "summary"
+        },
+        "detailView": "reader",
+        "filtersStyle": "chips",
+        "card": "stacked",
+        "aspect": "square"
+      },
+      "Lesson": {
+        "view": "cards",
+        "roles": {
+          "title": "title",
+          "badge": "type",
+          "meta": [
+            "order",
+            "durationMinutes"
+          ],
+          "media": "videoUrl"
+        },
+        "detailView": "reader",
+        "card": "text-first"
+      },
+      "Quiz": {
+        "view": "cards",
+        "roles": {
+          "title": "title"
+        },
+        "detailView": "record",
+        "card": "text-first"
+      },
+      "QuizQuestion": {
+        "view": "table",
+        "roles": {
+          "title": "prompt",
+          "meta": [
+            "order"
+          ]
+        }
+      },
+      "Enrollment": {
+        "view": "cards",
+        "roles": {
+          "title": "courseId",
+          "badge": "status",
+          "meta": [
+            "currentLessonId",
+            "enrolledAt"
+          ]
+        },
+        "detailView": "record",
+        "card": "stacked"
+      },
+      "LessonProgress": {
+        "view": "table",
+        "roles": {
+          "badge": "status",
+          "meta": [
+            "completedAt"
+          ]
+        }
+      },
+      "QuizSubmission": {
+        "view": "table",
+        "roles": {
+          "title": "quizId",
+          "badge": "status",
+          "meta": [
+            "score",
+            "submittedAt"
+          ]
+        }
+      },
+      "Review": {
+        "view": "cards",
+        "roles": {
+          "title": "courseId",
+          "badge": "status",
+          "subtitle": "content",
+          "meta": [
+            "rating",
+            "createdAt"
+          ]
+        },
+        "card": "stacked"
+      }
+    },
+    "homeView": "catalogue",
+    "looks": [
+      {
+        "recipe": "minimal",
+        "reason": "Clean, calm, and distraction-free styling gives learners and instructors focus with ample whitespace.",
+        "fontPairing": "humanist"
+      },
+      {
+        "recipe": "editorial",
+        "reason": "Editorial feel with bookish type suits rigorous courses, written lessons, and studious academy themes.",
+        "fontPairing": "bookish"
+      },
+      {
+        "recipe": "clay",
+        "reason": "Rounded friendly aesthetic creates an approachable, modern self-paced digital learning platform.",
+        "fontPairing": "geometric"
+      }
+    ],
+    "requested": {
+      "accent": "#005b5b",
+      "background": "#ffffff",
+      "words": "calm and studious, plenty of white space, a deep teal accent"
+    },
+    "seed": 432162871,
+    "replaced": [
+      "Enrollment: side needs an image, a video or an audio field; shown as stacked",
+      "LessonProgress: title 'lessonId' left out (a uuid field is not a name)",
+      "area 'learners': Enrollment: side needs an image, a video or an audio field; shown as stacked",
+      "area 'learners': LessonProgress: title 'lessonId' left out (a uuid field is not a name)"
+    ],
+    "fontPairing": "humanist"
+  },
+  "areas": [
+    {
+      "id": "learners",
+      "label": "Learner Space",
+      "roles": [
+        "learner"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "learning",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "wide",
+        "density": "comfortable",
+        "mainEntity": "Course",
+        "entities": {
+          "Category": {
+            "view": "table",
+            "roles": {}
+          },
+          "Course": {
+            "view": "cards",
+            "roles": {
+              "title": "title",
+              "media": "coverImage",
+              "badge": "status",
+              "subtitle": "summary"
+            },
+            "detailView": "reader",
+            "filtersStyle": "chips",
+            "card": "stacked",
+            "aspect": "square"
+          },
+          "Lesson": {
+            "view": "cards",
+            "roles": {
+              "title": "title",
+              "badge": "type",
+              "meta": [
+                "order",
+                "durationMinutes"
+              ],
+              "media": "videoUrl"
+            },
+            "detailView": "reader",
+            "card": "stacked"
+          },
+          "Quiz": {
+            "view": "cards",
+            "roles": {
+              "title": "title"
+            },
+            "card": "text-first"
+          },
+          "QuizQuestion": {
+            "view": "table",
+            "roles": {}
+          },
+          "Enrollment": {
+            "view": "cards",
+            "roles": {
+              "title": "courseId",
+              "badge": "status",
+              "meta": [
+                "currentLessonId",
+                "enrolledAt"
+              ]
+            },
+            "card": "stacked"
+          },
+          "LessonProgress": {
+            "view": "table",
+            "roles": {
+              "badge": "status",
+              "meta": [
+                "completedAt"
+              ]
+            }
+          },
+          "QuizSubmission": {
+            "view": "table",
+            "roles": {
+              "title": "quizId",
+              "badge": "status",
+              "meta": [
+                "score",
+                "submittedAt"
+              ]
+            }
+          },
+          "Review": {
+            "view": "cards",
+            "roles": {
+              "title": "courseId",
+              "badge": "status",
+              "subtitle": "content",
+              "meta": [
+                "rating",
+                "createdAt"
+              ]
+            },
+            "card": "stacked"
+          }
+        },
+        "homeView": "catalogue"
+      }
+    },
+    {
+      "id": "instructors",
+      "label": "Instructor Studio",
+      "roles": [
+        "instructor"
+      ],
+      "prefix": "/instructors",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "full",
+        "density": "comfortable",
+        "mainEntity": "Course",
+        "entities": {
+          "Category": {
+            "view": "table",
+            "roles": {
+              "title": "name"
+            }
+          },
+          "Course": {
+            "view": "cards",
+            "roles": {
+              "title": "title",
+              "badge": "status",
+              "subtitle": "summary",
+              "meta": [
+                "categoryId"
+              ],
+              "media": "coverImage"
+            },
+            "detailView": "profile",
+            "filtersStyle": "chips",
+            "card": "stacked",
+            "aspect": "square"
+          },
+          "Lesson": {
+            "view": "table",
+            "roles": {
+              "title": "title",
+              "badge": "type",
+              "meta": [
+                "order"
+              ],
+              "media": "videoUrl",
+              "duration": "durationMinutes"
+            },
+            "detailView": "watch"
+          },
+          "Quiz": {
+            "view": "cards",
+            "roles": {
+              "title": "title"
+            },
+            "card": "text-first"
+          },
+          "QuizQuestion": {
+            "view": "table",
+            "roles": {
+              "title": "prompt",
+              "meta": [
+                "order"
+              ]
+            }
+          },
+          "Enrollment": {
+            "view": "table",
+            "roles": {}
+          },
+          "LessonProgress": {
+            "view": "table",
+            "roles": {}
+          },
+          "QuizSubmission": {
+            "view": "table",
+            "roles": {}
+          },
+          "Review": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "admins",
+      "label": "Admin Console",
+      "roles": [
+        "admin"
+      ],
+      "prefix": "/admins",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "density": "compact",
+        "mainEntity": "Course",
+        "entities": {
+          "Category": {
+            "view": "table",
+            "roles": {
+              "title": "name"
+            }
+          },
+          "Course": {
+            "view": "table",
+            "roles": {
+              "title": "title",
+              "badge": "status",
+              "meta": [
+                "instructorId"
+              ],
+              "media": "coverImage"
+            },
+            "detailView": "media-side",
+            "filtersStyle": "chips",
+            "card": "stacked",
+            "aspect": "square"
+          },
+          "Lesson": {
+            "view": "cards",
+            "roles": {
+              "media": "videoUrl",
+              "duration": "durationMinutes"
+            },
+            "detailView": "watch",
+            "card": "stacked"
+          },
+          "Quiz": {
+            "view": "table",
+            "roles": {}
+          },
+          "QuizQuestion": {
+            "view": "table",
+            "roles": {}
+          },
+          "Enrollment": {
+            "view": "table",
+            "roles": {}
+          },
+          "LessonProgress": {
+            "view": "table",
+            "roles": {}
+          },
+          "QuizSubmission": {
+            "view": "table",
+            "roles": {}
+          },
+          "Review": {
+            "view": "table",
+            "roles": {
+              "title": "courseId",
+              "badge": "status",
+              "meta": [
+                "rating"
+              ]
+            }
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Published Courses",
+      "kind": "figure",
+      "entity": "Course",
+      "fn": "count",
+      "filter": {}
+    },
+    {
+      "label": "Active Enrollments",
+      "kind": "figure",
+      "entity": "Enrollment",
+      "fn": "count",
+      "filter": {
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "label": "Completed Courses",
+      "kind": "figure",
+      "entity": "Enrollment",
+      "fn": "count",
+      "filter": {
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "label": "Total Reviews",
+      "kind": "figure",
+      "entity": "Review",
+      "fn": "count",
+      "filter": {}
+    }
+  ],
+  "workflows": {
+    "version": "af9dfa4c8be5",
+    "tours": [
+      {
+        "id": "learner_course_completion",
+        "name": "Course Learning and Completion",
+        "outcome": "Learner successfully completes all lessons in order and finishes the course.",
+        "roles": [
+          "learner"
+        ],
+        "steps": [
+          {
+            "id": "browse_catalogue",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Browse catalogue by category and select course. Rule: Course must be published",
+            "operationId": "course.list",
+            "page": "courses",
+            "route": "/courses",
+            "target": {
+              "section": "courses-list",
+              "action": null
+            },
+            "kind": "look",
+            "record": "course"
+          },
+          {
+            "id": "enroll_course",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Enroll in the selected course (the enrollment becomes active). Rule: Learner cannot already be actively enrolled",
+            "operationId": "enrollment.create",
+            "statusAfter": "active",
+            "page": "courses-id",
+            "route": "/courses/[id]",
+            "target": {
+              "section": "courses-detail",
+              "action": "add-enrollments"
+            },
+            "kind": "do",
+            "record": "enrollment"
+          },
+          {
+            "id": "resume_lesson",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Open current lesson where left off (the enrollment becomes active). Rule: Must follow lesson order",
+            "operationId": "enrollment.get",
+            "statusAfter": "active",
+            "page": "enrollments-id",
+            "route": "/enrollments/[id]",
+            "target": {
+              "section": "enrollments-detail",
+              "action": null
+            },
+            "kind": "look",
+            "record": "enrollment"
+          },
+          {
+            "id": "take_quiz",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Take quiz at the end of the lesson if present (the quiz_submission becomes passed). Rule: Quiz questions must all be answered",
+            "operationId": "quizSubmission.create",
+            "statusAfter": "passed",
+            "page": "quizes-id",
+            "route": "/quizes/[id]",
+            "target": {
+              "section": "quizes-detail",
+              "action": "add-quiz-submissions"
+            },
+            "kind": "do",
+            "record": "quiz_submission"
+          },
+          {
+            "id": "complete_lesson",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Mark lesson as complete (the lesson_progress becomes completed). Rule: Previous lessons and required quiz must be completed",
+            "operationId": "lessonProgress.create",
+            "statusAfter": "completed",
+            "page": "enrollments-id",
+            "route": "/enrollments/[id]",
+            "target": {
+              "section": "enrollments-detail",
+              "action": "add-lesson-progresses"
+            },
+            "kind": "do",
+            "record": "lesson_progress"
+          },
+          {
+            "id": "complete_course",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Complete the final lesson and complete course (the enrollment becomes completed). Rule: All lessons in the course must be completed",
+            "operationId": "enrollment.complete",
+            "statusAfter": "completed",
+            "page": "enrollments-id",
+            "route": "/enrollments/[id]",
+            "target": {
+              "section": "enrollments-detail",
+              "action": "complete"
+            },
+            "kind": "do",
+            "record": "enrollment",
+            "needs": {
+              "step": "enroll_course",
+              "role": "learner",
+              "status": "active"
+            }
+          }
+        ]
+      },
+      {
+        "id": "course_authoring",
+        "name": "Course Authoring and Publishing",
+        "outcome": "A structured course with ordered lessons is published to the catalogue.",
+        "roles": [
+          "instructor"
+        ],
+        "steps": [
+          {
+            "id": "create_draft",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Create course draft under a category (the course becomes draft). Rule: Category must exist",
+            "operationId": "course.create",
+            "statusAfter": "draft",
+            "page": "instructors-categories-id-courses-new",
+            "route": "/instructors/categories/[id]/courses/new",
+            "target": {
+              "section": "course-create-in-category-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "course"
+          },
+          {
+            "id": "add_lessons",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Add ordered video or text lessons to course (the lesson becomes draft). Rule: Lessons must have a defined sequence order",
+            "operationId": "lesson.create",
+            "statusAfter": "draft",
+            "page": "instructors-courses-id",
+            "route": "/instructors/courses/[id]",
+            "target": {
+              "section": "courses-detail",
+              "action": "add-lessons"
+            },
+            "kind": "do",
+            "record": "lesson"
+          },
+          {
+            "id": "add_quiz",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Attach short quiz to lesson (the quiz becomes draft). Rule: Quiz must belong to a lesson",
+            "operationId": "quiz.create",
+            "statusAfter": "draft",
+            "page": "instructors-lessons-id",
+            "route": "/instructors/lessons/[id]",
+            "target": {
+              "section": "lessons-detail",
+              "action": "add-quizes"
+            },
+            "kind": "do",
+            "record": "quiz"
+          },
+          {
+            "id": "publish_course",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Publish the complete course (the course becomes published). Rule: Course must contain at least one lesson",
+            "operationId": "course.publish",
+            "statusAfter": "published",
+            "page": "instructors-courses-id",
+            "route": "/instructors/courses/[id]",
+            "target": {
+              "section": "courses-detail",
+              "action": "publish"
+            },
+            "kind": "do",
+            "record": "course",
+            "needs": {
+              "step": "create_draft",
+              "role": "instructor",
+              "status": "draft"
+            }
+          }
+        ]
+      },
+      {
+        "id": "course_review",
+        "name": "Course Rating and Reviewing",
+        "outcome": "A public rating and review are posted for a completed course.",
+        "roles": [
+          "learner"
+        ],
+        "steps": [
+          {
+            "id": "submit_review",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Submit star rating and short review for finished course (the review becomes published). Rule: Learner must have completed the course",
+            "operationId": "review.create",
+            "statusAfter": "published",
+            "page": "courses-id",
+            "route": "/courses/[id]",
+            "target": {
+              "section": "courses-detail",
+              "action": "add-reviews"
+            },
+            "kind": "do",
+            "record": "review"
+          }
+        ]
+      }
+    ]
+  }
+}

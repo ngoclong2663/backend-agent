@@ -1,0 +1,153 @@
+{
+  "name": "reactions",
+  "label": "Reactions",
+  "status": "ready",
+  "attachesTo": "content",
+  "choose": "People like, save or upvote a record with one tap, and see that they did.",
+  "replaces": [
+    "like",
+    "reaction",
+    "favorite",
+    "favourite",
+    "bookmark",
+    "save",
+    "upvote",
+    "vote"
+  ],
+  "options": {
+    "kinds": {
+      "default": [
+        "like"
+      ],
+      "values": [
+        "like",
+        "save",
+        "upvote"
+      ],
+      "help": "the reactions offered"
+    }
+  },
+  "spec": {
+    "entities": [
+      {
+        "name": "{Target}Reaction",
+        "fields": [
+          {
+            "name": "id",
+            "type": "uuid",
+            "primary": true
+          },
+          {
+            "name": "{target}Id",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "{person}Id",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "kind",
+            "type": "enum",
+            "values": [
+              "{option:kinds}"
+            ],
+            "required": true
+          },
+          {
+            "name": "createdAt",
+            "type": "datetime",
+            "required": true,
+            "default": "now"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "{target}Reactions",
+        "type": "one-to-many",
+        "from": "{Target}",
+        "to": "{Target}Reaction",
+        "foreignKey": "{target}Id",
+        "onDelete": "CASCADE"
+      }
+    ],
+    "operations": [
+      {
+        "operationId": "{target}Reaction.create",
+        "type": "crud",
+        "action": "create",
+        "entity": "{Target}Reaction",
+        "method": "POST",
+        "path": "/{targetPath}-reactions",
+        "auth": "jwt",
+        "policy": "own{Target}Reactions"
+      },
+      {
+        "operationId": "{target}Reaction.delete",
+        "type": "crud",
+        "action": "delete",
+        "entity": "{Target}Reaction",
+        "method": "DELETE",
+        "path": "/{targetPath}-reactions/{id}",
+        "auth": "jwt",
+        "policy": "own{Target}Reactions"
+      }
+    ],
+    "policies": [
+      {
+        "name": "own{Target}Reactions",
+        "type": "ownership",
+        "entity": "{Target}Reaction",
+        "ownerField": "{person}Id"
+      }
+    ],
+    "rules": [
+      {
+        "id": "one{Target}ReactionEach",
+        "kind": "uniqueTogether",
+        "entity": "{Target}Reaction",
+        "params": {
+          "fields": [
+            "{target}Id",
+            "{person}Id",
+            "kind"
+          ]
+        }
+      }
+    ]
+  },
+  "computed": [
+    {
+      "field": "{kind}Count",
+      "kind": "count",
+      "entity": "{Target}Reaction",
+      "key": "{target}Id",
+      "where": {
+        "kind": "{kind}"
+      }
+    },
+    {
+      "field": "my{Kind}Id",
+      "kind": "mine",
+      "entity": "{Target}Reaction",
+      "key": "{target}Id",
+      "where": {
+        "kind": "{kind}"
+      },
+      "owner": "{person}Id"
+    }
+  ],
+  "kit": {
+    "components": [
+      "ReactionButton"
+    ],
+    "slots": [
+      "reaction-button"
+    ]
+  }
+}

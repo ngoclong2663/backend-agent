@@ -43,7 +43,7 @@ DEV_ENV := DB_URL=postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@loc
            VIDEO_PROVIDERS=$(VIDEO_PROVIDERS) YOUTUBE_API_KEY=$(YOUTUBE_API_KEY) PIXABAY_API_KEY=$(PIXABAY_API_KEY)
 
 .PHONY: env up down down-all ps logs dev dev-down dev-api dev-worker dev-ui setup venv migrate test lint template runner runner-node frontend-base icon-index \
-        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app design-plugin-new design-plugin-check app-design-report app-design-proto kit-test sample-media video-keys
+        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app design-plugin-new design-plugin-check domain-new feature-new domain-check domain-report app-design-report app-design-proto kit-test sample-media video-keys
 
 env:
 	@test -f .env && echo ".env already exists" || ( \
@@ -133,6 +133,18 @@ design-plugin-new:
 
 design-plugin-check:
 	cd $(API_DIR) && $(DEV_ENV) IMAGE_PROVIDER=none LANGSMITH_TRACING=false $(PY)/python -m scripts.design_plugin check $(NAME) $(if $(KIND),--kind $(KIND),) $(ARGS)
+
+# Domain and feature plugins (Epic 33):
+#   make domain-new NAME=socials | make feature-new NAME=comments | make domain-check [NAME=socials]
+domain-new:
+	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.domain_plugin new-domain $(NAME)
+feature-new:
+	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.domain_plugin new-feature $(NAME)
+domain-check:
+	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.domain_plugin check $(NAME)
+# The domains' UX tasks on the recorded drafts (Story 33.1): make domain-report [ARGS=--baseline]
+domain-report:
+	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.domain_report $(ARGS)
 
 # The app design report (Story 23.1; Story 30.1: signed in, fingerprints, edge similarity): the golden apps, no model call.
 app-design-report:

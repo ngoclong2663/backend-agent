@@ -1,0 +1,1195 @@
+{
+  "auth": {
+    "roles": [
+      "operator",
+      "admin"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "A physical sector or bench area within the greenhouse facility.",
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 100,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 30,
+          "name": "code",
+          "required": true,
+          "type": "string",
+          "unique": true
+        },
+        {
+          "name": "description",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "name": "targetTempMin",
+          "nullable": true,
+          "type": "float"
+        },
+        {
+          "name": "targetTempMax",
+          "nullable": true,
+          "type": "float"
+        },
+        {
+          "name": "targetHumidityMin",
+          "nullable": true,
+          "type": "float"
+        },
+        {
+          "name": "targetHumidityMax",
+          "nullable": true,
+          "type": "float"
+        },
+        {
+          "name": "targetCo2Min",
+          "nullable": true,
+          "type": "integer"
+        },
+        {
+          "name": "targetCo2Max",
+          "nullable": true,
+          "type": "integer"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "code"
+          ],
+          "unique": true
+        }
+      ],
+      "name": "Zone"
+    },
+    {
+      "description": "Environmental telemetry sensor or pest inspection camera deployed in a zone.",
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 100,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 60,
+          "name": "deviceUid",
+          "required": true,
+          "type": "string",
+          "unique": true
+        },
+        {
+          "name": "type",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "SENSOR",
+            "CAMERA"
+          ]
+        },
+        {
+          "default": "NORMAL",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "NORMAL",
+            "FLAGGED",
+            "REBOOTING"
+          ]
+        },
+        {
+          "max": 100,
+          "min": 0,
+          "name": "batteryPercent",
+          "nullable": true,
+          "type": "integer"
+        },
+        {
+          "default": true,
+          "name": "isOnline",
+          "required": true,
+          "type": "boolean"
+        },
+        {
+          "default": "now",
+          "name": "lastSeenAt",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "maxLength": 50,
+          "name": "firmwareVersion",
+          "nullable": true,
+          "type": "string"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "zoneId"
+          ]
+        },
+        {
+          "fields": [
+            "deviceUid"
+          ],
+          "unique": true
+        },
+        {
+          "fields": [
+            "status"
+          ]
+        }
+      ],
+      "name": "Device"
+    },
+    {
+      "description": "Periodic environmental readings (temp, humidity, CO2, soil moisture) recorded every minute.",
+      "displayField": "recordedAt",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "deviceId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "temperature",
+          "required": true,
+          "type": "float"
+        },
+        {
+          "name": "humidity",
+          "required": true,
+          "type": "float"
+        },
+        {
+          "name": "co2",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "soilMoisture",
+          "required": true,
+          "type": "float"
+        },
+        {
+          "default": "UNREVIEWED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "UNREVIEWED",
+            "REVIEWED"
+          ]
+        },
+        {
+          "default": "now",
+          "index": true,
+          "name": "recordedAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "name": "reviewedAt",
+          "nullable": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "zoneId",
+            "recordedAt"
+          ]
+        },
+        {
+          "fields": [
+            "deviceId",
+            "recordedAt"
+          ]
+        }
+      ],
+      "name": "SensorReading"
+    },
+    {
+      "description": "Threshold breach notification requiring operator attention and acknowledgment.",
+      "displayField": "ruleName",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "readingId",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 120,
+          "name": "ruleName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "ACTIVE",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "ACTIVE",
+            "ACKNOWLEDGED"
+          ]
+        },
+        {
+          "default": "WARNING",
+          "name": "severity",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "INFO",
+            "WARNING",
+            "CRITICAL"
+          ]
+        },
+        {
+          "name": "message",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "index": true,
+          "name": "triggeredAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "name": "acknowledgedAt",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "maxLength": 100,
+          "name": "acknowledgedBy",
+          "nullable": true,
+          "type": "string"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "zoneId"
+          ]
+        },
+        {
+          "fields": [
+            "status"
+          ]
+        }
+      ],
+      "name": "Alert"
+    },
+    {
+      "description": "Computer vision pest observation with image snapshot and confidence score.",
+      "displayField": "pestType",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "deviceId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 80,
+          "name": "benchLocation",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 100,
+          "name": "pestType",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "max": 100,
+          "min": 0,
+          "name": "confidence",
+          "required": true,
+          "type": "float"
+        },
+        {
+          "name": "snapshotUrl",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "default": "UNREVIEWED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "UNREVIEWED",
+            "REVIEWED",
+            "CONFIRMED",
+            "DISMISSED"
+          ]
+        },
+        {
+          "name": "notes",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "index": true,
+          "name": "detectedAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "name": "reviewedAt",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "name": "confirmedAt",
+          "nullable": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "zoneId"
+          ]
+        },
+        {
+          "fields": [
+            "status"
+          ]
+        }
+      ],
+      "name": "PestDetection"
+    }
+  ],
+  "operations": [
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Zone",
+      "filters": [
+        "code"
+      ],
+      "method": "GET",
+      "operationId": "zone.list",
+      "pagination": true,
+      "path": "/zones",
+      "search": [
+        "name",
+        "code"
+      ],
+      "sort": [
+        "name",
+        "code"
+      ],
+      "summary": "List all greenhouse zones",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Zone",
+      "method": "GET",
+      "operationId": "zone.get",
+      "path": "/zones/{id}",
+      "summary": "Get zone details",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Zone",
+      "method": "POST",
+      "operationId": "zone.create",
+      "path": "/zones",
+      "policy": "adminOnly",
+      "request": {
+        "entity": "Zone",
+        "fields": [
+          "name",
+          "code",
+          "description",
+          "targetTempMin",
+          "targetTempMax",
+          "targetHumidityMin",
+          "targetHumidityMax",
+          "targetCo2Min",
+          "targetCo2Max"
+        ]
+      },
+      "summary": "Create a new greenhouse zone",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Zone",
+      "method": "PATCH",
+      "operationId": "zone.update",
+      "path": "/zones/{id}",
+      "policy": "adminOnly",
+      "request": {
+        "entity": "Zone",
+        "fields": [
+          "name",
+          "description",
+          "targetTempMin",
+          "targetTempMax",
+          "targetHumidityMin",
+          "targetHumidityMax",
+          "targetCo2Min",
+          "targetCo2Max"
+        ]
+      },
+      "summary": "Update zone configuration",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Zone",
+      "method": "DELETE",
+      "operationId": "zone.delete",
+      "path": "/zones/{id}",
+      "policy": "adminOnly",
+      "summary": "Delete a greenhouse zone",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Device",
+      "filters": [
+        "zoneId",
+        "type",
+        "status",
+        "isOnline"
+      ],
+      "method": "GET",
+      "operationId": "device.list",
+      "pagination": true,
+      "path": "/devices",
+      "search": [
+        "name",
+        "deviceUid"
+      ],
+      "sort": [
+        "lastSeenAt",
+        "name",
+        "batteryPercent"
+      ],
+      "summary": "List monitoring devices and their health status",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Device",
+      "method": "GET",
+      "operationId": "device.get",
+      "path": "/devices/{id}",
+      "summary": "Get device status and telemetry info",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Device",
+      "method": "POST",
+      "operationId": "device.create",
+      "path": "/devices",
+      "policy": "adminOnly",
+      "request": {
+        "entity": "Device",
+        "fields": [
+          "zoneId",
+          "name",
+          "deviceUid",
+          "type",
+          "batteryPercent",
+          "firmwareVersion"
+        ]
+      },
+      "summary": "Register a new sensor or camera in a zone",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Device",
+      "method": "PATCH",
+      "operationId": "device.update",
+      "path": "/devices/{id}",
+      "policy": "adminOnly",
+      "request": {
+        "entity": "Device",
+        "fields": [
+          "name",
+          "zoneId",
+          "firmwareVersion"
+        ]
+      },
+      "summary": "Update device details or reassign zone",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Device",
+      "method": "DELETE",
+      "operationId": "device.delete",
+      "path": "/devices/{id}",
+      "policy": "adminOnly",
+      "summary": "Remove a device from the greenhouse",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator reviews device connectivity and battery level. If device is offline or has low battery (e.g. <= 20%), its status transitions to FLAGGED.",
+      "entity": "Device",
+      "method": "POST",
+      "operationId": "device.flag",
+      "path": "/devices/{id}/flag",
+      "policy": "operatorOnly",
+      "rules": [
+        "deviceFlow"
+      ],
+      "summary": "Flag unhealthy or offline device",
+      "type": "custom",
+      "response": {
+        "entity": "Device"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Admin transmits remote reboot command to an unhealthy or flagged device. Sets device status to REBOOTING.",
+      "entity": "Device",
+      "method": "POST",
+      "operationId": "device.reboot",
+      "path": "/devices/{id}/reboot",
+      "policy": "adminOnly",
+      "rules": [
+        "deviceFlow"
+      ],
+      "summary": "Send reboot command to device",
+      "type": "custom",
+      "response": {
+        "entity": "Device"
+      }
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "SensorReading",
+      "filters": [
+        "zoneId",
+        "deviceId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "sensorReading.list",
+      "pagination": true,
+      "path": "/sensor-readings",
+      "sort": [
+        "recordedAt"
+      ],
+      "summary": "List sensor readings with filtering for 24-hour charts",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "SensorReading",
+      "method": "GET",
+      "operationId": "sensorReading.get",
+      "path": "/sensor-readings/{id}",
+      "summary": "Get a specific sensor reading",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator inspects zone dashboard readings and 24-hour trend charts, marking the reading as REVIEWED and setting reviewedAt timestamp.",
+      "entity": "SensorReading",
+      "method": "POST",
+      "operationId": "sensorReading.review",
+      "path": "/sensor-readings/{id}/review",
+      "policy": "operatorOnly",
+      "rules": [
+        "readingFlow"
+      ],
+      "summary": "Review sensor reading and trends",
+      "type": "custom",
+      "response": {
+        "entity": "SensorReading"
+      }
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Alert",
+      "filters": [
+        "zoneId",
+        "status",
+        "severity"
+      ],
+      "method": "GET",
+      "operationId": "alert.list",
+      "pagination": true,
+      "path": "/alerts",
+      "search": [
+        "ruleName",
+        "message"
+      ],
+      "sort": [
+        "triggeredAt"
+      ],
+      "summary": "List greenhouse threshold alerts",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Alert",
+      "method": "GET",
+      "operationId": "alert.get",
+      "path": "/alerts/{id}",
+      "summary": "Get alert details",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator triggers an active threshold alert when zone telemetry conditions exceed configured duration. Sets alert status to ACTIVE with triggeredAt timestamp.",
+      "entity": "Alert",
+      "method": "POST",
+      "operationId": "alert.trigger",
+      "path": "/alerts/trigger",
+      "policy": "operatorOnly",
+      "request": {
+        "entity": "Alert",
+        "fields": [
+          "zoneId",
+          "readingId",
+          "ruleName",
+          "severity",
+          "message"
+        ]
+      },
+      "rules": [
+        "alertFlow"
+      ],
+      "summary": "Trigger alert on rule violation",
+      "type": "custom"
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator acknowledges an active alert, recording acknowledgment timestamp and the operator identifier. Transitions status from ACTIVE to ACKNOWLEDGED.",
+      "entity": "Alert",
+      "method": "POST",
+      "operationId": "alert.acknowledge",
+      "path": "/alerts/{id}/acknowledge",
+      "policy": "operatorOnly",
+      "rules": [
+        "alertFlow"
+      ],
+      "summary": "Acknowledge active alert",
+      "type": "custom",
+      "response": {
+        "entity": "Alert"
+      }
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "PestDetection",
+      "filters": [
+        "zoneId",
+        "deviceId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "pestDetection.list",
+      "pagination": true,
+      "path": "/pest-detections",
+      "search": [
+        "pestType",
+        "benchLocation"
+      ],
+      "sort": [
+        "detectedAt",
+        "confidence"
+      ],
+      "summary": "List camera pest detection events",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "PestDetection",
+      "method": "GET",
+      "operationId": "pestDetection.get",
+      "path": "/pest-detections/{id}",
+      "summary": "Get pest detection details with snapshot and score",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator inspects pest detection snapshot and confidence score. Transitions status from UNREVIEWED to REVIEWED, recording reviewedAt timestamp.",
+      "entity": "PestDetection",
+      "method": "POST",
+      "operationId": "pestDetection.review",
+      "path": "/pest-detections/{id}/review",
+      "policy": "operatorOnly",
+      "rules": [
+        "detectionFlow"
+      ],
+      "summary": "Inspect pest detection snapshot",
+      "type": "custom",
+      "response": {
+        "entity": "PestDetection"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator confirms pest detection, validating pest presence on the bench. Transitions status from REVIEWED to CONFIRMED.",
+      "entity": "PestDetection",
+      "method": "POST",
+      "operationId": "pestDetection.confirm",
+      "path": "/pest-detections/{id}/confirm",
+      "policy": "operatorOnly",
+      "rules": [
+        "detectionFlow"
+      ],
+      "summary": "Confirm pest detection",
+      "type": "custom",
+      "response": {
+        "entity": "PestDetection"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Greenhouse Operator dismisses a false positive pest detection. Transitions status from REVIEWED to DISMISSED without triggering pest alerts.",
+      "entity": "PestDetection",
+      "method": "POST",
+      "operationId": "pestDetection.dismiss",
+      "path": "/pest-detections/{id}/dismiss",
+      "policy": "operatorOnly",
+      "rules": [
+        "detectionFlow"
+      ],
+      "summary": "Dismiss pest detection",
+      "type": "custom",
+      "response": {
+        "entity": "PestDetection"
+      }
+    },
+    {
+      "operationId": "alert.countWhereStatusActive",
+      "type": "aggregate",
+      "entity": "Alert",
+      "method": "GET",
+      "path": "/alerts/aggregate/count-where-status-active",
+      "summary": "Active Alerts",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "ACTIVE"
+        }
+      }
+    },
+    {
+      "operationId": "pestDetection.countWhereStatusReviewed",
+      "type": "aggregate",
+      "entity": "PestDetection",
+      "method": "GET",
+      "path": "/pest-detections/aggregate/count-where-status-reviewed",
+      "summary": "Pending Pest Detections",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "REVIEWED"
+        }
+      }
+    },
+    {
+      "operationId": "device.countWhereStatusFlagged",
+      "type": "aggregate",
+      "entity": "Device",
+      "method": "GET",
+      "path": "/devices/aggregate/count-where-status-flagged",
+      "summary": "Flagged Devices",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "FLAGGED"
+        }
+      }
+    },
+    {
+      "operationId": "device.countWhereIsOnlineFalse",
+      "type": "aggregate",
+      "entity": "Device",
+      "method": "GET",
+      "path": "/devices/aggregate/count-where-is-online-false",
+      "summary": "Offline Devices",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "isOnline": false
+        }
+      }
+    },
+    {
+      "operationId": "alert.countBySeverity",
+      "type": "aggregate",
+      "entity": "Alert",
+      "method": "GET",
+      "path": "/alerts/aggregate/count-by-severity",
+      "summary": "Alerts by Severity",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "severity"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "operatorOnly",
+      "roles": [
+        "operator"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "adminOnly",
+      "roles": [
+        "admin"
+      ],
+      "type": "role"
+    }
+  ],
+  "project": {
+    "description": "Commercial greenhouse monitoring platform for environmental sensors, pest detection vision, alerting, and hardware health management",
+    "name": "Verdant Greenhouse Monitor",
+    "slug": "verdant-greenhouse-monitor"
+  },
+  "relationships": [
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneDevices",
+      "onDelete": "RESTRICT",
+      "to": "Device",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneReadings",
+      "onDelete": "CASCADE",
+      "to": "SensorReading",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "deviceId",
+      "from": "Device",
+      "name": "deviceReadings",
+      "onDelete": "CASCADE",
+      "to": "SensorReading",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneAlerts",
+      "onDelete": "CASCADE",
+      "to": "Alert",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "readingId",
+      "from": "SensorReading",
+      "name": "readingAlerts",
+      "onDelete": "SET NULL",
+      "to": "Alert",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneDetections",
+      "onDelete": "CASCADE",
+      "to": "PestDetection",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "deviceId",
+      "from": "Device",
+      "name": "deviceDetections",
+      "onDelete": "SET NULL",
+      "to": "PestDetection",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Reading review status transitions from UNREVIEWED to REVIEWED.",
+      "entity": "SensorReading",
+      "id": "readingFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "UNREVIEWED": [
+            "REVIEWED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Alert flow moves from ACTIVE to ACKNOWLEDGED. Only active alerts can be acknowledged.",
+      "entity": "Alert",
+      "id": "alertFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "ACTIVE": [
+            "ACKNOWLEDGED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Detection flow moves from UNREVIEWED to REVIEWED, then to CONFIRMED or DISMISSED.",
+      "entity": "PestDetection",
+      "id": "detectionFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "REVIEWED": [
+            "CONFIRMED",
+            "DISMISSED"
+          ],
+          "UNREVIEWED": [
+            "REVIEWED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Device flow moves from FLAGGED to REBOOTING.",
+      "entity": "Device",
+      "id": "deviceFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "FLAGGED": [
+            "REBOOTING"
+          ],
+          "NORMAL": [
+            "FLAGGED"
+          ]
+        }
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Zone",
+      "records": [
+        {
+          "code": "ZONE-A",
+          "createdAt": "2026-11-10T08:00:00Z",
+          "description": "Main propagation greenhouse with seedling benches",
+          "id": "11111111-1111-1111-1111-111111111111",
+          "name": "Propagation Bay A",
+          "targetCo2Max": 1200,
+          "targetCo2Min": 600,
+          "targetHumidityMax": 80,
+          "targetHumidityMin": 60,
+          "targetTempMax": 26,
+          "targetTempMin": 20
+        },
+        {
+          "code": "ZONE-B",
+          "createdAt": "2026-11-10T08:00:00Z",
+          "description": "Hydroponic leafy greens and herbs production bay",
+          "id": "22222222-2222-2222-2222-222222222222",
+          "name": "Vegetative Bay B",
+          "targetCo2Max": 1400,
+          "targetCo2Min": 800,
+          "targetHumidityMax": 70,
+          "targetHumidityMin": 50,
+          "targetTempMax": 24,
+          "targetTempMin": 18
+        }
+      ]
+    },
+    {
+      "entity": "Device",
+      "records": [
+        {
+          "batteryPercent": 95,
+          "createdAt": "2026-11-10T08:05:00Z",
+          "deviceUid": "SN-ENV-001",
+          "firmwareVersion": "v2.4.1",
+          "id": "33333333-3333-3333-3333-333333333333",
+          "isOnline": true,
+          "lastSeenAt": "2026-11-10T11:25:00Z",
+          "name": "Bay A Climate Multi-Sensor",
+          "status": "NORMAL",
+          "type": "SENSOR",
+          "zoneId": "11111111-1111-1111-1111-111111111111"
+        },
+        {
+          "batteryPercent": 14,
+          "createdAt": "2026-11-10T08:10:00Z",
+          "deviceUid": "CAM-PST-002",
+          "firmwareVersion": "v1.9.0",
+          "id": "44444444-4444-4444-4444-444444444444",
+          "isOnline": false,
+          "lastSeenAt": "2026-11-10T10:45:00Z",
+          "name": "Bay A Bench 4 Overhead Cam",
+          "status": "FLAGGED",
+          "type": "CAMERA",
+          "zoneId": "11111111-1111-1111-1111-111111111111"
+        }
+      ]
+    },
+    {
+      "entity": "SensorReading",
+      "records": [
+        {
+          "co2": 1280,
+          "deviceId": "33333333-3333-3333-3333-333333333333",
+          "humidity": 74.5,
+          "id": "55555555-5555-5555-5555-555555555555",
+          "recordedAt": "2026-11-10T11:20:00Z",
+          "soilMoisture": 42.8,
+          "status": "UNREVIEWED",
+          "temperature": 27.4,
+          "zoneId": "11111111-1111-1111-1111-111111111111"
+        }
+      ]
+    },
+    {
+      "entity": "Alert",
+      "records": [
+        {
+          "acknowledgedAt": null,
+          "acknowledgedBy": null,
+          "id": "66666666-6666-6666-6666-666666666666",
+          "message": "CO2 reached 1280 ppm exceeding threshold of 1200 ppm for > 10 minutes",
+          "readingId": "55555555-5555-5555-5555-555555555555",
+          "ruleName": "High CO2 Excursion",
+          "severity": "WARNING",
+          "status": "ACTIVE",
+          "triggeredAt": "2026-11-10T11:21:00Z",
+          "zoneId": "11111111-1111-1111-1111-111111111111"
+        }
+      ]
+    },
+    {
+      "entity": "PestDetection",
+      "records": [
+        {
+          "benchLocation": "Bench 4 - East Corner",
+          "confidence": 94.2,
+          "confirmedAt": null,
+          "detectedAt": "2026-11-10T10:30:00Z",
+          "deviceId": "44444444-4444-4444-4444-444444444444",
+          "id": "77777777-7777-7777-7777-777777777777",
+          "notes": null,
+          "pestType": "Aphids (Aphis gossypii)",
+          "reviewedAt": null,
+          "snapshotUrl": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c",
+          "status": "UNREVIEWED",
+          "zoneId": "11111111-1111-1111-1111-111111111111"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

@@ -1,0 +1,752 @@
+{
+  "name": "Loop",
+  "tagline": "A playful short-video community",
+  "icon": "Repeat",
+  "nav": [
+    {
+      "entity": "Clip",
+      "label": "Feed",
+      "icon": "Film"
+    },
+    {
+      "entity": "Profile",
+      "label": "Profile",
+      "icon": "User"
+    },
+    {
+      "entity": "Notification",
+      "label": "Notifications",
+      "icon": "Bell"
+    },
+    {
+      "entity": "Report",
+      "label": "Moderation",
+      "icon": "ShieldAlert"
+    }
+  ],
+  "home": "Clip",
+  "entities": {
+    "Clip": {
+      "label": "Clip",
+      "plural": "Clips",
+      "displayField": "caption",
+      "listFields": [
+        "caption",
+        "creatorId",
+        "status",
+        "likesCount",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "videoUrl",
+        "caption",
+        "status",
+        "likesCount",
+        "commentsCount",
+        "durationSeconds",
+        "createdAt",
+        "creatorId"
+      ],
+      "fieldLabels": {
+        "creatorId": "Creator",
+        "videoUrl": "Video",
+        "caption": "Caption",
+        "status": "Status",
+        "likesCount": "Likes",
+        "commentsCount": "Comments",
+        "durationSeconds": "Duration (s)",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "caption": "Write a catchy caption for your clip",
+        "videoUrl": "Upload an MP4 or WebM short video clip"
+      },
+      "create": "page"
+    },
+    "Profile": {
+      "label": "Profile",
+      "plural": "Profiles",
+      "displayField": "displayName",
+      "listFields": [
+        "displayName",
+        "followersCount",
+        "followingCount",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "displayName",
+        "avatar",
+        "bio",
+        "followersCount",
+        "followingCount",
+        "status",
+        "memberId",
+        "createdAt",
+        "updatedAt"
+      ],
+      "fieldLabels": {
+        "memberId": "Member",
+        "displayName": "Display Name",
+        "avatar": "Avatar",
+        "bio": "Bio",
+        "followersCount": "Followers",
+        "followingCount": "Following",
+        "status": "Status",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      },
+      "help": {
+        "bio": "Tell the Loop community about yourself",
+        "displayName": "Your public creator handle or nickname"
+      }
+    },
+    "Comment": {
+      "label": "Comment",
+      "plural": "Comments",
+      "displayField": "text",
+      "listFields": [
+        "text",
+        "authorId",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "text",
+        "clipId",
+        "authorId",
+        "parentCommentId",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "clipId": "Clip",
+        "authorId": "Author",
+        "parentCommentId": "Replying to",
+        "text": "Comment",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "text": "Join the discussion or reply to another comment"
+      },
+      "create": "onRecord"
+    },
+    "Like": {
+      "label": "Like",
+      "plural": "Likes",
+      "displayField": "clipId",
+      "listFields": [
+        "clipId",
+        "memberId",
+        "createdAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "clipId",
+        "memberId",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "clipId": "Clip",
+        "memberId": "Member",
+        "createdAt": "Created at"
+      },
+      "help": {},
+      "create": "onRecord"
+    },
+    "Follow": {
+      "label": "Follow",
+      "plural": "Follows",
+      "displayField": "followingId",
+      "listFields": [
+        "followerId",
+        "followingId",
+        "createdAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "followerId",
+        "followingId",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "followerId": "Follower",
+        "followingId": "Creator",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    },
+    "Notification": {
+      "label": "Notification",
+      "plural": "Notifications",
+      "displayField": "message",
+      "listFields": [
+        "message",
+        "type",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "recipientId",
+        "actorId",
+        "type",
+        "message",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "recipientId": "Recipient",
+        "actorId": "From",
+        "type": "Event",
+        "message": "Notification",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    },
+    "Report": {
+      "label": "Report",
+      "plural": "Reports",
+      "displayField": "reason",
+      "listFields": [
+        "targetType",
+        "reason",
+        "status",
+        "createdAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "targetType",
+        "targetId",
+        "reporterId",
+        "reason",
+        "status",
+        "reviewedBy",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "targetType": "Content Type",
+        "targetId": "Target Item",
+        "reporterId": "Reported By",
+        "reason": "Reason",
+        "status": "Status",
+        "reviewedBy": "Moderator",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "reason": "Explain why this content violates community guidelines"
+      }
+    }
+  },
+  "design": {
+    "archetype": "feed",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "narrow",
+    "density": "comfortable",
+    "mainEntity": "Clip",
+    "entities": {
+      "Clip": {
+        "view": "feed",
+        "roles": {
+          "title": "caption",
+          "media": "videoUrl",
+          "stat": "likesCount",
+          "duration": "durationSeconds",
+          "badge": "status",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "watch",
+        "filtersStyle": "chips",
+        "card": "overlay",
+        "aspect": "portrait"
+      },
+      "Profile": {
+        "view": "cards",
+        "roles": {
+          "title": "displayName",
+          "avatar": "avatar",
+          "stat": "followersCount",
+          "badge": "status",
+          "meta": [
+            "bio"
+          ]
+        },
+        "detailView": "profile",
+        "card": "stacked"
+      },
+      "Comment": {
+        "view": "feed",
+        "roles": {
+          "title": "text",
+          "badge": "status",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "card": "stacked"
+      },
+      "Like": {
+        "view": "cards",
+        "roles": {
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "card": "stacked"
+      },
+      "Follow": {
+        "view": "cards",
+        "roles": {
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "card": "stacked"
+      },
+      "Notification": {
+        "view": "feed",
+        "roles": {
+          "title": "message",
+          "badge": "type",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "card": "stacked"
+      },
+      "Report": {
+        "view": "table",
+        "roles": {
+          "badge": "status",
+          "subtitle": "reason",
+          "meta": [
+            "createdAt"
+          ]
+        },
+        "detailView": "record",
+        "filtersStyle": "chips",
+        "card": "stacked"
+      }
+    },
+    "homeView": "feed",
+    "looks": [
+      {
+        "recipe": "playful",
+        "reason": "The requirement asks for it",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "neon",
+        "reason": "OLED black background pairs with vibrant glowing pink highlights for an immersive midnight video viewing experience.",
+        "fontPairing": "loud"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Puts short video media and member content front and center with minimal decorative distractions.",
+        "fontPairing": "humanist"
+      }
+    ],
+    "requested": {
+      "accent": "#ff1493",
+      "background": "#121212",
+      "scheme": "dark",
+      "corners": "rounded",
+      "photos": "prominent",
+      "words": "bold and playful, dark background, a hot pink accent"
+    },
+    "seed": 2558990925,
+    "reason": "A short-video feed requires immersive portrait-oriented media cards, effortless interaction touchpoints, and dedicated moderation controls.",
+    "replaced": [
+      "Profile: side needs an image, a video or an audio field; shown as stacked",
+      "Report: title 'targetType' left out (a enum field is not a name)",
+      "area 'member-area': Profile: side needs an image, a video or an audio field; shown as stacked",
+      "area 'member-area': Report: title 'targetType' left out (a enum field is not a name)",
+      "area 'moderator-area': Profile: side needs an image, a video or an audio field; shown as stacked",
+      "area 'moderator-area': Report: title 'targetType' left out (a enum field is not a name)"
+    ],
+    "fontPairing": "geometric"
+  },
+  "areas": [
+    {
+      "id": "member-area",
+      "label": "Community Feed",
+      "roles": [
+        "Member"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "feed",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "narrow",
+        "mainEntity": "Clip",
+        "entities": {
+          "Clip": {
+            "view": "feed",
+            "roles": {
+              "title": "caption",
+              "media": "videoUrl",
+              "stat": "likesCount",
+              "duration": "durationSeconds",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "watch",
+            "filtersStyle": "toolbar",
+            "card": "overlay"
+          },
+          "Profile": {
+            "view": "cards",
+            "roles": {
+              "title": "displayName",
+              "avatar": "avatar",
+              "stat": "followersCount",
+              "badge": "status",
+              "meta": [
+                "bio"
+              ]
+            },
+            "detailView": "profile",
+            "card": "stacked"
+          },
+          "Comment": {
+            "view": "feed",
+            "roles": {
+              "title": "text",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "record",
+            "card": "stacked"
+          },
+          "Notification": {
+            "view": "feed",
+            "roles": {
+              "title": "message",
+              "badge": "type",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "record",
+            "card": "stacked"
+          },
+          "Report": {
+            "view": "cards",
+            "roles": {
+              "badge": "status",
+              "subtitle": "reason",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "record",
+            "card": "stacked"
+          }
+        },
+        "homeView": "feed"
+      }
+    },
+    {
+      "id": "moderator-area",
+      "label": "Moderation Desk",
+      "roles": [
+        "Moderator"
+      ],
+      "prefix": "/moderator-area",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "mainEntity": "Report",
+        "entities": {
+          "Clip": {
+            "view": "media-grid",
+            "roles": {
+              "title": "caption",
+              "media": "videoUrl",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ],
+              "duration": "durationSeconds"
+            },
+            "detailView": "watch",
+            "card": "side"
+          },
+          "Profile": {
+            "view": "table",
+            "roles": {
+              "title": "displayName",
+              "avatar": "avatar",
+              "stat": "followersCount",
+              "badge": "status"
+            },
+            "detailView": "profile",
+            "card": "stacked"
+          },
+          "Comment": {
+            "view": "table",
+            "roles": {
+              "title": "text",
+              "badge": "status",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "record",
+            "card": "stacked"
+          },
+          "Notification": {
+            "view": "table",
+            "roles": {}
+          },
+          "Report": {
+            "view": "table",
+            "roles": {
+              "badge": "status",
+              "subtitle": "reason",
+              "meta": [
+                "createdAt"
+              ]
+            },
+            "detailView": "record",
+            "filtersStyle": "chips",
+            "card": "stacked"
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "dashboard": [
+    {
+      "label": "Pending Reports",
+      "kind": "figure",
+      "entity": "Report",
+      "fn": "count",
+      "filter": {
+        "status": "PENDING"
+      }
+    },
+    {
+      "label": "Published Clips",
+      "kind": "figure",
+      "entity": "Clip",
+      "fn": "count",
+      "filter": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "label": "Clips Today",
+      "kind": "figure",
+      "entity": "Clip",
+      "fn": "count",
+      "filter": {},
+      "period": "day"
+    },
+    {
+      "label": "Reports by Status",
+      "kind": "pie",
+      "entity": "Report",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    }
+  ],
+  "workflows": {
+    "version": "22b83934143f",
+    "tours": [
+      {
+        "id": "post_clip",
+        "name": "Post a clip",
+        "outcome": "A short video clip is published to the feed and appears on the creator profile",
+        "roles": [
+          "Member"
+        ],
+        "steps": [
+          {
+            "id": "post_clip_1",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Upload clip with caption (the clip becomes published). Rule: Clip must include valid video content and a caption",
+            "operationId": "clip.create",
+            "statusAfter": "published",
+            "page": "clips-new",
+            "route": "/clips/new",
+            "target": {
+              "section": "clip-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "clip"
+          },
+          {
+            "id": "post_clip_2",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Display clip on creator profile (the profile becomes updated)",
+            "operationId": null,
+            "statusAfter": "updated",
+            "automatic": true,
+            "kind": "note",
+            "record": "profile"
+          }
+        ]
+      },
+      {
+        "id": "engage_with_content",
+        "name": "Engage with content",
+        "outcome": "Feedback is recorded on the clip and the clip author is notified",
+        "roles": [
+          "Member"
+        ],
+        "steps": [
+          {
+            "id": "engage_clip_1",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Like or comment on clip (the clip becomes engaged). Rule: Member can like once per clip",
+            "operationId": "like.create",
+            "statusAfter": "engaged",
+            "page": "clips-id",
+            "route": "/clips/[id]",
+            "target": {
+              "section": "clips-detail",
+              "action": "add-likes"
+            },
+            "kind": "do",
+            "record": "clip"
+          },
+          {
+            "id": "engage_clip_2",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Notify clip author (the notification becomes sent)",
+            "operationId": null,
+            "statusAfter": "sent",
+            "automatic": true,
+            "kind": "note",
+            "record": "notification"
+          }
+        ]
+      },
+      {
+        "id": "follow_creator",
+        "name": "Follow a creator",
+        "outcome": "The member follows the creator and follow counts are updated",
+        "roles": [
+          "Member"
+        ],
+        "steps": [
+          {
+            "id": "follow_creator_1",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Follow creator (the profile becomes following). Rule: Cannot follow oneself",
+            "operationId": "follow.create",
+            "statusAfter": "following",
+            "page": "follows-new",
+            "route": "/follows/new",
+            "target": {
+              "section": "follow-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "profile"
+          },
+          {
+            "id": "follow_creator_2",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Notify followed creator (the notification becomes sent)",
+            "operationId": null,
+            "statusAfter": "sent",
+            "automatic": true,
+            "kind": "note",
+            "record": "notification"
+          }
+        ]
+      },
+      {
+        "id": "moderate_content",
+        "name": "Report and moderate content",
+        "outcome": "Violating content is hidden from the community",
+        "roles": [
+          "Member",
+          "Moderator"
+        ],
+        "steps": [
+          {
+            "id": "moderate_content_1",
+            "role": "Member",
+            "actor": "Member",
+            "title": "Report clip or comment (the report becomes pending). Rule: Reported item must exist",
+            "operationId": "report.create",
+            "statusAfter": "pending",
+            "page": "reports-new",
+            "route": "/reports/new",
+            "target": {
+              "section": "report-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "report"
+          },
+          {
+            "id": "moderate_content_2",
+            "role": "Moderator",
+            "actor": "Moderator",
+            "title": "Review report (the report becomes reviewed)",
+            "operationId": "report.review",
+            "statusAfter": "reviewed",
+            "page": "moderator-area-reports-id",
+            "route": "/moderator-area/reports/[id]",
+            "target": {
+              "section": "reports-detail",
+              "action": "review"
+            },
+            "kind": "do",
+            "record": "report",
+            "needs": {
+              "step": "moderate_content_1",
+              "role": "Member",
+              "status": "pending"
+            }
+          },
+          {
+            "id": "moderate_content_3",
+            "role": "Moderator",
+            "actor": "Moderator",
+            "title": "Hide violating content (the clip becomes hidden). Rule: Only content breaking rules may be hidden",
+            "operationId": "clip.hide",
+            "statusAfter": "hidden",
+            "page": "moderator-area-clips-id",
+            "route": "/moderator-area/clips/[id]",
+            "target": {
+              "section": "clips-detail",
+              "action": "hide"
+            },
+            "kind": "do",
+            "record": "clip"
+          }
+        ]
+      }
+    ]
+  }
+}

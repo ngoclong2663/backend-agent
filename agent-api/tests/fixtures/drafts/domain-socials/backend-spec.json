@@ -1,0 +1,1058 @@
+{
+  "auth": {
+    "roles": [
+      "Member",
+      "Moderator"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "Short video clips uploaded by members with captions and engagement counters.",
+      "displayField": "caption",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "description": "Owner member who uploaded the clip",
+          "index": true,
+          "name": "creatorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "description": "Short video file uploaded by the member",
+          "name": "videoUrl",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "description": "Text caption describing the video clip",
+          "maxLength": 300,
+          "name": "caption",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Current lifecycle status of the clip",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PUBLISHED",
+            "ENGAGED",
+            "HIDDEN"
+          ]
+        },
+        {
+          "default": 0,
+          "description": "Total number of likes received",
+          "min": 0,
+          "name": "likesCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "description": "Total number of comments received",
+          "min": 0,
+          "name": "commentsCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "description": "Length of the video clip in seconds",
+          "min": 1,
+          "name": "durationSeconds",
+          "type": "integer"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "creatorId"
+          ]
+        },
+        {
+          "fields": [
+            "status"
+          ]
+        },
+        {
+          "fields": [
+            "createdAt"
+          ]
+        }
+      ],
+      "name": "Clip"
+    },
+    {
+      "description": "Member creator profile tracking bios, avatars, and community follow counts.",
+      "displayField": "displayName",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "memberId",
+          "required": true,
+          "type": "uuid",
+          "unique": true
+        },
+        {
+          "maxLength": 60,
+          "name": "displayName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "avatar",
+          "nullable": true,
+          "type": "image"
+        },
+        {
+          "maxLength": 500,
+          "name": "bio",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "followersCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "followingCount",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "UPDATED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "UPDATED",
+            "FOLLOWING"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Profile"
+    },
+    {
+      "description": "Member comments and replies on clips.",
+      "displayField": "text",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "clipId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "authorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "parentCommentId",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 1000,
+          "name": "text",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "PUBLISHED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PUBLISHED",
+            "HIDDEN"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Comment"
+    },
+    {
+      "description": "Likes placed on clips by members.",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "clipId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "memberId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Like",
+      "uniqueConstraints": [
+        [
+          "clipId",
+          "memberId"
+        ]
+      ]
+    },
+    {
+      "description": "Following relationships between members.",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "followerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "followingId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Follow",
+      "uniqueConstraints": [
+        [
+          "followerId",
+          "followingId"
+        ]
+      ]
+    },
+    {
+      "description": "Activity alerts dispatched to members for likes, replies, and follows.",
+      "displayField": "message",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "recipientId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "actorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "type",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "LIKE",
+            "REPLY",
+            "FOLLOW"
+          ]
+        },
+        {
+          "maxLength": 255,
+          "name": "message",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "SENT",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "SENT",
+            "READ"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Notification"
+    },
+    {
+      "description": "Content violation reports submitted by members and reviewed by moderators.",
+      "displayField": "reason",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "targetType",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "CLIP",
+            "COMMENT"
+          ]
+        },
+        {
+          "index": true,
+          "name": "targetId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "reporterId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 500,
+          "name": "reason",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "PENDING",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PENDING",
+            "REVIEWED",
+            "DISMISSED"
+          ]
+        },
+        {
+          "index": true,
+          "name": "reviewedBy",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Report"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Upload and publish a new short video clip with caption.",
+      "entity": "Clip",
+      "method": "POST",
+      "operationId": "clip.create",
+      "path": "/clips",
+      "policy": "memberOnly",
+      "request": {
+        "fields": [
+          "videoUrl",
+          "caption",
+          "durationSeconds"
+        ],
+        "entity": "Clip"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "description": "Retrieve a clip by its unique ID.",
+      "entity": "Clip",
+      "method": "GET",
+      "operationId": "clip.get",
+      "path": "/clips/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "description": "List published or engaged video clips for the public community feed.",
+      "entity": "Clip",
+      "filters": [
+        "creatorId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "clip.list",
+      "pagination": true,
+      "path": "/clips",
+      "search": [
+        "caption"
+      ],
+      "sort": [
+        "createdAt",
+        "likesCount"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "description": "Update clip metadata (caption).",
+      "entity": "Clip",
+      "method": "PATCH",
+      "operationId": "clip.update",
+      "path": "/clips/{id}",
+      "policy": "ownClip",
+      "request": {
+        "fields": [
+          "caption"
+        ],
+        "entity": "Clip"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "description": "Remove an uploaded clip.",
+      "entity": "Clip",
+      "method": "DELETE",
+      "operationId": "clip.delete",
+      "path": "/clips/{id}",
+      "policy": "ownClip",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Hide a clip that breaks community rules after moderator review.",
+      "entity": "Clip",
+      "method": "POST",
+      "operationId": "clip.hide",
+      "path": "/clips/{id}/hide",
+      "policy": "moderatorOnly",
+      "rules": [
+        "clipLifecycle"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Clip"
+      }
+    },
+    {
+      "action": "get",
+      "description": "Get creator profile details by profile ID.",
+      "entity": "Profile",
+      "method": "GET",
+      "operationId": "profile.get",
+      "path": "/profiles/{id}",
+      "type": "crud",
+      "policy": "ownProfile"
+    },
+    {
+      "action": "list",
+      "description": "List member profiles.",
+      "entity": "Profile",
+      "filters": [
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "profile.list",
+      "pagination": true,
+      "path": "/profiles",
+      "search": [
+        "displayName"
+      ],
+      "sort": [
+        "followersCount",
+        "createdAt"
+      ],
+      "type": "crud",
+      "policy": "ownProfile"
+    },
+    {
+      "action": "update",
+      "description": "Update creator profile information.",
+      "entity": "Profile",
+      "method": "PATCH",
+      "operationId": "profile.update",
+      "path": "/profiles/{id}",
+      "policy": "ownProfile",
+      "request": {
+        "fields": [
+          "displayName",
+          "avatar",
+          "bio"
+        ],
+        "entity": "Profile"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Submit a comment on a clip or reply to an existing comment, transitioning comment to published and notifying author.",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "memberOnly",
+      "request": {
+        "fields": [
+          "clipId",
+          "parentCommentId",
+          "text"
+        ],
+        "entity": "Comment"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "description": "List comments under a specific clip or parent comment.",
+      "entity": "Comment",
+      "filters": [
+        "clipId",
+        "parentCommentId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "description": "Get a single comment.",
+      "entity": "Comment",
+      "method": "GET",
+      "operationId": "comment.get",
+      "path": "/comments/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "description": "Delete own comment.",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "ownComment",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Hide a violating comment as a moderator.",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.hide",
+      "path": "/comments/{id}/hide",
+      "policy": "moderatorOnly",
+      "type": "custom",
+      "response": {
+        "entity": "Comment"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Like a clip once per member, updating clip status to engaged and triggering an author notification.",
+      "entity": "Like",
+      "method": "POST",
+      "operationId": "like.create",
+      "path": "/likes",
+      "policy": "memberOnly",
+      "request": {
+        "fields": [
+          "clipId"
+        ],
+        "entity": "Like"
+      },
+      "rules": [
+        "oneLikePerMember"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Unlike a clip.",
+      "entity": "Like",
+      "method": "DELETE",
+      "operationId": "like.delete",
+      "path": "/likes/{id}",
+      "policy": "ownLike",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Follow a creator, updating creator profile and notifying the followed member.",
+      "entity": "Follow",
+      "method": "POST",
+      "operationId": "follow.create",
+      "path": "/follows",
+      "policy": "memberOnly",
+      "request": {
+        "fields": [
+          "followingId"
+        ],
+        "entity": "Follow"
+      },
+      "rules": [
+        "noSelfFollow",
+        "uniqueFollow"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Unfollow a creator.",
+      "entity": "Follow",
+      "method": "DELETE",
+      "operationId": "follow.delete",
+      "path": "/follows/{id}",
+      "policy": "ownFollow",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List activity notifications for the signed-in member.",
+      "entity": "Notification",
+      "filters": [
+        "type",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "notification.list",
+      "pagination": true,
+      "path": "/notifications",
+      "policy": "ownNotification",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "description": "Get a single notification.",
+      "entity": "Notification",
+      "method": "GET",
+      "operationId": "notification.get",
+      "path": "/notifications/{id}",
+      "policy": "ownNotification",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Submit a content report on a clip or comment for moderation.",
+      "entity": "Report",
+      "method": "POST",
+      "operationId": "report.create",
+      "path": "/reports",
+      "policy": "memberOnly",
+      "request": {
+        "fields": [
+          "targetType",
+          "targetId",
+          "reason"
+        ],
+        "entity": "Report"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List content violation reports for review.",
+      "entity": "Report",
+      "filters": [
+        "status",
+        "targetType"
+      ],
+      "method": "GET",
+      "operationId": "report.list",
+      "pagination": true,
+      "path": "/reports",
+      "policy": "moderatorOnly",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "description": "View violation report details.",
+      "entity": "Report",
+      "method": "GET",
+      "operationId": "report.get",
+      "path": "/reports/{id}",
+      "policy": "moderatorOnly",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Review and mark report as reviewed.",
+      "entity": "Report",
+      "method": "POST",
+      "operationId": "report.review",
+      "path": "/reports/{id}/review",
+      "policy": "moderatorOnly",
+      "rules": [
+        "reportLifecycle"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Report"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Dismiss report without taking enforcement action.",
+      "entity": "Report",
+      "method": "POST",
+      "operationId": "report.dismiss",
+      "path": "/reports/{id}/dismiss",
+      "policy": "moderatorOnly",
+      "rules": [
+        "reportLifecycle"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Report"
+      }
+    },
+    {
+      "operationId": "report.countWhereStatusPending",
+      "type": "aggregate",
+      "entity": "Report",
+      "method": "GET",
+      "path": "/reports/aggregate/count-where-status-pending",
+      "summary": "Pending Reports",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "PENDING"
+        }
+      }
+    },
+    {
+      "operationId": "clip.countWhereStatusPublished",
+      "type": "aggregate",
+      "entity": "Clip",
+      "method": "GET",
+      "path": "/clips/aggregate/count-where-status-published",
+      "summary": "Published Clips",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "PUBLISHED"
+        }
+      }
+    },
+    {
+      "operationId": "clip.countThisDay",
+      "type": "aggregate",
+      "entity": "Clip",
+      "method": "GET",
+      "path": "/clips/aggregate/count-this-day",
+      "summary": "Clips Today",
+      "aggregate": {
+        "fn": "count",
+        "period": "day",
+        "dateField": "createdAt"
+      }
+    },
+    {
+      "operationId": "report.countByStatus",
+      "type": "aggregate",
+      "entity": "Report",
+      "method": "GET",
+      "path": "/reports/aggregate/count-by-status",
+      "summary": "Reports by Status",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "status"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "memberOnly",
+      "roles": [
+        "Member"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "moderatorOnly",
+      "roles": [
+        "Moderator"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "Moderator"
+      ],
+      "name": "ownClip",
+      "ownerField": "creatorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "Moderator"
+      ],
+      "name": "ownProfile",
+      "ownerField": "memberId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "Moderator"
+      ],
+      "name": "ownComment",
+      "ownerField": "authorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownLike",
+      "ownerField": "memberId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownFollow",
+      "ownerField": "followerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "ownNotification",
+      "ownerField": "recipientId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Clip",
+      "name": "visibleClips",
+      "roles": [
+        "Member"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "entity": "Comment",
+      "name": "visibleComments",
+      "roles": [
+        "Member"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    }
+  ],
+  "project": {
+    "description": "A short-video community with feeds, likes, comments, follows, notifications, and moderation.",
+    "name": "Loop",
+    "slug": "loop"
+  },
+  "relationships": [
+    {
+      "foreignKey": "creatorId",
+      "from": "Profile",
+      "name": "creatorClips",
+      "onDelete": "CASCADE",
+      "to": "Clip",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "clipId",
+      "from": "Clip",
+      "name": "clipComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "clipId",
+      "from": "Clip",
+      "name": "clipLikes",
+      "onDelete": "CASCADE",
+      "to": "Like",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "parentCommentId",
+      "from": "Comment",
+      "name": "commentReplies",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Clip status moves from PUBLISHED to ENGAGED when receiving interactions, or HIDDEN when breaking rules.",
+      "entity": "Clip",
+      "id": "clipLifecycle",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "ENGAGED": [
+            "HIDDEN"
+          ],
+          "PUBLISHED": [
+            "ENGAGED",
+            "HIDDEN"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Hidden clips cannot be modified further.",
+      "entity": "Comment",
+      "id": "hiddenCommentFinal",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "HIDDEN"
+        ]
+      }
+    },
+    {
+      "description": "Only one like per member per clip allowed.",
+      "entity": "Like",
+      "id": "oneLikePerMember",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "clipId",
+          "memberId"
+        ]
+      }
+    },
+    {
+      "description": "Members can only follow another member once.",
+      "entity": "Follow",
+      "id": "uniqueFollow",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "followerId",
+          "followingId"
+        ]
+      }
+    },
+    {
+      "description": "A member cannot follow themselves.",
+      "entity": "Follow",
+      "id": "noSelfFollow",
+      "kind": "custom",
+      "params": {
+        "description": "followerId must not equal followingId"
+      }
+    },
+    {
+      "description": "Report status transitions from PENDING to REVIEWED, then optionally to DISMISSED.",
+      "entity": "Report",
+      "id": "reportLifecycle",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PENDING": [
+            "REVIEWED",
+            "DISMISSED"
+          ],
+          "REVIEWED": [
+            "DISMISSED"
+          ]
+        }
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

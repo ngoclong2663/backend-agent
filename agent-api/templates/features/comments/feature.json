@@ -1,0 +1,150 @@
+{
+  "name": "comments",
+  "label": "Comments",
+  "status": "ready",
+  "attachesTo": "content",
+  "choose": "People write comments under a record and reply to each other's comments.",
+  "replaces": [
+    "comment",
+    "reply",
+    "question",
+    "answer",
+    "discussion"
+  ],
+  "spec": {
+    "entities": [
+      {
+        "name": "{Target}Comment",
+        "displayField": "text",
+        "fields": [
+          {
+            "name": "id",
+            "type": "uuid",
+            "primary": true
+          },
+          {
+            "name": "{target}Id",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "authorId",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "parentId",
+            "type": "uuid",
+            "index": true
+          },
+          {
+            "name": "text",
+            "type": "text",
+            "required": true,
+            "maxLength": 2000
+          },
+          {
+            "name": "createdAt",
+            "type": "datetime",
+            "required": true,
+            "default": "now"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "{target}Comments",
+        "type": "one-to-many",
+        "from": "{Target}",
+        "to": "{Target}Comment",
+        "foreignKey": "{target}Id",
+        "onDelete": "CASCADE"
+      },
+      {
+        "name": "{target}CommentReplies",
+        "type": "one-to-many",
+        "from": "{Target}Comment",
+        "to": "{Target}Comment",
+        "foreignKey": "parentId",
+        "onDelete": "CASCADE"
+      }
+    ],
+    "operations": [
+      {
+        "operationId": "{target}Comment.list",
+        "type": "crud",
+        "action": "list",
+        "entity": "{Target}Comment",
+        "method": "GET",
+        "path": "/{targetPath}-comments",
+        "auth": "jwt",
+        "pagination": true,
+        "filters": [
+          "{target}Id",
+          "parentId"
+        ],
+        "sort": [
+          "createdAt"
+        ]
+      },
+      {
+        "operationId": "{target}Comment.create",
+        "type": "crud",
+        "action": "create",
+        "entity": "{Target}Comment",
+        "method": "POST",
+        "path": "/{targetPath}-comments",
+        "auth": "jwt",
+        "policy": "own{Target}Comments"
+      },
+      {
+        "operationId": "{target}Comment.update",
+        "type": "crud",
+        "action": "update",
+        "entity": "{Target}Comment",
+        "method": "PATCH",
+        "path": "/{targetPath}-comments/{id}",
+        "auth": "jwt",
+        "policy": "own{Target}Comments"
+      },
+      {
+        "operationId": "{target}Comment.delete",
+        "type": "crud",
+        "action": "delete",
+        "entity": "{Target}Comment",
+        "method": "DELETE",
+        "path": "/{targetPath}-comments/{id}",
+        "auth": "jwt",
+        "policy": "own{Target}Comments"
+      }
+    ],
+    "policies": [
+      {
+        "name": "own{Target}Comments",
+        "type": "ownership",
+        "entity": "{Target}Comment",
+        "ownerField": "authorId"
+      }
+    ]
+  },
+  "computed": [
+    {
+      "field": "commentCount",
+      "kind": "count",
+      "entity": "{Target}Comment",
+      "key": "{target}Id"
+    }
+  ],
+  "kit": {
+    "components": [
+      "CommentThread"
+    ],
+    "slots": [
+      "comment-thread",
+      "comment-preview"
+    ]
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "draftId": "f52a4b71-152e-4217-826d-8389ed61e8b7",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T04:25:28.035359Z",
+  "finishedAt": "2026-11-10T04:28:18.287363Z",
+  "assumptions": [
+    {
+      "path": "/entities/Course",
+      "message": "Added categoryId, summary, and coverImage to Course to satisfy catalogue browsing by category and cards view.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Lesson",
+      "message": "Lesson textContent and videoUrl fields accommodate video or written lesson types as required.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/QuizQuestion",
+      "message": "QuizQuestion entity stores structured prompt and options for lesson quizzes.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design/requested/accent",
+      "message": "Deep teal accent #005b5b selected based on requirement specification 'a deep teal accent'.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Online Course/E-learning (Feature-Rich Showcase + Social Proof); palette Vibrant learning colors + Progress green; fonts Friendly SaaS (Plus Jakarta Sans / Plus Jakarta Sans); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/entities/2/fields",
+      "message": "Lesson has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "course.publish: it answers the Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/11/response",
+      "message": "course.unpublish: it answers the Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/30/response",
+      "message": "enrollment.complete: it answers the Enrollment",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/2/fields",
+      "message": "Lesson has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6",
+      "message": "course.get: who sees a record follows the visibility policy learnerCourseVisibility",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7",
+      "message": "course.list: who sees a record follows the visibility policy learnerCourseVisibility",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/30",
+      "message": "enrollment.complete: only the record's own learner may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/38",
+      "message": "review.get: private to its learner (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/39",
+      "message": "review.list: private to its learner (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Enrollment: side needs an image, a video or an audio field; shown as stacked",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "LessonProgress: title 'lessonId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'learners': Enrollment: side needs an image, a video or an audio field; shown as stacked",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'learners': LessonProgress: title 'lessonId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Published Courses' is computed by course.count (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Active Enrollments' is computed by enrollment.countWhereStatusActive (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Completed Courses' is computed by enrollment.countWhereStatusCompleted (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Total Reviews' is computed by review.count (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (calm and studious, plenty of white space, a deep teal accent): accent #005b5b; background #ffffff",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Courses are added from their category's page",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations/course.delete",
+      "message": "Can instructors delete published courses with active enrollments, or should deletion be restricted?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/review.create",
+      "message": "Can learners edit their submitted course reviews or only delete/re-submit them?",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

@@ -1,0 +1,800 @@
+{
+  "auth": {
+    "roles": [
+      "Member",
+      "Moderator"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "Short video clips posted by community members",
+      "displayField": "caption",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "creatorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "videoUrl",
+          "required": true,
+          "type": "video"
+        },
+        {
+          "maxLength": 500,
+          "name": "caption",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "PUBLISHED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PUBLISHED",
+            "HIDDEN"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Clip"
+    },
+    {
+      "description": "Follower connections between members",
+      "displayField": "followingId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "followerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "followingId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "ACTIVE",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "ACTIVE"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Follow"
+    },
+    {
+      "description": "In-app interaction notifications for members",
+      "displayField": "message",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "recipientId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "type",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "LIKE",
+            "REPLY",
+            "FOLLOW"
+          ]
+        },
+        {
+          "maxLength": 255,
+          "name": "message",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "DELIVERED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "DELIVERED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Notification"
+    },
+    {
+      "description": "Reports on clips or comments violating community rules",
+      "displayField": "reason",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "reporterId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "itemId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "itemType",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "CLIP",
+            "COMMENT"
+          ]
+        },
+        {
+          "maxLength": 1000,
+          "name": "reason",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "PENDING",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PENDING",
+            "REVIEWED",
+            "DISMISSED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Report"
+    },
+    {
+      "name": "ClipComment",
+      "displayField": "text",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "clipId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "authorId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "parentId",
+          "type": "uuid",
+          "index": true
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "maxLength": 2000
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "ClipReaction",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "clipId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "userId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "kind",
+          "type": "enum",
+          "values": [
+            "like"
+          ],
+          "required": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Clip",
+      "method": "POST",
+      "operationId": "clip.create",
+      "path": "/clips",
+      "policy": "memberRole",
+      "request": {
+        "fields": [
+          "videoUrl",
+          "caption"
+        ],
+        "entity": "Clip"
+      },
+      "summary": "Post a new short clip",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Clip",
+      "method": "GET",
+      "operationId": "clip.get",
+      "path": "/clips/{id}",
+      "summary": "Get a single clip",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Clip",
+      "filters": [
+        "creatorId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "clip.list",
+      "pagination": true,
+      "path": "/clips",
+      "search": [
+        "caption"
+      ],
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "Browse clip feed",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Clip",
+      "method": "PATCH",
+      "operationId": "clip.update",
+      "path": "/clips/{id}",
+      "policy": "clipOwner",
+      "request": {
+        "fields": [
+          "caption"
+        ],
+        "entity": "Clip"
+      },
+      "summary": "Update clip caption",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Clip",
+      "method": "DELETE",
+      "operationId": "clip.delete",
+      "path": "/clips/{id}",
+      "policy": "clipOwner",
+      "summary": "Delete clip",
+      "type": "crud"
+    },
+    {
+      "description": "Moderator hides a rule-breaking clip from community feeds and profiles. Moves clip status to HIDDEN.",
+      "entity": "Clip",
+      "method": "POST",
+      "operationId": "clip.hide",
+      "path": "/clips/{id}/hide",
+      "policy": "moderatorOnly",
+      "summary": "Hide clip",
+      "type": "custom",
+      "response": {
+        "entity": "Clip"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Follow",
+      "method": "POST",
+      "operationId": "follow.create",
+      "path": "/follows",
+      "policy": "memberRole",
+      "request": {
+        "fields": [
+          "followingId"
+        ],
+        "entity": "Follow"
+      },
+      "rules": [
+        "uniqueFollow"
+      ],
+      "summary": "Follow a creator",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Follow",
+      "method": "GET",
+      "operationId": "follow.get",
+      "path": "/follows/{id}",
+      "summary": "Get follow record",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Follow",
+      "filters": [
+        "followerId",
+        "followingId"
+      ],
+      "method": "GET",
+      "operationId": "follow.list",
+      "pagination": true,
+      "path": "/follows",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List follows",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Follow",
+      "method": "DELETE",
+      "operationId": "follow.delete",
+      "path": "/follows/{id}",
+      "policy": "followOwner",
+      "summary": "Unfollow a creator",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Notification",
+      "method": "GET",
+      "operationId": "notification.get",
+      "path": "/notifications/{id}",
+      "policy": "notificationRecipient",
+      "summary": "Get notification",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Notification",
+      "filters": [
+        "type",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "notification.list",
+      "pagination": true,
+      "path": "/notifications",
+      "policy": "notificationRecipient",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List recipient notifications",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Report",
+      "method": "POST",
+      "operationId": "report.create",
+      "path": "/reports",
+      "policy": "memberRole",
+      "request": {
+        "fields": [
+          "itemId",
+          "itemType",
+          "reason"
+        ],
+        "entity": "Report"
+      },
+      "summary": "Report clip or comment",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Report",
+      "method": "GET",
+      "operationId": "report.get",
+      "path": "/reports/{id}",
+      "policy": "moderatorOnly",
+      "summary": "Get report details",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Report",
+      "filters": [
+        "itemType",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "report.list",
+      "pagination": true,
+      "path": "/reports",
+      "policy": "moderatorOnly",
+      "sort": [
+        "createdAt"
+      ],
+      "summary": "List reported content for moderation",
+      "type": "crud"
+    },
+    {
+      "description": "Moderator reviews reported content and marks the report as reviewed.",
+      "entity": "Report",
+      "method": "POST",
+      "operationId": "report.review",
+      "path": "/reports/{id}/review",
+      "policy": "moderatorOnly",
+      "summary": "Mark report as reviewed",
+      "type": "custom",
+      "response": {
+        "entity": "Report"
+      }
+    },
+    {
+      "description": "Moderator dismisses report when content complies with community rules. Moves status to DISMISSED.",
+      "entity": "Report",
+      "method": "POST",
+      "operationId": "report.dismiss",
+      "path": "/reports/{id}/dismiss",
+      "policy": "moderatorOnly",
+      "summary": "Dismiss report",
+      "type": "custom",
+      "response": {
+        "entity": "Report"
+      }
+    },
+    {
+      "operationId": "clipComment.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "ClipComment",
+      "method": "GET",
+      "path": "/clip-comments",
+      "auth": "jwt",
+      "pagination": true,
+      "filters": [
+        "clipId",
+        "parentId"
+      ],
+      "sort": [
+        "createdAt"
+      ]
+    },
+    {
+      "operationId": "clipComment.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "ClipComment",
+      "method": "POST",
+      "path": "/clip-comments",
+      "auth": "jwt",
+      "policy": "ownClipComments"
+    },
+    {
+      "operationId": "clipComment.update",
+      "type": "crud",
+      "action": "update",
+      "entity": "ClipComment",
+      "method": "PATCH",
+      "path": "/clip-comments/{id}",
+      "auth": "jwt",
+      "policy": "ownClipComments"
+    },
+    {
+      "operationId": "clipComment.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "ClipComment",
+      "method": "DELETE",
+      "path": "/clip-comments/{id}",
+      "auth": "jwt",
+      "policy": "ownClipComments"
+    },
+    {
+      "operationId": "clipReaction.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "ClipReaction",
+      "method": "POST",
+      "path": "/clip-reactions",
+      "auth": "jwt",
+      "policy": "ownClipReactions"
+    },
+    {
+      "operationId": "clipReaction.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "ClipReaction",
+      "method": "DELETE",
+      "path": "/clip-reactions/{id}",
+      "auth": "jwt",
+      "policy": "ownClipReactions"
+    }
+  ],
+  "policies": [
+    {
+      "name": "memberRole",
+      "roles": [
+        "Member"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "moderatorOnly",
+      "roles": [
+        "Moderator"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "Moderator"
+      ],
+      "name": "clipOwner",
+      "ownerField": "creatorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "followOwner",
+      "ownerField": "followerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [],
+      "name": "notificationRecipient",
+      "ownerField": "recipientId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Clip",
+      "name": "visibleClipsOnly",
+      "roles": [
+        "Member"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "name": "ownClipComments",
+      "type": "ownership",
+      "entity": "ClipComment",
+      "ownerField": "authorId"
+    },
+    {
+      "name": "ownClipReactions",
+      "type": "ownership",
+      "entity": "ClipReaction",
+      "ownerField": "userId"
+    }
+  ],
+  "project": {
+    "description": "Short-video community with feed browsing, creator follows, community interactions, and safety moderation",
+    "name": "Loop",
+    "slug": "loop"
+  },
+  "relationships": [
+    {
+      "from": "Clip",
+      "name": "clipReports",
+      "onDelete": "CASCADE",
+      "to": "Report",
+      "type": "one-to-many"
+    },
+    {
+      "name": "clipComments",
+      "type": "one-to-many",
+      "from": "Clip",
+      "to": "ClipComment",
+      "foreignKey": "clipId",
+      "onDelete": "CASCADE"
+    },
+    {
+      "name": "clipCommentReplies",
+      "type": "one-to-many",
+      "from": "ClipComment",
+      "to": "ClipComment",
+      "foreignKey": "parentId",
+      "onDelete": "CASCADE"
+    },
+    {
+      "name": "clipReactions",
+      "type": "one-to-many",
+      "from": "Clip",
+      "to": "ClipReaction",
+      "foreignKey": "clipId",
+      "onDelete": "CASCADE"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Clip transitions from published to hidden when moderated",
+      "entity": "Clip",
+      "id": "clipStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PUBLISHED": [
+            "HIDDEN"
+          ]
+        }
+      }
+    },
+    {
+      "description": "A member can only follow another member once",
+      "entity": "Follow",
+      "id": "uniqueFollow",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "followerId",
+          "followingId"
+        ]
+      }
+    },
+    {
+      "description": "Report transitions from pending to reviewed or dismissed",
+      "entity": "Report",
+      "id": "reportStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PENDING": [
+            "REVIEWED",
+            "DISMISSED"
+          ],
+          "REVIEWED": [
+            "DISMISSED"
+          ]
+        }
+      }
+    },
+    {
+      "id": "oneClipReactionEach",
+      "kind": "uniqueTogether",
+      "entity": "ClipReaction",
+      "params": {
+        "fields": [
+          "clipId",
+          "userId",
+          "kind"
+        ]
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  },
+  "features": [
+    {
+      "feature": "comments",
+      "on": "Clip",
+      "options": {},
+      "entities": [
+        "ClipComment"
+      ],
+      "computed": [
+        {
+          "field": "commentCount",
+          "kind": "count",
+          "entity": "ClipComment",
+          "key": "clipId",
+          "where": {}
+        }
+      ]
+    },
+    {
+      "feature": "reactions",
+      "on": "Clip",
+      "options": {
+        "kinds": [
+          "like"
+        ]
+      },
+      "entities": [
+        "ClipReaction"
+      ],
+      "computed": [
+        {
+          "field": "likeCount",
+          "kind": "count",
+          "entity": "ClipReaction",
+          "key": "clipId",
+          "where": {
+            "kind": "like"
+          }
+        },
+        {
+          "field": "myLikeId",
+          "kind": "mine",
+          "entity": "ClipReaction",
+          "key": "clipId",
+          "where": {
+            "kind": "like"
+          },
+          "owner": "userId"
+        }
+      ]
+    }
+  ]
+}

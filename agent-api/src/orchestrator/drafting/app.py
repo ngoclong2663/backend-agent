@@ -40,11 +40,13 @@ from ..frontend.app.typesetting import locale_of
 from ..integration.contract import build_contract
 from .access import secure_access
 from .answer_schema import app_answer_schema
+from .domains import apply_domain, offered, rank_domains
 
 # v7 (Epic 30): the design choices from the plugin registry; v6 (Epic 29): the media field types; v5: the
 # requirement's own look (`design.requested`); v4 (Epic 25): the access rules; v3 (Story 23.6): the design brief and
 # areas; v2 (22.8): sign-in, roles, plugins
 PROMPT = ("draft_app", "v9")
+DOMAIN_PROMPT = ("draft_app", "v10")  # Epic 33: v9 plus the domains code ranked for the requirement
 OUTLINE_FILE = "app-outline.json"  # what the model drafts next to the BackendSpec (code folds it into the FrontendSpec)
 # Outline examples shown in the prompt, relative to EXAMPLES_DIR; they fit `specs/flashcards.json`,
 # `specs/two-entity.json` and `specs/workshop-bookings.json` (the fake engine drafts from them too).
@@ -385,8 +387,13 @@ async def draft_app(
     await progress("drafting")
     # Story 22.8: an API engine answers in the shape of the three files (structured output); a CLI engine writes them
     inline = context.get("inline")
-    schema = app_answer_schema(backend_file, OUTLINE_FILE, context["notes_path"], design=True) if inline else None
     requirement = context.get("requirement_text") or ""
+    domains = rank_domains(requirement)  # Epic 33: the kinds of product the requirement describes
+    schema = (
+        app_answer_schema(backend_file, OUTLINE_FILE, context["notes_path"], design=True, domain=bool(domains))
+        if inline
+        else None
+    )
     products = product_rows(requirement)
     product_types = [row.get("Product Type", "") for row in products]
     candidates = archetype_candidates(requirement, product_types)
@@ -396,13 +403,21 @@ async def draft_app(
         "recommended_looks": recommended_looks(products),
         "style_words": style_words(requirement),
         "design_choices": design_choices(candidates),  # Epic 30: the plugins offered for these archetypes
+        "domains": offered(domains),
     }
-    result = await call("draft", prompts.render(*PROMPT, **context), response_schema=schema)
+    prompt = DOMAIN_PROMPT if domains else PROMPT
+    result = await call("draft", prompts.render(*prompt, **context), response_schema=schema)
     if result.status != EngineStatus.OK:
         from .drafts import DraftFailed
 
         raise DraftFailed(f"The engine stopped: {result.error_message or result.status}")
     notes: list[dict[str, Any]] = fix_backend_defaults(work, backend_file)
+    domain_block: dict[str, Any] | None = None
+    if domains:  # Epic 33: the domain's features merged before any check, so repairs see the whole spec
+        merged, domain_block, domain_notes = apply_domain(_load(work / backend_file), _load(work / OUTLINE_FILE))
+        if domain_block is not None:
+            (work / backend_file).write_text(json.dumps(merged, indent=2, ensure_ascii=False) + "\n")
+        notes += domain_notes
     error: str | None = None
     check = check_draft(work, GenerationMode.BACKEND)
     attempts = 0
@@ -441,6 +456,9 @@ async def draft_app(
         drafted, backend, build_contract(backend, build_plan(backend)), hint, seed=design_seed(requirement)
     )
     outline_fixes += finish_looks(outline, requirement, products)
+    outline.pop("domain", None)
+    if domain_block is not None:  # Epic 33: what code checked, never the model's raw answer
+        outline["domain"] = domain_block
     if not outline.get("locale") and locale_of(requirement):  # Story 23.8: a Japanese requirement, a Japanese app
         outline["locale"] = locale_of(requirement)
     # Story 22.3: the dashboard's figures are aggregate operations, templated like CRUD; code adds the missing ones.

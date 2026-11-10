@@ -1,0 +1,3124 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "Verdant Greenhouse Monitor",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "Commercial greenhouse monitoring platform for environmental sensors, pest detection vision, alerting, and hardware health management"
+  },
+  "theme": {
+    "style": "minimal",
+    "colorScheme": "light-dark",
+    "colors": {
+      "primary": "#2e7d32",
+      "secondary": "#eaecec",
+      "accent": "#2e7d32",
+      "background": "#f8faf8",
+      "foreground": "#0f172a",
+      "muted": "#eaecec",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Inter",
+      "bodyFont": "Inter"
+    },
+    "radius": "md",
+    "density": "comfortable",
+    "direction": {
+      "productType": "Weather App",
+      "pattern": "Hero-Centric Design",
+      "palette": "Atmospheric gradients (sky blue → sunset → storm grey) + temp scale",
+      "fontPairing": "Spatial Clear",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "Verdant Greenhouse Monitor",
+      "navigation": [
+        {
+          "label": "Dashboard",
+          "page": "home"
+        },
+        {
+          "label": "Alerts",
+          "page": "alerts"
+        },
+        {
+          "label": "Climate Readings",
+          "page": "sensor-readings"
+        },
+        {
+          "label": "Pest Detections",
+          "page": "pest-detections"
+        },
+        {
+          "label": "Devices",
+          "page": "devices"
+        },
+        {
+          "label": "Zones",
+          "page": "zones"
+        },
+        {
+          "label": "Dashboard",
+          "page": "admins-home"
+        },
+        {
+          "label": "Alerts",
+          "page": "admins-alerts"
+        },
+        {
+          "label": "Climate Readings",
+          "page": "admins-sensor-readings"
+        },
+        {
+          "label": "Pest Detections",
+          "page": "admins-pest-detections"
+        },
+        {
+          "label": "Devices",
+          "page": "admins-devices"
+        },
+        {
+          "label": "Zones",
+          "page": "admins-zones"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "Verdant Greenhouse Monitor",
+    "tagline": "Commercial greenhouse telemetry, climate excursion alerting, pest detection review, and hardware device health",
+    "icon": "Sprout",
+    "nav": [
+      {
+        "entity": "Alert",
+        "label": "Alerts",
+        "icon": "BellAlert"
+      },
+      {
+        "entity": "SensorReading",
+        "label": "Climate Readings",
+        "icon": "Activity"
+      },
+      {
+        "entity": "PestDetection",
+        "label": "Pest Detections",
+        "icon": "Bug"
+      },
+      {
+        "entity": "Device",
+        "label": "Devices",
+        "icon": "Cpu"
+      },
+      {
+        "entity": "Zone",
+        "label": "Zones",
+        "icon": "Warehouse"
+      }
+    ],
+    "home": "dashboard",
+    "entities": {
+      "Zone": {
+        "label": "Greenhouse Zone",
+        "plural": "Greenhouse Zones",
+        "displayField": "name",
+        "listFields": [
+          "name",
+          "code",
+          "targetTempMin",
+          "targetTempMax",
+          "targetCo2Max"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "name",
+          "code",
+          "description",
+          "targetTempMin",
+          "targetTempMax",
+          "targetHumidityMin",
+          "targetHumidityMax",
+          "targetCo2Min",
+          "targetCo2Max",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "name": "Zone Name",
+          "code": "Zone Code",
+          "description": "Description",
+          "targetTempMin": "Min Target Temp (°C)",
+          "targetTempMax": "Max Target Temp (°C)",
+          "targetHumidityMin": "Min Target Humidity (%)",
+          "targetHumidityMax": "Max Target Humidity (%)",
+          "targetCo2Min": "Min Target CO2 (ppm)",
+          "targetCo2Max": "Max Target CO2 (ppm)",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "code": "Short greenhouse bay or zone code (e.g. ZONE-A)",
+          "name": "Name of the greenhouse production zone"
+        },
+        "create": "page"
+      },
+      "Device": {
+        "label": "Device",
+        "plural": "Devices",
+        "displayField": "name",
+        "listFields": [
+          "name",
+          "zoneId",
+          "type",
+          "status",
+          "batteryPercent"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "name",
+          "deviceUid",
+          "zoneId",
+          "type",
+          "status",
+          "batteryPercent",
+          "isOnline",
+          "lastSeenAt",
+          "firmwareVersion",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "zoneId": "Assigned Zone",
+          "name": "Device Name",
+          "deviceUid": "Device Identifier",
+          "type": "Device Type",
+          "status": "Health Status",
+          "batteryPercent": "Battery Level (%)",
+          "isOnline": "Online Status",
+          "lastSeenAt": "Last Heartbeat",
+          "firmwareVersion": "Firmware Version",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "batteryPercent": "Current device battery charge percentage",
+          "deviceUid": "Hardware identifier or MAC address",
+          "isOnline": "Whether the device is transmitting heartbeats",
+          "status": "Health monitoring status (flagged when offline or battery is low)"
+        },
+        "create": "page"
+      },
+      "SensorReading": {
+        "label": "Sensor Reading",
+        "plural": "Sensor Readings",
+        "displayField": "recordedAt",
+        "listFields": [
+          "zoneId",
+          "temperature",
+          "humidity",
+          "co2",
+          "recordedAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "zoneId",
+          "deviceId",
+          "temperature",
+          "humidity",
+          "co2",
+          "soilMoisture",
+          "status",
+          "recordedAt",
+          "reviewedAt"
+        ],
+        "fieldLabels": {
+          "zoneId": "Greenhouse Zone",
+          "deviceId": "Sensor Device",
+          "temperature": "Temperature (°C)",
+          "humidity": "Relative Humidity (%)",
+          "co2": "CO2 Level (ppm)",
+          "soilMoisture": "Soil Moisture (%)",
+          "status": "Review Status",
+          "recordedAt": "Timestamp",
+          "reviewedAt": "Reviewed At"
+        },
+        "help": {
+          "co2": "Carbon dioxide concentration in parts per million",
+          "soilMoisture": "Volumetric soil water content percentage",
+          "temperature": "Ambient temperature in degrees Celsius"
+        }
+      },
+      "Alert": {
+        "label": "Alert",
+        "plural": "Alerts",
+        "displayField": "ruleName",
+        "listFields": [
+          "ruleName",
+          "zoneId",
+          "status",
+          "severity",
+          "triggeredAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "ruleName",
+          "zoneId",
+          "readingId",
+          "status",
+          "severity",
+          "message",
+          "triggeredAt",
+          "acknowledgedAt",
+          "acknowledgedBy"
+        ],
+        "fieldLabels": {
+          "zoneId": "Zone",
+          "readingId": "Sensor Reading",
+          "ruleName": "Rule Name",
+          "status": "Status",
+          "severity": "Severity",
+          "message": "Alert Message",
+          "triggeredAt": "Triggered At",
+          "acknowledgedAt": "Acknowledged At",
+          "acknowledgedBy": "Acknowledged By"
+        },
+        "help": {
+          "acknowledgedAt": "Timestamp when the operator acknowledged this alert",
+          "readingId": "Sensor reading that triggered the alert threshold excursion",
+          "ruleName": "Configured rule definition that was violated"
+        }
+      },
+      "PestDetection": {
+        "label": "Pest Detection",
+        "plural": "Pest Detections",
+        "displayField": "pestType",
+        "listFields": [
+          "pestType",
+          "zoneId",
+          "confidence",
+          "status",
+          "detectedAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "zoneId",
+          "benchLocation",
+          "snapshotUrl",
+          "pestType",
+          "confidence",
+          "status",
+          "detectedAt",
+          "reviewedAt",
+          "confirmedAt",
+          "notes",
+          "deviceId"
+        ],
+        "fieldLabels": {
+          "zoneId": "Zone",
+          "deviceId": "Device",
+          "benchLocation": "Bench / Position",
+          "pestType": "Suspected Pest",
+          "confidence": "Model Confidence (%)",
+          "snapshotUrl": "Bench Snapshot",
+          "status": "Detection Status",
+          "notes": "Operator Notes",
+          "detectedAt": "Detection Time",
+          "reviewedAt": "Review Time",
+          "confirmedAt": "Confirmation Time"
+        },
+        "help": {
+          "benchLocation": "Specific bench or zone quadrant where camera detected suspected pest",
+          "confidence": "Computer vision model detection certainty score (0-100)",
+          "snapshotUrl": "Snapshot image captured by bench camera"
+        }
+      }
+    },
+    "design": {
+      "archetype": "back-office",
+      "shell": "sidebar",
+      "mobileNav": "drawer",
+      "frame": "wide",
+      "density": "compact",
+      "mainEntity": "Alert",
+      "entities": {
+        "Zone": {
+          "view": "table",
+          "roles": {
+            "title": "name",
+            "subtitle": "code"
+          },
+          "detailView": "record",
+          "filtersStyle": "toolbar",
+          "card": "text-first"
+        },
+        "Device": {
+          "view": "table",
+          "roles": {
+            "title": "name",
+            "badge": "status",
+            "subtitle": "zoneId",
+            "meta": [
+              "type",
+              "batteryPercent",
+              "lastSeenAt"
+            ]
+          },
+          "detailView": "split-panel",
+          "filtersStyle": "chips",
+          "card": "text-first"
+        },
+        "SensorReading": {
+          "view": "table",
+          "roles": {
+            "title": "deviceId",
+            "stat": "temperature",
+            "badge": "status",
+            "subtitle": "zoneId",
+            "meta": [
+              "recordedAt"
+            ]
+          },
+          "detailView": "record",
+          "filtersStyle": "toolbar",
+          "card": "text-first"
+        },
+        "Alert": {
+          "view": "table",
+          "roles": {
+            "title": "ruleName",
+            "badge": "status",
+            "subtitle": "message",
+            "meta": [
+              "zoneId",
+              "triggeredAt"
+            ]
+          },
+          "detailView": "split-panel",
+          "filtersStyle": "chips",
+          "card": "text-first"
+        },
+        "PestDetection": {
+          "view": "cards",
+          "roles": {
+            "title": "pestType",
+            "media": "snapshotUrl",
+            "stat": "confidence",
+            "badge": "status",
+            "subtitle": "benchLocation",
+            "meta": [
+              "zoneId",
+              "detectedAt"
+            ]
+          },
+          "detailView": "media-side",
+          "filtersStyle": "chips",
+          "card": "stacked"
+        }
+      },
+      "homeView": "dashboard",
+      "looks": [
+        {
+          "recipe": "swiss",
+          "reason": "Swiss style provides precise high-density typography and clear information grids suited for commercial IoT telemetry monitoring.",
+          "fontPairing": "workshop"
+        },
+        {
+          "recipe": "minimal",
+          "reason": "Minimal recipe highlights critical sensor excursions and clear operational status with hairline dividers.",
+          "fontPairing": "humanist"
+        },
+        {
+          "recipe": "glass",
+          "reason": "A bolder option (added by code)",
+          "fontPairing": "geometric"
+        }
+      ],
+      "requested": {
+        "accent": "#2e7d32",
+        "background": "#f8faf8",
+        "scheme": "light",
+        "words": "clean and technical, light background, a leaf green accent"
+      },
+      "seed": 796179174,
+      "reason": "Verdant Greenhouse Monitor requires dense, actionable telemetry tables and cards for fast review of environmental excursions and device health.",
+      "replaced": [
+        "Zone: meta 'location' left out (no such field)",
+        "look 'neon' left out: a neon look does not suit this product",
+        "look 'enterprise' replaced by 'glass': three quiet looks offer no choice"
+      ],
+      "fontPairing": "workshop"
+    },
+    "areas": [
+      {
+        "id": "operators",
+        "label": "Operator Workspace",
+        "roles": [
+          "operator"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "back-office",
+          "shell": "rail",
+          "mobileNav": "drawer",
+          "frame": "standard",
+          "mainEntity": "Alert",
+          "entities": {
+            "Zone": {
+              "view": "table",
+              "roles": {}
+            },
+            "Device": {
+              "view": "table",
+              "roles": {}
+            },
+            "SensorReading": {
+              "view": "table",
+              "roles": {}
+            },
+            "Alert": {
+              "groupBy": "status",
+              "view": "board",
+              "roles": {},
+              "detailView": "record",
+              "filtersStyle": "toolbar",
+              "card": "text-first"
+            },
+            "PestDetection": {
+              "view": "cards",
+              "roles": {
+                "media": "snapshotUrl"
+              },
+              "card": "stacked"
+            }
+          },
+          "homeView": "bento"
+        }
+      },
+      {
+        "id": "admins",
+        "label": "Admin Console",
+        "roles": [
+          "admin"
+        ],
+        "prefix": "/admins",
+        "design": {
+          "archetype": "back-office",
+          "shell": "topbar",
+          "mobileNav": "drawer",
+          "frame": "standard",
+          "mainEntity": "Alert",
+          "entities": {
+            "Zone": {
+              "view": "table",
+              "roles": {}
+            },
+            "Device": {
+              "view": "table",
+              "roles": {}
+            },
+            "SensorReading": {
+              "view": "table",
+              "roles": {}
+            },
+            "Alert": {
+              "view": "cards",
+              "roles": {},
+              "detailView": "record",
+              "filtersStyle": "chips",
+              "card": "text-first"
+            },
+            "PestDetection": {
+              "view": "cards",
+              "roles": {
+                "media": "snapshotUrl"
+              },
+              "card": "stacked"
+            }
+          },
+          "homeView": "bento"
+        }
+      }
+    ],
+    "dashboard": [
+      {
+        "label": "Active Alerts",
+        "kind": "figure",
+        "entity": "Alert",
+        "fn": "count",
+        "filter": {
+          "status": "ACTIVE"
+        }
+      },
+      {
+        "label": "Pending Pest Detections",
+        "kind": "figure",
+        "entity": "PestDetection",
+        "fn": "count",
+        "filter": {
+          "status": "REVIEWED"
+        }
+      },
+      {
+        "label": "Flagged Devices",
+        "kind": "figure",
+        "entity": "Device",
+        "fn": "count",
+        "filter": {
+          "status": "FLAGGED"
+        }
+      },
+      {
+        "label": "Offline Devices",
+        "kind": "figure",
+        "entity": "Device",
+        "fn": "count",
+        "filter": {
+          "isOnline": false
+        }
+      },
+      {
+        "label": "Alerts by Severity",
+        "kind": "pie",
+        "entity": "Alert",
+        "fn": "count",
+        "filter": {},
+        "groupBy": "severity"
+      }
+    ],
+    "workflows": {
+      "version": "9f95355a2363",
+      "tours": [
+        {
+          "id": "monitor_climate_and_acknowledge_alerts",
+          "name": "Monitor Climate and Acknowledge Alerts",
+          "outcome": "Zone environmental excursions are identified and acknowledged by an operator",
+          "roles": [
+            "operator"
+          ],
+          "steps": [
+            {
+              "id": "inspect_telemetry",
+              "role": "operator",
+              "actor": "Greenhouse Operator",
+              "title": "Inspect zone dashboard and 24-hour sensor trends (the reading becomes reviewed). Rule: Readings must display latest values and 24-hour historical charts",
+              "operationId": "sensorReading.review",
+              "statusAfter": "reviewed",
+              "page": "sensor-readings-id",
+              "route": "/sensor-readings/[id]",
+              "target": {
+                "section": "sensor-readings-detail",
+                "action": "review"
+              },
+              "kind": "do",
+              "record": "reading"
+            },
+            {
+              "id": "generate_alert",
+              "role": "operator",
+              "actor": "Greenhouse Operator",
+              "title": "Trigger alert on rule violation (the alert becomes active). Rule: Alert triggers when conditions exceed configured threshold duration",
+              "operationId": "alert.trigger",
+              "statusAfter": "active",
+              "page": "alerts",
+              "route": "/alerts",
+              "target": {
+                "section": "alerts-actions",
+                "action": "trigger"
+              },
+              "kind": "do",
+              "record": "alert"
+            },
+            {
+              "id": "acknowledge_alert",
+              "role": "operator",
+              "actor": "Greenhouse Operator",
+              "title": "Acknowledge active alert (the alert becomes acknowledged). Rule: Only active alerts can be acknowledged",
+              "operationId": "alert.acknowledge",
+              "statusAfter": "acknowledged",
+              "page": "alerts-id",
+              "route": "/alerts/[id]",
+              "target": {
+                "section": "alerts-detail",
+                "action": "acknowledge"
+              },
+              "kind": "do",
+              "record": "alert",
+              "needs": {
+                "step": "generate_alert",
+                "role": "operator",
+                "status": "active"
+              }
+            }
+          ]
+        },
+        {
+          "id": "review_pest_detections",
+          "name": "Review Pest Detections",
+          "outcome": "Camera pest detections are validated to guide greenhouse pest interventions",
+          "roles": [
+            "operator"
+          ],
+          "steps": [
+            {
+              "id": "review_detection",
+              "role": "operator",
+              "actor": "Greenhouse Operator",
+              "title": "Inspect pest detection snapshot and confidence score (the detection becomes reviewed). Rule: Detections must include snapshot image and model confidence score",
+              "operationId": "pestDetection.review",
+              "statusAfter": "reviewed",
+              "page": "pest-detections-id",
+              "route": "/pest-detections/[id]",
+              "target": {
+                "section": "pest-detections-detail",
+                "action": "review"
+              },
+              "kind": "do",
+              "record": "detection"
+            },
+            {
+              "id": "confirm_detection",
+              "role": "operator",
+              "actor": "Greenhouse Operator",
+              "title": "Confirm pest detection (the detection becomes confirmed). Rule: Confirmed detections validate pest presence on bench",
+              "operationId": "pestDetection.confirm",
+              "statusAfter": "confirmed",
+              "page": "pest-detections-id",
+              "route": "/pest-detections/[id]",
+              "target": {
+                "section": "pest-detections-detail",
+                "action": "confirm"
+              },
+              "kind": "do",
+              "record": "detection",
+              "needs": {
+                "step": "review_detection",
+                "role": "operator",
+                "status": "reviewed"
+              }
+            }
+          ]
+        },
+        {
+          "id": "manage_device_health",
+          "name": "Manage Device Health",
+          "outcome": "Unhealthy or offline monitoring devices are restored to maintain telemetry",
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "steps": [
+            {
+              "id": "inspect_devices",
+              "role": "operator",
+              "actor": "Greenhouse Operator",
+              "title": "Review device connectivity and battery status (the device becomes flagged). Rule: Flags devices that are offline or have low battery",
+              "operationId": "device.flag",
+              "statusAfter": "flagged",
+              "page": "devices-id",
+              "route": "/devices/[id]",
+              "target": {
+                "section": "devices-detail",
+                "action": "flag"
+              },
+              "kind": "do",
+              "record": "device"
+            },
+            {
+              "id": "reboot_device",
+              "role": "admin",
+              "actor": "Greenhouse Admin",
+              "title": "Send reboot command to device (the device becomes rebooting). Rule: Only admins can issue remote device reboot commands",
+              "operationId": "device.reboot",
+              "statusAfter": "rebooting",
+              "page": "admins-devices-id",
+              "route": "/admins/devices/[id]",
+              "target": {
+                "section": "devices-detail",
+                "action": "reboot"
+              },
+              "kind": "do",
+              "record": "device",
+              "needs": {
+                "step": "inspect_devices",
+                "role": "operator",
+                "status": "flagged"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Verdant Greenhouse Monitor",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "alert.countWhereStatusActive"
+          },
+          "content": {
+            "label": "Active Alerts",
+            "kind": "figure",
+            "entity": "Alert",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "pestDetection.countWhereStatusReviewed"
+          },
+          "content": {
+            "label": "Pending Pest Detections",
+            "kind": "figure",
+            "entity": "PestDetection",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "device.countWhereStatusFlagged"
+          },
+          "content": {
+            "label": "Flagged Devices",
+            "kind": "figure",
+            "entity": "Device",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "device.countWhereIsOnlineFalse"
+          },
+          "content": {
+            "label": "Offline Devices",
+            "kind": "figure",
+            "entity": "Device",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "alert.countBySeverity"
+          },
+          "content": {
+            "label": "Alerts by Severity",
+            "kind": "pie",
+            "entity": "Alert",
+            "groupBy": "severity",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-alerts",
+          "component": "AppList",
+          "data": {
+            "operationId": "alert.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "ruleName",
+              "zoneId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Recent alerts",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status",
+                "severity"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "triggeredAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "alerts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "acknowledge",
+                "label": "Acknowledge active alert",
+                "kind": "mutation",
+                "operationId": "alert.acknowledge",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Acknowledge active alert: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-sensor-readings",
+          "component": "AppList",
+          "data": {
+            "operationId": "sensorReading.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "zoneId",
+              "temperature",
+              "humidity"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Recent sensor readings",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "recordedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "sensor-readings-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review sensor reading and trends",
+                "kind": "mutation",
+                "operationId": "sensorReading.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review sensor reading and trends: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-home",
+      "route": "/admins",
+      "title": "Verdant Greenhouse Monitor",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "alert.countWhereStatusActive"
+          },
+          "content": {
+            "label": "Active Alerts",
+            "kind": "figure",
+            "entity": "Alert",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "pestDetection.countWhereStatusReviewed"
+          },
+          "content": {
+            "label": "Pending Pest Detections",
+            "kind": "figure",
+            "entity": "PestDetection",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "device.countWhereStatusFlagged"
+          },
+          "content": {
+            "label": "Flagged Devices",
+            "kind": "figure",
+            "entity": "Device",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "device.countWhereIsOnlineFalse"
+          },
+          "content": {
+            "label": "Offline Devices",
+            "kind": "figure",
+            "entity": "Device",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "alert.countBySeverity"
+          },
+          "content": {
+            "label": "Alerts by Severity",
+            "kind": "pie",
+            "entity": "Alert",
+            "groupBy": "severity",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-alerts",
+          "component": "AppList",
+          "data": {
+            "operationId": "alert.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "ruleName",
+              "zoneId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Recent alerts",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status",
+                "severity"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "triggeredAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-alerts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-sensor-readings",
+          "component": "AppList",
+          "data": {
+            "operationId": "sensorReading.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "zoneId",
+              "temperature",
+              "humidity"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Recent sensor readings",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "recordedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-sensor-readings-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-alerts",
+      "route": "/admins/alerts",
+      "title": "Alerts",
+      "sections": [
+        {
+          "id": "alerts-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "alert.list",
+            "fields": [
+              "ruleName",
+              "zoneId",
+              "status",
+              "severity",
+              "triggeredAt"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Alerts",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status",
+                "severity"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "triggeredAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-alerts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-alerts-id",
+      "route": "/admins/alerts/[id]",
+      "title": "Alert",
+      "sections": [
+        {
+          "id": "alerts-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "alert.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "ruleName",
+              "zoneId",
+              "readingId",
+              "status",
+              "severity",
+              "message",
+              "triggeredAt",
+              "acknowledgedAt",
+              "acknowledgedBy"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Alert",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-devices",
+      "route": "/admins/devices",
+      "title": "Devices",
+      "sections": [
+        {
+          "id": "devices-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "device.list",
+            "fields": [
+              "name",
+              "zoneId",
+              "type",
+              "status",
+              "batteryPercent"
+            ]
+          },
+          "content": {
+            "entity": "Device",
+            "title": "Devices",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "type",
+                "status",
+                "isOnline"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "lastSeenAt",
+                "name",
+                "batteryPercent"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-devices-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-devices-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "reboot",
+                "label": "Send reboot command to device",
+                "kind": "mutation",
+                "operationId": "device.reboot",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Send reboot command to device: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "device.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this device? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Device deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-devices-id",
+      "route": "/admins/devices/[id]",
+      "title": "Device",
+      "sections": [
+        {
+          "id": "devices-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "device.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "deviceUid",
+              "zoneId",
+              "type",
+              "status",
+              "batteryPercent",
+              "isOnline",
+              "lastSeenAt",
+              "firmwareVersion",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Device",
+            "title": "Device",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-devices-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "reboot",
+                "label": "Send reboot command to device",
+                "kind": "mutation",
+                "operationId": "device.reboot",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Send reboot command to device: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "device.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this device? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Device deleted",
+                  "navigate": "admins-devices"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-devices-id-edit",
+      "route": "/admins/devices/[id]/edit",
+      "title": "Edit device",
+      "sections": [
+        {
+          "id": "devices-edit-form",
+          "component": "AppForm",
+          "form": "admins_device_update",
+          "content": {
+            "entity": "Device"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-pest-detections",
+      "route": "/admins/pest-detections",
+      "title": "Pest Detections",
+      "sections": [
+        {
+          "id": "pest-detections-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "pestDetection.list",
+            "fields": [
+              "pestType",
+              "zoneId",
+              "confidence",
+              "status",
+              "detectedAt"
+            ]
+          },
+          "content": {
+            "entity": "PestDetection",
+            "title": "Pest Detections",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "detectedAt",
+                "confidence"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-pest-detections-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-pest-detections-id",
+      "route": "/admins/pest-detections/[id]",
+      "title": "Pest Detection",
+      "sections": [
+        {
+          "id": "pest-detections-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "pestDetection.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "zoneId",
+              "benchLocation",
+              "snapshotUrl",
+              "pestType",
+              "confidence",
+              "status",
+              "detectedAt",
+              "reviewedAt",
+              "confirmedAt",
+              "notes",
+              "deviceId"
+            ]
+          },
+          "content": {
+            "entity": "PestDetection",
+            "title": "Pest Detection",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-sensor-readings",
+      "route": "/admins/sensor-readings",
+      "title": "Sensor Readings",
+      "sections": [
+        {
+          "id": "sensor-readings-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "sensorReading.list",
+            "fields": [
+              "zoneId",
+              "temperature",
+              "humidity",
+              "co2",
+              "recordedAt"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Sensor Readings",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "recordedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-sensor-readings-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-sensor-readings-id",
+      "route": "/admins/sensor-readings/[id]",
+      "title": "Sensor Reading",
+      "sections": [
+        {
+          "id": "sensor-readings-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "sensorReading.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "zoneId",
+              "deviceId",
+              "temperature",
+              "humidity",
+              "co2",
+              "soilMoisture",
+              "status",
+              "recordedAt",
+              "reviewedAt"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Sensor Reading",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-zones",
+      "route": "/admins/zones",
+      "title": "Greenhouse Zones",
+      "sections": [
+        {
+          "id": "zones-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "zone.list",
+            "fields": [
+              "name",
+              "code",
+              "targetTempMin",
+              "targetTempMax",
+              "targetCo2Max"
+            ]
+          },
+          "content": {
+            "entity": "Zone",
+            "title": "Greenhouse Zones",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "code"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "name",
+                "code"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-zones-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-zones-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "zone.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this greenhouse zone? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Greenhouse Zone deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "admins-zones-new",
+              "label": "New greenhouse zone"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-zones-id",
+      "route": "/admins/zones/[id]",
+      "title": "Greenhouse Zone",
+      "sections": [
+        {
+          "id": "zones-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "zone.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "code",
+              "description",
+              "targetTempMin",
+              "targetTempMax",
+              "targetHumidityMin",
+              "targetHumidityMax",
+              "targetCo2Min",
+              "targetCo2Max",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Zone",
+            "title": "Greenhouse Zone",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-zones-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "zone.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this greenhouse zone? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Greenhouse Zone deleted",
+                  "navigate": "admins-zones"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "devices-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "device.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "name",
+              "type",
+              "status",
+              "batteryPercent"
+            ]
+          },
+          "content": {
+            "entity": "Device",
+            "title": "Devices",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "type",
+                "status",
+                "isOnline"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "lastSeenAt",
+                "name",
+                "batteryPercent"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-devices-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-devices-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "reboot",
+                "label": "Send reboot command to device",
+                "kind": "mutation",
+                "operationId": "device.reboot",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Send reboot command to device: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "device.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this device? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Device deleted"
+                }
+              }
+            ],
+            "tab": "Devices",
+            "create": {
+              "page": "admins-zones-id-devices-new",
+              "label": "Add device",
+              "params": {
+                "id": "$route.id"
+              }
+            }
+          }
+        },
+        {
+          "id": "sensor-readings-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "sensorReading.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "temperature",
+              "humidity",
+              "co2",
+              "recordedAt"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Sensor Readings",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "recordedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-sensor-readings-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Sensor Readings"
+          }
+        },
+        {
+          "id": "alerts-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "alert.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "ruleName",
+              "status",
+              "severity",
+              "triggeredAt"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Alerts",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status",
+                "severity"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "triggeredAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-alerts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Alerts"
+          }
+        },
+        {
+          "id": "pest-detections-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "pestDetection.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "pestType",
+              "confidence",
+              "status",
+              "detectedAt"
+            ]
+          },
+          "content": {
+            "entity": "PestDetection",
+            "title": "Pest Detections",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "detectedAt",
+                "confidence"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-pest-detections-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Pest Detections"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-zones-id-devices-new",
+      "route": "/admins/zones/[id]/devices/new",
+      "title": "New device",
+      "sections": [
+        {
+          "id": "device-create-in-zone-form",
+          "component": "AppForm",
+          "form": "admins_device_create_in_zone",
+          "content": {
+            "entity": "Device"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-zones-id-edit",
+      "route": "/admins/zones/[id]/edit",
+      "title": "Edit greenhouse zone",
+      "sections": [
+        {
+          "id": "zones-edit-form",
+          "component": "AppForm",
+          "form": "admins_zone_update",
+          "content": {
+            "entity": "Zone"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-zones-new",
+      "route": "/admins/zones/new",
+      "title": "New greenhouse zone",
+      "sections": [
+        {
+          "id": "zone-create-form",
+          "component": "AppForm",
+          "form": "admins_zone_create",
+          "content": {
+            "entity": "Zone"
+          }
+        }
+      ]
+    },
+    {
+      "id": "alerts",
+      "route": "/alerts",
+      "title": "Alerts",
+      "sections": [
+        {
+          "id": "alerts-actions",
+          "component": "AppActions",
+          "content": {
+            "entity": "Alert",
+            "actions": [
+              {
+                "id": "trigger",
+                "label": "Trigger alert on rule violation",
+                "kind": "mutation",
+                "operationId": "alert.trigger",
+                "onSuccess": {
+                  "toast": "Trigger alert on rule violation: done"
+                },
+                "form": "alert_trigger"
+              }
+            ]
+          }
+        },
+        {
+          "id": "alerts-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "alert.list",
+            "fields": [
+              "ruleName",
+              "zoneId",
+              "status",
+              "severity",
+              "triggeredAt"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Alerts",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status",
+                "severity"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "triggeredAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "alerts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "acknowledge",
+                "label": "Acknowledge active alert",
+                "kind": "mutation",
+                "operationId": "alert.acknowledge",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Acknowledge active alert: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "alerts-id",
+      "route": "/alerts/[id]",
+      "title": "Alert",
+      "sections": [
+        {
+          "id": "alerts-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "alert.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "ruleName",
+              "zoneId",
+              "readingId",
+              "status",
+              "severity",
+              "message",
+              "triggeredAt",
+              "acknowledgedAt",
+              "acknowledgedBy"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Alert",
+            "actions": [
+              {
+                "id": "acknowledge",
+                "label": "Acknowledge active alert",
+                "kind": "mutation",
+                "operationId": "alert.acknowledge",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Acknowledge active alert: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "devices",
+      "route": "/devices",
+      "title": "Devices",
+      "sections": [
+        {
+          "id": "devices-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "device.list",
+            "fields": [
+              "name",
+              "zoneId",
+              "type",
+              "status",
+              "batteryPercent"
+            ]
+          },
+          "content": {
+            "entity": "Device",
+            "title": "Devices",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "type",
+                "status",
+                "isOnline"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "lastSeenAt",
+                "name",
+                "batteryPercent"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "devices-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "flag",
+                "label": "Flag unhealthy or offline device",
+                "kind": "mutation",
+                "operationId": "device.flag",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Flag unhealthy or offline device: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "devices-id",
+      "route": "/devices/[id]",
+      "title": "Device",
+      "sections": [
+        {
+          "id": "devices-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "device.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "deviceUid",
+              "zoneId",
+              "type",
+              "status",
+              "batteryPercent",
+              "isOnline",
+              "lastSeenAt",
+              "firmwareVersion",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Device",
+            "title": "Device",
+            "actions": [
+              {
+                "id": "flag",
+                "label": "Flag unhealthy or offline device",
+                "kind": "mutation",
+                "operationId": "device.flag",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Flag unhealthy or offline device: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pest-detections",
+      "route": "/pest-detections",
+      "title": "Pest Detections",
+      "sections": [
+        {
+          "id": "pest-detections-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "pestDetection.list",
+            "fields": [
+              "pestType",
+              "zoneId",
+              "confidence",
+              "status",
+              "detectedAt"
+            ]
+          },
+          "content": {
+            "entity": "PestDetection",
+            "title": "Pest Detections",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "detectedAt",
+                "confidence"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "pest-detections-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Inspect pest detection snapshot",
+                "kind": "mutation",
+                "operationId": "pestDetection.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Inspect pest detection snapshot: done"
+                }
+              },
+              {
+                "id": "confirm",
+                "label": "Confirm pest detection",
+                "kind": "mutation",
+                "operationId": "pestDetection.confirm",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm pest detection: done"
+                }
+              },
+              {
+                "id": "dismiss",
+                "label": "Dismiss pest detection",
+                "kind": "mutation",
+                "operationId": "pestDetection.dismiss",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Dismiss pest detection: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pest-detections-id",
+      "route": "/pest-detections/[id]",
+      "title": "Pest Detection",
+      "sections": [
+        {
+          "id": "pest-detections-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "pestDetection.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "zoneId",
+              "benchLocation",
+              "snapshotUrl",
+              "pestType",
+              "confidence",
+              "status",
+              "detectedAt",
+              "reviewedAt",
+              "confirmedAt",
+              "notes",
+              "deviceId"
+            ]
+          },
+          "content": {
+            "entity": "PestDetection",
+            "title": "Pest Detection",
+            "actions": [
+              {
+                "id": "review",
+                "label": "Inspect pest detection snapshot",
+                "kind": "mutation",
+                "operationId": "pestDetection.review",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Inspect pest detection snapshot: done"
+                }
+              },
+              {
+                "id": "confirm",
+                "label": "Confirm pest detection",
+                "kind": "mutation",
+                "operationId": "pestDetection.confirm",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm pest detection: done"
+                }
+              },
+              {
+                "id": "dismiss",
+                "label": "Dismiss pest detection",
+                "kind": "mutation",
+                "operationId": "pestDetection.dismiss",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Dismiss pest detection: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sensor-readings",
+      "route": "/sensor-readings",
+      "title": "Sensor Readings",
+      "sections": [
+        {
+          "id": "sensor-readings-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "sensorReading.list",
+            "fields": [
+              "zoneId",
+              "temperature",
+              "humidity",
+              "co2",
+              "recordedAt"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Sensor Readings",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "recordedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "sensor-readings-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review sensor reading and trends",
+                "kind": "mutation",
+                "operationId": "sensorReading.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review sensor reading and trends: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "sensor-readings-id",
+      "route": "/sensor-readings/[id]",
+      "title": "Sensor Reading",
+      "sections": [
+        {
+          "id": "sensor-readings-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "sensorReading.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "zoneId",
+              "deviceId",
+              "temperature",
+              "humidity",
+              "co2",
+              "soilMoisture",
+              "status",
+              "recordedAt",
+              "reviewedAt"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Sensor Reading",
+            "actions": [
+              {
+                "id": "review",
+                "label": "Review sensor reading and trends",
+                "kind": "mutation",
+                "operationId": "sensorReading.review",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Review sensor reading and trends: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "zones",
+      "route": "/zones",
+      "title": "Greenhouse Zones",
+      "sections": [
+        {
+          "id": "zones-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "zone.list",
+            "fields": [
+              "name",
+              "code",
+              "targetTempMin",
+              "targetTempMax",
+              "targetCo2Max"
+            ]
+          },
+          "content": {
+            "entity": "Zone",
+            "title": "Greenhouse Zones",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "code"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "name",
+                "code"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "zones-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "zones-id",
+      "route": "/zones/[id]",
+      "title": "Greenhouse Zone",
+      "sections": [
+        {
+          "id": "zones-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "zone.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "code",
+              "description",
+              "targetTempMin",
+              "targetTempMax",
+              "targetHumidityMin",
+              "targetHumidityMax",
+              "targetCo2Min",
+              "targetCo2Max",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Zone",
+            "title": "Greenhouse Zone",
+            "actions": []
+          }
+        },
+        {
+          "id": "devices-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "device.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "name",
+              "type",
+              "status",
+              "batteryPercent"
+            ]
+          },
+          "content": {
+            "entity": "Device",
+            "title": "Devices",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "type",
+                "status",
+                "isOnline"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "lastSeenAt",
+                "name",
+                "batteryPercent"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "devices-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "flag",
+                "label": "Flag unhealthy or offline device",
+                "kind": "mutation",
+                "operationId": "device.flag",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Flag unhealthy or offline device: done"
+                }
+              }
+            ],
+            "tab": "Devices"
+          }
+        },
+        {
+          "id": "sensor-readings-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "sensorReading.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "temperature",
+              "humidity",
+              "co2",
+              "recordedAt"
+            ]
+          },
+          "content": {
+            "entity": "SensorReading",
+            "title": "Sensor Readings",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "recordedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "sensor-readings-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review sensor reading and trends",
+                "kind": "mutation",
+                "operationId": "sensorReading.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review sensor reading and trends: done"
+                }
+              }
+            ],
+            "tab": "Sensor Readings"
+          }
+        },
+        {
+          "id": "alerts-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "alert.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "ruleName",
+              "status",
+              "severity",
+              "triggeredAt"
+            ]
+          },
+          "content": {
+            "entity": "Alert",
+            "title": "Alerts",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status",
+                "severity"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "triggeredAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "alerts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "acknowledge",
+                "label": "Acknowledge active alert",
+                "kind": "mutation",
+                "operationId": "alert.acknowledge",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Acknowledge active alert: done"
+                }
+              }
+            ],
+            "tab": "Alerts"
+          }
+        },
+        {
+          "id": "pest-detections-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "pestDetection.list",
+            "params": {
+              "zoneId": "$route.id"
+            },
+            "fields": [
+              "pestType",
+              "confidence",
+              "status",
+              "detectedAt"
+            ]
+          },
+          "content": {
+            "entity": "PestDetection",
+            "title": "Pest Detections",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "detectedAt",
+                "confidence"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "pest-detections-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Inspect pest detection snapshot",
+                "kind": "mutation",
+                "operationId": "pestDetection.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Inspect pest detection snapshot: done"
+                }
+              },
+              {
+                "id": "confirm",
+                "label": "Confirm pest detection",
+                "kind": "mutation",
+                "operationId": "pestDetection.confirm",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm pest detection: done"
+                }
+              },
+              {
+                "id": "dismiss",
+                "label": "Dismiss pest detection",
+                "kind": "mutation",
+                "operationId": "pestDetection.dismiss",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Dismiss pest detection: done"
+                }
+              }
+            ],
+            "tab": "Pest Detections"
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "alert_trigger",
+      "operationId": "alert.trigger",
+      "fields": [
+        {
+          "name": "zoneId",
+          "type": "string",
+          "label": "Zone",
+          "required": true,
+          "reference": {
+            "entity": "Zone",
+            "listOperation": "zone.list",
+            "detailOperation": "zone.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "readingId",
+          "type": "string",
+          "label": "Sensor Reading",
+          "required": false,
+          "reference": {
+            "entity": "SensorReading",
+            "listOperation": "sensorReading.list",
+            "detailOperation": "sensorReading.get",
+            "labelField": "recordedAt",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "ruleName",
+          "type": "string",
+          "label": "Rule Name",
+          "required": true,
+          "maxLength": 120,
+          "help": "Configured rule definition that was violated"
+        },
+        {
+          "name": "severity",
+          "type": "enum",
+          "label": "Severity",
+          "required": false,
+          "values": [
+            "INFO",
+            "WARNING",
+            "CRITICAL"
+          ],
+          "value": "WARNING"
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "label": "Alert Message",
+          "required": true
+        }
+      ],
+      "submitLabel": "Trigger alert on rule violation",
+      "onSuccess": {
+        "toast": "Trigger alert on rule violation: done"
+      }
+    },
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "admins_zone_create",
+      "operationId": "zone.create",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Zone Name",
+          "required": true,
+          "maxLength": 100,
+          "help": "Name of the greenhouse production zone"
+        },
+        {
+          "name": "code",
+          "type": "string",
+          "label": "Zone Code",
+          "required": true,
+          "maxLength": 30,
+          "help": "Short greenhouse bay or zone code (e.g. ZONE-A)"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "label": "Description",
+          "required": false
+        },
+        {
+          "name": "targetTempMin",
+          "type": "number",
+          "label": "Min Target Temp (°C)",
+          "required": false
+        },
+        {
+          "name": "targetTempMax",
+          "type": "number",
+          "label": "Max Target Temp (°C)",
+          "required": false
+        },
+        {
+          "name": "targetHumidityMin",
+          "type": "number",
+          "label": "Min Target Humidity (%)",
+          "required": false
+        },
+        {
+          "name": "targetHumidityMax",
+          "type": "number",
+          "label": "Max Target Humidity (%)",
+          "required": false
+        },
+        {
+          "name": "targetCo2Min",
+          "type": "integer",
+          "label": "Min Target CO2 (ppm)",
+          "required": false
+        },
+        {
+          "name": "targetCo2Max",
+          "type": "integer",
+          "label": "Max Target CO2 (ppm)",
+          "required": false
+        }
+      ],
+      "submitLabel": "Create greenhouse zone",
+      "onSuccess": {
+        "toast": "Greenhouse Zone created",
+        "navigate": "admins-zones-id"
+      }
+    },
+    {
+      "id": "admins_zone_update",
+      "operationId": "zone.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "zone.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Zone Name",
+          "required": false,
+          "maxLength": 100,
+          "help": "Name of the greenhouse production zone"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "label": "Description",
+          "required": false
+        },
+        {
+          "name": "targetTempMin",
+          "type": "number",
+          "label": "Min Target Temp (°C)",
+          "required": false
+        },
+        {
+          "name": "targetTempMax",
+          "type": "number",
+          "label": "Max Target Temp (°C)",
+          "required": false
+        },
+        {
+          "name": "targetHumidityMin",
+          "type": "number",
+          "label": "Min Target Humidity (%)",
+          "required": false
+        },
+        {
+          "name": "targetHumidityMax",
+          "type": "number",
+          "label": "Max Target Humidity (%)",
+          "required": false
+        },
+        {
+          "name": "targetCo2Min",
+          "type": "integer",
+          "label": "Min Target CO2 (ppm)",
+          "required": false
+        },
+        {
+          "name": "targetCo2Max",
+          "type": "integer",
+          "label": "Max Target CO2 (ppm)",
+          "required": false
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Greenhouse Zone saved",
+        "navigate": "admins-zones-id"
+      }
+    },
+    {
+      "id": "admins_device_create_in_zone",
+      "operationId": "device.create",
+      "fields": [
+        {
+          "name": "zoneId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Device Name",
+          "required": true,
+          "maxLength": 100
+        },
+        {
+          "name": "deviceUid",
+          "type": "string",
+          "label": "Device Identifier",
+          "required": true,
+          "maxLength": 60,
+          "help": "Hardware identifier or MAC address"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "label": "Device Type",
+          "required": true,
+          "values": [
+            "SENSOR",
+            "CAMERA"
+          ]
+        },
+        {
+          "name": "batteryPercent",
+          "type": "integer",
+          "label": "Battery Level (%)",
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "help": "Current device battery charge percentage",
+          "unit": "%"
+        },
+        {
+          "name": "firmwareVersion",
+          "type": "string",
+          "label": "Firmware Version",
+          "required": false,
+          "maxLength": 50
+        }
+      ],
+      "submitLabel": "Create device",
+      "onSuccess": {
+        "toast": "Device created",
+        "navigate": "admins-zones-id"
+      }
+    },
+    {
+      "id": "admins_device_update",
+      "operationId": "device.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "device.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "zoneId",
+          "type": "string",
+          "label": "Assigned Zone",
+          "required": false,
+          "reference": {
+            "entity": "Zone",
+            "listOperation": "zone.list",
+            "detailOperation": "zone.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Device Name",
+          "required": false,
+          "maxLength": 100
+        },
+        {
+          "name": "firmwareVersion",
+          "type": "string",
+          "label": "Firmware Version",
+          "required": false,
+          "maxLength": 50
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Device saved",
+        "navigate": "admins-devices-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  }
+}

@@ -1,0 +1,6366 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "Brightpath Academy",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "An online course platform where instructors publish self-paced courses and learners enroll, progress through ordered lessons and quizzes, and review finished courses."
+  },
+  "theme": {
+    "style": "playful",
+    "colorScheme": "light-dark",
+    "colors": {
+      "primary": "#005b5b",
+      "secondary": "#f1f4f4",
+      "accent": "#005b5b",
+      "background": "#ffffff",
+      "foreground": "#134e4a",
+      "muted": "#f1f4f4",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Plus Jakarta Sans",
+      "bodyFont": "Plus Jakarta Sans"
+    },
+    "radius": "lg",
+    "density": "comfortable",
+    "direction": {
+      "productType": "Online Course/E-learning",
+      "pattern": "Feature-Rich Showcase + Social Proof",
+      "palette": "Vibrant learning colors + Progress green",
+      "fontPairing": "Friendly SaaS",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "Brightpath Academy",
+      "navigation": [
+        {
+          "label": "Courses",
+          "page": "courses"
+        },
+        {
+          "label": "My Learning",
+          "page": "enrollments"
+        },
+        {
+          "label": "Categories",
+          "page": "categories"
+        },
+        {
+          "label": "Reviews",
+          "page": "reviews"
+        },
+        {
+          "label": "Dashboard",
+          "page": "dashboard"
+        },
+        {
+          "label": "Dashboard",
+          "page": "instructors-home"
+        },
+        {
+          "label": "Courses",
+          "page": "instructors-courses"
+        },
+        {
+          "label": "My Learning",
+          "page": "instructors-enrollments"
+        },
+        {
+          "label": "Categories",
+          "page": "instructors-categories"
+        },
+        {
+          "label": "Reviews",
+          "page": "instructors-reviews"
+        },
+        {
+          "label": "Dashboard",
+          "page": "admins-home"
+        },
+        {
+          "label": "Courses",
+          "page": "admins-courses"
+        },
+        {
+          "label": "My Learning",
+          "page": "admins-enrollments"
+        },
+        {
+          "label": "Categories",
+          "page": "admins-categories"
+        },
+        {
+          "label": "Reviews",
+          "page": "admins-reviews"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "Brightpath Academy",
+    "tagline": "Self-paced online course platform for curious minds",
+    "icon": "GraduationCap",
+    "nav": [
+      {
+        "entity": "Course",
+        "label": "Courses",
+        "icon": "BookOpen"
+      },
+      {
+        "entity": "Enrollment",
+        "label": "My Learning",
+        "icon": "Compass"
+      },
+      {
+        "entity": "Category",
+        "label": "Categories",
+        "icon": "FolderTree"
+      },
+      {
+        "entity": "Review",
+        "label": "Reviews",
+        "icon": "Star"
+      }
+    ],
+    "home": "Course",
+    "entities": {
+      "Category": {
+        "label": "Category",
+        "plural": "Categories",
+        "displayField": "name",
+        "listFields": [
+          "name"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "name",
+          "description"
+        ],
+        "fieldLabels": {
+          "name": "Category Name",
+          "description": "Description"
+        },
+        "help": {}
+      },
+      "Course": {
+        "label": "Course",
+        "plural": "Courses",
+        "displayField": "title",
+        "listFields": [
+          "title",
+          "categoryId",
+          "status"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "title",
+          "summary",
+          "categoryId",
+          "instructorId",
+          "status",
+          "coverImage",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "categoryId": "Category",
+          "instructorId": "Instructor",
+          "title": "Course Title",
+          "summary": "Summary",
+          "coverImage": "Cover Image",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "summary": "A concise overview of the course subject and learning goals"
+        },
+        "create": "page"
+      },
+      "Lesson": {
+        "label": "Lesson",
+        "plural": "Lessons",
+        "displayField": "title",
+        "listFields": [
+          "title",
+          "courseId",
+          "order",
+          "type"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "title",
+          "courseId",
+          "order",
+          "type",
+          "durationMinutes",
+          "textContent",
+          "videoUrl",
+          "status"
+        ],
+        "fieldLabels": {
+          "courseId": "Course",
+          "title": "Lesson Title",
+          "order": "Order Sequence",
+          "type": "Lesson Type",
+          "textContent": "Reading Content",
+          "videoUrl": "Video URL",
+          "durationMinutes": "Duration (min)",
+          "status": "Status"
+        },
+        "help": {},
+        "create": "onRecord"
+      },
+      "Quiz": {
+        "label": "Quiz",
+        "plural": "Quizes",
+        "displayField": "title",
+        "listFields": [
+          "title",
+          "lessonId",
+          "passingScore"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "title",
+          "lessonId",
+          "passingScore",
+          "status"
+        ],
+        "fieldLabels": {
+          "lessonId": "Lesson",
+          "title": "Quiz Title",
+          "passingScore": "Passing Score (%)",
+          "status": "Status"
+        },
+        "help": {},
+        "create": "onRecord"
+      },
+      "QuizQuestion": {
+        "label": "Quiz question",
+        "plural": "Quiz questions",
+        "displayField": "prompt",
+        "listFields": [
+          "prompt",
+          "quizId",
+          "order"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "quizId",
+          "prompt",
+          "options",
+          "order"
+        ],
+        "fieldLabels": {
+          "quizId": "Quiz",
+          "prompt": "Question Prompt",
+          "options": "Choices / Options",
+          "order": "Order"
+        },
+        "help": {},
+        "create": "onRecord"
+      },
+      "Enrollment": {
+        "label": "Enrollment",
+        "plural": "Enrollments",
+        "displayField": "courseId",
+        "listFields": [
+          "courseId",
+          "status",
+          "currentLessonId",
+          "enrolledAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "courseId",
+          "learnerId",
+          "status",
+          "currentLessonId",
+          "enrolledAt",
+          "completedAt"
+        ],
+        "fieldLabels": {
+          "courseId": "Course",
+          "learnerId": "Learner",
+          "status": "Status",
+          "currentLessonId": "Current Lesson",
+          "enrolledAt": "Enrolled Date",
+          "completedAt": "Completed Date"
+        },
+        "help": {},
+        "create": "onRecord"
+      },
+      "LessonProgress": {
+        "label": "Lesson progress",
+        "plural": "Lesson progresses",
+        "displayField": "lessonId",
+        "listFields": [
+          "lessonId",
+          "status",
+          "completedAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "enrollmentId",
+          "lessonId",
+          "learnerId",
+          "status",
+          "completedAt"
+        ],
+        "fieldLabels": {
+          "enrollmentId": "Enrollment",
+          "lessonId": "Lesson",
+          "learnerId": "Learner",
+          "status": "Status",
+          "completedAt": "Completed At"
+        },
+        "help": {},
+        "create": "onRecord"
+      },
+      "QuizSubmission": {
+        "label": "Quiz submission",
+        "plural": "Quiz submissions",
+        "displayField": "quizId",
+        "listFields": [
+          "quizId",
+          "score",
+          "status",
+          "submittedAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "quizId",
+          "learnerId",
+          "score",
+          "status",
+          "submittedAt",
+          "answers"
+        ],
+        "fieldLabels": {
+          "quizId": "Quiz",
+          "learnerId": "Learner",
+          "score": "Score (%)",
+          "answers": "Answers",
+          "status": "Status",
+          "submittedAt": "Submitted At"
+        },
+        "help": {},
+        "create": "onRecord"
+      },
+      "Review": {
+        "label": "Review",
+        "plural": "Reviews",
+        "displayField": "courseId",
+        "listFields": [
+          "courseId",
+          "rating",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "courseId",
+          "learnerId",
+          "rating",
+          "content",
+          "status",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "courseId": "Course",
+          "learnerId": "Learner",
+          "rating": "Star Rating",
+          "content": "Review Comments",
+          "status": "Status",
+          "createdAt": "Submitted At"
+        },
+        "help": {},
+        "create": "onRecord"
+      }
+    },
+    "design": {
+      "archetype": "learning",
+      "shell": "topbar",
+      "mobileNav": "bottom-tabs",
+      "frame": "wide",
+      "density": "spacious",
+      "mainEntity": "Course",
+      "entities": {
+        "Category": {
+          "view": "table",
+          "roles": {
+            "title": "name"
+          },
+          "filtersStyle": "toolbar"
+        },
+        "Course": {
+          "view": "cards",
+          "roles": {
+            "title": "title",
+            "media": "coverImage",
+            "badge": "status",
+            "subtitle": "summary"
+          },
+          "detailView": "reader",
+          "filtersStyle": "chips",
+          "card": "stacked",
+          "aspect": "square"
+        },
+        "Lesson": {
+          "view": "cards",
+          "roles": {
+            "title": "title",
+            "badge": "type",
+            "meta": [
+              "order",
+              "durationMinutes"
+            ],
+            "media": "videoUrl"
+          },
+          "detailView": "reader",
+          "card": "text-first"
+        },
+        "Quiz": {
+          "view": "cards",
+          "roles": {
+            "title": "title"
+          },
+          "detailView": "record",
+          "card": "text-first"
+        },
+        "QuizQuestion": {
+          "view": "table",
+          "roles": {
+            "title": "prompt",
+            "meta": [
+              "order"
+            ]
+          }
+        },
+        "Enrollment": {
+          "view": "cards",
+          "roles": {
+            "title": "courseId",
+            "badge": "status",
+            "meta": [
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "detailView": "record",
+          "card": "stacked"
+        },
+        "LessonProgress": {
+          "view": "table",
+          "roles": {
+            "badge": "status",
+            "meta": [
+              "completedAt"
+            ]
+          }
+        },
+        "QuizSubmission": {
+          "view": "table",
+          "roles": {
+            "title": "quizId",
+            "badge": "status",
+            "meta": [
+              "score",
+              "submittedAt"
+            ]
+          }
+        },
+        "Review": {
+          "view": "cards",
+          "roles": {
+            "title": "courseId",
+            "badge": "status",
+            "subtitle": "content",
+            "meta": [
+              "rating",
+              "createdAt"
+            ]
+          },
+          "card": "stacked"
+        }
+      },
+      "homeView": "catalogue",
+      "looks": [
+        {
+          "recipe": "minimal",
+          "reason": "Clean, calm, and distraction-free styling gives learners and instructors focus with ample whitespace.",
+          "fontPairing": "humanist"
+        },
+        {
+          "recipe": "editorial",
+          "reason": "Editorial feel with bookish type suits rigorous courses, written lessons, and studious academy themes.",
+          "fontPairing": "bookish"
+        },
+        {
+          "recipe": "clay",
+          "reason": "Rounded friendly aesthetic creates an approachable, modern self-paced digital learning platform.",
+          "fontPairing": "geometric"
+        }
+      ],
+      "requested": {
+        "accent": "#005b5b",
+        "background": "#ffffff",
+        "words": "calm and studious, plenty of white space, a deep teal accent"
+      },
+      "seed": 432162871,
+      "replaced": [
+        "Enrollment: side needs an image, a video or an audio field; shown as stacked",
+        "LessonProgress: title 'lessonId' left out (a uuid field is not a name)",
+        "area 'learners': Enrollment: side needs an image, a video or an audio field; shown as stacked",
+        "area 'learners': LessonProgress: title 'lessonId' left out (a uuid field is not a name)"
+      ],
+      "fontPairing": "humanist"
+    },
+    "areas": [
+      {
+        "id": "learners",
+        "label": "Learner Space",
+        "roles": [
+          "learner"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "learning",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "wide",
+          "density": "comfortable",
+          "mainEntity": "Course",
+          "entities": {
+            "Category": {
+              "view": "table",
+              "roles": {}
+            },
+            "Course": {
+              "view": "cards",
+              "roles": {
+                "title": "title",
+                "media": "coverImage",
+                "badge": "status",
+                "subtitle": "summary"
+              },
+              "detailView": "reader",
+              "filtersStyle": "chips",
+              "card": "stacked",
+              "aspect": "square"
+            },
+            "Lesson": {
+              "view": "cards",
+              "roles": {
+                "title": "title",
+                "badge": "type",
+                "meta": [
+                  "order",
+                  "durationMinutes"
+                ],
+                "media": "videoUrl"
+              },
+              "detailView": "reader",
+              "card": "stacked"
+            },
+            "Quiz": {
+              "view": "cards",
+              "roles": {
+                "title": "title"
+              },
+              "card": "text-first"
+            },
+            "QuizQuestion": {
+              "view": "table",
+              "roles": {}
+            },
+            "Enrollment": {
+              "view": "cards",
+              "roles": {
+                "title": "courseId",
+                "badge": "status",
+                "meta": [
+                  "currentLessonId",
+                  "enrolledAt"
+                ]
+              },
+              "card": "stacked"
+            },
+            "LessonProgress": {
+              "view": "table",
+              "roles": {
+                "badge": "status",
+                "meta": [
+                  "completedAt"
+                ]
+              }
+            },
+            "QuizSubmission": {
+              "view": "table",
+              "roles": {
+                "title": "quizId",
+                "badge": "status",
+                "meta": [
+                  "score",
+                  "submittedAt"
+                ]
+              }
+            },
+            "Review": {
+              "view": "cards",
+              "roles": {
+                "title": "courseId",
+                "badge": "status",
+                "subtitle": "content",
+                "meta": [
+                  "rating",
+                  "createdAt"
+                ]
+              },
+              "card": "stacked"
+            }
+          },
+          "homeView": "catalogue"
+        }
+      },
+      {
+        "id": "instructors",
+        "label": "Instructor Studio",
+        "roles": [
+          "instructor"
+        ],
+        "prefix": "/instructors",
+        "design": {
+          "archetype": "workspace",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "full",
+          "density": "comfortable",
+          "mainEntity": "Course",
+          "entities": {
+            "Category": {
+              "view": "table",
+              "roles": {
+                "title": "name"
+              }
+            },
+            "Course": {
+              "view": "cards",
+              "roles": {
+                "title": "title",
+                "badge": "status",
+                "subtitle": "summary",
+                "meta": [
+                  "categoryId"
+                ],
+                "media": "coverImage"
+              },
+              "detailView": "profile",
+              "filtersStyle": "chips",
+              "card": "stacked",
+              "aspect": "square"
+            },
+            "Lesson": {
+              "view": "table",
+              "roles": {
+                "title": "title",
+                "badge": "type",
+                "meta": [
+                  "order"
+                ],
+                "media": "videoUrl",
+                "duration": "durationMinutes"
+              },
+              "detailView": "watch"
+            },
+            "Quiz": {
+              "view": "cards",
+              "roles": {
+                "title": "title"
+              },
+              "card": "text-first"
+            },
+            "QuizQuestion": {
+              "view": "table",
+              "roles": {
+                "title": "prompt",
+                "meta": [
+                  "order"
+                ]
+              }
+            },
+            "Enrollment": {
+              "view": "table",
+              "roles": {}
+            },
+            "LessonProgress": {
+              "view": "table",
+              "roles": {}
+            },
+            "QuizSubmission": {
+              "view": "table",
+              "roles": {}
+            },
+            "Review": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "dashboard"
+        }
+      },
+      {
+        "id": "admins",
+        "label": "Admin Console",
+        "roles": [
+          "admin"
+        ],
+        "prefix": "/admins",
+        "design": {
+          "archetype": "back-office",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "standard",
+          "density": "compact",
+          "mainEntity": "Course",
+          "entities": {
+            "Category": {
+              "view": "table",
+              "roles": {
+                "title": "name"
+              }
+            },
+            "Course": {
+              "view": "table",
+              "roles": {
+                "title": "title",
+                "badge": "status",
+                "meta": [
+                  "instructorId"
+                ],
+                "media": "coverImage"
+              },
+              "detailView": "media-side",
+              "filtersStyle": "chips",
+              "card": "stacked",
+              "aspect": "square"
+            },
+            "Lesson": {
+              "view": "cards",
+              "roles": {
+                "media": "videoUrl",
+                "duration": "durationMinutes"
+              },
+              "detailView": "watch",
+              "card": "stacked"
+            },
+            "Quiz": {
+              "view": "table",
+              "roles": {}
+            },
+            "QuizQuestion": {
+              "view": "table",
+              "roles": {}
+            },
+            "Enrollment": {
+              "view": "table",
+              "roles": {}
+            },
+            "LessonProgress": {
+              "view": "table",
+              "roles": {}
+            },
+            "QuizSubmission": {
+              "view": "table",
+              "roles": {}
+            },
+            "Review": {
+              "view": "table",
+              "roles": {
+                "title": "courseId",
+                "badge": "status",
+                "meta": [
+                  "rating"
+                ]
+              }
+            }
+          },
+          "homeView": "dashboard"
+        }
+      }
+    ],
+    "dashboard": [
+      {
+        "label": "Published Courses",
+        "kind": "figure",
+        "entity": "Course",
+        "fn": "count",
+        "filter": {}
+      },
+      {
+        "label": "Active Enrollments",
+        "kind": "figure",
+        "entity": "Enrollment",
+        "fn": "count",
+        "filter": {
+          "status": "ACTIVE"
+        }
+      },
+      {
+        "label": "Completed Courses",
+        "kind": "figure",
+        "entity": "Enrollment",
+        "fn": "count",
+        "filter": {
+          "status": "COMPLETED"
+        }
+      },
+      {
+        "label": "Total Reviews",
+        "kind": "figure",
+        "entity": "Review",
+        "fn": "count",
+        "filter": {}
+      }
+    ],
+    "workflows": {
+      "version": "af9dfa4c8be5",
+      "tours": [
+        {
+          "id": "learner_course_completion",
+          "name": "Course Learning and Completion",
+          "outcome": "Learner successfully completes all lessons in order and finishes the course.",
+          "roles": [
+            "learner"
+          ],
+          "steps": [
+            {
+              "id": "browse_catalogue",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Browse catalogue by category and select course. Rule: Course must be published",
+              "operationId": "course.list",
+              "page": "courses",
+              "route": "/courses",
+              "target": {
+                "section": "courses-list",
+                "action": null
+              },
+              "kind": "look",
+              "record": "course"
+            },
+            {
+              "id": "enroll_course",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Enroll in the selected course (the enrollment becomes active). Rule: Learner cannot already be actively enrolled",
+              "operationId": "enrollment.create",
+              "statusAfter": "active",
+              "page": "courses-id",
+              "route": "/courses/[id]",
+              "target": {
+                "section": "courses-detail",
+                "action": "add-enrollments"
+              },
+              "kind": "do",
+              "record": "enrollment"
+            },
+            {
+              "id": "resume_lesson",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Open current lesson where left off (the enrollment becomes active). Rule: Must follow lesson order",
+              "operationId": "enrollment.get",
+              "statusAfter": "active",
+              "page": "enrollments-id",
+              "route": "/enrollments/[id]",
+              "target": {
+                "section": "enrollments-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "enrollment"
+            },
+            {
+              "id": "take_quiz",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Take quiz at the end of the lesson if present (the quiz_submission becomes passed). Rule: Quiz questions must all be answered",
+              "operationId": "quizSubmission.create",
+              "statusAfter": "passed",
+              "page": "quizes-id",
+              "route": "/quizes/[id]",
+              "target": {
+                "section": "quizes-detail",
+                "action": "add-quiz-submissions"
+              },
+              "kind": "do",
+              "record": "quiz_submission"
+            },
+            {
+              "id": "complete_lesson",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Mark lesson as complete (the lesson_progress becomes completed). Rule: Previous lessons and required quiz must be completed",
+              "operationId": "lessonProgress.create",
+              "statusAfter": "completed",
+              "page": "enrollments-id",
+              "route": "/enrollments/[id]",
+              "target": {
+                "section": "enrollments-detail",
+                "action": "add-lesson-progresses"
+              },
+              "kind": "do",
+              "record": "lesson_progress"
+            },
+            {
+              "id": "complete_course",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Complete the final lesson and complete course (the enrollment becomes completed). Rule: All lessons in the course must be completed",
+              "operationId": "enrollment.complete",
+              "statusAfter": "completed",
+              "page": "enrollments-id",
+              "route": "/enrollments/[id]",
+              "target": {
+                "section": "enrollments-detail",
+                "action": "complete"
+              },
+              "kind": "do",
+              "record": "enrollment",
+              "needs": {
+                "step": "enroll_course",
+                "role": "learner",
+                "status": "active"
+              }
+            }
+          ]
+        },
+        {
+          "id": "course_authoring",
+          "name": "Course Authoring and Publishing",
+          "outcome": "A structured course with ordered lessons is published to the catalogue.",
+          "roles": [
+            "instructor"
+          ],
+          "steps": [
+            {
+              "id": "create_draft",
+              "role": "instructor",
+              "actor": "Instructor",
+              "title": "Create course draft under a category (the course becomes draft). Rule: Category must exist",
+              "operationId": "course.create",
+              "statusAfter": "draft",
+              "page": "instructors-categories-id-courses-new",
+              "route": "/instructors/categories/[id]/courses/new",
+              "target": {
+                "section": "course-create-in-category-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "course"
+            },
+            {
+              "id": "add_lessons",
+              "role": "instructor",
+              "actor": "Instructor",
+              "title": "Add ordered video or text lessons to course (the lesson becomes draft). Rule: Lessons must have a defined sequence order",
+              "operationId": "lesson.create",
+              "statusAfter": "draft",
+              "page": "instructors-courses-id",
+              "route": "/instructors/courses/[id]",
+              "target": {
+                "section": "courses-detail",
+                "action": "add-lessons"
+              },
+              "kind": "do",
+              "record": "lesson"
+            },
+            {
+              "id": "add_quiz",
+              "role": "instructor",
+              "actor": "Instructor",
+              "title": "Attach short quiz to lesson (the quiz becomes draft). Rule: Quiz must belong to a lesson",
+              "operationId": "quiz.create",
+              "statusAfter": "draft",
+              "page": "instructors-lessons-id",
+              "route": "/instructors/lessons/[id]",
+              "target": {
+                "section": "lessons-detail",
+                "action": "add-quizes"
+              },
+              "kind": "do",
+              "record": "quiz"
+            },
+            {
+              "id": "publish_course",
+              "role": "instructor",
+              "actor": "Instructor",
+              "title": "Publish the complete course (the course becomes published). Rule: Course must contain at least one lesson",
+              "operationId": "course.publish",
+              "statusAfter": "published",
+              "page": "instructors-courses-id",
+              "route": "/instructors/courses/[id]",
+              "target": {
+                "section": "courses-detail",
+                "action": "publish"
+              },
+              "kind": "do",
+              "record": "course",
+              "needs": {
+                "step": "create_draft",
+                "role": "instructor",
+                "status": "draft"
+              }
+            }
+          ]
+        },
+        {
+          "id": "course_review",
+          "name": "Course Rating and Reviewing",
+          "outcome": "A public rating and review are posted for a completed course.",
+          "roles": [
+            "learner"
+          ],
+          "steps": [
+            {
+              "id": "submit_review",
+              "role": "learner",
+              "actor": "Learner",
+              "title": "Submit star rating and short review for finished course (the review becomes published). Rule: Learner must have completed the course",
+              "operationId": "review.create",
+              "statusAfter": "published",
+              "page": "courses-id",
+              "route": "/courses/[id]",
+              "target": {
+                "section": "courses-detail",
+                "action": "add-reviews"
+              },
+              "kind": "do",
+              "record": "review"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Courses",
+      "sections": [
+        {
+          "id": "courses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-home",
+      "route": "/admins",
+      "title": "Brightpath Academy",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "course.count"
+          },
+          "content": {
+            "label": "Published Courses",
+            "kind": "figure",
+            "entity": "Course",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "enrollment.countWhereStatusActive"
+          },
+          "content": {
+            "label": "Active Enrollments",
+            "kind": "figure",
+            "entity": "Enrollment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "enrollment.countWhereStatusCompleted"
+          },
+          "content": {
+            "label": "Completed Courses",
+            "kind": "figure",
+            "entity": "Enrollment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "review.count"
+          },
+          "content": {
+            "label": "Total Reviews",
+            "kind": "figure",
+            "entity": "Review",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-courses",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Recent courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "unpublish",
+                "label": "Unpublish",
+                "kind": "mutation",
+                "operationId": "course.unpublish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Unpublish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-enrollments",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "courseId",
+              "status",
+              "currentLessonId"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Recent enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-categories",
+      "route": "/admins/categories",
+      "title": "Categories",
+      "sections": [
+        {
+          "id": "categories-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "category.list",
+            "fields": [
+              "name"
+            ]
+          },
+          "content": {
+            "entity": "Category",
+            "title": "Categories",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "maxLimit": 100,
+              "sort": [
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-categories-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-categories-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "category.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this category? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Category deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "admins-categories-new",
+              "label": "New category"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-categories-id",
+      "route": "/admins/categories/[id]",
+      "title": "Category",
+      "sections": [
+        {
+          "id": "categories-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "category.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "description"
+            ]
+          },
+          "content": {
+            "entity": "Category",
+            "title": "Category",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-categories-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "category.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this category? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Category deleted",
+                  "navigate": "admins-categories"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "courses-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "params": {
+              "categoryId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "unpublish",
+                "label": "Unpublish",
+                "kind": "mutation",
+                "operationId": "course.unpublish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Unpublish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ],
+            "tab": "Courses"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-categories-id-edit",
+      "route": "/admins/categories/[id]/edit",
+      "title": "Edit category",
+      "sections": [
+        {
+          "id": "categories-edit-form",
+          "component": "AppForm",
+          "form": "admins_category_update",
+          "content": {
+            "entity": "Category"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-categories-new",
+      "route": "/admins/categories/new",
+      "title": "New category",
+      "sections": [
+        {
+          "id": "category-create-form",
+          "component": "AppForm",
+          "form": "admins_category_create",
+          "content": {
+            "entity": "Category"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-courses",
+      "route": "/admins/courses",
+      "title": "Courses",
+      "sections": [
+        {
+          "id": "courses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "unpublish",
+                "label": "Unpublish",
+                "kind": "mutation",
+                "operationId": "course.unpublish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Unpublish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-courses-id",
+      "route": "/admins/courses/[id]",
+      "title": "Course",
+      "sections": [
+        {
+          "id": "courses-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "course.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "summary",
+              "categoryId",
+              "instructorId",
+              "status",
+              "coverImage",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Course",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "admins-courses-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "unpublish",
+                "label": "Unpublish",
+                "kind": "mutation",
+                "operationId": "course.unpublish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Unpublish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted",
+                  "navigate": "admins-courses"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lessons-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "lesson.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "order",
+              "type"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lessons",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-lessons-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Lessons"
+          }
+        },
+        {
+          "id": "enrollments-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "status",
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ],
+            "tab": "Enrollments"
+          }
+        },
+        {
+          "id": "reviews-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "rating",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted"
+                }
+              }
+            ],
+            "tab": "Reviews"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-courses-id-edit",
+      "route": "/admins/courses/[id]/edit",
+      "title": "Edit course",
+      "sections": [
+        {
+          "id": "courses-edit-form",
+          "component": "AppForm",
+          "form": "admins_course_update",
+          "content": {
+            "entity": "Course"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-enrollments",
+      "route": "/admins/enrollments",
+      "title": "Enrollments",
+      "sections": [
+        {
+          "id": "enrollments-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "fields": [
+              "courseId",
+              "status",
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-enrollments-id",
+      "route": "/admins/enrollments/[id]",
+      "title": "Enrollment",
+      "sections": [
+        {
+          "id": "enrollments-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "enrollment.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "courseId",
+              "learnerId",
+              "status",
+              "currentLessonId",
+              "enrolledAt",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollment",
+            "actions": [
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lesson-progresses-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "lessonProgress.list",
+            "params": {
+              "enrollmentId": "$route.id"
+            },
+            "fields": [
+              "lessonId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progresses",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "lessonId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "completedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-lesson-progresses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Lesson progresses"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-lesson-progresses",
+      "route": "/admins/lesson-progresses",
+      "title": "Lesson progresses",
+      "sections": [
+        {
+          "id": "lesson-progresses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "lessonProgress.list",
+            "fields": [
+              "lessonId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progresses",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "lessonId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "completedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-lesson-progresses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-lesson-progresses-id",
+      "route": "/admins/lesson-progresses/[id]",
+      "title": "Lesson progress",
+      "sections": [
+        {
+          "id": "lesson-progresses-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "lessonProgress.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "enrollmentId",
+              "lessonId",
+              "learnerId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progress",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-lessons",
+      "route": "/admins/lessons",
+      "title": "Lessons",
+      "sections": [
+        {
+          "id": "lessons-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "lesson.list",
+            "fields": [
+              "title",
+              "courseId",
+              "order",
+              "type"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lessons",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-lessons-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-lessons-id",
+      "route": "/admins/lessons/[id]",
+      "title": "Lesson",
+      "sections": [
+        {
+          "id": "lessons-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "lesson.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "courseId",
+              "order",
+              "type",
+              "durationMinutes",
+              "textContent",
+              "videoUrl",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lesson",
+            "actions": []
+          }
+        },
+        {
+          "id": "quizes-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quiz.list",
+            "params": {
+              "lessonId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "passingScore"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quizes",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-quizes-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quizes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-quiz-questions",
+      "route": "/admins/quiz-questions",
+      "title": "Quiz questions",
+      "sections": [
+        {
+          "id": "quiz-questions-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizQuestion.list",
+            "fields": [
+              "prompt",
+              "quizId",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz questions",
+            "style": "table",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-quiz-questions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-quiz-questions-id",
+      "route": "/admins/quiz-questions/[id]",
+      "title": "Quiz question",
+      "sections": [
+        {
+          "id": "quiz-questions-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quizQuestion.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "quizId",
+              "prompt",
+              "options",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz question",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-quiz-submissions",
+      "route": "/admins/quiz-submissions",
+      "title": "Quiz submissions",
+      "sections": [
+        {
+          "id": "quiz-submissions-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizSubmission.list",
+            "fields": [
+              "quizId",
+              "score",
+              "status",
+              "submittedAt"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submissions",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "submittedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-quiz-submissions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-quiz-submissions-id",
+      "route": "/admins/quiz-submissions/[id]",
+      "title": "Quiz submission",
+      "sections": [
+        {
+          "id": "quiz-submissions-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quizSubmission.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "quizId",
+              "learnerId",
+              "score",
+              "status",
+              "submittedAt",
+              "answers"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submission",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-quizes",
+      "route": "/admins/quizes",
+      "title": "Quizes",
+      "sections": [
+        {
+          "id": "quizes-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quiz.list",
+            "fields": [
+              "title",
+              "lessonId",
+              "passingScore"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quizes",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-quizes-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-quizes-id",
+      "route": "/admins/quizes/[id]",
+      "title": "Quiz",
+      "sections": [
+        {
+          "id": "quizes-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quiz.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "lessonId",
+              "passingScore",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quiz",
+            "actions": []
+          }
+        },
+        {
+          "id": "quiz-questions-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizQuestion.list",
+            "params": {
+              "quizId": "$route.id"
+            },
+            "fields": [
+              "prompt",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz questions",
+            "style": "table",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-quiz-questions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quiz questions"
+          }
+        },
+        {
+          "id": "quiz-submissions-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizSubmission.list",
+            "params": {
+              "quizId": "$route.id"
+            },
+            "fields": [
+              "score",
+              "status",
+              "submittedAt"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submissions",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "submittedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-quiz-submissions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quiz submissions"
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-reviews",
+      "route": "/admins/reviews",
+      "title": "Reviews",
+      "sections": [
+        {
+          "id": "reviews-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "fields": [
+              "courseId",
+              "rating",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "admins-reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "admins-reviews-id",
+      "route": "/admins/reviews/[id]",
+      "title": "Review",
+      "sections": [
+        {
+          "id": "reviews-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "review.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "courseId",
+              "learnerId",
+              "rating",
+              "content",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Review",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted",
+                  "navigate": "admins-reviews"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "categories",
+      "route": "/categories",
+      "title": "Categories",
+      "sections": [
+        {
+          "id": "categories-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "category.list",
+            "fields": [
+              "name"
+            ]
+          },
+          "content": {
+            "entity": "Category",
+            "title": "Categories",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "maxLimit": 100,
+              "sort": [
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "categories-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "categories-id",
+      "route": "/categories/[id]",
+      "title": "Category",
+      "sections": [
+        {
+          "id": "categories-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "category.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "description"
+            ]
+          },
+          "content": {
+            "entity": "Category",
+            "title": "Category",
+            "actions": []
+          }
+        },
+        {
+          "id": "courses-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "params": {
+              "categoryId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ],
+            "tab": "Courses"
+          }
+        }
+      ]
+    },
+    {
+      "id": "courses",
+      "route": "/courses",
+      "title": "Courses",
+      "sections": [
+        {
+          "id": "courses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "courses-id",
+      "route": "/courses/[id]",
+      "title": "Course",
+      "sections": [
+        {
+          "id": "courses-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "course.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "summary",
+              "categoryId",
+              "instructorId",
+              "status",
+              "coverImage",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Course",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "courses-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "add-enrollments",
+                "label": "Add enrollment",
+                "kind": "mutation",
+                "operationId": "enrollment.create",
+                "form": "enrollment_create_on_course",
+                "onSuccess": {
+                  "toast": "Enrollment created"
+                }
+              },
+              {
+                "id": "add-reviews",
+                "label": "Add review",
+                "kind": "mutation",
+                "operationId": "review.create",
+                "form": "review_create_on_course",
+                "onSuccess": {
+                  "toast": "Review created"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted",
+                  "navigate": "courses"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lessons-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "lesson.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "order",
+              "type"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lessons",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "lessons-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Lessons"
+          }
+        },
+        {
+          "id": "enrollments-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "status",
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ],
+            "tab": "Enrollments"
+          }
+        },
+        {
+          "id": "reviews-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "rating",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted"
+                }
+              }
+            ],
+            "tab": "Reviews"
+          }
+        }
+      ]
+    },
+    {
+      "id": "courses-id-edit",
+      "route": "/courses/[id]/edit",
+      "title": "Edit course",
+      "sections": [
+        {
+          "id": "courses-edit-form",
+          "component": "AppForm",
+          "form": "course_update",
+          "content": {
+            "entity": "Course"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "route": "/dashboard",
+      "title": "Dashboard",
+      "sections": [
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "enrollment.countWhereStatusActive"
+          },
+          "content": {
+            "label": "Active Enrollments",
+            "kind": "figure",
+            "entity": "Enrollment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "enrollment.countWhereStatusCompleted"
+          },
+          "content": {
+            "label": "Completed Courses",
+            "kind": "figure",
+            "entity": "Enrollment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "review.count"
+          },
+          "content": {
+            "label": "Total Reviews",
+            "kind": "figure",
+            "entity": "Review",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-courses",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Recent courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-enrollments",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "courseId",
+              "status",
+              "currentLessonId"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Recent enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "enrollments",
+      "route": "/enrollments",
+      "title": "Enrollments",
+      "sections": [
+        {
+          "id": "enrollments-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "fields": [
+              "courseId",
+              "status",
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "enrollments-id",
+      "route": "/enrollments/[id]",
+      "title": "Enrollment",
+      "sections": [
+        {
+          "id": "enrollments-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "enrollment.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "courseId",
+              "learnerId",
+              "status",
+              "currentLessonId",
+              "enrolledAt",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollment",
+            "actions": [
+              {
+                "id": "add-lesson-progresses",
+                "label": "Add lesson progress",
+                "kind": "mutation",
+                "operationId": "lessonProgress.create",
+                "form": "lessonProgress_create_on_enrollment",
+                "onSuccess": {
+                  "toast": "Lesson progress created"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lesson-progresses-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "lessonProgress.list",
+            "params": {
+              "enrollmentId": "$route.id"
+            },
+            "fields": [
+              "lessonId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progresses",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "lessonId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "completedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "lesson-progresses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Lesson progresses"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-home",
+      "route": "/instructors",
+      "title": "Brightpath Academy",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "course.count"
+          },
+          "content": {
+            "label": "Published Courses",
+            "kind": "figure",
+            "entity": "Course",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "enrollment.countWhereStatusActive"
+          },
+          "content": {
+            "label": "Active Enrollments",
+            "kind": "figure",
+            "entity": "Enrollment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "enrollment.countWhereStatusCompleted"
+          },
+          "content": {
+            "label": "Completed Courses",
+            "kind": "figure",
+            "entity": "Enrollment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "review.count"
+          },
+          "content": {
+            "label": "Total Reviews",
+            "kind": "figure",
+            "entity": "Review",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-courses",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Recent courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-enrollments",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "courseId",
+              "status",
+              "currentLessonId"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Recent enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-categories",
+      "route": "/instructors/categories",
+      "title": "Categories",
+      "sections": [
+        {
+          "id": "categories-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "category.list",
+            "fields": [
+              "name"
+            ]
+          },
+          "content": {
+            "entity": "Category",
+            "title": "Categories",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "maxLimit": 100,
+              "sort": [
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-categories-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-categories-id",
+      "route": "/instructors/categories/[id]",
+      "title": "Category",
+      "sections": [
+        {
+          "id": "categories-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "category.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "description"
+            ]
+          },
+          "content": {
+            "entity": "Category",
+            "title": "Category",
+            "actions": []
+          }
+        },
+        {
+          "id": "courses-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "params": {
+              "categoryId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ],
+            "tab": "Courses",
+            "create": {
+              "page": "instructors-categories-id-courses-new",
+              "label": "Add course",
+              "params": {
+                "id": "$route.id"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-categories-id-courses-new",
+      "route": "/instructors/categories/[id]/courses/new",
+      "title": "New course",
+      "sections": [
+        {
+          "id": "course-create-in-category-form",
+          "component": "AppForm",
+          "form": "instructors_course_create_in_category",
+          "content": {
+            "entity": "Course"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-courses",
+      "route": "/instructors/courses",
+      "title": "Courses",
+      "sections": [
+        {
+          "id": "courses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "course.list",
+            "fields": [
+              "title",
+              "categoryId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Courses",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "title"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-courses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-courses-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-courses-id",
+      "route": "/instructors/courses/[id]",
+      "title": "Course",
+      "sections": [
+        {
+          "id": "courses-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "course.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "summary",
+              "categoryId",
+              "instructorId",
+              "status",
+              "coverImage",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Course",
+            "title": "Course",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-courses-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "add-lessons",
+                "label": "Add lesson",
+                "kind": "mutation",
+                "operationId": "lesson.create",
+                "form": "instructors_lesson_create_on_course",
+                "onSuccess": {
+                  "toast": "Lesson created"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "course.publish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "course.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this course? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Course deleted",
+                  "navigate": "instructors-courses"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lessons-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "lesson.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "order",
+              "type"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lessons",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-lessons-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-lessons-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "lesson.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this lesson? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Lesson deleted"
+                }
+              }
+            ],
+            "tab": "Lessons"
+          }
+        },
+        {
+          "id": "enrollments-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "status",
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ],
+            "tab": "Enrollments"
+          }
+        },
+        {
+          "id": "reviews-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "params": {
+              "courseId": "$route.id"
+            },
+            "fields": [
+              "rating",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted"
+                }
+              }
+            ],
+            "tab": "Reviews"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-courses-id-edit",
+      "route": "/instructors/courses/[id]/edit",
+      "title": "Edit course",
+      "sections": [
+        {
+          "id": "courses-edit-form",
+          "component": "AppForm",
+          "form": "instructors_course_update",
+          "content": {
+            "entity": "Course"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-enrollments",
+      "route": "/instructors/enrollments",
+      "title": "Enrollments",
+      "sections": [
+        {
+          "id": "enrollments-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "enrollment.list",
+            "fields": [
+              "courseId",
+              "status",
+              "currentLessonId",
+              "enrolledAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollments",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "enrolledAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-enrollments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-enrollments-id",
+      "route": "/instructors/enrollments/[id]",
+      "title": "Enrollment",
+      "sections": [
+        {
+          "id": "enrollments-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "enrollment.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "courseId",
+              "learnerId",
+              "status",
+              "currentLessonId",
+              "enrolledAt",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "Enrollment",
+            "title": "Enrollment",
+            "actions": [
+              {
+                "id": "complete",
+                "label": "Complete",
+                "kind": "mutation",
+                "operationId": "enrollment.complete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete: done"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lesson-progresses-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "lessonProgress.list",
+            "params": {
+              "enrollmentId": "$route.id"
+            },
+            "fields": [
+              "lessonId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progresses",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "lessonId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "completedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-lesson-progresses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Lesson progresses"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-lesson-progresses",
+      "route": "/instructors/lesson-progresses",
+      "title": "Lesson progresses",
+      "sections": [
+        {
+          "id": "lesson-progresses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "lessonProgress.list",
+            "fields": [
+              "lessonId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progresses",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "lessonId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "completedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-lesson-progresses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-lesson-progresses-id",
+      "route": "/instructors/lesson-progresses/[id]",
+      "title": "Lesson progress",
+      "sections": [
+        {
+          "id": "lesson-progresses-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "lessonProgress.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "enrollmentId",
+              "lessonId",
+              "learnerId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progress",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-lessons",
+      "route": "/instructors/lessons",
+      "title": "Lessons",
+      "sections": [
+        {
+          "id": "lessons-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "lesson.list",
+            "fields": [
+              "title",
+              "courseId",
+              "order",
+              "type"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lessons",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-lessons-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-lessons-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "lesson.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this lesson? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Lesson deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-lessons-id",
+      "route": "/instructors/lessons/[id]",
+      "title": "Lesson",
+      "sections": [
+        {
+          "id": "lessons-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "lesson.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "courseId",
+              "order",
+              "type",
+              "durationMinutes",
+              "textContent",
+              "videoUrl",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lesson",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-lessons-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "add-quizes",
+                "label": "Add quiz",
+                "kind": "mutation",
+                "operationId": "quiz.create",
+                "form": "instructors_quiz_create_on_lesson",
+                "onSuccess": {
+                  "toast": "Quiz created"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "lesson.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this lesson? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Lesson deleted",
+                  "navigate": "instructors-lessons"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "quizes-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quiz.list",
+            "params": {
+              "lessonId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "passingScore"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quizes",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-quizes-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-quizes-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "quiz.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this quiz? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Quiz deleted"
+                }
+              }
+            ],
+            "tab": "Quizes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-lessons-id-edit",
+      "route": "/instructors/lessons/[id]/edit",
+      "title": "Edit lesson",
+      "sections": [
+        {
+          "id": "lessons-edit-form",
+          "component": "AppForm",
+          "form": "instructors_lesson_update",
+          "content": {
+            "entity": "Lesson"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quiz-questions",
+      "route": "/instructors/quiz-questions",
+      "title": "Quiz questions",
+      "sections": [
+        {
+          "id": "quiz-questions-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizQuestion.list",
+            "fields": [
+              "prompt",
+              "quizId",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz questions",
+            "style": "table",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-quiz-questions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-quiz-questions-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "quizQuestion.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this quiz question? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Quiz question deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quiz-questions-id",
+      "route": "/instructors/quiz-questions/[id]",
+      "title": "Quiz question",
+      "sections": [
+        {
+          "id": "quiz-questions-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quizQuestion.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "quizId",
+              "prompt",
+              "options",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz question",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-quiz-questions-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "quizQuestion.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this quiz question? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Quiz question deleted",
+                  "navigate": "instructors-quiz-questions"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quiz-questions-id-edit",
+      "route": "/instructors/quiz-questions/[id]/edit",
+      "title": "Edit quiz question",
+      "sections": [
+        {
+          "id": "quiz-questions-edit-form",
+          "component": "AppForm",
+          "form": "instructors_quizQuestion_update",
+          "content": {
+            "entity": "QuizQuestion"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quiz-submissions",
+      "route": "/instructors/quiz-submissions",
+      "title": "Quiz submissions",
+      "sections": [
+        {
+          "id": "quiz-submissions-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizSubmission.list",
+            "fields": [
+              "quizId",
+              "score",
+              "status",
+              "submittedAt"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submissions",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "submittedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-quiz-submissions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quiz-submissions-id",
+      "route": "/instructors/quiz-submissions/[id]",
+      "title": "Quiz submission",
+      "sections": [
+        {
+          "id": "quiz-submissions-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quizSubmission.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "quizId",
+              "learnerId",
+              "score",
+              "status",
+              "submittedAt",
+              "answers"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submission",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quizes",
+      "route": "/instructors/quizes",
+      "title": "Quizes",
+      "sections": [
+        {
+          "id": "quizes-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quiz.list",
+            "fields": [
+              "title",
+              "lessonId",
+              "passingScore"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quizes",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-quizes-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-quizes-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "quiz.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this quiz? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Quiz deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quizes-id",
+      "route": "/instructors/quizes/[id]",
+      "title": "Quiz",
+      "sections": [
+        {
+          "id": "quizes-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quiz.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "lessonId",
+              "passingScore",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quiz",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-quizes-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "add-quiz-questions",
+                "label": "Add quiz question",
+                "kind": "mutation",
+                "operationId": "quizQuestion.create",
+                "form": "instructors_quizQuestion_create_on_quiz",
+                "onSuccess": {
+                  "toast": "Quiz question created"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "quiz.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this quiz? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Quiz deleted",
+                  "navigate": "instructors-quizes"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "quiz-questions-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizQuestion.list",
+            "params": {
+              "quizId": "$route.id"
+            },
+            "fields": [
+              "prompt",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz questions",
+            "style": "table",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-quiz-questions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "instructors-quiz-questions-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "quizQuestion.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this quiz question? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Quiz question deleted"
+                }
+              }
+            ],
+            "tab": "Quiz questions"
+          }
+        },
+        {
+          "id": "quiz-submissions-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizSubmission.list",
+            "params": {
+              "quizId": "$route.id"
+            },
+            "fields": [
+              "score",
+              "status",
+              "submittedAt"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submissions",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "submittedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-quiz-submissions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quiz submissions"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-quizes-id-edit",
+      "route": "/instructors/quizes/[id]/edit",
+      "title": "Edit quiz",
+      "sections": [
+        {
+          "id": "quizes-edit-form",
+          "component": "AppForm",
+          "form": "instructors_quiz_update",
+          "content": {
+            "entity": "Quiz"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-reviews",
+      "route": "/instructors/reviews",
+      "title": "Reviews",
+      "sections": [
+        {
+          "id": "reviews-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "fields": [
+              "courseId",
+              "rating",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "instructors-reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "instructors-reviews-id",
+      "route": "/instructors/reviews/[id]",
+      "title": "Review",
+      "sections": [
+        {
+          "id": "reviews-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "review.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "courseId",
+              "learnerId",
+              "rating",
+              "content",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Review",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted",
+                  "navigate": "instructors-reviews"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lesson-progresses",
+      "route": "/lesson-progresses",
+      "title": "Lesson progresses",
+      "sections": [
+        {
+          "id": "lesson-progresses-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "lessonProgress.list",
+            "fields": [
+              "lessonId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progresses",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "lessonId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "completedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "lesson-progresses-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lesson-progresses-id",
+      "route": "/lesson-progresses/[id]",
+      "title": "Lesson progress",
+      "sections": [
+        {
+          "id": "lesson-progresses-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "lessonProgress.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "enrollmentId",
+              "lessonId",
+              "learnerId",
+              "status",
+              "completedAt"
+            ]
+          },
+          "content": {
+            "entity": "LessonProgress",
+            "title": "Lesson progress",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "lessons",
+      "route": "/lessons",
+      "title": "Lessons",
+      "sections": [
+        {
+          "id": "lessons-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "lesson.list",
+            "fields": [
+              "title",
+              "courseId",
+              "order",
+              "type"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lessons",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "lessons-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lessons-id",
+      "route": "/lessons/[id]",
+      "title": "Lesson",
+      "sections": [
+        {
+          "id": "lessons-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "lesson.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "courseId",
+              "order",
+              "type",
+              "durationMinutes",
+              "textContent",
+              "videoUrl",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Lesson",
+            "title": "Lesson",
+            "actions": []
+          }
+        },
+        {
+          "id": "quizes-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quiz.list",
+            "params": {
+              "lessonId": "$route.id"
+            },
+            "fields": [
+              "title",
+              "passingScore"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quizes",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "quizes-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quizes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-questions",
+      "route": "/quiz-questions",
+      "title": "Quiz questions",
+      "sections": [
+        {
+          "id": "quiz-questions-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizQuestion.list",
+            "fields": [
+              "prompt",
+              "quizId",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz questions",
+            "style": "table",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "quiz-questions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-questions-id",
+      "route": "/quiz-questions/[id]",
+      "title": "Quiz question",
+      "sections": [
+        {
+          "id": "quiz-questions-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quizQuestion.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "quizId",
+              "prompt",
+              "options",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz question",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-submissions",
+      "route": "/quiz-submissions",
+      "title": "Quiz submissions",
+      "sections": [
+        {
+          "id": "quiz-submissions-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizSubmission.list",
+            "fields": [
+              "quizId",
+              "score",
+              "status",
+              "submittedAt"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submissions",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "submittedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "quiz-submissions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-submissions-id",
+      "route": "/quiz-submissions/[id]",
+      "title": "Quiz submission",
+      "sections": [
+        {
+          "id": "quiz-submissions-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quizSubmission.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "quizId",
+              "learnerId",
+              "score",
+              "status",
+              "submittedAt",
+              "answers"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submission",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "quizes",
+      "route": "/quizes",
+      "title": "Quizes",
+      "sections": [
+        {
+          "id": "quizes-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "quiz.list",
+            "fields": [
+              "title",
+              "lessonId",
+              "passingScore"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quizes",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "quizes-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "quizes-id",
+      "route": "/quizes/[id]",
+      "title": "Quiz",
+      "sections": [
+        {
+          "id": "quizes-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "quiz.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "title",
+              "lessonId",
+              "passingScore",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Quiz",
+            "title": "Quiz",
+            "actions": [
+              {
+                "id": "add-quiz-submissions",
+                "label": "Add quiz submission",
+                "kind": "mutation",
+                "operationId": "quizSubmission.create",
+                "form": "quizSubmission_create_on_quiz",
+                "onSuccess": {
+                  "toast": "Quiz submission created"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "quiz-questions-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizQuestion.list",
+            "params": {
+              "quizId": "$route.id"
+            },
+            "fields": [
+              "prompt",
+              "order"
+            ]
+          },
+          "content": {
+            "entity": "QuizQuestion",
+            "title": "Quiz questions",
+            "style": "table",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "order"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "quiz-questions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quiz questions"
+          }
+        },
+        {
+          "id": "quiz-submissions-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "quizSubmission.list",
+            "params": {
+              "quizId": "$route.id"
+            },
+            "fields": [
+              "score",
+              "status",
+              "submittedAt"
+            ]
+          },
+          "content": {
+            "entity": "QuizSubmission",
+            "title": "Quiz submissions",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "submittedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "quiz-submissions-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Quiz submissions"
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "reviews",
+      "route": "/reviews",
+      "title": "Reviews",
+      "sections": [
+        {
+          "id": "reviews-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "fields": [
+              "courseId",
+              "rating",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "reviews-id",
+      "route": "/reviews/[id]",
+      "title": "Review",
+      "sections": [
+        {
+          "id": "reviews-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "review.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "courseId",
+              "learnerId",
+              "rating",
+              "content",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Review",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "review.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this review? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Review deleted",
+                  "navigate": "reviews"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "enrollment_create_on_course",
+      "operationId": "enrollment.create",
+      "fields": [
+        {
+          "name": "courseId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "currentLessonId",
+          "type": "string",
+          "label": "Current Lesson",
+          "required": false
+        },
+        {
+          "name": "completedAt",
+          "type": "datetime",
+          "label": "Completed Date",
+          "required": false
+        }
+      ],
+      "submitLabel": "Create enrollment",
+      "onSuccess": {
+        "toast": "Enrollment created"
+      }
+    },
+    {
+      "id": "review_create_on_course",
+      "operationId": "review.create",
+      "fields": [
+        {
+          "name": "courseId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "rating",
+          "type": "integer",
+          "label": "Star Rating",
+          "required": true,
+          "min": 1,
+          "max": 5
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "label": "Review Comments",
+          "required": true,
+          "maxLength": 1000
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Status",
+          "required": false,
+          "values": [
+            "PUBLISHED"
+          ],
+          "value": "PUBLISHED"
+        }
+      ],
+      "submitLabel": "Create review",
+      "onSuccess": {
+        "toast": "Review created"
+      }
+    },
+    {
+      "id": "course_update",
+      "operationId": "course.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "course.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "categoryId",
+          "type": "string",
+          "label": "Category",
+          "required": false,
+          "reference": {
+            "entity": "Category",
+            "listOperation": "category.list",
+            "detailOperation": "category.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "label": "Course Title",
+          "required": false,
+          "maxLength": 150
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "label": "Summary",
+          "required": false,
+          "maxLength": 1000,
+          "help": "A concise overview of the course subject and learning goals"
+        },
+        {
+          "name": "coverImage",
+          "type": "string",
+          "label": "Cover Image",
+          "required": false,
+          "upload": {
+            "entity": "Course",
+            "field": "coverImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Course saved",
+        "navigate": "courses-id"
+      }
+    },
+    {
+      "id": "quizSubmission_create_on_quiz",
+      "operationId": "quizSubmission.create",
+      "fields": [
+        {
+          "name": "quizId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "score",
+          "type": "integer",
+          "label": "Score (%)",
+          "required": true,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "answers",
+          "type": "string",
+          "label": "Answers",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Status",
+          "required": false,
+          "values": [
+            "PASSED",
+            "FAILED"
+          ],
+          "value": "PASSED"
+        }
+      ],
+      "submitLabel": "Create quiz submission",
+      "onSuccess": {
+        "toast": "Quiz submission created"
+      }
+    },
+    {
+      "id": "lessonProgress_create_on_enrollment",
+      "operationId": "lessonProgress.create",
+      "fields": [
+        {
+          "name": "enrollmentId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "lessonId",
+          "type": "string",
+          "label": "Lesson",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Status",
+          "required": false,
+          "values": [
+            "COMPLETED"
+          ],
+          "value": "COMPLETED"
+        }
+      ],
+      "submitLabel": "Create lesson progress",
+      "onSuccess": {
+        "toast": "Lesson progress created"
+      }
+    },
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "instructors_course_create_in_category",
+      "operationId": "course.create",
+      "fields": [
+        {
+          "name": "categoryId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "label": "Course Title",
+          "required": true,
+          "maxLength": 150
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "label": "Summary",
+          "required": false,
+          "maxLength": 1000,
+          "help": "A concise overview of the course subject and learning goals"
+        },
+        {
+          "name": "coverImage",
+          "type": "string",
+          "label": "Cover Image",
+          "required": false,
+          "upload": {
+            "entity": "Course",
+            "field": "coverImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Create course",
+      "onSuccess": {
+        "toast": "Course created",
+        "navigate": "instructors-categories-id"
+      }
+    },
+    {
+      "id": "instructors_course_update",
+      "operationId": "course.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "course.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "categoryId",
+          "type": "string",
+          "label": "Category",
+          "required": false,
+          "reference": {
+            "entity": "Category",
+            "listOperation": "category.list",
+            "detailOperation": "category.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "label": "Course Title",
+          "required": false,
+          "maxLength": 150
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "label": "Summary",
+          "required": false,
+          "maxLength": 1000,
+          "help": "A concise overview of the course subject and learning goals"
+        },
+        {
+          "name": "coverImage",
+          "type": "string",
+          "label": "Cover Image",
+          "required": false,
+          "upload": {
+            "entity": "Course",
+            "field": "coverImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Course saved",
+        "navigate": "instructors-courses-id"
+      }
+    },
+    {
+      "id": "instructors_lesson_update",
+      "operationId": "lesson.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "lesson.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "title",
+          "type": "string",
+          "label": "Lesson Title",
+          "required": false,
+          "maxLength": 150
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "label": "Order Sequence",
+          "required": false,
+          "min": 1
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "label": "Lesson Type",
+          "required": false,
+          "values": [
+            "VIDEO",
+            "TEXT"
+          ]
+        },
+        {
+          "name": "textContent",
+          "type": "text",
+          "label": "Reading Content",
+          "required": false
+        },
+        {
+          "name": "videoUrl",
+          "type": "string",
+          "label": "Video URL",
+          "required": false,
+          "upload": {
+            "entity": "Lesson",
+            "field": "videoUrl",
+            "presign": "files.presign",
+            "kind": "video",
+            "accept": [
+              "video/mp4",
+              "video/webm"
+            ],
+            "maxSize": 209715200
+          }
+        },
+        {
+          "name": "durationMinutes",
+          "type": "integer",
+          "label": "Duration (min)",
+          "required": false,
+          "min": 0,
+          "unit": "min"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Lesson saved",
+        "navigate": "instructors-lessons-id"
+      }
+    },
+    {
+      "id": "instructors_quiz_update",
+      "operationId": "quiz.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "quiz.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "title",
+          "type": "string",
+          "label": "Quiz Title",
+          "required": false,
+          "maxLength": 150
+        },
+        {
+          "name": "passingScore",
+          "type": "integer",
+          "label": "Passing Score (%)",
+          "required": false,
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Quiz saved",
+        "navigate": "instructors-quizes-id"
+      }
+    },
+    {
+      "id": "instructors_quizQuestion_update",
+      "operationId": "quizQuestion.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "quizQuestion.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "quizId",
+          "type": "string",
+          "label": "Quiz",
+          "required": false,
+          "reference": {
+            "entity": "Quiz",
+            "listOperation": "quiz.list",
+            "detailOperation": "quiz.get",
+            "labelField": "title",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "prompt",
+          "type": "text",
+          "label": "Question Prompt",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "string",
+          "label": "Choices / Options",
+          "required": false
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "label": "Order",
+          "required": false,
+          "min": 1
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Quiz question saved",
+        "navigate": "instructors-quiz-questions-id"
+      }
+    },
+    {
+      "id": "admins_category_create",
+      "operationId": "category.create",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Category Name",
+          "required": true,
+          "maxLength": 80
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "label": "Description",
+          "required": false
+        }
+      ],
+      "submitLabel": "Create category",
+      "onSuccess": {
+        "toast": "Category created",
+        "navigate": "admins-categories-id"
+      }
+    },
+    {
+      "id": "admins_category_update",
+      "operationId": "category.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "category.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Category Name",
+          "required": false,
+          "maxLength": 80
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "label": "Description",
+          "required": false
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Category saved",
+        "navigate": "admins-categories-id"
+      }
+    },
+    {
+      "id": "admins_course_update",
+      "operationId": "course.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "course.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "categoryId",
+          "type": "string",
+          "label": "Category",
+          "required": false,
+          "reference": {
+            "entity": "Category",
+            "listOperation": "category.list",
+            "detailOperation": "category.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "label": "Course Title",
+          "required": false,
+          "maxLength": 150
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "label": "Summary",
+          "required": false,
+          "maxLength": 1000,
+          "help": "A concise overview of the course subject and learning goals"
+        },
+        {
+          "name": "coverImage",
+          "type": "string",
+          "label": "Cover Image",
+          "required": false,
+          "upload": {
+            "entity": "Course",
+            "field": "coverImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Course saved",
+        "navigate": "admins-courses-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  }
+}

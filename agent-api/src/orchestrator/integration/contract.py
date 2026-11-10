@@ -155,8 +155,21 @@ def present(record: dict[str, Any], model: dict[str, Any], by_entity: dict[str, 
         out[child["apiName"]] = (
             None if row is None else {"id": row.get(child["primaryKeyField"]), "label": row.get(child["labelField"])}
         )
+    for item in model.get("computed", []):  # Epic 33: a feature's count from the fixtures; no viewer, no own row
+        out[item["field"]] = _computed_value(item, record.get(own), by_entity)
     out["allowedActions"] = list(actions)
     return out
+
+
+def _computed_value(item: dict[str, Any], own: Any, by_entity: dict[str, list[dict[str, Any]]]) -> Any:
+    """A computed field of a fixture row (Epic 33): the rows pointing at it for a `count`; null for `mine` (fixtures
+    are read by no one)."""
+    if item["kind"] == "mine":
+        return None
+    where = item.get("whereFields") or item.get("where") or {}
+    rows = by_entity.get(item["entity"]) or []
+    key = item.get("keyField") or item["key"]
+    return sum(1 for row in rows if row.get(key) == own and all(row.get(k) == v for k, v in where.items()))
 
 
 # -- examples ----------------------------------------------------------------------------------------------------
@@ -580,6 +593,13 @@ class _Builder:
                 if self.actions(entity):
                     actions["enum"] = self.actions(entity)
                 properties["allowedActions"] = {"type": "array", "items": actions}
+                for item in model.get("computed", []):  # Epic 33: read-only, computed by the server per caller
+                    server = {"readOnly": True, "x-bga": {"source": "server", "computed": item["kind"]}}
+                    if item["kind"] == "count":
+                        properties[item["field"]] = {"type": "integer", "minimum": 0, **server}
+                    else:
+                        own = {"type": "string", "format": "uuid"}
+                        properties[item["field"]] = {"anyOf": [own, {"type": "null"}], **server}
             self.schemas[name] = _object(properties, list(properties))
         return f"#/components/schemas/{name}"
 
@@ -936,6 +956,23 @@ class _Builder:
                     else {}
                 ),
                 "allowedActions": self.actions(entity),
+                **(
+                    {
+                        "computed": [
+                            {
+                                "field": item["field"],
+                                "kind": item["kind"],
+                                "entity": item["entity"],
+                                "key": item["keyField"],
+                                "where": item["whereFields"],
+                                **({"owner": item["ownerField"]} if item.get("ownerField") else {}),
+                            }
+                            for item in model["computed"]
+                        ]
+                    }
+                    if model.get("computed")
+                    else {}
+                ),
             }
         return out
 
@@ -979,6 +1016,8 @@ def presented_record(contract: dict[str, Any], entity: str | None, record: dict[
         out[child["apiName"]] = (
             None if row is None else {"id": row.get(child["primaryKeyField"]), "label": row.get(child["labelField"])}
         )
+    for item in info.get("computed") or []:  # Epic 33
+        out[item["field"]] = _computed_value(item, own, fixtures)
     out["allowedActions"] = list(info["allowedActions"])
     return out
 

@@ -1036,6 +1036,21 @@ _Implemented 2026-11-07 (Epic 25)._
   against a baseline taken before the patterns.
 - **Requirement first:** what the requirement says about placement or audience overrides the pattern, with a note.
 
+### FR-47: Domain Plugins (proposed, Epic 33)
+
+- **Domains:** a kind of product (learning platform, socials, news, drivers, edge AI / IoT) is a plugin naming its core
+  entities by role, its areas and people, the features it requires or offers, and the UX tasks it must pass. A draft is
+  checked against its domain; a requirement outside every domain is generated as before.
+- **Types:** each domain offers page layouts (a course catalogue, a short-video feed, a courier app, a sensor dashboard)
+  built from research into how real products of that kind organize their pages, never from their look or branding.
+- **Features:** behaviours shared across domains (comments with replies, reactions with state, follow, enrollment and
+  progress, dispatch, telemetry, alert rules) are full-stack plugins: their data, rules, API, mocks, screen parts and
+  checks come from the plugin, not from the model's draft.
+- **The model picks, code checks:** the model picks the domain, a type per area and the optional features; code
+  validates each and falls back where it can't be filled. The requirement overrides a type's defaults, with a note.
+- **Never empty:** an IoT app's devices are simulated through the real ingestion API, so its dashboard has data from
+  the first minute.
+
 ---
 
 ## 5. BackendSpec Input Example

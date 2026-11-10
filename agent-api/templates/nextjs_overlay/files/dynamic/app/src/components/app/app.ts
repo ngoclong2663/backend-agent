@@ -4,8 +4,13 @@ import data from "@/content/app.json";
 export type TAppAction = {
   id: string;
   label: string;
-  /** Story 22.7: `pay` starts the payments plugin's checkout. */
-  kind: "link" | "mutation" | "pay";
+  /** Story 22.7: `pay` starts the payments plugin's checkout. Epic 33: `reaction` toggles a feature's reaction. */
+  kind: "link" | "mutation" | "pay" | "reaction";
+  /** Epic 33 (`reaction`): the undo operation, the record field holding the caller's own row, the count field. */
+  undoOperationId?: string;
+  state?: string;
+  count?: string;
+  reaction?: "like" | "save" | "upvote";
   page?: string;
   params?: Record<string, unknown>;
   operationId?: string;
@@ -49,6 +54,19 @@ export type TAppContent = {
   field?: string;
   /** Epic 32 (Story 32.5): an operation run once when the record opens (a view counted), never a button. */
   onOpen?: { operationId: string; params?: Record<string, unknown>; body?: Record<string, unknown> };
+  /** Epic 33 (`CommentThread`): the comments feature's operations and fields. */
+  thread?: {
+    list: string;
+    create: string;
+    update?: string;
+    remove?: string;
+    target: string;
+    parent: string;
+    text: string;
+    owner: string;
+    maxLimit?: number;
+  };
+  operations?: string[];
 };
 
 /** One app section as the screen planner wrote it (Epic 22): its binding is in `data`, `form` and `content`. */
@@ -348,6 +366,8 @@ export function allowed(record: TRecord | undefined, action: TAppAction, session
   // an action that does not address this record by id (a collection action; a child created from the record with one
   // click, its body naming the record) is not among the record's own `allowedActions`: the operation's access decides
   if (action.kind === "mutation" && action.operationId && !action.params) return !session || canUse(action.operationId, session);
+  // Epic 33: a reaction is the person's own row on the record, allowed by the operation's access alone
+  if (action.kind === "reaction") return !session || canUse(action.operationId, session);
   const list = record?.allowedActions;
   if (!Array.isArray(list)) return !action.allow; // a transition or a payment needs the record to allow it
   if (action.allow) return list.includes(action.allow);

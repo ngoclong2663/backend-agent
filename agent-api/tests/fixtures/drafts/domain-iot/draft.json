@@ -1,0 +1,172 @@
+{
+  "draftId": "7e1186bd-f8a5-49ae-af7a-0bbc6c088df1",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T04:27:31.129894Z",
+  "finishedAt": "2026-11-10T04:28:29.530869Z",
+  "assumptions": [
+    {
+      "path": "/auth/roles",
+      "message": "Defined role names as 'operator' and 'admin' corresponding to Greenhouse Operator and Greenhouse Admin.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/SensorReading",
+      "message": "Modeled environmental telemetry metrics (temperature, humidity, CO2, soil moisture) directly on the SensorReading entity.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/rules/detectionFlow",
+      "message": "PestDetection status initial state is UNREVIEWED, transitioning to REVIEWED, and then CONFIRMED or DISMISSED based on operator review.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/rules/deviceFlow",
+      "message": "Device status initial state is NORMAL, transitioning to FLAGGED when offline or on low battery, and REBOOTING upon admin command.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "Configured light technical theme with #2e7d32 green accent matching 'clean and technical, light background, a leaf green accent'.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Weather App (Hero-Centric Design); palette Atmospheric gradients (sky blue → sunset → storm grey) + temp scale; fonts Spatial Clear (Inter / Inter); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "device.flag: it answers the Device",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/11/response",
+      "message": "device.reboot: it answers the Device",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/14/response",
+      "message": "sensorReading.review: it answers the SensorReading",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/18/response",
+      "message": "alert.acknowledge: it answers the Alert",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/21/response",
+      "message": "pestDetection.review: it answers the PestDetection",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/22/response",
+      "message": "pestDetection.confirm: it answers the PestDetection",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/23/response",
+      "message": "pestDetection.dismiss: it answers the PestDetection",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/dashboard/4",
+      "message": "Dashboard item 'Average Zone Temperature': 'avg' needs a number field of SensorReading; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Zone: meta 'location' left out (no such field)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'neon' left out: a neon look does not suit this product",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'enterprise' replaced by 'glass': three quiet looks offer no choice",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Active Alerts' is computed by alert.countWhereStatusActive (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Pending Pest Detections' is computed by pestDetection.countWhereStatusReviewed (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Flagged Devices' is computed by device.countWhereStatusFlagged (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Offline Devices' is computed by device.countWhereIsOnlineFalse (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/4",
+      "message": "'Alerts by Severity' is computed by alert.countBySeverity (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (clean and technical, light background, a leaf green accent): accent #2e7d32; background #f8faf8",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Devices are added from their greenhouse zone's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/assets",
+      "message": "No Unsplash photo for: PestDetection.snapshotUrl 'Bench 4 - East Corner' (no Unsplash photo for 'Bench 4 - East Corner PestDetection')",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations/alert.trigger",
+      "message": "Alert threshold rules configuration is deferred to a future version per requirement; verify if alert creation will eventually be driven by background stream processing or edge gateway.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/pestDetection.dismiss",
+      "message": "Confirm whether dismissed pest detections require a mandatory reason note field before closing.",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

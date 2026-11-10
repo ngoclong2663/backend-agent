@@ -1,0 +1,1019 @@
+{
+  "auth": {
+    "roles": [
+      "Reader",
+      "Writer",
+      "Editor"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "News articles drafted by writers and reviewed, scheduled, or published by editors",
+      "displayField": "headline",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 200,
+          "name": "headline",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 300,
+          "name": "subheading",
+          "nullable": true,
+          "required": false,
+          "type": "string"
+        },
+        {
+          "description": "City news division category",
+          "index": true,
+          "name": "section",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ]
+        },
+        {
+          "description": "Full body content of the news article",
+          "name": "body",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "name": "leadImage",
+          "nullable": true,
+          "required": false,
+          "type": "image"
+        },
+        {
+          "default": false,
+          "description": "Marks the article to be featured as the primary lead story on the front page",
+          "index": true,
+          "name": "isLeadStory",
+          "required": true,
+          "type": "boolean"
+        },
+        {
+          "default": "draft",
+          "description": "Lifecycle status of the article",
+          "index": true,
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "draft",
+            "submitted",
+            "under_review",
+            "changes_requested",
+            "scheduled",
+            "published"
+          ]
+        },
+        {
+          "description": "Editorial feedback specified when revisions are requested",
+          "name": "editorFeedback",
+          "nullable": true,
+          "required": false,
+          "type": "text"
+        },
+        {
+          "description": "Future release timestamp when scheduled",
+          "name": "scheduledFor",
+          "nullable": true,
+          "required": false,
+          "type": "datetime"
+        },
+        {
+          "description": "Timestamp when the article went public",
+          "index": true,
+          "name": "publishedAt",
+          "nullable": true,
+          "required": false,
+          "type": "datetime"
+        },
+        {
+          "index": true,
+          "name": "writerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "editorId",
+          "nullable": true,
+          "required": false,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "section",
+            "status"
+          ]
+        },
+        {
+          "fields": [
+            "isLeadStory",
+            "status"
+          ]
+        }
+      ],
+      "name": "Article"
+    },
+    {
+      "description": "Comments posted by readers at the end of published articles",
+      "displayField": "body",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "articleId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "readerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 100,
+          "name": "readerName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 2000,
+          "name": "body",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "posted",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "posted"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Comment"
+    },
+    {
+      "description": "Articles bookmarked by readers to read later",
+      "displayField": "articleId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "articleId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "readerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "bookmarked",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "bookmarked"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Bookmark",
+      "uniqueConstraints": [
+        [
+          "readerId",
+          "articleId"
+        ]
+      ]
+    },
+    {
+      "description": "Sections followed by readers for tailored news discovery",
+      "displayField": "section",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "readerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "section",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ]
+        },
+        {
+          "default": "active",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "active"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Follow",
+      "uniqueConstraints": [
+        [
+          "readerId",
+          "section"
+        ]
+      ]
+    },
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "unique": true,
+          "maxLength": 255
+        },
+        {
+          "name": "role",
+          "type": "enum",
+          "values": [
+            "Reader",
+            "Writer",
+            "Editor"
+          ],
+          "default": "Reader"
+        }
+      ],
+      "displayField": "email"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.create",
+      "path": "/articles",
+      "policy": "writersOnly",
+      "request": {
+        "entity": "Article",
+        "fields": [
+          "headline",
+          "subheading",
+          "section",
+          "leadImage",
+          "body"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Article",
+      "method": "GET",
+      "operationId": "article.get",
+      "path": "/articles/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Article",
+      "filters": [
+        "section",
+        "status",
+        "writerId",
+        "isLeadStory"
+      ],
+      "method": "GET",
+      "operationId": "article.list",
+      "pagination": true,
+      "path": "/articles",
+      "search": [
+        "headline",
+        "subheading"
+      ],
+      "sort": [
+        "publishedAt",
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Article",
+      "method": "PATCH",
+      "operationId": "article.update",
+      "path": "/articles/{id}",
+      "policy": "writerOrEditor",
+      "request": {
+        "entity": "Article",
+        "fields": [
+          "headline",
+          "subheading",
+          "section",
+          "leadImage",
+          "body",
+          "isLeadStory"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Article",
+      "method": "DELETE",
+      "operationId": "article.delete",
+      "path": "/articles/{id}",
+      "policy": "editorsOnly",
+      "type": "crud"
+    },
+    {
+      "description": "Writer submits a draft article for editorial review. Changes status from draft or changes_requested to submitted. Requires headline, section, and body to be non-empty.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.submit",
+      "path": "/articles/{id}/submit",
+      "policy": "articleOwnerOnly",
+      "rules": [
+        "articleWorkflow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "description": "Editor reviews a submitted draft article. Changes status to under_review for factual and tone verification.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.review",
+      "path": "/articles/{id}/review",
+      "policy": "articleAssignedEditor",
+      "rules": [
+        "articleWorkflow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "description": "Editor requests revisions on a draft under review. Requires feedback text specifying needed improvements. Changes status to changes_requested.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.requestChanges",
+      "path": "/articles/{id}/request-changes",
+      "policy": "articleAssignedEditor",
+      "request": {
+        "properties": [
+          {
+            "description": "Editorial revision requirements",
+            "maxLength": 2000,
+            "name": "editorFeedback",
+            "required": true,
+            "type": "text"
+          }
+        ],
+        "type": "object"
+      },
+      "rules": [
+        "articleWorkflow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "description": "Editor schedules an article for release at a future timestamp. Changes status to scheduled.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.schedule",
+      "path": "/articles/{id}/schedule",
+      "policy": "articleAssignedEditor",
+      "request": {
+        "properties": [
+          {
+            "description": "Future publication timestamp",
+            "name": "scheduledFor",
+            "required": true,
+            "type": "datetime"
+          }
+        ],
+        "type": "object"
+      },
+      "rules": [
+        "articleWorkflow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "description": "Editor releases a scheduled article whose scheduled release time has elapsed, setting status to published and publishedAt to now.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.releaseScheduled",
+      "path": "/articles/{id}/release",
+      "policy": "articleAssignedEditor",
+      "rules": [
+        "articleWorkflow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "description": "Editor publishes a submitted, reviewed, or scheduled article. Sets status to published and publishedAt to now.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.publish",
+      "path": "/articles/{id}/publish",
+      "policy": "articleAssignedEditor",
+      "rules": [
+        "articleWorkflow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Comment",
+      "method": "POST",
+      "operationId": "comment.create",
+      "path": "/comments",
+      "policy": "readersOnly",
+      "request": {
+        "entity": "Comment",
+        "fields": [
+          "articleId",
+          "readerName",
+          "body"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Comment",
+      "method": "GET",
+      "operationId": "comment.get",
+      "path": "/comments/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Comment",
+      "filters": [
+        "articleId",
+        "readerId"
+      ],
+      "method": "GET",
+      "operationId": "comment.list",
+      "pagination": true,
+      "path": "/comments",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Comment",
+      "method": "DELETE",
+      "operationId": "comment.delete",
+      "path": "/comments/{id}",
+      "policy": "readerCommentOwnership",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Bookmark",
+      "method": "POST",
+      "operationId": "bookmark.create",
+      "path": "/bookmarks",
+      "policy": "readersOnly",
+      "request": {
+        "entity": "Bookmark",
+        "fields": [
+          "articleId"
+        ]
+      },
+      "rules": [
+        "uniqueBookmark"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Bookmark",
+      "method": "GET",
+      "operationId": "bookmark.get",
+      "path": "/bookmarks/{id}",
+      "policy": "readerBookmarkOwnership",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Bookmark",
+      "filters": [
+        "articleId"
+      ],
+      "method": "GET",
+      "operationId": "bookmark.list",
+      "pagination": true,
+      "path": "/bookmarks",
+      "policy": "readerBookmarkOwnership",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Bookmark",
+      "method": "DELETE",
+      "operationId": "bookmark.delete",
+      "path": "/bookmarks/{id}",
+      "policy": "readerBookmarkOwnership",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Follow",
+      "method": "POST",
+      "operationId": "follow.create",
+      "path": "/follows",
+      "policy": "readersOnly",
+      "request": {
+        "entity": "Follow",
+        "fields": [
+          "section"
+        ]
+      },
+      "rules": [
+        "uniqueFollow"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Follow",
+      "method": "GET",
+      "operationId": "follow.get",
+      "path": "/follows/{id}",
+      "policy": "readerFollowOwnership",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Follow",
+      "filters": [
+        "section"
+      ],
+      "method": "GET",
+      "operationId": "follow.list",
+      "pagination": true,
+      "path": "/follows",
+      "policy": "readerFollowOwnership",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Follow",
+      "method": "DELETE",
+      "operationId": "follow.delete",
+      "path": "/follows/{id}",
+      "policy": "readerFollowOwnership",
+      "type": "crud"
+    },
+    {
+      "operationId": "user.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "User",
+      "method": "GET",
+      "path": "/users",
+      "summary": "Find a user",
+      "policy": "userDirectory",
+      "pagination": {
+        "defaultLimit": 20,
+        "maxLimit": 100
+      },
+      "search": [
+        "email"
+      ],
+      "filters": [
+        "role"
+      ]
+    },
+    {
+      "operationId": "user.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "User",
+      "method": "GET",
+      "path": "/users/{id}",
+      "summary": "A user",
+      "policy": "userDirectory"
+    },
+    {
+      "operationId": "article.countWhereStatusPublished",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-published",
+      "summary": "Published Articles",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "published"
+        }
+      }
+    },
+    {
+      "operationId": "article.countWhereStatusSubmitted",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-submitted",
+      "summary": "Drafts Awaiting Review",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "submitted"
+        }
+      }
+    },
+    {
+      "operationId": "article.countWhereStatusUnderReview",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-under-review",
+      "summary": "Articles Under Review",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "under_review"
+        }
+      }
+    },
+    {
+      "operationId": "article.countWhereStatusScheduled",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-scheduled",
+      "summary": "Scheduled Articles",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "scheduled"
+        }
+      }
+    },
+    {
+      "operationId": "comment.count",
+      "type": "aggregate",
+      "entity": "Comment",
+      "method": "GET",
+      "path": "/comments/aggregate/count",
+      "summary": "Comments Posted",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "article.countBySection",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-by-section",
+      "summary": "Articles by Section",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "section"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "writersOnly",
+      "roles": [
+        "Writer"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "editorsOnly",
+      "roles": [
+        "Editor"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "readersOnly",
+      "roles": [
+        "Reader"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "writerOrEditor",
+      "roles": [
+        "Writer",
+        "Editor"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "Editor"
+      ],
+      "name": "writerArticleOwnership",
+      "ownerField": "writerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "Editor"
+      ],
+      "name": "readerCommentOwnership",
+      "ownerField": "readerId",
+      "type": "ownership"
+    },
+    {
+      "name": "readerBookmarkOwnership",
+      "ownerField": "readerId",
+      "type": "ownership"
+    },
+    {
+      "name": "readerFollowOwnership",
+      "ownerField": "readerId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Article",
+      "name": "readerArticleVisibility",
+      "roles": [
+        "Reader"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "published"
+      }
+    },
+    {
+      "name": "articleOwnerOnly",
+      "type": "ownership",
+      "ownerField": "writerId",
+      "bypassRoles": []
+    },
+    {
+      "name": "articleAssignedEditor",
+      "type": "ownership",
+      "ownerField": "editorId",
+      "bypassRoles": []
+    },
+    {
+      "name": "userDirectory",
+      "type": "role",
+      "roles": [
+        "Editor"
+      ]
+    }
+  ],
+  "project": {
+    "description": "City news platform where writers draft stories across sections, editors review and publish them, and readers browse, bookmark, follow sections, and comment.",
+    "name": "The Harbour Ledger",
+    "slug": "the-harbour-ledger"
+  },
+  "relationships": [
+    {
+      "foreignKey": "articleId",
+      "from": "Article",
+      "name": "articleComments",
+      "onDelete": "CASCADE",
+      "to": "Comment",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "articleId",
+      "from": "Article",
+      "name": "articleBookmarks",
+      "onDelete": "CASCADE",
+      "to": "Bookmark",
+      "type": "one-to-many"
+    },
+    {
+      "name": "articleEditorId",
+      "type": "one-to-many",
+      "from": "User",
+      "to": "Article",
+      "foreignKey": "editorId",
+      "onDelete": "SET NULL"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Article state machine transitions per editorial workflow",
+      "entity": "Article",
+      "id": "articleWorkflow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "changes_requested": [
+            "submitted"
+          ],
+          "draft": [
+            "submitted"
+          ],
+          "scheduled": [
+            "published"
+          ],
+          "submitted": [
+            "under_review",
+            "published"
+          ],
+          "under_review": [
+            "published",
+            "changes_requested",
+            "scheduled"
+          ]
+        }
+      }
+    },
+    {
+      "description": "A reader can bookmark a specific article only once",
+      "entity": "Bookmark",
+      "id": "uniqueBookmark",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "readerId",
+          "articleId"
+        ]
+      }
+    },
+    {
+      "description": "A reader can follow a specific section only once",
+      "entity": "Follow",
+      "id": "uniqueFollow",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "readerId",
+          "section"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Article",
+      "records": [
+        {
+          "body": "Municipal council approves landmark investment in green transit, expanding electric tramways to the outer docks and reducing urban emissions.",
+          "createdAt": "2026-11-01T08:00:00Z",
+          "headline": "City Council Unveils Vision for Harbour Transit Expansion",
+          "id": "7b15d2a6-2182-4467-bc22-38d58c89b001",
+          "isLeadStory": true,
+          "publishedAt": "2026-11-01T09:00:00Z",
+          "section": "City",
+          "status": "published",
+          "subheading": "New light rail lines scheduled to connect the waterfront by 2028",
+          "writerId": "9c84e1b2-2345-4abc-9def-0123456789ab",
+          "leadImage": "https://images.unsplash.com/photo-1714109581740-3122add2f281?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Q2l0eSUyMENvdW5jaWwlMjBVbnZlaWxzJTIwVmlzaW9uJTIwZm9yJTIwSGFyYm91ciUyMFRyYW5zaXQlMjBFeHBhbnNpb24lMjBBcnRpY2xlfGVufDF8MHx8fDE3OTQyODQ3Mzh8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80"
+        },
+        {
+          "body": "Local tech ventures and maritime freight operators announce joint innovation hub at the northern pier to streamline global supply chains.",
+          "createdAt": "2026-11-02T10:30:00Z",
+          "headline": "Waterfront Logistics Hub Secures Venture Backing",
+          "id": "7b15d2a6-2182-4467-bc22-38d58c89b002",
+          "isLeadStory": false,
+          "publishedAt": "2026-11-02T11:15:00Z",
+          "section": "Business",
+          "status": "published",
+          "subheading": "Private funding round closes at fifty million for automated terminal",
+          "writerId": "9c84e1b2-2345-4abc-9def-0123456789ab",
+          "leadImage": "https://images.unsplash.com/photo-1606185540834-d6e7483ee1a4?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8V2F0ZXJmcm9udCUyMExvZ2lzdGljcyUyMEh1YiUyMFNlY3VyZXMlMjBWZW50dXJlJTIwQmFja2luZyUyMEFydGljbGV8ZW58MXwwfHx8MTc5NDI4NDczOXww&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80"
+        },
+        {
+          "body": "The historic Grand Dock Theatre reopens this Friday with an internationally acclaimed exhibition and civic symphony performance.",
+          "createdAt": "2026-11-03T14:00:00Z",
+          "headline": "Grand Dock Theatre Reopens After Meticulous Restoration",
+          "id": "7b15d2a6-2182-4467-bc22-38d58c89b003",
+          "isLeadStory": false,
+          "publishedAt": "2026-11-03T15:00:00Z",
+          "section": "Culture",
+          "status": "published",
+          "subheading": "Century-old architectural jewel restored to original splendour",
+          "writerId": "9c84e1b2-2345-4abc-9def-0123456789ab"
+        },
+        {
+          "body": "The Harbour Mariners clinched a dramatic overtime victory against the visiting rivals in front of a sold-out waterfront arena.",
+          "createdAt": "2026-11-04T18:00:00Z",
+          "headline": "Mariners Seal Stoppage-Time Thriller Before Home Crowd",
+          "id": "7b15d2a6-2182-4467-bc22-38d58c89b004",
+          "isLeadStory": false,
+          "publishedAt": "2026-11-04T19:30:00Z",
+          "section": "Sport",
+          "status": "published",
+          "subheading": "Late strike secures regional cup semifinal berth",
+          "writerId": "9c84e1b2-2345-4abc-9def-0123456789ab",
+          "leadImage": "https://images.unsplash.com/photo-1786985705464-db512f7739b0?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8TWFyaW5lcnMlMjBTZWFsJTIwU3RvcHBhZ2UtVGltZSUyMFRocmlsbGVyJTIwQmVmb3JlJTIwSG9tZSUyMENyb3dkJTIwQXJ0aWNsZXxlbnwxfDB8fHwxNzk0Mjg0NzQxfDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

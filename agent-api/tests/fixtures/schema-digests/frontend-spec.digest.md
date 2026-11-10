@@ -56,6 +56,14 @@ type AppDesign = {
   replaced?: string[];
 };
 
+// Epic 33: the kind of product the model recognized (a domain plugin), as `draft_app@v10` writes it.
+type AppDomain = {
+  name: string;
+  roles?: Record<string, string>;
+  types?: Record<string, string>;
+  features?: string[];
+};
+
 // How an entity is named and shown; every field is optional (code fills it from the BackendSpec).
 type AppEntity = {
   label?: string | null;
@@ -137,6 +145,7 @@ type AppOutline = {
   locale?: string | null;
   areas?: AppArea[];
   workflows?: Record<string, unknown> | null;
+  domain?: AppDomain | null;
 };
 
 // What the requirement itself says about the look, as values (2026-11-07): the requirement comes before the design data's choice for its kind of product.

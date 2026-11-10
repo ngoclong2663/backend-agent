@@ -178,9 +178,13 @@ def _typed_rules(defs: dict[str, Any]) -> None:
 
 
 @cache
-def _app_answer_schema(design: bool) -> dict[str, Any]:
+def _app_answer_schema(design: bool, domain: bool = False) -> dict[str, Any]:
     backend, backend_defs = _relocate(spec_json_schema(), "", set())
-    outline, outline_defs = _relocate(outline_schema(design), "Outline", set(backend_defs))
+    # Epic 33: the features block is code's (merged after the draft), never the model's to write
+    backend.get("properties", {}).pop("features", None)
+    for name in ("FeatureAttachment", "FeatureComputedField"):
+        backend_defs.pop(name, None)
+    outline, outline_defs = _relocate(outline_schema(design, domain), "Outline", set(backend_defs))
     defs = {**backend_defs, **outline_defs}
     _typed_rules(defs)
     defs |= {"BackendSpec": backend, "AppOutline": outline, "DraftNotes": NOTES}
@@ -206,10 +210,12 @@ def _app_answer_schema(design: bool) -> dict[str, Any]:
     return _clean(schema)
 
 
-def app_answer_schema(backend_file: str, outline_file: str, notes_file: str, design: bool = False) -> dict[str, Any]:
+def app_answer_schema(
+    backend_file: str, outline_file: str, notes_file: str, design: bool = False, domain: bool = False
+) -> dict[str, Any]:
     """The answer of a `draft_app` step: `{"files": {<backend>, <outline>, <notes>}, "message"}` (a copy). `design`
-    (Epic 23, `draft_app@v3`): the outline's design brief and areas too."""
-    schema = copy.deepcopy(_app_answer_schema(design))
+    (Epic 23, `draft_app@v3`): the outline's design brief and areas too; `domain` (Epic 33): the outline's domain."""
+    schema = copy.deepcopy(_app_answer_schema(design, domain))
     files = schema["properties"]["files"]
     names = {"backend-spec.json": backend_file, "app-outline.json": outline_file, "notes.json": notes_file}
     files["properties"] = {names[name]: body for name, body in files["properties"].items()}

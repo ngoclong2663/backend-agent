@@ -1,0 +1,3724 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "The Harbour Ledger",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "City news platform where writers draft stories across sections, editors review and publish them, and readers browse, bookmark, follow sections, and comment."
+  },
+  "theme": {
+    "style": "editorial",
+    "colorScheme": "light-dark",
+    "colors": {
+      "primary": "#1e3a8a",
+      "secondary": "#eceae9",
+      "accent": "#1e3a8a",
+      "background": "#faf8f5",
+      "foreground": "#0f172a",
+      "muted": "#eceae9",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Playfair Display",
+      "bodyFont": "Source Serif 4"
+    },
+    "radius": "none",
+    "density": "comfortable",
+    "direction": {
+      "productType": "Bookmark & Read-Later",
+      "pattern": "Minimal & Direct + Demo",
+      "palette": "Paper warm white + ink neutral + minimal accent + tag colors",
+      "fontPairing": "Minimalist Monochrome Editorial",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "The Harbour Ledger",
+      "navigation": [
+        {
+          "label": "Front Page & News",
+          "page": "articles"
+        },
+        {
+          "label": "Followed Sections",
+          "page": "follows"
+        },
+        {
+          "label": "Mine",
+          "page": "mine"
+        },
+        {
+          "label": "Dashboard",
+          "page": "writers-home"
+        },
+        {
+          "label": "Front Page & News",
+          "page": "writers-articles"
+        },
+        {
+          "label": "Reading List",
+          "page": "writers-bookmarks"
+        },
+        {
+          "label": "Followed Sections",
+          "page": "writers-follows"
+        },
+        {
+          "label": "Dashboard",
+          "page": "editors-home"
+        },
+        {
+          "label": "Front Page & News",
+          "page": "editors-articles"
+        },
+        {
+          "label": "Reading List",
+          "page": "editors-bookmarks"
+        },
+        {
+          "label": "Followed Sections",
+          "page": "editors-follows"
+        },
+        {
+          "label": "Users",
+          "page": "editors-users"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "The Harbour Ledger",
+    "tagline": "A trusted city news daily covering City, Business, Culture, and Sport",
+    "icon": "Newspaper",
+    "nav": [
+      {
+        "entity": "Article",
+        "label": "Front Page & News",
+        "icon": "Newspaper"
+      },
+      {
+        "entity": "Bookmark",
+        "label": "Reading List",
+        "icon": "Bookmark"
+      },
+      {
+        "entity": "Follow",
+        "label": "Followed Sections",
+        "icon": "Compass"
+      },
+      {
+        "entity": "User"
+      }
+    ],
+    "home": "Article",
+    "entities": {
+      "Article": {
+        "label": "Article",
+        "plural": "Articles",
+        "displayField": "headline",
+        "listFields": [
+          "headline",
+          "section",
+          "status",
+          "publishedAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "headline",
+          "subheading",
+          "section",
+          "leadImage",
+          "body",
+          "status",
+          "editorFeedback",
+          "scheduledFor",
+          "publishedAt",
+          "isLeadStory",
+          "createdAt",
+          "writerId",
+          "editorId",
+          "updatedAt"
+        ],
+        "fieldLabels": {
+          "headline": "Headline",
+          "subheading": "Subheading",
+          "section": "Section",
+          "body": "Article Body",
+          "leadImage": "Lead Image",
+          "isLeadStory": "Lead Story",
+          "status": "Status",
+          "editorFeedback": "Editorial Feedback",
+          "scheduledFor": "Scheduled Release Time",
+          "publishedAt": "Publication Date",
+          "writerId": "Writer",
+          "editorId": "Editor",
+          "createdAt": "Created at",
+          "updatedAt": "Updated at"
+        },
+        "help": {
+          "editorFeedback": "Notes and required revisions provided by the editor",
+          "isLeadStory": "Highlight this article as the front-page lead story",
+          "scheduledFor": "Future time when the article will automatically or manually be released",
+          "section": "City, Business, Culture, or Sport"
+        },
+        "create": "page"
+      },
+      "Comment": {
+        "label": "Comment",
+        "plural": "Comments",
+        "displayField": "readerName",
+        "listFields": [
+          "articleId",
+          "readerName",
+          "body",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "articleId",
+          "readerName",
+          "body",
+          "status",
+          "createdAt",
+          "readerId"
+        ],
+        "fieldLabels": {
+          "articleId": "Article",
+          "readerId": "Reader",
+          "readerName": "Reader Name",
+          "body": "Comment",
+          "status": "Status",
+          "createdAt": "Posted At"
+        },
+        "help": {
+          "body": "Join the discussion on this story"
+        },
+        "create": "onRecord"
+      },
+      "Bookmark": {
+        "label": "Bookmark",
+        "plural": "Bookmarks",
+        "displayField": "articleId",
+        "listFields": [
+          "articleId",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "articleId",
+          "status",
+          "createdAt",
+          "readerId"
+        ],
+        "fieldLabels": {
+          "articleId": "Saved Article",
+          "readerId": "Reader",
+          "status": "Bookmark Status",
+          "createdAt": "Bookmarked At"
+        },
+        "help": {
+          "articleId": "The published article saved to your reading list"
+        },
+        "create": "onRecord"
+      },
+      "Follow": {
+        "label": "Section Follow",
+        "plural": "Section Follows",
+        "displayField": "section",
+        "listFields": [
+          "section",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "section",
+          "status",
+          "createdAt",
+          "readerId"
+        ],
+        "fieldLabels": {
+          "readerId": "Reader",
+          "section": "Followed Section",
+          "status": "Status",
+          "createdAt": "Followed At"
+        },
+        "help": {
+          "section": "Follow sections you care about to receive curated updates"
+        }
+      },
+      "User": {
+        "label": "User",
+        "plural": "Users",
+        "displayField": "email",
+        "listFields": [
+          "email",
+          "role"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "email",
+          "role"
+        ],
+        "fieldLabels": {
+          "email": "Email",
+          "role": "Role"
+        },
+        "help": {}
+      }
+    },
+    "design": {
+      "archetype": "feed",
+      "shell": "topbar",
+      "mobileNav": "bottom-tabs",
+      "frame": "standard",
+      "density": "comfortable",
+      "mainEntity": "Article",
+      "entities": {
+        "Article": {
+          "view": "feed",
+          "roles": {
+            "title": "headline",
+            "media": "leadImage",
+            "badge": "section",
+            "subtitle": "subheading",
+            "meta": [
+              "status",
+              "publishedAt"
+            ]
+          },
+          "detailView": "reader",
+          "filtersStyle": "chips",
+          "card": "stacked"
+        },
+        "Comment": {
+          "view": "cards",
+          "roles": {
+            "title": "readerName",
+            "badge": "status",
+            "subtitle": "body",
+            "meta": [
+              "createdAt"
+            ]
+          },
+          "detailView": "record",
+          "filtersStyle": "toolbar",
+          "card": "text-first"
+        },
+        "Bookmark": {
+          "view": "cards",
+          "roles": {
+            "title": "articleId",
+            "badge": "status",
+            "meta": [
+              "createdAt"
+            ]
+          },
+          "detailView": "record",
+          "filtersStyle": "toolbar",
+          "card": "text-first"
+        },
+        "Follow": {
+          "view": "cards",
+          "roles": {
+            "badge": "section",
+            "meta": [
+              "createdAt"
+            ]
+          },
+          "detailView": "record",
+          "filtersStyle": "toolbar",
+          "card": "text-first"
+        },
+        "User": {
+          "view": "table",
+          "roles": {}
+        }
+      },
+      "homeView": "feed",
+      "looks": [
+        {
+          "recipe": "editorial",
+          "reason": "The requirement asks for it",
+          "fontPairing": "editorial"
+        },
+        {
+          "recipe": "swiss",
+          "reason": "Clean Swiss grid emphasizes journalistic objectivity, legibility, and high-density content hierarchy.",
+          "fontPairing": "bookish"
+        },
+        {
+          "recipe": "soft",
+          "reason": "A bolder option (added by code)",
+          "fontPairing": "editorial"
+        }
+      ],
+      "requested": {
+        "accent": "#1e3a8a",
+        "background": "#faf8f5",
+        "scheme": "light",
+        "headingFont": "serif",
+        "corners": "sharp",
+        "words": "editorial and trustworthy, a classic serif for headlines, off-white paper and a navy accent"
+      },
+      "seed": 3885258191,
+      "fontPairing": "editorial",
+      "reason": "Editorial news publication emphasizing curated front-page reading, section-based discovery, and structured editorial workflows.",
+      "replaced": [
+        "Follow: title 'section' left out (a enum field is not a name)",
+        "look 'minimal' replaced by 'soft': three quiet looks offer no choice"
+      ]
+    },
+    "areas": [
+      {
+        "id": "readers",
+        "label": "Readers",
+        "roles": [
+          "Reader"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "catalogue",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "standard",
+          "density": "comfortable",
+          "mainEntity": "Article",
+          "entities": {
+            "Article": {
+              "groupBy": "section",
+              "view": "shelves",
+              "roles": {
+                "media": "leadImage"
+              },
+              "detailView": "reader",
+              "filtersStyle": "toolbar",
+              "card": "stacked"
+            },
+            "Comment": {
+              "view": "table",
+              "roles": {}
+            },
+            "Bookmark": {
+              "view": "table",
+              "roles": {}
+            },
+            "Follow": {
+              "view": "table",
+              "roles": {}
+            },
+            "User": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "feed"
+        }
+      },
+      {
+        "id": "writers",
+        "label": "Writers",
+        "roles": [
+          "Writer"
+        ],
+        "prefix": "/writers",
+        "design": {
+          "archetype": "workspace",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "wide",
+          "density": "comfortable",
+          "mainEntity": "Article",
+          "entities": {
+            "Article": {
+              "view": "cards",
+              "roles": {
+                "media": "leadImage"
+              },
+              "detailView": "profile",
+              "filtersStyle": "chips",
+              "card": "stacked"
+            },
+            "Comment": {
+              "view": "table",
+              "roles": {}
+            },
+            "Bookmark": {
+              "view": "table",
+              "roles": {}
+            },
+            "Follow": {
+              "view": "table",
+              "roles": {}
+            },
+            "User": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "dashboard"
+        }
+      },
+      {
+        "id": "editors",
+        "label": "Editors",
+        "roles": [
+          "Editor"
+        ],
+        "prefix": "/editors",
+        "design": {
+          "archetype": "back-office",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "wide",
+          "density": "compact",
+          "mainEntity": "Article",
+          "entities": {
+            "Article": {
+              "groupBy": "status",
+              "view": "board",
+              "roles": {
+                "media": "leadImage"
+              },
+              "detailView": "record",
+              "filtersStyle": "facets",
+              "card": "side"
+            },
+            "Comment": {
+              "view": "table",
+              "roles": {}
+            },
+            "Bookmark": {
+              "view": "table",
+              "roles": {}
+            },
+            "Follow": {
+              "view": "table",
+              "roles": {}
+            },
+            "User": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "dashboard"
+        }
+      }
+    ],
+    "dashboard": [
+      {
+        "label": "Published Articles",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "published"
+        }
+      },
+      {
+        "label": "Drafts Awaiting Review",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "submitted"
+        }
+      },
+      {
+        "label": "Articles Under Review",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "under_review"
+        }
+      },
+      {
+        "label": "Scheduled Articles",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "scheduled"
+        }
+      },
+      {
+        "label": "Comments Posted",
+        "kind": "figure",
+        "entity": "Comment",
+        "fn": "count",
+        "filter": {}
+      },
+      {
+        "label": "Articles by Section",
+        "kind": "pie",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {},
+        "groupBy": "section"
+      }
+    ],
+    "workflows": {
+      "version": "0c045cf852a0",
+      "tours": [
+        {
+          "id": "publish_article",
+          "name": "Publish Article",
+          "outcome": "An article is reviewed and published for public readership",
+          "roles": [
+            "Editor",
+            "Writer"
+          ],
+          "steps": [
+            {
+              "id": "draft_article",
+              "role": "Writer",
+              "actor": "Writer",
+              "title": "Draft article in section (the article becomes draft). Rule: Section must be City, Business, Culture, or Sport",
+              "operationId": "article.create",
+              "statusAfter": "draft",
+              "page": "writers-articles-new",
+              "route": "/writers/articles/new",
+              "target": {
+                "section": "article-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "article"
+            },
+            {
+              "id": "submit_draft",
+              "role": "Writer",
+              "actor": "Writer",
+              "title": "Submit draft for review (the article becomes submitted). Rule: Headline, section, and body cannot be empty",
+              "operationId": "article.submit",
+              "statusAfter": "submitted",
+              "page": "writers-articles-id",
+              "route": "/writers/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "article",
+              "needs": {
+                "step": "draft_article",
+                "role": "Writer",
+                "status": "draft"
+              }
+            },
+            {
+              "id": "review_draft",
+              "role": "Editor",
+              "actor": "Editor",
+              "title": "Review submitted draft (the article becomes under_review). Rule: Must verify factual integrity and editorial tone",
+              "operationId": "article.review",
+              "statusAfter": "under_review",
+              "page": "editors-articles-id",
+              "route": "/editors/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "review"
+              },
+              "kind": "do",
+              "record": "article",
+              "needs": {
+                "step": "submit_draft",
+                "role": "Writer",
+                "status": "submitted"
+              }
+            },
+            {
+              "id": "publish_article_step",
+              "role": "Editor",
+              "actor": "Editor",
+              "title": "Publish article (the article becomes published). Rule: Only submitted or reviewed drafts can be published",
+              "operationId": "article.publish",
+              "statusAfter": "published",
+              "page": "editors-articles-id",
+              "route": "/editors/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "publish"
+              },
+              "kind": "do",
+              "record": "article",
+              "needs": {
+                "step": "review_draft",
+                "role": "Editor",
+                "status": "under_review"
+              }
+            }
+          ]
+        },
+        {
+          "id": "read_and_comment",
+          "name": "Read and Comment on Article",
+          "outcome": "A reader reads a story and adds their perspective to the article discussion",
+          "roles": [
+            "Reader"
+          ],
+          "steps": [
+            {
+              "id": "view_article",
+              "role": "Reader",
+              "actor": "Reader",
+              "title": "View front page and select article. Rule: Only published articles are visible",
+              "operationId": "article.get",
+              "page": "articles-id",
+              "route": "/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "article"
+            },
+            {
+              "id": "post_comment",
+              "role": "Reader",
+              "actor": "Reader",
+              "title": "Post comment on article (the comment becomes posted). Rule: Comments can only be posted on published articles",
+              "operationId": "comment.create",
+              "statusAfter": "posted",
+              "page": "articles-id",
+              "route": "/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "add-comments"
+              },
+              "kind": "do",
+              "record": "comment"
+            }
+          ]
+        },
+        {
+          "id": "bookmark_and_follow",
+          "name": "Bookmark Article and Follow Section",
+          "outcome": "Articles are saved for later reading and sections are followed for curated discovery",
+          "roles": [
+            "Reader"
+          ],
+          "steps": [
+            {
+              "id": "bookmark_article",
+              "role": "Reader",
+              "actor": "Reader",
+              "title": "Bookmark article to read later (the bookmark becomes bookmarked). Rule: Only published articles can be bookmarked",
+              "operationId": "bookmark.create",
+              "statusAfter": "bookmarked",
+              "page": "articles-id",
+              "route": "/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "add-bookmarks"
+              },
+              "kind": "do",
+              "record": "bookmark"
+            },
+            {
+              "id": "follow_section",
+              "role": "Reader",
+              "actor": "Reader",
+              "title": "Follow section (the follow becomes active). Rule: Section must be an existing active section",
+              "operationId": "follow.create",
+              "statusAfter": "active",
+              "page": "follows-new",
+              "route": "/follows/new",
+              "target": {
+                "section": "follow-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "follow"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "add-bookmarks",
+                "label": "Bookmark",
+                "kind": "mutation",
+                "operationId": "bookmark.create",
+                "body": {
+                  "articleId": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Bookmark created"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "articles",
+      "route": "/articles",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "add-bookmarks",
+                "label": "Bookmark",
+                "kind": "mutation",
+                "operationId": "bookmark.create",
+                "body": {
+                  "articleId": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Bookmark created"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "articles-id",
+      "route": "/articles/[id]",
+      "title": "Article",
+      "sections": [
+        {
+          "id": "articles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "article.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "headline",
+              "subheading",
+              "section",
+              "leadImage",
+              "body",
+              "status",
+              "editorFeedback",
+              "scheduledFor",
+              "publishedAt",
+              "isLeadStory",
+              "createdAt",
+              "writerId",
+              "editorId",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Article",
+            "actions": [
+              {
+                "id": "add-comments",
+                "label": "Add comment",
+                "kind": "mutation",
+                "operationId": "comment.create",
+                "form": "comment_create_on_article",
+                "onSuccess": {
+                  "toast": "Comment created"
+                }
+              },
+              {
+                "id": "add-bookmarks",
+                "label": "Bookmark",
+                "kind": "mutation",
+                "operationId": "bookmark.create",
+                "body": {
+                  "articleId": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Bookmark created"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "comments-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "comment.list",
+            "params": {
+              "articleId": "$route.id"
+            },
+            "fields": [
+              "readerName",
+              "body",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comments",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "comments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted"
+                }
+              }
+            ],
+            "tab": "Comments"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bookmarks-id",
+      "route": "/bookmarks/[id]",
+      "title": "Bookmark",
+      "sections": [
+        {
+          "id": "bookmarks-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "bookmark.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmark",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted",
+                  "navigate": "bookmarks"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "comments-id",
+      "route": "/comments/[id]",
+      "title": "Comment",
+      "sections": [
+        {
+          "id": "comments-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "comment.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "articleId",
+              "readerName",
+              "body",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comment",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted",
+                  "navigate": "comments"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-home",
+      "route": "/editors",
+      "title": "The Harbour Ledger",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusPublished"
+          },
+          "content": {
+            "label": "Published Articles",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusSubmitted"
+          },
+          "content": {
+            "label": "Drafts Awaiting Review",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusUnderReview"
+          },
+          "content": {
+            "label": "Articles Under Review",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusScheduled"
+          },
+          "content": {
+            "label": "Scheduled Articles",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "comment.count"
+          },
+          "content": {
+            "label": "Comments Posted",
+            "kind": "figure",
+            "entity": "Comment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-6",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countBySection"
+          },
+          "content": {
+            "label": "Articles by Section",
+            "kind": "pie",
+            "entity": "Article",
+            "groupBy": "section",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-articles",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "headline",
+              "section",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Recent articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "editors-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-bookmarks",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Recent bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-articles",
+      "route": "/editors/articles",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "editors-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-articles-id",
+      "route": "/editors/articles/[id]",
+      "title": "Article",
+      "sections": [
+        {
+          "id": "articles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "article.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "headline",
+              "subheading",
+              "section",
+              "leadImage",
+              "body",
+              "status",
+              "editorFeedback",
+              "scheduledFor",
+              "publishedAt",
+              "isLeadStory",
+              "createdAt",
+              "writerId",
+              "editorId",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Article",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "editors-articles-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "request-changes",
+                "label": "Request changes",
+                "kind": "mutation",
+                "operationId": "article.requestChanges",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Request changes: done"
+                },
+                "form": "editors_article_requestChanges"
+              },
+              {
+                "id": "schedule",
+                "label": "Schedule",
+                "kind": "mutation",
+                "operationId": "article.schedule",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Schedule: done"
+                },
+                "form": "editors_article_schedule"
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted",
+                  "navigate": "editors-articles"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "comments-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "comment.list",
+            "params": {
+              "articleId": "$route.id"
+            },
+            "fields": [
+              "readerName",
+              "body",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comments",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-comments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted"
+                }
+              }
+            ],
+            "tab": "Comments"
+          }
+        },
+        {
+          "id": "bookmarks-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "params": {
+              "articleId": "$route.id"
+            },
+            "fields": [
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ],
+            "tab": "Bookmarks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-articles-id-edit",
+      "route": "/editors/articles/[id]/edit",
+      "title": "Edit article",
+      "sections": [
+        {
+          "id": "articles-edit-form",
+          "component": "AppForm",
+          "form": "editors_article_update",
+          "content": {
+            "entity": "Article"
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-bookmarks",
+      "route": "/editors/bookmarks",
+      "title": "Bookmarks",
+      "sections": [
+        {
+          "id": "bookmarks-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-bookmarks-id",
+      "route": "/editors/bookmarks/[id]",
+      "title": "Bookmark",
+      "sections": [
+        {
+          "id": "bookmarks-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "bookmark.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmark",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted",
+                  "navigate": "editors-bookmarks"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-comments",
+      "route": "/editors/comments",
+      "title": "Comments",
+      "sections": [
+        {
+          "id": "comments-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "comment.list",
+            "fields": [
+              "articleId",
+              "readerName",
+              "body",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comments",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-comments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-comments-id",
+      "route": "/editors/comments/[id]",
+      "title": "Comment",
+      "sections": [
+        {
+          "id": "comments-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "comment.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "articleId",
+              "readerName",
+              "body",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comment",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted",
+                  "navigate": "editors-comments"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-follows",
+      "route": "/editors/follows",
+      "title": "Section Follows",
+      "sections": [
+        {
+          "id": "follows-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "follow.list",
+            "fields": [
+              "section",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Section Follows",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "section"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-follows-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this section follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Section Follow deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-follows-id",
+      "route": "/editors/follows/[id]",
+      "title": "Section Follow",
+      "sections": [
+        {
+          "id": "follows-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "follow.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "section",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Section Follow",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this section follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Section Follow deleted",
+                  "navigate": "editors-follows"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-users",
+      "route": "/editors/users",
+      "title": "Users",
+      "sections": [
+        {
+          "id": "users-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "user.list",
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "Users",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "role"
+              ],
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-users-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "editors-users-id",
+      "route": "/editors/users/[id]",
+      "title": "User",
+      "sections": [
+        {
+          "id": "users-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "user.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "User",
+            "actions": []
+          }
+        },
+        {
+          "id": "articles-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "params": {
+              "writerId": "$route.id"
+            },
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "editors-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "editors-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted"
+                }
+              }
+            ],
+            "tab": "Articles"
+          }
+        }
+      ]
+    },
+    {
+      "id": "follows",
+      "route": "/follows",
+      "title": "Section Follows",
+      "sections": [
+        {
+          "id": "follows-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "follow.list",
+            "fields": [
+              "section",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Section Follows",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "section"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "follows-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this section follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Section Follow deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "follows-new",
+              "label": "New section follow"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "follows-id",
+      "route": "/follows/[id]",
+      "title": "Section Follow",
+      "sections": [
+        {
+          "id": "follows-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "follow.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "section",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Section Follow",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this section follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Section Follow deleted",
+                  "navigate": "follows"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "follows-new",
+      "route": "/follows/new",
+      "title": "New section follow",
+      "sections": [
+        {
+          "id": "follow-create-form",
+          "component": "AppForm",
+          "form": "follow_create",
+          "content": {
+            "entity": "Follow"
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mine",
+      "route": "/mine",
+      "title": "Mine",
+      "sections": [
+        {
+          "id": "bookmarks-mine",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ],
+            "tab": "Reading List"
+          }
+        },
+        {
+          "id": "comments-mine",
+          "component": "AppList",
+          "data": {
+            "operationId": "comment.list",
+            "fields": [
+              "articleId",
+              "readerName",
+              "body",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comments",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "comments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted"
+                }
+              }
+            ],
+            "tab": "Comments"
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-home",
+      "route": "/writers",
+      "title": "The Harbour Ledger",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusPublished"
+          },
+          "content": {
+            "label": "Published Articles",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusSubmitted"
+          },
+          "content": {
+            "label": "Drafts Awaiting Review",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusUnderReview"
+          },
+          "content": {
+            "label": "Articles Under Review",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusScheduled"
+          },
+          "content": {
+            "label": "Scheduled Articles",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "comment.count"
+          },
+          "content": {
+            "label": "Comments Posted",
+            "kind": "figure",
+            "entity": "Comment",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-6",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countBySection"
+          },
+          "content": {
+            "label": "Articles by Section",
+            "kind": "pie",
+            "entity": "Article",
+            "groupBy": "section",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-articles",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "headline",
+              "section",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Recent articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "writers-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-bookmarks",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Recent bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-articles",
+      "route": "/writers/articles",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status",
+                "isLeadStory"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "writers-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              }
+            ],
+            "create": {
+              "page": "writers-articles-new",
+              "label": "New article"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-articles-id",
+      "route": "/writers/articles/[id]",
+      "title": "Article",
+      "sections": [
+        {
+          "id": "articles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "article.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "headline",
+              "subheading",
+              "section",
+              "leadImage",
+              "body",
+              "status",
+              "editorFeedback",
+              "scheduledFor",
+              "publishedAt",
+              "isLeadStory",
+              "createdAt",
+              "writerId",
+              "editorId",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Article",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "writers-articles-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "article.submit",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit: done"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Review",
+                "kind": "mutation",
+                "operationId": "article.review",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Review: done"
+                }
+              },
+              {
+                "id": "request-changes",
+                "label": "Request changes",
+                "kind": "mutation",
+                "operationId": "article.requestChanges",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Request changes: done"
+                },
+                "form": "writers_article_requestChanges"
+              },
+              {
+                "id": "schedule",
+                "label": "Schedule",
+                "kind": "mutation",
+                "operationId": "article.schedule",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Schedule: done"
+                },
+                "form": "writers_article_schedule"
+              },
+              {
+                "id": "release-scheduled",
+                "label": "Release scheduled",
+                "kind": "mutation",
+                "operationId": "article.releaseScheduled",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Release scheduled: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "comments-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "comment.list",
+            "params": {
+              "articleId": "$route.id"
+            },
+            "fields": [
+              "readerName",
+              "body",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comments",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-comments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted"
+                }
+              }
+            ],
+            "tab": "Comments"
+          }
+        },
+        {
+          "id": "bookmarks-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "params": {
+              "articleId": "$route.id"
+            },
+            "fields": [
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ],
+            "tab": "Bookmarks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-articles-id-edit",
+      "route": "/writers/articles/[id]/edit",
+      "title": "Edit article",
+      "sections": [
+        {
+          "id": "articles-edit-form",
+          "component": "AppForm",
+          "form": "writers_article_update",
+          "content": {
+            "entity": "Article"
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-articles-new",
+      "route": "/writers/articles/new",
+      "title": "New article",
+      "sections": [
+        {
+          "id": "article-create-form",
+          "component": "AppForm",
+          "form": "writers_article_create",
+          "content": {
+            "entity": "Article"
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-bookmarks",
+      "route": "/writers/bookmarks",
+      "title": "Bookmarks",
+      "sections": [
+        {
+          "id": "bookmarks-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "bookmark.list",
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmarks",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-bookmarks-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-bookmarks-id",
+      "route": "/writers/bookmarks/[id]",
+      "title": "Bookmark",
+      "sections": [
+        {
+          "id": "bookmarks-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "bookmark.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "articleId",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Bookmark",
+            "title": "Bookmark",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "bookmark.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this bookmark? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Bookmark deleted",
+                  "navigate": "writers-bookmarks"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-comments",
+      "route": "/writers/comments",
+      "title": "Comments",
+      "sections": [
+        {
+          "id": "comments-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "comment.list",
+            "fields": [
+              "articleId",
+              "readerName",
+              "body",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comments",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-comments-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-comments-id",
+      "route": "/writers/comments/[id]",
+      "title": "Comment",
+      "sections": [
+        {
+          "id": "comments-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "comment.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "articleId",
+              "readerName",
+              "body",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Comment",
+            "title": "Comment",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "comment.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this comment? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Comment deleted",
+                  "navigate": "writers-comments"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-follows",
+      "route": "/writers/follows",
+      "title": "Section Follows",
+      "sections": [
+        {
+          "id": "follows-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "follow.list",
+            "fields": [
+              "section",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Section Follows",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "section"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "writers-follows-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this section follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Section Follow deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "writers-follows-id",
+      "route": "/writers/follows/[id]",
+      "title": "Section Follow",
+      "sections": [
+        {
+          "id": "follows-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "follow.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "section",
+              "status",
+              "createdAt",
+              "readerId"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Section Follow",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this section follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Section Follow deleted",
+                  "navigate": "writers-follows"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "comment_create_on_article",
+      "operationId": "comment.create",
+      "fields": [
+        {
+          "name": "articleId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "readerName",
+          "type": "string",
+          "label": "Reader Name",
+          "required": true,
+          "maxLength": 100
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "label": "Comment",
+          "required": true,
+          "maxLength": 2000,
+          "help": "Join the discussion on this story"
+        }
+      ],
+      "submitLabel": "Create comment",
+      "onSuccess": {
+        "toast": "Comment created"
+      }
+    },
+    {
+      "id": "follow_create",
+      "operationId": "follow.create",
+      "fields": [
+        {
+          "name": "section",
+          "type": "enum",
+          "label": "Followed Section",
+          "required": true,
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ],
+          "help": "Follow sections you care about to receive curated updates"
+        }
+      ],
+      "submitLabel": "Create section follow",
+      "onSuccess": {
+        "toast": "Section Follow created",
+        "navigate": "follows-id"
+      }
+    },
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "writers_article_create",
+      "operationId": "article.create",
+      "fields": [
+        {
+          "name": "headline",
+          "type": "string",
+          "label": "Headline",
+          "required": true,
+          "maxLength": 200
+        },
+        {
+          "name": "subheading",
+          "type": "string",
+          "label": "Subheading",
+          "required": false,
+          "maxLength": 300
+        },
+        {
+          "name": "section",
+          "type": "enum",
+          "label": "Section",
+          "required": true,
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ],
+          "help": "City, Business, Culture, or Sport"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "label": "Article Body",
+          "required": true
+        },
+        {
+          "name": "leadImage",
+          "type": "string",
+          "label": "Lead Image",
+          "required": false,
+          "upload": {
+            "entity": "Article",
+            "field": "leadImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Create article",
+      "onSuccess": {
+        "toast": "Article created",
+        "navigate": "writers-articles-id"
+      }
+    },
+    {
+      "id": "writers_article_update",
+      "operationId": "article.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "article.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "headline",
+          "type": "string",
+          "label": "Headline",
+          "required": false,
+          "maxLength": 200
+        },
+        {
+          "name": "subheading",
+          "type": "string",
+          "label": "Subheading",
+          "required": false,
+          "maxLength": 300
+        },
+        {
+          "name": "section",
+          "type": "enum",
+          "label": "Section",
+          "required": false,
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ],
+          "help": "City, Business, Culture, or Sport"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "label": "Article Body",
+          "required": false
+        },
+        {
+          "name": "leadImage",
+          "type": "string",
+          "label": "Lead Image",
+          "required": false,
+          "upload": {
+            "entity": "Article",
+            "field": "leadImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        },
+        {
+          "name": "isLeadStory",
+          "type": "boolean",
+          "label": "Lead Story",
+          "required": false,
+          "help": "Highlight this article as the front-page lead story"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Article saved",
+        "navigate": "writers-articles-id"
+      }
+    },
+    {
+      "id": "editors_article_update",
+      "operationId": "article.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "article.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "headline",
+          "type": "string",
+          "label": "Headline",
+          "required": false,
+          "maxLength": 200
+        },
+        {
+          "name": "subheading",
+          "type": "string",
+          "label": "Subheading",
+          "required": false,
+          "maxLength": 300
+        },
+        {
+          "name": "section",
+          "type": "enum",
+          "label": "Section",
+          "required": false,
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ],
+          "help": "City, Business, Culture, or Sport"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "label": "Article Body",
+          "required": false
+        },
+        {
+          "name": "leadImage",
+          "type": "string",
+          "label": "Lead Image",
+          "required": false,
+          "upload": {
+            "entity": "Article",
+            "field": "leadImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        },
+        {
+          "name": "isLeadStory",
+          "type": "boolean",
+          "label": "Lead Story",
+          "required": false,
+          "help": "Highlight this article as the front-page lead story"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Article saved",
+        "navigate": "editors-articles-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  },
+  "assets": [
+    {
+      "id": "seed-1",
+      "kind": "image",
+      "alt": "two buses parked next to each other in a parking lot",
+      "source": "https://images.unsplash.com/photo-1714109581740-3122add2f281?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Q2l0eSUyMENvdW5jaWwlMjBVbnZlaWxzJTIwVmlzaW9uJTIwZm9yJTIwSGFyYm91ciUyMFRyYW5zaXQlMjBFeHBhbnNpb24lMjBBcnRpY2xlfGVufDF8MHx8fDE3OTQyODQ3Mzh8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Andrew Wang",
+        "profileUrl": "https://unsplash.com/@cpanw?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "E_66mBGitnQ"
+      }
+    },
+    {
+      "id": "seed-2",
+      "kind": "image",
+      "alt": "red and blue cargo ship on body of water during daytime",
+      "source": "https://images.unsplash.com/photo-1606185540834-d6e7483ee1a4?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8V2F0ZXJmcm9udCUyMExvZ2lzdGljcyUyMEh1YiUyMFNlY3VyZXMlMjBWZW50dXJlJTIwQmFja2luZyUyMEFydGljbGV8ZW58MXwwfHx8MTc5NDI4NDczOXww&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "william william",
+        "profileUrl": "https://unsplash.com/@william07?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "NndKt2kF1L4"
+      }
+    },
+    {
+      "id": "seed-3",
+      "kind": "image",
+      "alt": "A laughing man in a navy t-shirt pointing at a soccer match",
+      "source": "https://images.unsplash.com/photo-1786985705464-db512f7739b0?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8TWFyaW5lcnMlMjBTZWFsJTIwU3RvcHBhZ2UtVGltZSUyMFRocmlsbGVyJTIwQmVmb3JlJTIwSG9tZSUyMENyb3dkJTIwQXJ0aWNsZXxlbnwxfDB8fHwxNzk0Mjg0NzQxfDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Jon Matthews",
+        "profileUrl": "https://unsplash.com/@jkmatt?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "mduLFyflH2w"
+      }
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "draftId": "05b5c53f-438d-4679-be99-4cf789853489",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T04:23:23.460622Z",
+  "finishedAt": "2026-11-10T04:24:25.119605Z",
+  "assumptions": [
+    {
+      "path": "/entities/Delivery/fields/fee",
+      "message": "Delivery fee is specified upon creation by the shop as an incentive payout for the courier.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/delivery.get",
+      "message": "Customer tracking is made publicly available by ID so customers do not need to register an account.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/DriverProfile",
+      "message": "DriverProfile holds online status per driver to enforce the rule that couriers must be online.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/areas",
+      "message": "Three separate application areas created for Shop, Driver, and Dispatcher to match their distinct operational workflows.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Food Delivery / On-Demand (Hero-Centric Design + Feature-Rich); palette Appetizing warm (orange/red) + trust blue + map accent; fonts Startup Bold (Outfit + Rubik) (Outfit / Rubik); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/operations/3/response",
+      "message": "delivery.accept: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/4/response",
+      "message": "delivery.startGoingToPickup: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5/response",
+      "message": "delivery.confirmPickedUp: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6/response",
+      "message": "delivery.startGoingToDropoff: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7/response",
+      "message": "delivery.completeDelivery: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/1",
+      "message": "delivery.get: private to its driver (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/3",
+      "message": "delivery.accept: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/4",
+      "message": "delivery.startGoingToPickup: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5",
+      "message": "delivery.confirmPickedUp: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6",
+      "message": "delivery.startGoingToDropoff: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7",
+      "message": "delivery.completeDelivery: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Delivery",
+      "message": "Delivery: shop create it for a driver, chosen in the form (driverId); it then belongs to that driver",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/entities/DriverProfile/create",
+      "message": "DriverProfile has no parent record to be made on; placed by default",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "DriverProfile: profile needs an image field; shown as record",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'driver': DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'driver': DriverProfile: profile needs an image field; shown as record",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'dispatcher': DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'dispatcher': DriverProfile: profile needs an image field; shown as record",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Open Offers' is computed by delivery.countWhereStatusOffered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Delivered Today' is computed by delivery.countThisDayWhereStatusDelivered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Drivers Online' is computed by driverProfile.countWhereIsOnlineTrue (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Deliveries by Status' is computed by delivery.countByStatus (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/4",
+      "message": "'Earnings Today' is computed by delivery.sumFeeThisDayOnDeliveredAtWhereStatusDelivered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/5",
+      "message": "'Earnings This Week' is computed by delivery.sumFeeThisWeekOnDeliveredAtWhereStatusDelivered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (practical and fast to use on a phone, high contrast, a bright orange accent): accent #f97316; sans headings (Outfit); rounded corners; photos first (Delivery)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/workflows",
+      "message": "3 workflow step(s) could not be bound to the app; see the Business tab",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/rules/deliveryTransitions",
+      "message": "Can shops cancel an offered delivery before a driver accepts it?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/delivery.accept",
+      "message": "Is there a maximum time window for a driver to reach pickup before an offer is unassigned or reclaimed?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Delivery/fields/fee",
+      "message": "What currency is used for courier delivery fees?",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

@@ -1,0 +1,2776 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "Swiftdrop",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "A courier app for local shops, online couriers, and dispatch operations."
+  },
+  "theme": {
+    "style": "playful",
+    "colorScheme": "light-dark",
+    "colors": {
+      "primary": "#f97316",
+      "secondary": "#fdf4f0",
+      "accent": "#f97316",
+      "background": "#fff7ed",
+      "foreground": "#0f172a",
+      "muted": "#fdf4f0",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Outfit",
+      "bodyFont": "Rubik"
+    },
+    "radius": "lg",
+    "density": "comfortable",
+    "direction": {
+      "productType": "Food Delivery / On-Demand",
+      "pattern": "Hero-Centric Design + Feature-Rich",
+      "palette": "Appetizing warm (orange/red) + trust blue + map accent",
+      "fontPairing": "Startup Bold (Outfit + Rubik)",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "Swiftdrop",
+      "navigation": [
+        {
+          "label": "Deliveries",
+          "page": "deliveries"
+        },
+        {
+          "label": "Users",
+          "page": "users"
+        },
+        {
+          "label": "Dashboard",
+          "page": "dashboard"
+        },
+        {
+          "label": "Deliveries",
+          "page": "driver-deliveries"
+        },
+        {
+          "label": "Dashboard",
+          "page": "driver-dashboard"
+        },
+        {
+          "label": "Dashboard",
+          "page": "dispatcher-home"
+        },
+        {
+          "label": "Deliveries",
+          "page": "dispatcher-deliveries"
+        },
+        {
+          "label": "Availability",
+          "page": "dispatcher-driver-profiles"
+        },
+        {
+          "label": "Users",
+          "page": "dispatcher-users"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "Swiftdrop",
+    "tagline": "On-demand local shop courier deliveries with real-time tracking",
+    "icon": "Truck",
+    "nav": [
+      {
+        "entity": "Delivery",
+        "label": "Deliveries",
+        "icon": "Package"
+      },
+      {
+        "entity": "DriverProfile",
+        "label": "Availability",
+        "icon": "UserCheck"
+      },
+      {
+        "entity": "User"
+      }
+    ],
+    "home": "dashboard",
+    "entities": {
+      "Delivery": {
+        "label": "Delivery",
+        "plural": "Deliveries",
+        "displayField": "customerName",
+        "listFields": [
+          "customerName",
+          "dropoffAddress",
+          "parcelSize",
+          "fee",
+          "status"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "pickupAddress",
+          "dropoffAddress",
+          "customerName",
+          "customerPhone",
+          "parcelSize",
+          "fee",
+          "status",
+          "driverId",
+          "proofPhoto",
+          "createdAt",
+          "deliveredAt",
+          "shopId"
+        ],
+        "fieldLabels": {
+          "shopId": "Shop",
+          "driverId": "Assigned Driver",
+          "pickupAddress": "Pickup Address",
+          "dropoffAddress": "Drop-off Address",
+          "customerName": "Customer Name",
+          "customerPhone": "Customer Phone",
+          "parcelSize": "Parcel Size",
+          "fee": "Courier Fee",
+          "status": "Status",
+          "proofPhoto": "Proof of Delivery Photo",
+          "createdAt": "Created at",
+          "deliveredAt": "Delivered At"
+        },
+        "help": {
+          "fee": "Payout offered to courier for completing the delivery",
+          "parcelSize": "Size of package: small, medium, or large",
+          "proofPhoto": "Mandatory photo of the delivered parcel at the door"
+        },
+        "create": "page"
+      },
+      "DriverProfile": {
+        "label": "Driver Profile",
+        "plural": "Driver Profiles",
+        "displayField": "driverId",
+        "listFields": [
+          "driverId",
+          "isOnline",
+          "updatedAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "driverId",
+          "isOnline",
+          "updatedAt"
+        ],
+        "fieldLabels": {
+          "driverId": "Driver Account",
+          "isOnline": "Online Availability",
+          "updatedAt": "Last Updated"
+        },
+        "help": {
+          "isOnline": "Toggle availability to receive new delivery offers"
+        }
+      },
+      "User": {
+        "label": "User",
+        "plural": "Users",
+        "displayField": "email",
+        "listFields": [
+          "email",
+          "role"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "email",
+          "role"
+        ],
+        "fieldLabels": {
+          "email": "Email",
+          "role": "Role"
+        },
+        "help": {}
+      }
+    },
+    "design": {
+      "archetype": "workspace",
+      "shell": "topbar",
+      "mobileNav": "bottom-tabs",
+      "frame": "narrow",
+      "density": "compact",
+      "mainEntity": "Delivery",
+      "entities": {
+        "Delivery": {
+          "view": "media-grid",
+          "roles": {
+            "title": "customerName",
+            "media": "proofPhoto",
+            "price": "fee",
+            "badge": "status",
+            "subtitle": "dropoffAddress",
+            "meta": [
+              "parcelSize",
+              "createdAt"
+            ]
+          },
+          "detailView": "media",
+          "filtersStyle": "chips",
+          "card": "side"
+        },
+        "DriverProfile": {
+          "view": "cards",
+          "roles": {
+            "badge": "isOnline"
+          },
+          "detailView": "record",
+          "filtersStyle": "chips",
+          "card": "text-first"
+        },
+        "User": {
+          "view": "table",
+          "roles": {}
+        }
+      },
+      "homeView": "dashboard",
+      "looks": [
+        {
+          "recipe": "playful",
+          "reason": "Vibrant, block-based styling tailored for on-demand couriers on phones.",
+          "fontPairing": "geometric"
+        },
+        {
+          "recipe": "glass",
+          "reason": "Translucent glass cards providing a sleek, modern consumer delivery feel.",
+          "fontPairing": "geometric"
+        },
+        {
+          "recipe": "minimal",
+          "reason": "High contrast hairline flat design maximizing speed, legibility, and usability on mobile devices.",
+          "fontPairing": "humanist"
+        }
+      ],
+      "requested": {
+        "accent": "#f97316",
+        "scheme": "light",
+        "headingFont": "sans",
+        "corners": "rounded",
+        "photos": "prominent",
+        "words": "practical and fast to use on a phone, high contrast, a bright orange accent"
+      },
+      "seed": 1922755215,
+      "reason": "A mobile-first workspace giving couriers and shop owners immediate clarity and high-contrast actions on the go.",
+      "replaced": [
+        "DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+        "DriverProfile: profile needs an image field; shown as record",
+        "area 'driver': DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+        "area 'driver': DriverProfile: profile needs an image field; shown as record",
+        "area 'dispatcher': DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+        "area 'dispatcher': DriverProfile: profile needs an image field; shown as record"
+      ],
+      "fontPairing": "geometric"
+    },
+    "areas": [
+      {
+        "id": "shop",
+        "label": "Shop Portal",
+        "roles": [
+          "shop"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "storefront",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "narrow",
+          "density": "compact",
+          "mainEntity": "Delivery",
+          "entities": {
+            "Delivery": {
+              "view": "media-grid",
+              "roles": {
+                "title": "customerName",
+                "price": "fee",
+                "badge": "status",
+                "subtitle": "dropoffAddress",
+                "media": "proofPhoto"
+              },
+              "detailView": "media",
+              "filtersStyle": "facets",
+              "card": "text-first"
+            },
+            "DriverProfile": {
+              "view": "table",
+              "roles": {}
+            },
+            "User": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "feed"
+        }
+      },
+      {
+        "id": "driver",
+        "label": "Driver Hub",
+        "roles": [
+          "driver"
+        ],
+        "prefix": "/driver",
+        "design": {
+          "archetype": "workspace",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "narrow",
+          "density": "compact",
+          "mainEntity": "Delivery",
+          "entities": {
+            "Delivery": {
+              "view": "media-grid",
+              "roles": {
+                "title": "customerName",
+                "media": "proofPhoto",
+                "price": "fee",
+                "badge": "status",
+                "subtitle": "dropoffAddress"
+              },
+              "detailView": "media",
+              "filtersStyle": "chips",
+              "card": "side"
+            },
+            "DriverProfile": {
+              "view": "cards",
+              "roles": {
+                "badge": "isOnline"
+              },
+              "detailView": "record",
+              "card": "text-first"
+            },
+            "User": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "feed"
+        }
+      },
+      {
+        "id": "dispatcher",
+        "label": "Dispatch Control",
+        "roles": [
+          "dispatcher"
+        ],
+        "prefix": "/dispatcher",
+        "design": {
+          "archetype": "back-office",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "wide",
+          "density": "compact",
+          "mainEntity": "Delivery",
+          "entities": {
+            "Delivery": {
+              "view": "media-grid",
+              "roles": {
+                "title": "customerName",
+                "price": "fee",
+                "badge": "status",
+                "subtitle": "dropoffAddress",
+                "media": "proofPhoto"
+              },
+              "detailView": "split-panel",
+              "filtersStyle": "chips",
+              "card": "side"
+            },
+            "DriverProfile": {
+              "view": "table",
+              "roles": {
+                "badge": "isOnline"
+              },
+              "detailView": "record",
+              "filtersStyle": "chips"
+            },
+            "User": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "dashboard"
+        }
+      }
+    ],
+    "dashboard": [
+      {
+        "label": "Open Offers",
+        "kind": "figure",
+        "entity": "Delivery",
+        "fn": "count",
+        "filter": {
+          "status": "offered"
+        }
+      },
+      {
+        "label": "Delivered Today",
+        "kind": "figure",
+        "entity": "Delivery",
+        "fn": "count",
+        "filter": {
+          "status": "delivered"
+        },
+        "period": "day"
+      },
+      {
+        "label": "Drivers Online",
+        "kind": "figure",
+        "entity": "DriverProfile",
+        "fn": "count",
+        "filter": {
+          "isOnline": true
+        }
+      },
+      {
+        "label": "Deliveries by Status",
+        "kind": "bar",
+        "entity": "Delivery",
+        "fn": "count",
+        "filter": {},
+        "groupBy": "status"
+      },
+      {
+        "label": "Earnings Today",
+        "kind": "figure",
+        "entity": "Delivery",
+        "fn": "sum",
+        "field": "fee",
+        "filter": {
+          "status": "delivered"
+        },
+        "period": "day",
+        "dateField": "deliveredAt"
+      },
+      {
+        "label": "Earnings This Week",
+        "kind": "figure",
+        "entity": "Delivery",
+        "fn": "sum",
+        "field": "fee",
+        "filter": {
+          "status": "delivered"
+        },
+        "period": "week",
+        "dateField": "deliveredAt"
+      }
+    ],
+    "workflows": {
+      "version": "986669417579",
+      "tours": [
+        {
+          "id": "order_fulfillment",
+          "name": "Parcel Order and Fulfillment",
+          "outcome": "The parcel is delivered to the customer with photographic proof",
+          "roles": [
+            "driver",
+            "shop"
+          ],
+          "steps": [
+            {
+              "id": "create_delivery",
+              "role": "shop",
+              "actor": "Shop",
+              "title": "Create delivery request (the delivery becomes offered). Rule: Must include pickup address, drop-off address, customer name, phone, and parcel size",
+              "operationId": "delivery.create",
+              "statusAfter": "offered",
+              "page": "deliveries-new",
+              "route": "/deliveries/new",
+              "target": {
+                "section": "delivery-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "delivery"
+            },
+            {
+              "id": "accept_offer",
+              "role": "driver",
+              "actor": "Driver",
+              "title": "Accept delivery offer (the delivery becomes assigned). Rule: Driver must be online, carry only one delivery at a time, and offer not already taken",
+              "operationId": "delivery.accept",
+              "statusAfter": "assigned",
+              "page": "driver-deliveries-id",
+              "route": "/driver/deliveries/[id]",
+              "target": {
+                "section": "deliveries-detail",
+                "action": "accept"
+              },
+              "kind": "do",
+              "record": "delivery",
+              "needs": {
+                "step": "create_delivery",
+                "role": "shop",
+                "status": "offered"
+              }
+            },
+            {
+              "id": "start_pickup",
+              "role": "driver",
+              "actor": "Driver",
+              "title": "Start traveling to pickup (the delivery becomes going_to_pickup)",
+              "operationId": "delivery.startGoingToPickup",
+              "statusAfter": "going_to_pickup",
+              "page": "driver-deliveries-id",
+              "route": "/driver/deliveries/[id]",
+              "target": {
+                "section": "deliveries-detail",
+                "action": "start-going-to-pickup"
+              },
+              "kind": "do",
+              "record": "delivery",
+              "needs": {
+                "step": "accept_offer",
+                "role": "driver",
+                "status": "assigned"
+              }
+            },
+            {
+              "id": "confirm_pickup",
+              "role": "driver",
+              "actor": "Driver",
+              "title": "Confirm parcel picked up (the delivery becomes picked_up)",
+              "operationId": "delivery.confirmPickedUp",
+              "statusAfter": "picked_up",
+              "page": "driver-deliveries-id",
+              "route": "/driver/deliveries/[id]",
+              "target": {
+                "section": "deliveries-detail",
+                "action": "confirm-picked-up"
+              },
+              "kind": "do",
+              "record": "delivery",
+              "needs": {
+                "step": "start_pickup",
+                "role": "driver",
+                "status": "going_to_pickup"
+              }
+            },
+            {
+              "id": "start_dropoff",
+              "role": "driver",
+              "actor": "Driver",
+              "title": "Start traveling to drop-off (the delivery becomes going_to_dropoff)",
+              "operationId": "delivery.startGoingToDropoff",
+              "statusAfter": "going_to_dropoff",
+              "page": "driver-deliveries-id",
+              "route": "/driver/deliveries/[id]",
+              "target": {
+                "section": "deliveries-detail",
+                "action": "start-going-to-dropoff"
+              },
+              "kind": "do",
+              "record": "delivery",
+              "needs": {
+                "step": "confirm_pickup",
+                "role": "driver",
+                "status": "picked_up"
+              }
+            },
+            {
+              "id": "complete_delivery",
+              "role": "driver",
+              "actor": "Driver",
+              "title": "Complete delivery with proof photo (the delivery becomes delivered). Rule: Photo of parcel at door is mandatory",
+              "operationId": "delivery.completeDelivery",
+              "statusAfter": "delivered",
+              "page": "driver-deliveries-id",
+              "route": "/driver/deliveries/[id]",
+              "target": {
+                "section": "deliveries-detail",
+                "action": "complete-delivery"
+              },
+              "kind": "do",
+              "record": "delivery",
+              "needs": {
+                "step": "start_dropoff",
+                "role": "driver",
+                "status": "going_to_dropoff"
+              }
+            }
+          ]
+        },
+        {
+          "id": "track_delivery",
+          "name": "Customer Delivery Tracking",
+          "outcome": "Customer stays informed of parcel delivery progress",
+          "roles": [],
+          "steps": [
+            {
+              "id": "view_progress",
+              "role": null,
+              "actor": "Customer",
+              "title": "View delivery progress",
+              "operationId": null,
+              "skip": "no app role plays this actor",
+              "kind": "note",
+              "record": "delivery"
+            }
+          ]
+        },
+        {
+          "id": "track_earnings",
+          "name": "Driver Earnings Review",
+          "outcome": "Driver verifies income earned today and this week",
+          "roles": [
+            "driver"
+          ],
+          "steps": [
+            {
+              "id": "view_earnings",
+              "role": "driver",
+              "actor": "Driver",
+              "title": "View daily and weekly earnings. Rule: Only completed deliveries are counted toward earnings",
+              "operationId": "delivery.sumFeeThisDayOnDeliveredAtWhereStatusDelivered",
+              "page": "driver-dashboard",
+              "route": "/driver/dashboard",
+              "target": {
+                "section": "figure-5",
+                "action": null
+              },
+              "kind": "look",
+              "record": "delivery"
+            }
+          ]
+        },
+        {
+          "id": "dispatch_oversight",
+          "name": "Dispatcher Delivery Oversight",
+          "outcome": "Dispatcher monitors operations and driver availability",
+          "roles": [
+            "dispatcher"
+          ],
+          "steps": [
+            {
+              "id": "monitor_network",
+              "role": "dispatcher",
+              "actor": "Dispatcher",
+              "title": "View deliveries by status and online drivers",
+              "operationId": "delivery.countByStatus",
+              "page": "dispatcher-home",
+              "route": "/dispatcher",
+              "target": {
+                "section": "figure-4",
+                "action": null
+              },
+              "kind": "look",
+              "record": "delivery"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Deliveries",
+      "sections": [
+        {
+          "id": "deliveries-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize",
+              "fee",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ],
+            "create": {
+              "page": "deliveries-new",
+              "label": "New delivery"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "route": "/dashboard",
+      "title": "Dashboard",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countWhereStatusOffered"
+          },
+          "content": {
+            "label": "Open Offers",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countThisDayWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Delivered Today",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "driverProfile.countWhereIsOnlineTrue"
+          },
+          "content": {
+            "label": "Drivers Online",
+            "kind": "figure",
+            "entity": "DriverProfile",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countByStatus"
+          },
+          "content": {
+            "label": "Deliveries by Status",
+            "kind": "bar",
+            "entity": "Delivery",
+            "groupBy": "status",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.sumFeeThisDayOnDeliveredAtWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Earnings Today",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "sum",
+            "field": "fee"
+          }
+        },
+        {
+          "id": "figure-6",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.sumFeeThisWeekOnDeliveredAtWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Earnings This Week",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "sum",
+            "field": "fee"
+          }
+        },
+        {
+          "id": "recent-deliveries",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Recent deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-users",
+          "component": "AppList",
+          "data": {
+            "operationId": "user.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "Recent users",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "role"
+              ],
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "users-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "deliveries",
+      "route": "/deliveries",
+      "title": "Deliveries",
+      "sections": [
+        {
+          "id": "deliveries-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize",
+              "fee",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ],
+            "create": {
+              "page": "deliveries-new",
+              "label": "New delivery"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "deliveries-id",
+      "route": "/deliveries/[id]",
+      "title": "Delivery",
+      "sections": [
+        {
+          "id": "deliveries-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "delivery.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "pickupAddress",
+              "dropoffAddress",
+              "customerName",
+              "customerPhone",
+              "parcelSize",
+              "fee",
+              "status",
+              "driverId",
+              "proofPhoto",
+              "createdAt",
+              "deliveredAt",
+              "shopId"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Delivery",
+            "actions": [
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              },
+              {
+                "id": "complete-delivery",
+                "label": "Complete delivery",
+                "kind": "mutation",
+                "operationId": "delivery.completeDelivery",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete delivery: done"
+                },
+                "form": "delivery_completeDelivery"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "deliveries-new",
+      "route": "/deliveries/new",
+      "title": "New delivery",
+      "sections": [
+        {
+          "id": "delivery-create-form",
+          "component": "AppForm",
+          "form": "delivery_create",
+          "content": {
+            "entity": "Delivery"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-home",
+      "route": "/dispatcher",
+      "title": "Swiftdrop",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countWhereStatusOffered"
+          },
+          "content": {
+            "label": "Open Offers",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countThisDayWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Delivered Today",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "driverProfile.countWhereIsOnlineTrue"
+          },
+          "content": {
+            "label": "Drivers Online",
+            "kind": "figure",
+            "entity": "DriverProfile",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countByStatus"
+          },
+          "content": {
+            "label": "Deliveries by Status",
+            "kind": "bar",
+            "entity": "Delivery",
+            "groupBy": "status",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.sumFeeThisDayOnDeliveredAtWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Earnings Today",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "sum",
+            "field": "fee"
+          }
+        },
+        {
+          "id": "figure-6",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.sumFeeThisWeekOnDeliveredAtWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Earnings This Week",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "sum",
+            "field": "fee"
+          }
+        },
+        {
+          "id": "recent-deliveries",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Recent deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "dispatcher-deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-driver-profiles",
+          "component": "AppList",
+          "data": {
+            "operationId": "driverProfile.list",
+            "params": {
+              "limit": 5
+            },
+            "fields": [
+              "driverId",
+              "isOnline",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "DriverProfile",
+            "title": "Recent driver profiles",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "isOnline"
+              ],
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "dispatcher-driver-profiles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "dispatcher-driver-profiles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-deliveries",
+      "route": "/dispatcher/deliveries",
+      "title": "Deliveries",
+      "sections": [
+        {
+          "id": "deliveries-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize",
+              "fee",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "dispatcher-deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-deliveries-id",
+      "route": "/dispatcher/deliveries/[id]",
+      "title": "Delivery",
+      "sections": [
+        {
+          "id": "deliveries-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "delivery.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "pickupAddress",
+              "dropoffAddress",
+              "customerName",
+              "customerPhone",
+              "parcelSize",
+              "fee",
+              "status",
+              "driverId",
+              "proofPhoto",
+              "createdAt",
+              "deliveredAt",
+              "shopId"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Delivery",
+            "actions": [
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              },
+              {
+                "id": "complete-delivery",
+                "label": "Complete delivery",
+                "kind": "mutation",
+                "operationId": "delivery.completeDelivery",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete delivery: done"
+                },
+                "form": "dispatcher_delivery_completeDelivery"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-driver-profiles",
+      "route": "/dispatcher/driver-profiles",
+      "title": "Driver Profiles",
+      "sections": [
+        {
+          "id": "driver-profiles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "driverProfile.list",
+            "fields": [
+              "driverId",
+              "isOnline",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "DriverProfile",
+            "title": "Driver Profiles",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "isOnline"
+              ],
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "dispatcher-driver-profiles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "dispatcher-driver-profiles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-driver-profiles-id",
+      "route": "/dispatcher/driver-profiles/[id]",
+      "title": "Driver Profile",
+      "sections": [
+        {
+          "id": "driver-profiles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "driverProfile.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "driverId",
+              "isOnline",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "DriverProfile",
+            "title": "Driver Profile",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "dispatcher-driver-profiles-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-driver-profiles-id-edit",
+      "route": "/dispatcher/driver-profiles/[id]/edit",
+      "title": "Edit driver profile",
+      "sections": [
+        {
+          "id": "driver-profiles-edit-form",
+          "component": "AppForm",
+          "form": "dispatcher_driverProfile_update",
+          "content": {
+            "entity": "DriverProfile"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-users",
+      "route": "/dispatcher/users",
+      "title": "Users",
+      "sections": [
+        {
+          "id": "users-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "user.list",
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "Users",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "role"
+              ],
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "dispatcher-users-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dispatcher-users-id",
+      "route": "/dispatcher/users/[id]",
+      "title": "User",
+      "sections": [
+        {
+          "id": "users-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "user.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "User",
+            "actions": []
+          }
+        },
+        {
+          "id": "deliveries-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "params": {
+              "shopId": "$route.id"
+            },
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize",
+              "fee",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "dispatcher-deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ],
+            "tab": "Deliveries"
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-home",
+      "route": "/driver",
+      "title": "Deliveries",
+      "sections": [
+        {
+          "id": "deliveries-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize",
+              "fee",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "driver-deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-profiles-id",
+      "route": "/driver-profiles/[id]",
+      "title": "Driver Profile",
+      "sections": [
+        {
+          "id": "driver-profiles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "driverProfile.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "driverId",
+              "isOnline",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "DriverProfile",
+            "title": "Driver Profile",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "driver-profiles-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-profiles-id-edit",
+      "route": "/driver-profiles/[id]/edit",
+      "title": "Edit driver profile",
+      "sections": [
+        {
+          "id": "driver-profiles-edit-form",
+          "component": "AppForm",
+          "form": "driverProfile_update",
+          "content": {
+            "entity": "DriverProfile"
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-dashboard",
+      "route": "/driver/dashboard",
+      "title": "Dashboard",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countWhereStatusOffered"
+          },
+          "content": {
+            "label": "Open Offers",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countThisDayWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Delivered Today",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "driverProfile.countWhereIsOnlineTrue"
+          },
+          "content": {
+            "label": "Drivers Online",
+            "kind": "figure",
+            "entity": "DriverProfile",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.countByStatus"
+          },
+          "content": {
+            "label": "Deliveries by Status",
+            "kind": "bar",
+            "entity": "Delivery",
+            "groupBy": "status",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.sumFeeThisDayOnDeliveredAtWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Earnings Today",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "sum",
+            "field": "fee"
+          }
+        },
+        {
+          "id": "figure-6",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "delivery.sumFeeThisWeekOnDeliveredAtWhereStatusDelivered"
+          },
+          "content": {
+            "label": "Earnings This Week",
+            "kind": "figure",
+            "entity": "Delivery",
+            "fn": "sum",
+            "field": "fee"
+          }
+        },
+        {
+          "id": "recent-deliveries",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Recent deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "driver-deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-deliveries",
+      "route": "/driver/deliveries",
+      "title": "Deliveries",
+      "sections": [
+        {
+          "id": "deliveries-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "delivery.list",
+            "fields": [
+              "customerName",
+              "dropoffAddress",
+              "parcelSize",
+              "fee",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Deliveries",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "fee"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "driver-deliveries-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-deliveries-id",
+      "route": "/driver/deliveries/[id]",
+      "title": "Delivery",
+      "sections": [
+        {
+          "id": "deliveries-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "delivery.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "pickupAddress",
+              "dropoffAddress",
+              "customerName",
+              "customerPhone",
+              "parcelSize",
+              "fee",
+              "status",
+              "driverId",
+              "proofPhoto",
+              "createdAt",
+              "deliveredAt",
+              "shopId"
+            ]
+          },
+          "content": {
+            "entity": "Delivery",
+            "title": "Delivery",
+            "actions": [
+              {
+                "id": "accept",
+                "label": "Accept",
+                "kind": "mutation",
+                "operationId": "delivery.accept",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Accept: done"
+                }
+              },
+              {
+                "id": "start-going-to-pickup",
+                "label": "Start going to pickup",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToPickup",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to pickup: done"
+                }
+              },
+              {
+                "id": "confirm-picked-up",
+                "label": "Confirm picked up",
+                "kind": "mutation",
+                "operationId": "delivery.confirmPickedUp",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Confirm picked up: done"
+                }
+              },
+              {
+                "id": "start-going-to-dropoff",
+                "label": "Start going to dropoff",
+                "kind": "mutation",
+                "operationId": "delivery.startGoingToDropoff",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Start going to dropoff: done"
+                }
+              },
+              {
+                "id": "complete-delivery",
+                "label": "Complete delivery",
+                "kind": "mutation",
+                "operationId": "delivery.completeDelivery",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Complete delivery: done"
+                },
+                "form": "driver_delivery_completeDelivery"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-driver-profiles-id",
+      "route": "/driver/driver-profiles/[id]",
+      "title": "Driver Profile",
+      "sections": [
+        {
+          "id": "driver-profiles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "driverProfile.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "driverId",
+              "isOnline",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "DriverProfile",
+            "title": "Driver Profile",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "driver-driver-profiles-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "driver-driver-profiles-id-edit",
+      "route": "/driver/driver-profiles/[id]/edit",
+      "title": "Edit driver profile",
+      "sections": [
+        {
+          "id": "driver-profiles-edit-form",
+          "component": "AppForm",
+          "form": "driver_driverProfile_update",
+          "content": {
+            "entity": "DriverProfile"
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "users",
+      "route": "/users",
+      "title": "Users",
+      "sections": [
+        {
+          "id": "users-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "user.list",
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "Users",
+            "style": "table",
+            "controls": {
+              "search": true,
+              "filters": [
+                "role"
+              ],
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "users-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "users-id",
+      "route": "/users/[id]",
+      "title": "User",
+      "sections": [
+        {
+          "id": "users-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "user.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "email",
+              "role"
+            ]
+          },
+          "content": {
+            "entity": "User",
+            "title": "User",
+            "actions": []
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "delivery_create",
+      "operationId": "delivery.create",
+      "fields": [
+        {
+          "name": "pickupAddress",
+          "type": "string",
+          "label": "Pickup Address",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "dropoffAddress",
+          "type": "string",
+          "label": "Drop-off Address",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "customerName",
+          "type": "string",
+          "label": "Customer Name",
+          "required": true,
+          "maxLength": 120
+        },
+        {
+          "name": "customerPhone",
+          "type": "tel",
+          "label": "Customer Phone",
+          "required": true,
+          "maxLength": 32
+        },
+        {
+          "name": "parcelSize",
+          "type": "enum",
+          "label": "Parcel Size",
+          "required": true,
+          "values": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "help": "Size of package: small, medium, or large"
+        },
+        {
+          "name": "fee",
+          "type": "decimal",
+          "label": "Courier Fee",
+          "required": true,
+          "min": 0,
+          "help": "Payout offered to courier for completing the delivery"
+        }
+      ],
+      "submitLabel": "Create delivery",
+      "onSuccess": {
+        "toast": "Delivery created",
+        "navigate": "deliveries-id"
+      }
+    },
+    {
+      "id": "delivery_completeDelivery",
+      "operationId": "delivery.completeDelivery",
+      "params": {
+        "id": "$route.id"
+      },
+      "fields": [
+        {
+          "name": "proofPhoto",
+          "type": "string",
+          "label": "Proof of Delivery Photo",
+          "required": false,
+          "upload": {
+            "entity": "Delivery",
+            "field": "proofPhoto",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "maxSize": 5242880
+          },
+          "help": "Mandatory photo of the delivered parcel at the door"
+        }
+      ],
+      "submitLabel": "Complete delivery",
+      "onSuccess": {
+        "toast": "Complete delivery: done"
+      }
+    },
+    {
+      "id": "driverProfile_update",
+      "operationId": "driverProfile.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "driverProfile.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "isOnline",
+          "type": "boolean",
+          "label": "Online Availability",
+          "required": false,
+          "help": "Toggle availability to receive new delivery offers"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Driver Profile saved",
+        "navigate": "driver-profiles-id"
+      }
+    },
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "driver_driverProfile_update",
+      "operationId": "driverProfile.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "driverProfile.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "isOnline",
+          "type": "boolean",
+          "label": "Online Availability",
+          "required": false,
+          "help": "Toggle availability to receive new delivery offers"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Driver Profile saved",
+        "navigate": "driver-driver-profiles-id"
+      }
+    },
+    {
+      "id": "dispatcher_driverProfile_update",
+      "operationId": "driverProfile.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "driverProfile.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "isOnline",
+          "type": "boolean",
+          "label": "Online Availability",
+          "required": false,
+          "help": "Toggle availability to receive new delivery offers"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Driver Profile saved",
+        "navigate": "dispatcher-driver-profiles-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  }
+}

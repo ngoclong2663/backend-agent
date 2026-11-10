@@ -1,0 +1,1263 @@
+{
+  "auth": {
+    "roles": [
+      "learner",
+      "instructor",
+      "admin"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 80,
+          "name": "name",
+          "required": true,
+          "type": "string",
+          "unique": true
+        },
+        {
+          "name": "description",
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "name": "Category"
+    },
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "categoryId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "instructorId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 150,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 1000,
+          "name": "summary",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "name": "coverImage",
+          "nullable": true,
+          "required": false,
+          "type": "image"
+        },
+        {
+          "default": "DRAFT",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "DRAFT",
+            "PUBLISHED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Course"
+    },
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "courseId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 150,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "min": 1,
+          "name": "order",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "TEXT",
+          "name": "type",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "VIDEO",
+            "TEXT"
+          ]
+        },
+        {
+          "name": "textContent",
+          "nullable": true,
+          "required": false,
+          "type": "text"
+        },
+        {
+          "name": "videoUrl",
+          "nullable": true,
+          "required": false,
+          "type": "video"
+        },
+        {
+          "min": 0,
+          "name": "durationMinutes",
+          "nullable": true,
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "default": "DRAFT",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "DRAFT"
+          ]
+        }
+      ],
+      "name": "Lesson"
+    },
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "lessonId",
+          "required": true,
+          "type": "uuid",
+          "unique": true
+        },
+        {
+          "maxLength": 150,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": 70,
+          "max": 100,
+          "min": 0,
+          "name": "passingScore",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": "DRAFT",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "DRAFT"
+          ]
+        }
+      ],
+      "name": "Quiz"
+    },
+    {
+      "displayField": "prompt",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "quizId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "prompt",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "name": "options",
+          "required": true,
+          "type": "json"
+        },
+        {
+          "min": 1,
+          "name": "order",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "name": "QuizQuestion"
+    },
+    {
+      "displayField": "courseId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "courseId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "learnerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "ACTIVE",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "ACTIVE",
+            "COMPLETED"
+          ]
+        },
+        {
+          "name": "currentLessonId",
+          "nullable": true,
+          "required": false,
+          "type": "uuid"
+        },
+        {
+          "default": "now",
+          "name": "enrolledAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "name": "completedAt",
+          "nullable": true,
+          "required": false,
+          "type": "datetime"
+        }
+      ],
+      "name": "Enrollment"
+    },
+    {
+      "displayField": "lessonId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "enrollmentId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "lessonId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "learnerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "default": "COMPLETED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "COMPLETED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "completedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "LessonProgress"
+    },
+    {
+      "displayField": "quizId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "quizId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "learnerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "max": 100,
+          "min": 0,
+          "name": "score",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "answers",
+          "nullable": true,
+          "required": false,
+          "type": "json"
+        },
+        {
+          "default": "PASSED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PASSED",
+            "FAILED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "submittedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "QuizSubmission"
+    },
+    {
+      "displayField": "courseId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "courseId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "learnerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "max": 5,
+          "min": 1,
+          "name": "rating",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "maxLength": 1000,
+          "name": "content",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "default": "PUBLISHED",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PUBLISHED"
+          ]
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Review"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Category",
+      "method": "POST",
+      "operationId": "category.create",
+      "path": "/categories",
+      "policy": "adminOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Category",
+      "method": "GET",
+      "operationId": "category.get",
+      "path": "/categories/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Category",
+      "method": "GET",
+      "operationId": "category.list",
+      "pagination": true,
+      "path": "/categories",
+      "search": [
+        "name"
+      ],
+      "sort": [
+        "name"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Category",
+      "method": "PATCH",
+      "operationId": "category.update",
+      "path": "/categories/{id}",
+      "policy": "adminOnly",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Category",
+      "method": "DELETE",
+      "operationId": "category.delete",
+      "path": "/categories/{id}",
+      "policy": "adminOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "POST",
+      "operationId": "course.create",
+      "path": "/courses",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Course",
+      "method": "GET",
+      "operationId": "course.get",
+      "path": "/courses/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "entity": "Course",
+      "filters": [
+        "categoryId",
+        "status",
+        "instructorId"
+      ],
+      "method": "GET",
+      "operationId": "course.list",
+      "pagination": true,
+      "path": "/courses",
+      "search": [
+        "title",
+        "summary"
+      ],
+      "sort": [
+        "createdAt",
+        "title"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "PATCH",
+      "operationId": "course.update",
+      "path": "/courses/{id}",
+      "policy": "ownCourseOrAdmin",
+      "request": {
+        "fields": [
+          "categoryId",
+          "title",
+          "summary",
+          "coverImage"
+        ],
+        "entity": "Course"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Course",
+      "method": "DELETE",
+      "operationId": "course.delete",
+      "path": "/courses/{id}",
+      "policy": "ownCourseOrAdmin",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Instructor publishes a draft course once it contains at least one lesson. Status transitions from DRAFT to PUBLISHED.",
+      "entity": "Course",
+      "method": "POST",
+      "operationId": "course.publish",
+      "path": "/courses/{id}/publish",
+      "policy": "ownCourse",
+      "rules": [
+        "courseStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Course"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Administrator unpublishes a non-compliant or outdated course, moving it back to DRAFT or unpublished.",
+      "entity": "Course",
+      "method": "POST",
+      "operationId": "course.unpublish",
+      "path": "/courses/{id}/unpublish",
+      "policy": "adminOnly",
+      "type": "custom",
+      "response": {
+        "entity": "Course"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "POST",
+      "operationId": "lesson.create",
+      "path": "/lessons",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "GET",
+      "operationId": "lesson.get",
+      "path": "/lessons/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "filters": [
+        "courseId"
+      ],
+      "method": "GET",
+      "operationId": "lesson.list",
+      "pagination": true,
+      "path": "/lessons",
+      "sort": [
+        "order"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "PATCH",
+      "operationId": "lesson.update",
+      "path": "/lessons/{id}",
+      "policy": "instructorOnly",
+      "request": {
+        "fields": [
+          "title",
+          "order",
+          "type",
+          "textContent",
+          "videoUrl",
+          "durationMinutes"
+        ],
+        "entity": "Lesson"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Lesson",
+      "method": "DELETE",
+      "operationId": "lesson.delete",
+      "path": "/lessons/{id}",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Quiz",
+      "method": "POST",
+      "operationId": "quiz.create",
+      "path": "/quizzes",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Quiz",
+      "method": "GET",
+      "operationId": "quiz.get",
+      "path": "/quizzes/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Quiz",
+      "filters": [
+        "lessonId"
+      ],
+      "method": "GET",
+      "operationId": "quiz.list",
+      "pagination": true,
+      "path": "/quizzes",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "Quiz",
+      "method": "PATCH",
+      "operationId": "quiz.update",
+      "path": "/quizzes/{id}",
+      "policy": "instructorOnly",
+      "request": {
+        "fields": [
+          "title",
+          "passingScore"
+        ],
+        "entity": "Quiz"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Quiz",
+      "method": "DELETE",
+      "operationId": "quiz.delete",
+      "path": "/quizzes/{id}",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "QuizQuestion",
+      "method": "POST",
+      "operationId": "quizQuestion.create",
+      "path": "/quiz-questions",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "QuizQuestion",
+      "method": "GET",
+      "operationId": "quizQuestion.get",
+      "path": "/quiz-questions/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "QuizQuestion",
+      "filters": [
+        "quizId"
+      ],
+      "method": "GET",
+      "operationId": "quizQuestion.list",
+      "pagination": true,
+      "path": "/quiz-questions",
+      "sort": [
+        "order"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "QuizQuestion",
+      "method": "PATCH",
+      "operationId": "quizQuestion.update",
+      "path": "/quiz-questions/{id}",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "QuizQuestion",
+      "method": "DELETE",
+      "operationId": "quizQuestion.delete",
+      "path": "/quiz-questions/{id}",
+      "policy": "instructorOnly",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Enrollment",
+      "method": "POST",
+      "operationId": "enrollment.create",
+      "path": "/enrollments",
+      "policy": "learnerOnly",
+      "rules": [
+        "uniqueActiveEnrollment"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Enrollment",
+      "method": "GET",
+      "operationId": "enrollment.get",
+      "path": "/enrollments/{id}",
+      "policy": "ownEnrollment",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Enrollment",
+      "filters": [
+        "courseId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "enrollment.list",
+      "pagination": true,
+      "path": "/enrollments",
+      "policy": "ownEnrollment",
+      "sort": [
+        "enrolledAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Learner completes the final lesson and finishes the course. Status changes from ACTIVE to COMPLETED once all lessons have completed progress.",
+      "entity": "Enrollment",
+      "method": "POST",
+      "operationId": "enrollment.complete",
+      "path": "/enrollments/{id}/complete",
+      "policy": "enrollmentOwnerOnly",
+      "rules": [
+        "enrollmentStatusFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Enrollment"
+      }
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "LessonProgress",
+      "method": "POST",
+      "operationId": "lessonProgress.create",
+      "path": "/lesson-progress",
+      "policy": "learnerOnly",
+      "rules": [
+        "uniqueLessonProgress"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "LessonProgress",
+      "method": "GET",
+      "operationId": "lessonProgress.get",
+      "path": "/lesson-progress/{id}",
+      "policy": "ownLessonProgress",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "LessonProgress",
+      "filters": [
+        "enrollmentId",
+        "lessonId"
+      ],
+      "method": "GET",
+      "operationId": "lessonProgress.list",
+      "pagination": true,
+      "path": "/lesson-progress",
+      "policy": "ownLessonProgress",
+      "sort": [
+        "completedAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "QuizSubmission",
+      "method": "POST",
+      "operationId": "quizSubmission.create",
+      "path": "/quiz-submissions",
+      "policy": "learnerOnly",
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "QuizSubmission",
+      "method": "GET",
+      "operationId": "quizSubmission.get",
+      "path": "/quiz-submissions/{id}",
+      "policy": "ownQuizSubmission",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "QuizSubmission",
+      "filters": [
+        "quizId",
+        "status"
+      ],
+      "method": "GET",
+      "operationId": "quizSubmission.list",
+      "pagination": true,
+      "path": "/quiz-submissions",
+      "policy": "ownQuizSubmission",
+      "sort": [
+        "submittedAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Review",
+      "method": "POST",
+      "operationId": "review.create",
+      "path": "/reviews",
+      "policy": "learnerOnly",
+      "rules": [
+        "uniqueCourseReview"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "entity": "Review",
+      "method": "GET",
+      "operationId": "review.get",
+      "path": "/reviews/{id}",
+      "type": "crud",
+      "policy": "ownReviewOrAdmin"
+    },
+    {
+      "action": "list",
+      "entity": "Review",
+      "filters": [
+        "courseId"
+      ],
+      "method": "GET",
+      "operationId": "review.list",
+      "pagination": true,
+      "path": "/reviews",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud",
+      "policy": "ownReviewOrAdmin"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "entity": "Review",
+      "method": "DELETE",
+      "operationId": "review.delete",
+      "path": "/reviews/{id}",
+      "policy": "ownReviewOrAdmin",
+      "type": "crud"
+    },
+    {
+      "operationId": "course.count",
+      "type": "aggregate",
+      "entity": "Course",
+      "method": "GET",
+      "path": "/courses/aggregate/count",
+      "summary": "Published Courses",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "enrollment.countWhereStatusActive",
+      "type": "aggregate",
+      "entity": "Enrollment",
+      "method": "GET",
+      "path": "/enrollments/aggregate/count-where-status-active",
+      "summary": "Active Enrollments",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "ACTIVE"
+        }
+      }
+    },
+    {
+      "operationId": "enrollment.countWhereStatusCompleted",
+      "type": "aggregate",
+      "entity": "Enrollment",
+      "method": "GET",
+      "path": "/enrollments/aggregate/count-where-status-completed",
+      "summary": "Completed Courses",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "COMPLETED"
+        }
+      }
+    },
+    {
+      "operationId": "review.count",
+      "type": "aggregate",
+      "entity": "Review",
+      "method": "GET",
+      "path": "/reviews/aggregate/count",
+      "summary": "Total Reviews",
+      "aggregate": {
+        "fn": "count"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "bypassRoles": [
+        "admin"
+      ],
+      "name": "learnerOnly",
+      "roles": [
+        "learner"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "admin"
+      ],
+      "name": "instructorOnly",
+      "roles": [
+        "instructor"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "adminOnly",
+      "roles": [
+        "admin"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "admin"
+      ],
+      "name": "ownCourse",
+      "ownerField": "instructorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "admin"
+      ],
+      "name": "ownCourseOrAdmin",
+      "ownerField": "instructorId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "admin",
+        "instructor"
+      ],
+      "name": "ownEnrollment",
+      "ownerField": "learnerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "admin"
+      ],
+      "name": "ownLessonProgress",
+      "ownerField": "learnerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "admin",
+        "instructor"
+      ],
+      "name": "ownQuizSubmission",
+      "ownerField": "learnerId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "admin"
+      ],
+      "name": "ownReviewOrAdmin",
+      "ownerField": "learnerId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Course",
+      "name": "learnerCourseVisibility",
+      "roles": [
+        "learner"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "name": "enrollmentOwnerOnly",
+      "type": "ownership",
+      "ownerField": "learnerId",
+      "bypassRoles": []
+    }
+  ],
+  "project": {
+    "description": "An online course platform where instructors publish self-paced courses and learners enroll, progress through ordered lessons and quizzes, and review finished courses.",
+    "name": "Brightpath Academy",
+    "slug": "brightpath-academy"
+  },
+  "relationships": [
+    {
+      "foreignKey": "categoryId",
+      "from": "Category",
+      "name": "categoryCourses",
+      "onDelete": "RESTRICT",
+      "to": "Course",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "courseId",
+      "from": "Course",
+      "name": "courseLessons",
+      "onDelete": "CASCADE",
+      "to": "Lesson",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "lessonId",
+      "from": "Lesson",
+      "name": "lessonQuiz",
+      "onDelete": "CASCADE",
+      "to": "Quiz",
+      "type": "one-to-one"
+    },
+    {
+      "foreignKey": "quizId",
+      "from": "Quiz",
+      "name": "quizQuestions",
+      "onDelete": "CASCADE",
+      "to": "QuizQuestion",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "courseId",
+      "from": "Course",
+      "name": "courseEnrollments",
+      "onDelete": "CASCADE",
+      "to": "Enrollment",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "enrollmentId",
+      "from": "Enrollment",
+      "name": "enrollmentProgress",
+      "onDelete": "CASCADE",
+      "to": "LessonProgress",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "quizId",
+      "from": "Quiz",
+      "name": "quizSubmissions",
+      "onDelete": "CASCADE",
+      "to": "QuizSubmission",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "courseId",
+      "from": "Course",
+      "name": "courseReviews",
+      "onDelete": "CASCADE",
+      "to": "Review",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "A course moves from DRAFT to PUBLISHED when published.",
+      "entity": "Course",
+      "id": "courseStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "DRAFT": [
+            "PUBLISHED"
+          ],
+          "PUBLISHED": [
+            "DRAFT"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Enrollment transitions from ACTIVE to COMPLETED upon course completion.",
+      "entity": "Enrollment",
+      "id": "enrollmentStatusFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "ACTIVE": [
+            "COMPLETED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "A learner cannot be actively enrolled in the same course more than once.",
+      "entity": "Enrollment",
+      "id": "uniqueActiveEnrollment",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "courseId",
+          "learnerId"
+        ],
+        "where": {
+          "status": "ACTIVE"
+        }
+      }
+    },
+    {
+      "description": "A learner tracks completion per lesson per enrollment only once.",
+      "entity": "LessonProgress",
+      "id": "uniqueLessonProgress",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "enrollmentId",
+          "lessonId"
+        ]
+      }
+    },
+    {
+      "description": "A learner can submit at most one review per course.",
+      "entity": "Review",
+      "id": "uniqueCourseReview",
+      "kind": "uniqueTogether",
+      "params": {
+        "fields": [
+          "courseId",
+          "learnerId"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Category",
+      "records": [
+        {
+          "description": "Software engineering, web development, and cloud computing",
+          "name": "Computer Science"
+        },
+        {
+          "description": "UI/UX, visual design, and product design fundamentals",
+          "name": "Design"
+        },
+        {
+          "description": "Product strategy, entrepreneurship, and agile workflows",
+          "name": "Business"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  }
+}

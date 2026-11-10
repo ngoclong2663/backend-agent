@@ -313,6 +313,102 @@
       "title": "Entity",
       "type": "object"
     },
+    "FeatureAttachment": {
+      "additionalProperties": false,
+      "description": "Epic 33: a feature plugin attached to an entity (`reactions` on `Clip`). Its entities, operations and rules are\nmerged into this spec as plain entries; what plain entries can't say (computed fields) is here.",
+      "properties": {
+        "feature": {
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "title": "Feature",
+          "type": "string"
+        },
+        "on": {
+          "title": "On",
+          "type": "string"
+        },
+        "options": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Options",
+          "type": "object"
+        },
+        "entities": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "computed": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FeatureComputedField"
+          },
+          "title": "Computed",
+          "type": "array"
+        }
+      },
+      "required": [
+        "feature",
+        "on"
+      ],
+      "title": "FeatureAttachment",
+      "type": "object"
+    },
+    "FeatureComputedField": {
+      "additionalProperties": false,
+      "description": "Epic 33: a read-only field a feature adds to its target's responses (`likeCount`, `myLikeId`). `count`: rows of\n`entity` whose `key` is the record; `mine`: the id of the caller's row (its `owner` is the caller), else null.",
+      "properties": {
+        "field": {
+          "pattern": "^[a-z][a-zA-Z0-9]*$",
+          "title": "Field",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "count",
+            "mine"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "entity": {
+          "title": "Entity",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "where": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Where",
+          "type": "object"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner"
+        }
+      },
+      "required": [
+        "field",
+        "kind",
+        "entity",
+        "key"
+      ],
+      "title": "FeatureComputedField",
+      "type": "object"
+    },
     "FieldDef": {
       "additionalProperties": false,
       "properties": {
@@ -1535,6 +1631,14 @@
         "$ref": "#/$defs/Seed"
       },
       "title": "Seed",
+      "type": "array"
+    },
+    "features": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FeatureAttachment"
+      },
+      "title": "Features",
       "type": "array"
     },
     "x-frontendBindings": {

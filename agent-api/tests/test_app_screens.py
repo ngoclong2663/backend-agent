@@ -272,7 +272,8 @@ def test_the_kit_renders_every_app_section():
     slots = {name for names in PLUGIN_SLOTS.values() for name in names}
     for name in APP_SECTIONS:
         assert f'case "{name}":' in switch, name
-        assert (KIT / f"{name}.tsx").is_file() or name in slots, name
+        # Epic 33: a feature plugin's section lives in the kit's features folder
+        assert (KIT / f"{name}.tsx").is_file() or (KIT / "features" / f"{name}.tsx").is_file() or name in slots, name
 
 
 def test_an_app_scaffolds_the_kit_and_its_data(tmp_path):

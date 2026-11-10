@@ -1,0 +1,62 @@
+{
+  "domain": "learning",
+  "tasks": [
+    {
+      "id": "resume-lesson",
+      "role": "learner",
+      "goal": "Resume the last lesson from home",
+      "budget": 1,
+      "check": {
+        "kind": "resume"
+      }
+    },
+    {
+      "id": "see-progress",
+      "role": "learner",
+      "goal": "See progress per course",
+      "check": {
+        "kind": "field_shown",
+        "words": [
+          "progress"
+        ]
+      }
+    },
+    {
+      "id": "complete-lesson",
+      "role": "learner",
+      "goal": "Mark a lesson complete",
+      "budget": 2,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "complete",
+          "finish"
+        ]
+      }
+    },
+    {
+      "id": "answer-question",
+      "role": "learner",
+      "goal": "Reply to a question under a lesson",
+      "budget": 3,
+      "check": {
+        "kind": "reply"
+      }
+    },
+    {
+      "id": "submit-quiz",
+      "role": "learner",
+      "goal": "Submit a quiz",
+      "budget": 4,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "submit",
+          "submission",
+          "attempt",
+          "answer"
+        ]
+      }
+    }
+  ]
+}

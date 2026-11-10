@@ -1,0 +1,2043 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "Loop",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "Short-video community with feed browsing, creator follows, community interactions, and safety moderation"
+  },
+  "theme": {
+    "style": "minimal",
+    "colorScheme": "dark",
+    "colors": {
+      "primary": "#ec4899",
+      "secondary": "#10182b",
+      "accent": "#ec4899",
+      "background": "#0f172a",
+      "foreground": "#ffffff",
+      "muted": "#10182b",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Atkinson Hyperlegible",
+      "bodyFont": "Atkinson Hyperlegible"
+    },
+    "radius": "md",
+    "density": "comfortable",
+    "direction": {
+      "productType": "Forum / Discussion Board",
+      "pattern": "Feed + Thread View",
+      "palette": "Dark neutral + topic accent colors + unread indicator + reputation badge",
+      "fontPairing": "Accessibility First",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "Loop",
+      "navigation": [
+        {
+          "label": "Feed",
+          "page": "clips"
+        },
+        {
+          "label": "Notifications",
+          "page": "notifications"
+        },
+        {
+          "label": "Dashboard",
+          "page": "moderators-home"
+        },
+        {
+          "label": "Feed",
+          "page": "moderators-clips"
+        },
+        {
+          "label": "Notifications",
+          "page": "moderators-notifications"
+        },
+        {
+          "label": "Following",
+          "page": "moderators-follows"
+        },
+        {
+          "label": "Reports",
+          "page": "moderators-reports"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "Loop",
+    "tagline": "Short-video community with vibrant feeds and creator interactions",
+    "icon": "Film",
+    "nav": [
+      {
+        "entity": "Clip",
+        "label": "Feed",
+        "icon": "Flame"
+      },
+      {
+        "entity": "Notification",
+        "label": "Notifications",
+        "icon": "Bell"
+      },
+      {
+        "entity": "Follow",
+        "label": "Following",
+        "icon": "Users"
+      },
+      {
+        "entity": "Report",
+        "label": "Reports",
+        "icon": "ShieldAlert"
+      }
+    ],
+    "home": "Clip",
+    "entities": {
+      "Clip": {
+        "label": "Clip",
+        "plural": "Clips",
+        "displayField": "caption",
+        "listFields": [
+          "caption",
+          "creatorId",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "videoUrl",
+          "caption",
+          "creatorId",
+          "status",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "creatorId": "Creator",
+          "videoUrl": "Video",
+          "caption": "Caption",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "caption": "Brief description or caption for your short video clip",
+          "videoUrl": "Upload a short video clip (MP4 or WebM)"
+        },
+        "create": "page"
+      },
+      "Follow": {
+        "label": "Follow",
+        "plural": "Follows",
+        "displayField": "followingId",
+        "listFields": [
+          "followerId",
+          "followingId",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "followerId",
+          "followingId",
+          "status",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "followerId": "Follower",
+          "followingId": "Following",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "followingId": "The creator being followed"
+        }
+      },
+      "Notification": {
+        "label": "Notification",
+        "plural": "Notifications",
+        "displayField": "message",
+        "listFields": [
+          "type",
+          "message",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "recipientId",
+          "type",
+          "message",
+          "status",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "recipientId": "Recipient",
+          "type": "Type",
+          "message": "Notification",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "message": "Details of the interaction event"
+        }
+      },
+      "Report": {
+        "label": "Report",
+        "plural": "Reports",
+        "displayField": "reason",
+        "listFields": [
+          "itemType",
+          "reason",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "reporterId",
+          "itemId",
+          "itemType",
+          "reason",
+          "status",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "reporterId": "Reporter",
+          "itemId": "Reported Item",
+          "itemType": "Item Type",
+          "reason": "Reason",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {
+          "reason": "Why this clip or comment violates community guidelines"
+        },
+        "create": "onRecord"
+      },
+      "ClipComment": {
+        "label": "Clip comment",
+        "plural": "Clip comments",
+        "displayField": "text",
+        "listFields": [
+          "text",
+          "clipId",
+          "authorId",
+          "parentId"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "clipId",
+          "authorId",
+          "parentId",
+          "text",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "clipId": "Clip",
+          "authorId": "Author",
+          "parentId": "Parent",
+          "text": "Text",
+          "createdAt": "Created at"
+        },
+        "help": {}
+      },
+      "ClipReaction": {
+        "label": "Clip reaction",
+        "plural": "Clip reactions",
+        "displayField": "clipId",
+        "listFields": [
+          "clipId",
+          "userId",
+          "kind",
+          "createdAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "clipId",
+          "userId",
+          "kind",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "clipId": "Clip",
+          "userId": "User",
+          "kind": "Kind",
+          "createdAt": "Created at"
+        },
+        "help": {}
+      }
+    },
+    "design": {
+      "archetype": "feed",
+      "shell": "topbar",
+      "mobileNav": "bottom-tabs",
+      "frame": "narrow",
+      "mainEntity": "Clip",
+      "entities": {
+        "Clip": {
+          "view": "feed",
+          "roles": {
+            "title": "caption",
+            "media": "videoUrl",
+            "badge": "status",
+            "meta": [
+              "createdAt"
+            ]
+          },
+          "detailView": "watch",
+          "filtersStyle": "chips",
+          "card": "overlay"
+        },
+        "Follow": {
+          "view": "cards",
+          "roles": {
+            "subtitle": "followingId",
+            "meta": [
+              "createdAt"
+            ]
+          },
+          "card": "text-first"
+        },
+        "Notification": {
+          "view": "cards",
+          "roles": {
+            "badge": "type",
+            "subtitle": "message",
+            "meta": [
+              "createdAt"
+            ]
+          },
+          "card": "text-first"
+        },
+        "Report": {
+          "view": "table",
+          "roles": {
+            "badge": "status",
+            "subtitle": "reason",
+            "meta": [
+              "createdAt"
+            ]
+          }
+        },
+        "ClipComment": {
+          "view": "table",
+          "roles": {}
+        }
+      },
+      "homeView": "feed",
+      "looks": [
+        {
+          "recipe": "playful",
+          "reason": "The requirement asks for it",
+          "fontPairing": "loud"
+        },
+        {
+          "recipe": "neon",
+          "reason": "OLED dark background with glowing pink neon accents highlights video content.",
+          "fontPairing": "loud"
+        },
+        {
+          "recipe": "cinema",
+          "reason": "Clean dark video feed presentation putting media and creator content first.",
+          "fontPairing": "humanist"
+        }
+      ],
+      "requested": {
+        "accent": "#ec4899",
+        "background": "#0f172a",
+        "scheme": "dark",
+        "words": "bold and playful, dark background, a hot pink accent"
+      },
+      "seed": 462806555,
+      "reason": "Feed archetype prioritizes seamless video consumption, creator discovery, and community interactions.",
+      "replaced": [
+        "Clip: subtitle 'caption' left out (already the title)",
+        "Follow: title 'followerId' left out (a uuid field is not a name)",
+        "Notification: title 'type' left out (a enum field is not a name)",
+        "Report: title 'itemType' left out (a enum field is not a name)",
+        "area 'members': Clip: subtitle 'caption' left out (already the title)",
+        "area 'moderators': Report: title 'itemType' left out (a enum field is not a name)"
+      ],
+      "fontPairing": "loud"
+    },
+    "areas": [
+      {
+        "id": "members",
+        "label": "Community",
+        "roles": [
+          "Member"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "feed",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "narrow",
+          "mainEntity": "Clip",
+          "entities": {
+            "Clip": {
+              "view": "feed",
+              "roles": {
+                "title": "caption",
+                "media": "videoUrl",
+                "badge": "status",
+                "meta": [
+                  "createdAt"
+                ]
+              },
+              "detailView": "watch",
+              "filtersStyle": "chips",
+              "card": "overlay"
+            },
+            "Follow": {
+              "view": "cards",
+              "roles": {},
+              "card": "text-first"
+            },
+            "Notification": {
+              "view": "cards",
+              "roles": {},
+              "card": "text-first"
+            },
+            "Report": {
+              "view": "cards",
+              "roles": {},
+              "card": "text-first"
+            },
+            "ClipComment": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "feed"
+        }
+      },
+      {
+        "id": "moderators",
+        "label": "Moderation",
+        "roles": [
+          "Moderator"
+        ],
+        "prefix": "/moderators",
+        "design": {
+          "archetype": "back-office",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "standard",
+          "mainEntity": "Report",
+          "entities": {
+            "Clip": {
+              "view": "table",
+              "roles": {
+                "title": "caption",
+                "media": "videoUrl",
+                "badge": "status",
+                "meta": [
+                  "createdAt"
+                ]
+              },
+              "detailView": "watch"
+            },
+            "Follow": {
+              "view": "table",
+              "roles": {}
+            },
+            "Notification": {
+              "view": "table",
+              "roles": {}
+            },
+            "Report": {
+              "view": "table",
+              "roles": {
+                "badge": "status",
+                "subtitle": "reason",
+                "meta": [
+                  "createdAt"
+                ]
+              },
+              "detailView": "record",
+              "filtersStyle": "facets",
+              "card": "text-first"
+            },
+            "ClipComment": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "dashboard"
+        }
+      }
+    ],
+    "domain": {
+      "name": "socials",
+      "roles": {
+        "content": "Clip"
+      },
+      "types": {},
+      "features": []
+    },
+    "dashboard": [],
+    "workflows": {
+      "version": "a65122ec5d57",
+      "tours": [
+        {
+          "id": "post_and_discover_clip",
+          "name": "Post and Discover Clip",
+          "outcome": "A short clip is published and discoverable by community members in the feed",
+          "roles": [
+            "Member"
+          ],
+          "steps": [
+            {
+              "id": "upload_clip",
+              "role": "Member",
+              "actor": "Member",
+              "title": "Upload video with caption (the clip becomes published). Rule: Clip must be a short video with a caption",
+              "operationId": "clip.create",
+              "statusAfter": "published",
+              "page": "clips-new",
+              "route": "/clips/new",
+              "target": {
+                "section": "clip-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "clip"
+            },
+            {
+              "id": "view_feed",
+              "role": "Member",
+              "actor": "Member",
+              "title": "Browse community feed and view clip (the clip becomes published). Rule: Only visible non-hidden clips are shown",
+              "operationId": "clip.get",
+              "statusAfter": "published",
+              "page": "clips-id",
+              "route": "/clips/[id]",
+              "target": {
+                "section": "clips-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "clip"
+            }
+          ]
+        },
+        {
+          "id": "engage_with_community",
+          "name": "Engage with Community",
+          "outcome": "Social interactions and connections are established, notifying the creator",
+          "roles": [
+            "Member"
+          ],
+          "steps": [
+            {
+              "id": "interact_clip",
+              "role": "Member",
+              "actor": "Member",
+              "title": "Like clip or comment on clip (the interaction becomes recorded). Rule: Interactions require signed-in member account",
+              "operationId": "clipReaction.create",
+              "statusAfter": "recorded",
+              "page": "clips-id",
+              "route": "/clips/[id]",
+              "target": {
+                "section": "clips-detail",
+                "action": "react-like"
+              },
+              "kind": "do",
+              "record": "interaction"
+            },
+            {
+              "id": "follow_creator",
+              "role": "Member",
+              "actor": "Member",
+              "title": "Follow clip creator (the follow becomes active). Rule: Member cannot follow themselves",
+              "operationId": "follow.create",
+              "statusAfter": "active",
+              "page": "follows-new",
+              "route": "/follows/new",
+              "target": {
+                "section": "follow-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "follow"
+            },
+            {
+              "id": "receive_notification",
+              "role": "Member",
+              "actor": "Member",
+              "title": "Receive interaction notification (the notification becomes delivered). Rule: Notify recipient on likes, replies, and follows",
+              "operationId": null,
+              "statusAfter": "delivered",
+              "automatic": true,
+              "page": "notifications",
+              "route": "/notifications",
+              "kind": "note",
+              "record": "notification"
+            }
+          ]
+        },
+        {
+          "id": "moderate_content",
+          "name": "Moderate Reported Content",
+          "outcome": "Inappropriate content is hidden to keep the community safe",
+          "roles": [
+            "Member",
+            "Moderator"
+          ],
+          "steps": [
+            {
+              "id": "submit_report",
+              "role": "Member",
+              "actor": "Member",
+              "title": "Submit report on clip or comment (the report becomes pending). Rule: Anyone can report suspicious or abusive content",
+              "operationId": "report.create",
+              "statusAfter": "pending",
+              "page": "reports-new",
+              "route": "/reports/new",
+              "target": {
+                "section": "report-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "report"
+            },
+            {
+              "id": "review_report",
+              "role": "Moderator",
+              "actor": "Moderator",
+              "title": "Review reported content (the report becomes reviewed). Rule: Moderator evaluates against community guidelines",
+              "operationId": "report.review",
+              "statusAfter": "reviewed",
+              "page": "moderators-reports-id",
+              "route": "/moderators/reports/[id]",
+              "target": {
+                "section": "reports-detail",
+                "action": "review"
+              },
+              "kind": "do",
+              "record": "report",
+              "needs": {
+                "step": "submit_report",
+                "role": "Member",
+                "status": "pending"
+              }
+            },
+            {
+              "id": "hide_content",
+              "role": "Moderator",
+              "actor": "Moderator",
+              "title": "Hide rule-breaking content (the clip becomes hidden). Rule: Rule-breaking clips and comments must be hidden from feeds and profiles",
+              "operationId": "clip.hide",
+              "statusAfter": "hidden",
+              "page": "moderators-clips-id",
+              "route": "/moderators/clips/[id]",
+              "target": {
+                "section": "clips-detail",
+                "action": "hide"
+              },
+              "kind": "do",
+              "record": "clip"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Clips",
+      "sections": [
+        {
+          "id": "clips-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "clip.list",
+            "fields": [
+              "caption",
+              "creatorId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Clip",
+            "title": "Clips",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-like",
+                "label": "Like",
+                "kind": "reaction",
+                "reaction": "like",
+                "operationId": "clipReaction.create",
+                "undoOperationId": "clipReaction.delete",
+                "state": "myLikeId",
+                "count": "likeCount",
+                "body": {
+                  "clipId": "$record.id",
+                  "kind": "like"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "clips-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "clips-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "clip.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this clip? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Clip deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "clips-new",
+              "label": "New clip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "clips",
+      "route": "/clips",
+      "title": "Clips",
+      "sections": [
+        {
+          "id": "clips-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "clip.list",
+            "fields": [
+              "caption",
+              "creatorId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Clip",
+            "title": "Clips",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-like",
+                "label": "Like",
+                "kind": "reaction",
+                "reaction": "like",
+                "operationId": "clipReaction.create",
+                "undoOperationId": "clipReaction.delete",
+                "state": "myLikeId",
+                "count": "likeCount",
+                "body": {
+                  "clipId": "$record.id",
+                  "kind": "like"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "clips-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "clips-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "clip.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this clip? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Clip deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "clips-new",
+              "label": "New clip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "clips-id",
+      "route": "/clips/[id]",
+      "title": "Clip",
+      "sections": [
+        {
+          "id": "clips-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "clip.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "videoUrl",
+              "caption",
+              "creatorId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Clip",
+            "title": "Clip",
+            "actions": [
+              {
+                "id": "react-like",
+                "label": "Like",
+                "kind": "reaction",
+                "reaction": "like",
+                "operationId": "clipReaction.create",
+                "undoOperationId": "clipReaction.delete",
+                "state": "myLikeId",
+                "count": "likeCount",
+                "body": {
+                  "clipId": "$route.id",
+                  "kind": "like"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "clips-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "clip.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this clip? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Clip deleted",
+                  "navigate": "clips"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "clips-comments",
+          "component": "CommentThread",
+          "content": {
+            "entity": "ClipComment",
+            "title": "Comments",
+            "thread": {
+              "list": "clipComment.list",
+              "target": "clipId",
+              "parent": "parentId",
+              "text": "text",
+              "owner": "authorId",
+              "maxLimit": 100,
+              "create": "clipComment.create",
+              "update": "clipComment.update",
+              "remove": "clipComment.delete"
+            },
+            "operations": [
+              "clipComment.list",
+              "clipComment.create",
+              "clipComment.update",
+              "clipComment.delete"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "clips-id-edit",
+      "route": "/clips/[id]/edit",
+      "title": "Edit clip",
+      "sections": [
+        {
+          "id": "clips-edit-form",
+          "component": "AppForm",
+          "form": "clip_update",
+          "content": {
+            "entity": "Clip"
+          }
+        }
+      ]
+    },
+    {
+      "id": "clips-new",
+      "route": "/clips/new",
+      "title": "New clip",
+      "sections": [
+        {
+          "id": "clip-create-form",
+          "component": "AppForm",
+          "form": "clip_create",
+          "content": {
+            "entity": "Clip"
+          }
+        }
+      ]
+    },
+    {
+      "id": "follows",
+      "route": "/follows",
+      "title": "Follows",
+      "sections": [
+        {
+          "id": "follows-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "follow.list",
+            "fields": [
+              "followerId",
+              "followingId",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Follows",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "followingId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "follows-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Follow deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "follows-new",
+              "label": "New follow"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "follows-id",
+      "route": "/follows/[id]",
+      "title": "Follow",
+      "sections": [
+        {
+          "id": "follows-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "follow.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "followerId",
+              "followingId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Follow",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Follow deleted",
+                  "navigate": "follows"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "follows-new",
+      "route": "/follows/new",
+      "title": "New follow",
+      "sections": [
+        {
+          "id": "follow-create-form",
+          "component": "AppForm",
+          "form": "follow_create",
+          "content": {
+            "entity": "Follow"
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-home",
+      "route": "/moderators",
+      "title": "Loop",
+      "sections": [
+        {
+          "id": "recent-clips",
+          "component": "AppList",
+          "data": {
+            "operationId": "clip.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "caption",
+              "creatorId",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Clip",
+            "title": "Recent clips",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-like",
+                "label": "Like",
+                "kind": "reaction",
+                "reaction": "like",
+                "operationId": "clipReaction.create",
+                "undoOperationId": "clipReaction.delete",
+                "state": "myLikeId",
+                "count": "likeCount",
+                "body": {
+                  "clipId": "$record.id",
+                  "kind": "like"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "moderators-clips-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "moderators-clips-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "hide",
+                "label": "Hide clip",
+                "kind": "mutation",
+                "operationId": "clip.hide",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Hide clip: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "clip.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this clip? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Clip deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-notifications",
+          "component": "AppList",
+          "data": {
+            "operationId": "notification.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "type",
+              "message",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Notification",
+            "title": "Recent notifications",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "type",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "moderators-notifications-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-clips",
+      "route": "/moderators/clips",
+      "title": "Clips",
+      "sections": [
+        {
+          "id": "clips-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "clip.list",
+            "fields": [
+              "caption",
+              "creatorId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Clip",
+            "title": "Clips",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-like",
+                "label": "Like",
+                "kind": "reaction",
+                "reaction": "like",
+                "operationId": "clipReaction.create",
+                "undoOperationId": "clipReaction.delete",
+                "state": "myLikeId",
+                "count": "likeCount",
+                "body": {
+                  "clipId": "$record.id",
+                  "kind": "like"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "moderators-clips-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "moderators-clips-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "hide",
+                "label": "Hide clip",
+                "kind": "mutation",
+                "operationId": "clip.hide",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Hide clip: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "clip.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this clip? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Clip deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-clips-id",
+      "route": "/moderators/clips/[id]",
+      "title": "Clip",
+      "sections": [
+        {
+          "id": "clips-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "clip.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "videoUrl",
+              "caption",
+              "creatorId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Clip",
+            "title": "Clip",
+            "actions": [
+              {
+                "id": "react-like",
+                "label": "Like",
+                "kind": "reaction",
+                "reaction": "like",
+                "operationId": "clipReaction.create",
+                "undoOperationId": "clipReaction.delete",
+                "state": "myLikeId",
+                "count": "likeCount",
+                "body": {
+                  "clipId": "$route.id",
+                  "kind": "like"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "moderators-clips-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "hide",
+                "label": "Hide clip",
+                "kind": "mutation",
+                "operationId": "clip.hide",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Hide clip: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "clip.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this clip? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Clip deleted",
+                  "navigate": "moderators-clips"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "clips-comments",
+          "component": "CommentThread",
+          "content": {
+            "entity": "ClipComment",
+            "title": "Comments",
+            "thread": {
+              "list": "clipComment.list",
+              "target": "clipId",
+              "parent": "parentId",
+              "text": "text",
+              "owner": "authorId",
+              "maxLimit": 100,
+              "create": "clipComment.create",
+              "update": "clipComment.update",
+              "remove": "clipComment.delete"
+            },
+            "operations": [
+              "clipComment.list",
+              "clipComment.create",
+              "clipComment.update",
+              "clipComment.delete"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-clips-id-edit",
+      "route": "/moderators/clips/[id]/edit",
+      "title": "Edit clip",
+      "sections": [
+        {
+          "id": "clips-edit-form",
+          "component": "AppForm",
+          "form": "moderators_clip_update",
+          "content": {
+            "entity": "Clip"
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-follows",
+      "route": "/moderators/follows",
+      "title": "Follows",
+      "sections": [
+        {
+          "id": "follows-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "follow.list",
+            "fields": [
+              "followerId",
+              "followingId",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Follows",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "followingId"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "moderators-follows-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Follow deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-follows-id",
+      "route": "/moderators/follows/[id]",
+      "title": "Follow",
+      "sections": [
+        {
+          "id": "follows-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "follow.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "followerId",
+              "followingId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Follow",
+            "title": "Follow",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "follow.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this follow? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Follow deleted",
+                  "navigate": "moderators-follows"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-notifications",
+      "route": "/moderators/notifications",
+      "title": "Notifications",
+      "sections": [
+        {
+          "id": "notifications-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "notification.list",
+            "fields": [
+              "type",
+              "message",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Notification",
+            "title": "Notifications",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "type",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "moderators-notifications-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-notifications-id",
+      "route": "/moderators/notifications/[id]",
+      "title": "Notification",
+      "sections": [
+        {
+          "id": "notifications-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "notification.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "recipientId",
+              "type",
+              "message",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Notification",
+            "title": "Notification",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-reports",
+      "route": "/moderators/reports",
+      "title": "Reports",
+      "sections": [
+        {
+          "id": "reports-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "report.list",
+            "fields": [
+              "itemType",
+              "reason",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Report",
+            "title": "Reports",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "itemType",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "moderators-reports-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "review",
+                "label": "Mark report as reviewed",
+                "kind": "mutation",
+                "operationId": "report.review",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Mark report as reviewed: done"
+                }
+              },
+              {
+                "id": "dismiss",
+                "label": "Dismiss report",
+                "kind": "mutation",
+                "operationId": "report.dismiss",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Dismiss report: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moderators-reports-id",
+      "route": "/moderators/reports/[id]",
+      "title": "Report",
+      "sections": [
+        {
+          "id": "reports-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "report.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "reporterId",
+              "itemId",
+              "itemType",
+              "reason",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Report",
+            "title": "Report",
+            "actions": [
+              {
+                "id": "review",
+                "label": "Mark report as reviewed",
+                "kind": "mutation",
+                "operationId": "report.review",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Mark report as reviewed: done"
+                }
+              },
+              {
+                "id": "dismiss",
+                "label": "Dismiss report",
+                "kind": "mutation",
+                "operationId": "report.dismiss",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Dismiss report: done"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "notifications",
+      "route": "/notifications",
+      "title": "Notifications",
+      "sections": [
+        {
+          "id": "notifications-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "notification.list",
+            "fields": [
+              "type",
+              "message",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Notification",
+            "title": "Notifications",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "type",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "notifications-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "notifications-id",
+      "route": "/notifications/[id]",
+      "title": "Notification",
+      "sections": [
+        {
+          "id": "notifications-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "notification.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "recipientId",
+              "type",
+              "message",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Notification",
+            "title": "Notification",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "reports-new",
+      "route": "/reports/new",
+      "title": "New report",
+      "sections": [
+        {
+          "id": "report-create-form",
+          "component": "AppForm",
+          "form": "report_create",
+          "content": {
+            "entity": "Report"
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "clip_create",
+      "operationId": "clip.create",
+      "fields": [
+        {
+          "name": "videoUrl",
+          "type": "string",
+          "label": "Video",
+          "required": true,
+          "upload": {
+            "entity": "Clip",
+            "field": "videoUrl",
+            "presign": "files.presign",
+            "kind": "video",
+            "accept": [
+              "video/mp4",
+              "video/webm"
+            ],
+            "maxSize": 209715200
+          },
+          "help": "Upload a short video clip (MP4 or WebM)"
+        },
+        {
+          "name": "caption",
+          "type": "string",
+          "label": "Caption",
+          "required": true,
+          "maxLength": 500,
+          "help": "Brief description or caption for your short video clip"
+        }
+      ],
+      "submitLabel": "Create clip",
+      "onSuccess": {
+        "toast": "Clip created",
+        "navigate": "clips-id"
+      }
+    },
+    {
+      "id": "clip_update",
+      "operationId": "clip.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "clip.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "caption",
+          "type": "string",
+          "label": "Caption",
+          "required": false,
+          "maxLength": 500,
+          "help": "Brief description or caption for your short video clip"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Clip saved",
+        "navigate": "clips-id"
+      }
+    },
+    {
+      "id": "follow_create",
+      "operationId": "follow.create",
+      "fields": [
+        {
+          "name": "followingId",
+          "type": "string",
+          "label": "Following",
+          "required": true,
+          "help": "The creator being followed"
+        }
+      ],
+      "submitLabel": "Create follow",
+      "onSuccess": {
+        "toast": "Follow created",
+        "navigate": "follows-id"
+      }
+    },
+    {
+      "id": "report_create",
+      "operationId": "report.create",
+      "fields": [
+        {
+          "name": "itemId",
+          "type": "string",
+          "label": "Reported Item",
+          "required": true
+        },
+        {
+          "name": "itemType",
+          "type": "enum",
+          "label": "Item Type",
+          "required": true,
+          "values": [
+            "CLIP",
+            "COMMENT"
+          ]
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "label": "Reason",
+          "required": true,
+          "maxLength": 1000,
+          "help": "Why this clip or comment violates community guidelines"
+        }
+      ],
+      "submitLabel": "Create report",
+      "onSuccess": {
+        "toast": "Report created",
+        "navigate": "home"
+      }
+    },
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "moderators_clip_update",
+      "operationId": "clip.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "clip.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "caption",
+          "type": "string",
+          "label": "Caption",
+          "required": false,
+          "maxLength": 500,
+          "help": "Brief description or caption for your short video clip"
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Clip saved",
+        "navigate": "moderators-clips-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  }
+}

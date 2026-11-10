@@ -1,0 +1,51 @@
+{
+  "domain": "news",
+  "tasks": [
+    {
+      "id": "bookmark-article",
+      "role": "reader",
+      "goal": "Bookmark an article and see it's saved",
+      "budget": 1,
+      "check": {
+        "kind": "reaction_state",
+        "verbs": [
+          "bookmark",
+          "save"
+        ]
+      }
+    },
+    {
+      "id": "follow-section",
+      "role": "reader",
+      "goal": "Follow a section",
+      "budget": 2,
+      "check": {
+        "kind": "reaction_state",
+        "verbs": [
+          "follow"
+        ]
+      }
+    },
+    {
+      "id": "publish-reviewed",
+      "role": "editor",
+      "goal": "Publish an article in review",
+      "budget": 2,
+      "check": {
+        "kind": "action",
+        "verbs": [
+          "publish"
+        ]
+      }
+    },
+    {
+      "id": "reply-to-comment",
+      "role": "reader",
+      "goal": "Reply to a comment under an article",
+      "budget": 3,
+      "check": {
+        "kind": "reply"
+      }
+    }
+  ]
+}

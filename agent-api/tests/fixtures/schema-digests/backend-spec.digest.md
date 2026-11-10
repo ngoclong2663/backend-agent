@@ -16,6 +16,7 @@ type BackendSpec = {
   webhooks?: Webhooks | null;
   payments?: Payments | null;
   seed?: Seed[];
+  features?: FeatureAttachment[];
   x-frontendBindings?: FrontendBinding[];
 };
 
@@ -63,6 +64,25 @@ type Entity = {
   indexes?: IndexDef[];
   uniqueConstraints?: string[][];
   displayField?: string | null;
+};
+
+// Epic 33: a feature plugin attached to an entity (`reactions` on `Clip`).
+type FeatureAttachment = {
+  feature: string;
+  on: string;
+  options?: Record<string, unknown>;
+  entities?: string[];
+  computed?: FeatureComputedField[];
+};
+
+// Epic 33: a read-only field a feature adds to its target's responses (`likeCount`, `myLikeId`).
+type FeatureComputedField = {
+  field: string;
+  kind: "count" | "mine";
+  entity: string;
+  key: string;
+  where?: Record<string, unknown>;
+  owner?: string | null;
 };
 
 type FieldDef = {

@@ -273,6 +273,29 @@ class FrontendBinding(SpecModel):
     params: dict[str, Any] = {}
 
 
+class FeatureComputedField(SpecModel):
+    """Epic 33: a read-only field a feature adds to its target's responses (`likeCount`, `myLikeId`). `count`: rows of
+    `entity` whose `key` is the record; `mine`: the id of the caller's row (its `owner` is the caller), else null."""
+
+    field: str = Field(pattern=r"^[a-z][a-zA-Z0-9]*$")
+    kind: Literal["count", "mine"]
+    entity: str
+    key: str
+    where: dict[str, Any] = {}
+    owner: str | None = None
+
+
+class FeatureAttachment(SpecModel):
+    """Epic 33: a feature plugin attached to an entity (`reactions` on `Clip`). Its entities, operations and rules are
+    merged into this spec as plain entries; what plain entries can't say (computed fields) is here."""
+
+    feature: str = Field(pattern=r"^[a-z][a-z0-9-]*$")
+    on: str
+    options: dict[str, Any] = {}
+    entities: list[str] = []  # the entities the feature owns (the access rules leave them as the feature wrote them)
+    computed: list[FeatureComputedField] = []
+
+
 class BackendSpecV1(SpecModel):
     model_config = ConfigDict(title="BackendSpec 1.0")
 
@@ -291,4 +314,5 @@ class BackendSpecV1(SpecModel):
     webhooks: Webhooks | None = None
     payments: Payments | None = None
     seed: list[Seed] = []
+    features: list[FeatureAttachment] = []  # Epic 33: written by code when a domain's features are merged
     frontend_bindings: list[FrontendBinding] = Field(default=[], alias="x-frontendBindings")
