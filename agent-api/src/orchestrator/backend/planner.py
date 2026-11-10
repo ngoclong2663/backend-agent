@@ -117,6 +117,8 @@ def _column(entity: dict[str, Any], field: dict[str, Any]) -> dict[str, Any]:
         column["default"] = {"autoincrement": True}
     elif default == "now" and field["type"] in ("date", "datetime"):
         column["default"] = {"factory": "now (UTC)"}
+    elif default == "@code" and field["type"] == "string":  # Epic 33: a code the server makes (a tracking code)
+        column["default"] = {"factory": "code"}
     elif default is not None:
         column["default"] = {"value": default}
     return column

@@ -1036,7 +1036,7 @@ _Implemented 2026-11-07 (Epic 25)._
   against a baseline taken before the patterns.
 - **Requirement first:** what the requirement says about placement or audience overrides the pattern, with a note.
 
-### FR-47: Domain Plugins (proposed, Epic 33)
+### FR-47: Domain Plugins (Epic 33, done 2026-11-10)
 
 - **Domains:** a kind of product (learning platform, socials, news, drivers, edge AI / IoT) is a plugin naming its core
   entities by role, its areas and people, the features it requires or offers, and the UX tasks it must pass. A draft is

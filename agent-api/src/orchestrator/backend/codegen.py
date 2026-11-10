@@ -209,6 +209,9 @@ def _model_field(column: dict[str, Any], model: dict[str, Any], imports: Imports
             kwargs.append("default=None")
             annotation += " | None"
         kwargs.append("primary_key=True")
+    elif default.get("factory") == "code":  # a short unique code the server makes (a tracking code)
+        imports.add("uuid")
+        kwargs.append("default_factory=lambda: uuid.uuid4().hex[:10].upper()")
     elif "factory" in default:
         imports.add("datetime as dt")
         factory = "dt.datetime.now(dt.UTC).date()" if column["type"] == "date" else "dt.datetime.now(dt.UTC)"
@@ -1387,8 +1390,10 @@ class _Module:
             if op.get("type") == "aggregate":  # Epic 21: declared before the `/{id}` routes below
                 imports.add(usecases, op["usecaseDep"]).add(dtos, op["responseDto"])
                 returns = f"list[{op['responseDto']}]" if self._grouped(op) else op["responseDto"]
-                # Story 23.9: a role policy guards the figure (the plugins' dependencies; the use case takes none)
-                guards = [param for param in self._router_params(op) if not param.usecase_annotation]
+                # Story 23.9: a role policy guards the figure (the plugins' dependencies; the use case takes none).
+                # Every dependency stays on the route, also one the plugin meant for the use case (an ownership
+                # policy's caller): a figure behind sign-in was otherwise open to anyone (a courier draft's earnings)
+                guards = list(self._router_params(op))
                 for param in guards:
                     self._imports(imports, param.imports)
                 extra = "".join(f", {param.name}: {param.annotation}" for param in guards)
@@ -1398,12 +1403,29 @@ class _Module:
                     signature = (
                         f"async def {op['handler']}(\n" + "".join(f"    {p},\n" for p in params) + f") -> {returns}:"
                     )
-                handlers.insert(
-                    0,
-                    f'@{variable}.get("{op["path"]}", operation_id="{op["operationId"]}", response_model={returns})\n'
-                    f"{signature}\n"
-                    "    return await usecase.execute()\n",
+                # its error responses, as the CRUD routes declare theirs (found on a courier draft: the earnings
+                # figures behind sign-in left out their 401 and the API contract check failed)
+                statuses = sorted({e["status"] for e in op.get("errors") or []})
+                responses = (
+                    f", responses={{{', '.join(f'{status}: ERROR' for status in statuses)}}}" if statuses else ""
                 )
+                decorator = (
+                    f'@{variable}.get("{op["path"]}", operation_id="{op["operationId"]}", '
+                    f"response_model={returns}{responses})"
+                )
+                if len(decorator) > 120:
+                    decorator = (
+                        f"@{variable}.get(\n"
+                        f'    "{op["path"]}",\n    operation_id="{op["operationId"]}",\n'
+                        f"    response_model={returns},\n"
+                        + (
+                            f"    responses={{{', '.join(f'{status}: ERROR' for status in statuses)}}},\n"
+                            if statuses
+                            else ""
+                        )
+                        + ")"
+                    )
+                handlers.insert(0, f"{decorator}\n{signature}\n    return await usecase.execute()\n")
                 continue
             if action not in self.ops:
                 continue
@@ -1590,8 +1612,12 @@ class _Tests:
         for column in self._required(model):
             if column.get("source") == "currentUser":  # Story 10.3: the signed-in test user owns it, if any
                 self.imports.add("tests.auth", "current_user_id")
-                parent = self._parent(column)
-                fallback = f"{self.seed(parent)}().{_pk(parent)['attr']}"
+                if column.get("foreignKey"):
+                    parent = self._parent(column)
+                    fallback = f"{self.seed(parent)}().{_pk(parent)['attr']}"
+                else:  # a plain id filled from the user (Epic 33: a creating role's own id), no parent to seed
+                    self.imports.add("uuid")
+                    fallback = "uuid.uuid4()"
                 lines.append(
                     f'    if "{column["attr"]}" not in values:\n'
                     f'        values["{column["attr"]}"] = current_user_id() or {fallback}\n'
@@ -1790,7 +1816,8 @@ class _Tests:
                     f"def {name}(client):\n    payload = _payload()\n\n"
                     f'    response = client.post("{op["path"]}", json=payload)\n\n'
                     "    assert response.status_code == 201, response.text\n"
-                    "    body = response.json()\n" + compare
+                    # nothing sent to compare (a feature's row made from the caller alone): no unused `body` (F841)
+                    + ("    body = response.json()\n" + compare if compare else "")
                 )
             if case == "invalid":
                 body = "{}" if any(_required(c) for c in self.crud.request_columns(op)) else '{"unexpectedField": 1}'

@@ -38,7 +38,7 @@ DIGEST_LIMIT = 30_000
 PROMPT_VERSIONS = {
     "generate_database": "v2",
     "generate_backend": "v3",
-    "complete_backend": "v5",
+    "complete_backend": "v6",
     "repair_code": "v3",
 }
 

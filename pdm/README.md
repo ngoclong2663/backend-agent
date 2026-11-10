@@ -95,7 +95,7 @@ lane, tracing, results, and an OpenAPI explorer that sends test calls to the run
 | 30 | [Design plugins: a registry of layouts and looks that grows every day](epic30_design_plugins/epic30_design_plugins.md) (done 2026-11-09; guide: [design-plugins.md](../docs/development/design-plugins.md)) | Phase 5 | 8 |
 | 31 | [Sample videos: YouTube embeds and stock video files](epic31_sample_videos/epic31_sample_videos.md) (done 2026-11-09) | Phase 5 | 5 |
 | 32 | [Product patterns: screens that behave like the product](epic32_product_patterns/epic32_product_patterns.md) (done 2026-11-09) | Phase 5 | 8 |
-| 33 | [Domain plugins: apps built from what each kind of product really is](epic33_domain_plugins/epic33_domain_plugins.md) (proposed 2026-11-10) | Phase 5 | 14 |
+| 33 | [Domain plugins: apps built from what each kind of product really is](epic33_domain_plugins/epic33_domain_plugins.md) (done 2026-11-10) | Phase 5 | 14 |
 
 ### Suggested delivery order
 

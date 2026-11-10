@@ -54,3 +54,28 @@ def test_a_unique_pairs_success_scenario_still_finds_its_pair_free():
     pairs = {(row["quizId"], row["learnerId"]) for row in fixtures["QuizSubmission"]}
     assert (success["body"]["quizId"], learner) not in pairs
     assert dangling(contract, plan) == []
+
+
+@pytest.mark.parametrize("folder", DRAFTS, ids=lambda f: f.name)
+def test_a_unique_key_takes_each_parent_once(folder):
+    """The courier draft's availability (one per driver): three rows over two demo drivers repeated a unique key and
+    the seed failed with a UniqueViolation (gen_01M723BPHN5PC2FR99EGAQWCXA)."""
+    spec = validate_spec_data(json.loads((folder / "backend-spec.json").read_text())).normalized
+    plan = build_plan(spec)
+    fixtures = build_contract(spec, plan)["x-bga"]["fixtures"]
+    for model in plan["models"]:
+        for column in model["columns"]:
+            if column.get("unique") and not column["primaryKey"] and model.get("entity"):
+                values = [row.get(column["apiName"]) for row in fixtures.get(model["entity"]) or []]
+                values = [v for v in values if v is not None]
+                assert len(values) == len(set(map(str, values))), (model["entity"], column["apiName"])
+
+
+def test_the_proof_photo_is_the_deliverys_own_photo_field():
+    from src.orchestrator.drafting.domains import role_field
+
+    spec = json.loads((DRAFTS[0].parent / "domain-drivers-v10" / "backend-spec.json").read_text())
+    fields = [f["name"] for e in spec["entities"] if e["name"] == "Delivery" for f in e["fields"]]
+    found = role_field(spec, "Delivery", "photo")
+    assert found in fields or found == "proofPhoto"
+    assert "doorPhoto" not in fields or found == "doorPhoto"

@@ -294,7 +294,34 @@ class PoliciesPlugin(Plugin):
             owner = readers[0] if readers else owner
             if owner is not None and not owner_from_request(spec, module["entity"]):
                 self._owner_from_user(plan, module, model, owner)
+            self._creator_from_user(plan, module, model)
         plan["unresolved"] = [entry for entry in plan["unresolved"] if entry["kind"] not in ("auth", "policies")]
+
+    def _creator_from_user(self, plan: dict[str, Any], module: dict[str, Any], model: dict[str, Any]) -> None:
+        """A required id named after the role that creates the record (`shopId` for `shop_owner`), left out of the
+        create's request with nothing to fill it, is the creator: the signed-in user (found on a real courier draft:
+        every create answered 500 without it)."""
+        for op in module["operations"]:
+            sent = op.get("requestFields")
+            if op.get("action") != "create" or sent is None:
+                continue
+            words = {word for role in _roles(op) for word in re.split(r"[^a-z0-9]+", role.lower()) if word}
+            for column in model["columns"]:
+                name = column["apiName"]
+                if (
+                    column["type"] != "uuid"
+                    or column["primaryKey"]
+                    or column.get("nullable", True)
+                    or column.get("source")
+                    or column.get("default")
+                    or name in sent
+                    or not name.endswith("Id")
+                    or name[:-2].lower() not in words
+                ):
+                    continue
+                column["source"] = "currentUser"
+                column["sourceValue"] = f"current_user.{plan['auth']['primaryKeyAttr']}"
+                op["auth"] = {**(op.get("auth") or {"policy": None}), "auth": "jwt"}
 
     def _owner_from_user(
         self, plan: dict[str, Any], module: dict[str, Any], model: dict[str, Any], owner: dict[str, Any]

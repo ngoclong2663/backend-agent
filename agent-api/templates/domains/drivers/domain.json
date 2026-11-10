@@ -92,7 +92,7 @@
         "on": "delivery",
         "options": {
           "state": "{state:deliver}",
-          "field": "proofPhoto"
+          "field": "{photo}"
         }
       },
       {

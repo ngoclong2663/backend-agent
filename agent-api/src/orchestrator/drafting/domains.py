@@ -81,6 +81,12 @@ def role_field(backend: dict[str, Any], entity: str, kind: str) -> str | None:
         return owner or next((f for f in (*AUTHOR_FIELDS, *roles) if f in fields), None)
     if kind == "section":
         return next((f for f in SECTION_FIELDS if f in fields), None)
+    if kind == "photo":  # the record's own photo field when it has one (`doorPhoto`), else the feature's
+        typed = {field["name"]: field.get("type") for field in found.get("fields") or []}
+        named = [f for f in fields if any(word in f.lower() for word in ("proof", "photo", "picture", "image"))]
+        return next((f for f in named if typed.get(f) in ("image", "file")), None) or (
+            named[0] if named else "proofPhoto"
+        )
     return None
 
 

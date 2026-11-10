@@ -214,6 +214,7 @@ def fix_backend_defaults(work: Path, backend_file: str) -> list[dict[str, Any]]:
                 note(f"/operations/{o_index}/{key}", f"{operation.get('operationId')}: '{key}' is a list of names")
     notes += fix_media_fields(data)
     notes += fix_person_relationships(data)
+    notes += fix_unsent_codes(data)
     entities = {e.get("name") for e in data.get("entities") or [] if isinstance(e, dict)}
     for o_index, operation in enumerate(data.get("operations") or []):
         if not isinstance(operation, dict) or operation.get("type") != "custom" or operation.get("response"):
@@ -250,6 +251,39 @@ def media_kind_of(field: dict[str, Any]) -> str | None:
         if any(word in names for word in words):
             return kind
     return None
+
+
+def fix_unsent_codes(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """A required unique text the create's request leaves out (a delivery's tracking code) with nothing to fill it gets
+    a generated code (`@code`): the create otherwise answered 500 on every call (found on a real courier draft)."""
+    notes: list[dict[str, Any]] = []
+    entities = {e.get("name"): e for e in data.get("entities") or [] if isinstance(e, dict)}
+    for op in data.get("operations") or []:
+        if not isinstance(op, dict) or op.get("action") != "create":
+            continue
+        sent = (op.get("request") or {}).get("fields")
+        entity = entities.get(op.get("entity"))
+        if not isinstance(sent, list) or entity is None:
+            continue
+        for item in entity.get("fields") or []:
+            if (
+                item.get("type") == "string"
+                and item.get("unique")
+                and item.get("required")
+                and item.get("default") is None
+                and not item.get("primary")
+                and item.get("name") not in sent
+            ):
+                item["default"] = "@code"
+                notes.append(
+                    {
+                        "spec": "backend",
+                        "path": f"/entities/{entity['name']}/fields/{item['name']}",
+                        "message": f"{entity['name']}.{item['name']} is not sent on create: the server makes a code",
+                        "suggestion": None,
+                    }
+                )
+    return notes
 
 
 def fix_person_relationships(data: dict[str, Any]) -> list[dict[str, Any]]:

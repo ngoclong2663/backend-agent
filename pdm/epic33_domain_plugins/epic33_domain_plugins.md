@@ -131,3 +131,10 @@ a model drafting plugin folders; real-time, maps and native gestures (D10).
 ## Status
 
 Proposed 2026-11-10, for review.
+
+**Done 2026-11-10** (branch `feat/epic33-domain-plugins`): Stories 33.1–33.14. Domain, type and feature plugins with
+one registry; five domains (socials, news, learning, drivers, IoT), one type each, ten features (comments, reactions,
+follow, enrollment, completion, availability, proof-of-delivery, tracking, telemetry, and the toggles they share);
+computed fields in the generated backend, contract and mocks; `draft_app@v10` offers the ranked domains and code merges
+them; feedback on screens. The UX tasks went from **11 of 24** (today's kit) to 23 of 24 on the real v10 drafts; news,
+learning, IoT and drivers generated end to end and were checked live. Deviations in the stories' Status notes.

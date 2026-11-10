@@ -333,6 +333,7 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
                 if len(kept) >= capacity > 1:
                     kept = kept[: capacity - 1]
             records[model["entity"]] = kept
+    _unique_keys(models, records, by_table, set(seeds))
     for model in models:  # Story 10.5: a file field holds an object key under its prefix, per owner when there is one
         owner = next((c["apiName"] for c in model["columns"] if c.get("source") == "currentUser"), None)
         language = (tracks.get(model["entity"]) or {}).get("language")
@@ -353,6 +354,54 @@ def build_fixtures(spec: dict[str, Any], plan: dict[str, Any]) -> tuple[dict[str
             {name: row[name] for name in order if name in row} for row in records[model["entity"]]
         ]
     return records, set(seeds)
+
+
+def _unique_keys(
+    models: list[dict[str, Any]],
+    records: dict[str, list[dict[str, Any]]],
+    by_table: dict[str, dict[str, Any]],
+    seeded: set[str],
+) -> None:
+    """A unique foreign key (one availability per driver) takes each parent once: pass 2 spreads the rows over the
+    parents, so with fewer parents than rows a later row repeats a key and the seed fails on the unique constraint
+    (found on a courier draft: three availabilities, two demo drivers). The repeats go, and the rows that point at
+    them."""
+    for model in models:
+        if model["entity"] in seeded:
+            continue  # the spec's own seed rows are inserted as written
+        for column in model["columns"]:
+            if not (column.get("unique") and column.get("foreignKey") and not column["primaryKey"]):
+                continue
+            seen: set[str] = set()
+            for row in list(records[model["entity"]]):
+                value = row.get(column["apiName"])
+                if value is None:
+                    continue
+                if str(value) in seen:
+                    _drop_row(models, records, by_table, model, row)
+                else:
+                    seen.add(str(value))
+
+
+def _drop_row(
+    models: list[dict[str, Any]],
+    records: dict[str, list[dict[str, Any]]],
+    by_table: dict[str, dict[str, Any]],
+    model: dict[str, Any],
+    row: dict[str, Any],
+) -> None:
+    """Removes a fixture row and, recursively, the rows whose foreign key names it (the seed must insert)."""
+    rows = records.get(model["entity"]) or []
+    if row in rows:
+        rows.remove(row)
+    pk = next((c["apiName"] for c in model["columns"] if c["primaryKey"]), "id")
+    for other in models:
+        for column in other["columns"]:
+            fk = column.get("foreignKey") or {}
+            if by_table.get(fk.get("references", "").partition(".")[0]) is not model:
+                continue
+            for dependent in [r for r in records.get(other["entity"]) or [] if r.get(column["apiName"]) == row.get(pk)]:
+                _drop_row(models, records, by_table, other, dependent)
 
 
 def _track_rows(model: dict[str, Any], track: dict[str, Any]) -> list[dict[str, Any]]:
