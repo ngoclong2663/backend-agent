@@ -1,0 +1,255 @@
+{
+  "taken": "2026-11-10",
+  "apps": {
+    "drivers": {
+      "theme": {
+        "colorScheme": "light-dark",
+        "colors": {
+          "primary": "#f97316",
+          "secondary": "#fdf4f0",
+          "accent": "#f97316",
+          "background": "#fff7ed",
+          "foreground": "#0f172a",
+          "muted": "#fdf4f0",
+          "destructive": "#dc2626"
+        },
+        "typography": {
+          "headingFont": "Outfit",
+          "bodyFont": "Inter",
+          "headingWeight": 600,
+          "headingCase": "normal",
+          "tracking": "tight",
+          "ratio": "default"
+        },
+        "radius": "lg",
+        "density": "comfortable"
+      },
+      "measures": {
+        "primary": "#f97316",
+        "fonts": [
+          "Outfit",
+          "Inter"
+        ],
+        "textContrast": 16.81,
+        "buttonText": 7.06,
+        "buttonOnPage": 2.64,
+        "readable": true,
+        "greyNeutrals": [],
+        "cliches": []
+      }
+    },
+    "iot": {
+      "theme": {
+        "colorScheme": "light-dark",
+        "colors": {
+          "primary": "#2e7d32",
+          "secondary": "#ebeded",
+          "accent": "#2e7d32",
+          "background": "#f9fbf9",
+          "foreground": "#0f172a",
+          "muted": "#ebeded",
+          "destructive": "#dc2626"
+        },
+        "typography": {
+          "headingFont": "Bricolage Grotesque",
+          "bodyFont": "DM Sans",
+          "headingWeight": 700,
+          "headingCase": "normal",
+          "tracking": "tight",
+          "ratio": "default"
+        },
+        "radius": "md",
+        "density": "comfortable"
+      },
+      "measures": {
+        "primary": "#2e7d32",
+        "fonts": [
+          "Bricolage Grotesque",
+          "DM Sans"
+        ],
+        "textContrast": 17.17,
+        "buttonText": 5.13,
+        "buttonOnPage": 4.93,
+        "readable": true,
+        "greyNeutrals": [],
+        "cliches": []
+      }
+    },
+    "learning": {
+      "theme": {
+        "colorScheme": "light-dark",
+        "colors": {
+          "primary": "#005f73",
+          "secondary": "#e8f1f4",
+          "accent": "#005f73",
+          "background": "#f0fdfa",
+          "foreground": "#134e4a",
+          "muted": "#e8f1f4",
+          "destructive": "#dc2626"
+        },
+        "typography": {
+          "headingFont": "Outfit",
+          "bodyFont": "Inter",
+          "headingWeight": 600,
+          "headingCase": "normal",
+          "tracking": "tight",
+          "ratio": "default"
+        },
+        "radius": "lg",
+        "density": "comfortable"
+      },
+      "measures": {
+        "primary": "#005f73",
+        "fonts": [
+          "Outfit",
+          "Inter"
+        ],
+        "textContrast": 9.09,
+        "buttonText": 7.28,
+        "buttonOnPage": 6.98,
+        "readable": true,
+        "greyNeutrals": [],
+        "cliches": []
+      }
+    },
+    "news": {
+      "theme": {
+        "colorScheme": "light-dark",
+        "colors": {
+          "primary": "#1e3a8a",
+          "secondary": "#ededee",
+          "accent": "#1e3a8a",
+          "background": "#fbfbfa",
+          "foreground": "#0f172a",
+          "muted": "#ededee",
+          "destructive": "#dc2626"
+        },
+        "typography": {
+          "headingFont": "Playfair Display",
+          "bodyFont": "Source Sans 3",
+          "headingWeight": 500,
+          "headingCase": "normal",
+          "tracking": "normal",
+          "ratio": "dramatic"
+        },
+        "radius": "sm",
+        "density": "comfortable"
+      },
+      "measures": {
+        "primary": "#1e3a8a",
+        "fonts": [
+          "Playfair Display",
+          "Source Sans 3"
+        ],
+        "textContrast": 17.24,
+        "buttonText": 10.36,
+        "buttonOnPage": 10.0,
+        "readable": true,
+        "greyNeutrals": [
+          "secondary",
+          "muted"
+        ],
+        "cliches": []
+      }
+    },
+    "socials": {
+      "theme": {
+        "colorScheme": "dark",
+        "colors": {
+          "primary": "#ec4899",
+          "secondary": "#10182b",
+          "accent": "#ec4899",
+          "background": "#0f172a",
+          "foreground": "#ffffff",
+          "muted": "#10182b",
+          "destructive": "#dc2626"
+        },
+        "typography": {
+          "headingFont": "Unbounded",
+          "bodyFont": "Archivo",
+          "headingWeight": 700,
+          "headingCase": "upper",
+          "tracking": "wide",
+          "ratio": "dramatic"
+        },
+        "radius": "md",
+        "density": "comfortable"
+      },
+      "measures": {
+        "primary": "#ec4899",
+        "fonts": [
+          "Unbounded",
+          "Archivo"
+        ],
+        "textContrast": 17.85,
+        "buttonText": 5.61,
+        "buttonOnPage": 5.06,
+        "readable": true,
+        "greyNeutrals": [],
+        "cliches": []
+      }
+    },
+    "yarn": {
+      "theme": {
+        "colorScheme": "light-dark",
+        "colors": {
+          "primary": "#4a6741",
+          "secondary": "#f3f3f3",
+          "accent": "#4a6741",
+          "background": "#ffffff",
+          "foreground": "#333333",
+          "muted": "#f3f3f3",
+          "destructive": "#dc2626"
+        },
+        "typography": {
+          "headingFont": "Inter",
+          "bodyFont": "Inter",
+          "headingWeight": 600,
+          "headingCase": "normal",
+          "tracking": "tight",
+          "ratio": "default"
+        },
+        "radius": "none",
+        "density": "comfortable"
+      },
+      "measures": {
+        "primary": "#4a6741",
+        "fonts": [
+          "Inter",
+          "Inter"
+        ],
+        "textContrast": 12.63,
+        "buttonText": 6.35,
+        "buttonOnPage": 6.35,
+        "readable": true,
+        "greyNeutrals": [
+          "secondary",
+          "muted"
+        ],
+        "cliches": [
+          "one-plain-sans"
+        ]
+      }
+    }
+  },
+  "distinctness": {
+    "nearestHueGap": {
+      "drivers": 54.2,
+      "iot": 17.2,
+      "learning": 34.0,
+      "news": 34.0,
+      "socials": 54.2,
+      "yarn": 17.2
+    },
+    "meanHueGap": 101.1,
+    "sharedFonts": 2
+  },
+  "summary": {
+    "apps": 6,
+    "readable": 6,
+    "withCliches": 1,
+    "withGreyNeutrals": 2,
+    "meanHueGap": 101.1,
+    "sharedFonts": 2
+  }
+}

@@ -1,0 +1,808 @@
+{
+  "auth": {
+    "roles": [
+      "reader",
+      "writer",
+      "editor"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "title",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 200,
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "section",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ]
+        },
+        {
+          "maxLength": 500,
+          "name": "excerpt",
+          "nullable": true,
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "name": "coverImage",
+          "nullable": true,
+          "type": "image"
+        },
+        {
+          "default": "draft",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "draft",
+            "under_review",
+            "changes_requested",
+            "scheduled",
+            "published"
+          ]
+        },
+        {
+          "index": true,
+          "name": "writerId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 2000,
+          "name": "editorFeedback",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "name": "scheduledFor",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "name": "publishedAt",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Article"
+    },
+    {
+      "name": "ArticleComment",
+      "displayField": "text",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "articleId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "authorId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "parentId",
+          "type": "uuid",
+          "index": true
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "maxLength": 2000
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "ArticleReaction",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "articleId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "userId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "kind",
+          "type": "enum",
+          "values": [
+            "save"
+          ],
+          "required": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "SectionFollow",
+      "displayField": "subject",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "followerId",
+          "type": "uuid",
+          "required": true,
+          "index": true
+        },
+        {
+          "name": "subject",
+          "type": "string",
+          "required": true,
+          "index": true,
+          "maxLength": 80
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Writer drafts a new article in a section with title and content. Status starts as draft.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.create",
+      "path": "/articles",
+      "policy": "writersOnly",
+      "request": {
+        "entity": "Article",
+        "fields": [
+          "title",
+          "section",
+          "excerpt",
+          "content",
+          "coverImage"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "description": "Retrieve an article by ID. Visibility policy ensures readers see only published articles, while writers and editors see draft/review stages.",
+      "entity": "Article",
+      "method": "GET",
+      "operationId": "article.get",
+      "path": "/articles/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "description": "List articles with pagination, filters on section and status, sorting, and text search across title and content. Filtered by visibility policy.",
+      "entity": "Article",
+      "filters": [
+        "section",
+        "status",
+        "writerId"
+      ],
+      "method": "GET",
+      "operationId": "article.list",
+      "pagination": true,
+      "path": "/articles",
+      "search": [
+        "title",
+        "content"
+      ],
+      "sort": [
+        "publishedAt",
+        "createdAt",
+        "title"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "description": "Writer updates their draft or changes_requested article. Cannot directly alter status via this operation.",
+      "entity": "Article",
+      "method": "PATCH",
+      "operationId": "article.update",
+      "path": "/articles/{id}",
+      "policy": "writerDrafts",
+      "request": {
+        "entity": "Article",
+        "fields": [
+          "title",
+          "section",
+          "excerpt",
+          "content",
+          "coverImage"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "description": "Writer deletes their own draft article before review.",
+      "entity": "Article",
+      "method": "DELETE",
+      "operationId": "article.delete",
+      "path": "/articles/{id}",
+      "policy": "writerDrafts",
+      "type": "crud"
+    },
+    {
+      "auth": "jwt",
+      "description": "Writer submits a draft or revised article for review. Transitions status to under_review. Draft must have title, content, and section.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.submitForReview",
+      "path": "/articles/{id}/submit-for-review",
+      "policy": "articleOwnerOnly",
+      "rules": [
+        "articleFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Editor requests revisions on an article under review, providing specific feedback. Transitions status to changes_requested.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.requestChanges",
+      "path": "/articles/{id}/request-changes",
+      "policy": "editorsOnly",
+      "request": {
+        "entity": "Article",
+        "fields": [
+          "editorFeedback"
+        ]
+      },
+      "rules": [
+        "articleFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Editor publishes an article that is under review. Transitions status to published and sets publishedAt timestamp.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.publish",
+      "path": "/articles/{id}/publish",
+      "policy": "editorsOnly",
+      "rules": [
+        "articleFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Editor schedules an article under review for future release. Transitions status to scheduled and sets scheduledFor timestamp in the future.",
+      "entity": "Article",
+      "method": "POST",
+      "operationId": "article.schedule",
+      "path": "/articles/{id}/schedule",
+      "policy": "editorsOnly",
+      "request": {
+        "entity": "Article",
+        "fields": [
+          "scheduledFor"
+        ]
+      },
+      "rules": [
+        "articleFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Article"
+      }
+    },
+    {
+      "operationId": "articleComment.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "ArticleComment",
+      "method": "GET",
+      "path": "/article-comments",
+      "auth": "jwt",
+      "pagination": true,
+      "filters": [
+        "articleId",
+        "parentId"
+      ],
+      "sort": [
+        "createdAt"
+      ]
+    },
+    {
+      "operationId": "articleComment.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "ArticleComment",
+      "method": "POST",
+      "path": "/article-comments",
+      "auth": "jwt",
+      "policy": "ownArticleComments"
+    },
+    {
+      "operationId": "articleComment.update",
+      "type": "crud",
+      "action": "update",
+      "entity": "ArticleComment",
+      "method": "PATCH",
+      "path": "/article-comments/{id}",
+      "auth": "jwt",
+      "policy": "ownArticleComments"
+    },
+    {
+      "operationId": "articleComment.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "ArticleComment",
+      "method": "DELETE",
+      "path": "/article-comments/{id}",
+      "auth": "jwt",
+      "policy": "ownArticleComments"
+    },
+    {
+      "operationId": "articleReaction.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "ArticleReaction",
+      "method": "POST",
+      "path": "/article-reactions",
+      "auth": "jwt",
+      "policy": "ownArticleReactions"
+    },
+    {
+      "operationId": "articleReaction.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "ArticleReaction",
+      "method": "DELETE",
+      "path": "/article-reactions/{id}",
+      "auth": "jwt",
+      "policy": "ownArticleReactions"
+    },
+    {
+      "operationId": "sectionFollow.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "SectionFollow",
+      "method": "POST",
+      "path": "/section-follows",
+      "auth": "jwt",
+      "policy": "ownSectionFollows"
+    },
+    {
+      "operationId": "sectionFollow.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "SectionFollow",
+      "method": "DELETE",
+      "path": "/section-follows/{id}",
+      "auth": "jwt",
+      "policy": "ownSectionFollows"
+    },
+    {
+      "operationId": "article.countThisWeek",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-this-week",
+      "summary": "Published Stories",
+      "aggregate": {
+        "fn": "count",
+        "period": "week",
+        "dateField": "createdAt"
+      }
+    },
+    {
+      "operationId": "article.countWhereStatusUnderReview",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-under-review",
+      "summary": "Articles Under Review",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "under_review"
+        }
+      }
+    },
+    {
+      "operationId": "article.countWhereStatusChangesRequested",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-changes-requested",
+      "summary": "Revisions Pending",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "changes_requested"
+        }
+      }
+    },
+    {
+      "operationId": "article.countWhereStatusScheduled",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-where-status-scheduled",
+      "summary": "Scheduled Articles",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "scheduled"
+        }
+      }
+    },
+    {
+      "operationId": "article.countBySection",
+      "type": "aggregate",
+      "entity": "Article",
+      "method": "GET",
+      "path": "/articles/aggregate/count-by-section",
+      "summary": "Stories by Section",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "section"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "writersOnly",
+      "roles": [
+        "writer"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "editorsOnly",
+      "roles": [
+        "editor"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "editor"
+      ],
+      "name": "writerDrafts",
+      "ownerField": "writerId",
+      "type": "ownership"
+    },
+    {
+      "entity": "Article",
+      "name": "readerPublishedOnly",
+      "roles": [
+        "reader"
+      ],
+      "type": "visibility",
+      "where": {
+        "status": "published"
+      }
+    },
+    {
+      "name": "ownArticleComments",
+      "type": "ownership",
+      "entity": "ArticleComment",
+      "ownerField": "authorId"
+    },
+    {
+      "name": "ownArticleReactions",
+      "type": "ownership",
+      "entity": "ArticleReaction",
+      "ownerField": "userId"
+    },
+    {
+      "name": "ownSectionFollows",
+      "type": "ownership",
+      "entity": "SectionFollow",
+      "ownerField": "followerId"
+    },
+    {
+      "name": "articleOwnerOnly",
+      "type": "ownership",
+      "ownerField": "writerId",
+      "bypassRoles": []
+    }
+  ],
+  "project": {
+    "description": "A city news site where writers draft stories in sections, editors review and publish or schedule them, and readers read and comment.",
+    "name": "The Harbour Ledger",
+    "slug": "harbour-ledger"
+  },
+  "rules": [
+    {
+      "description": "Valid status transitions for an article through drafting, review, revision, scheduling, and publication.",
+      "entity": "Article",
+      "id": "articleFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "changes_requested": [
+            "under_review"
+          ],
+          "draft": [
+            "under_review"
+          ],
+          "scheduled": [
+            "published"
+          ],
+          "under_review": [
+            "published",
+            "changes_requested",
+            "scheduled"
+          ]
+        }
+      }
+    },
+    {
+      "id": "oneArticleReactionEach",
+      "kind": "uniqueTogether",
+      "entity": "ArticleReaction",
+      "params": {
+        "fields": [
+          "articleId",
+          "userId",
+          "kind"
+        ]
+      }
+    },
+    {
+      "id": "oneSectionFollowEach",
+      "kind": "uniqueTogether",
+      "entity": "SectionFollow",
+      "params": {
+        "fields": [
+          "followerId",
+          "subject"
+        ]
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Article",
+      "records": [
+        {
+          "content": "Work officially began this morning on the expansion of the Harbour Metro line connecting North Quay to the Financial District...",
+          "createdAt": "2026-11-01T08:00:00Z",
+          "excerpt": "Major infrastructure investment connects North Quay with downtown transit corridors.",
+          "id": "a1000000-0000-0000-0000-000000000001",
+          "publishedAt": "2026-11-01T09:00:00Z",
+          "section": "City",
+          "status": "published",
+          "title": "Harbour Transit Authority Breaks Ground on Metro Extension",
+          "writerId": "00000000-0000-0000-0000-000000000001",
+          "coverImage": "https://images.unsplash.com/photo-1547380243-c25d8e5dbe5b?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8SGFyYm91ciUyMFRyYW5zaXQlMjBBdXRob3JpdHklMjBCcmVha3MlMjBHcm91bmQlMjBvbiUyME1ldHJvJTIwRXh0ZW5zaW9uJTIwQXJ0aWNsZXxlbnwxfDB8fHwxNzk0MzAwNDAwfDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80"
+        },
+        {
+          "content": "Local tech firms and port logistics operators announced a joint venture aiming to digitize freight clearance across the waterfront...",
+          "createdAt": "2026-11-02T10:00:00Z",
+          "excerpt": "Waterfront logistics leaders adopt automated freight verification platform.",
+          "id": "a1000000-0000-0000-0000-000000000002",
+          "publishedAt": "2026-11-02T11:30:00Z",
+          "section": "Business",
+          "status": "published",
+          "title": "Port Tech Venture Secures $14M for Waterfront Logistics Modernization",
+          "writerId": "00000000-0000-0000-0000-000000000001"
+        },
+        {
+          "content": "The Municipal Arts Pavilion unveiled its winter retrospective featuring works by over thirty local painters, sculptors, and printmakers...",
+          "createdAt": "2026-11-03T12:00:00Z",
+          "excerpt": "Winter retrospective showcases thirty regional artists at the Pavilion.",
+          "id": "a1000000-0000-0000-0000-000000000003",
+          "publishedAt": "2026-11-03T14:00:00Z",
+          "section": "Culture",
+          "status": "published",
+          "title": "Harbour Pavilion Opens Annual Regional Artists Retrospective",
+          "writerId": "00000000-0000-0000-0000-000000000001",
+          "coverImage": "https://images.unsplash.com/photo-1764788127528-1bce10c424f3?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8SGFyYm91ciUyMFBhdmlsaW9uJTIwT3BlbnMlMjBBbm51YWwlMjBSZWdpb25hbCUyMEFydGlzdHMlMjBSZXRyb3NwZWN0aXZlJTIwQXJ0aWNsZXxlbnwxfDB8fHwxNzk0MzAwNDAyfDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80"
+        },
+        {
+          "content": "In a thrilling match yesterday evening at Bayview Arena, the Harbour United sealed their playoff berth with a stoppage-time goal...",
+          "createdAt": "2026-11-04T18:00:00Z",
+          "excerpt": "Stoppage-time winner punches ticket to postseason knockout rounds.",
+          "id": "a1000000-0000-0000-0000-000000000004",
+          "publishedAt": "2026-11-04T20:15:00Z",
+          "section": "Sport",
+          "status": "published",
+          "title": "Harbour United Secures Postseason Spot with Dramatic Late Winner",
+          "writerId": "00000000-0000-0000-0000-000000000001",
+          "coverImage": "https://images.unsplash.com/photo-1757031298995-22b05bb4ef1e?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8SGFyYm91ciUyMFVuaXRlZCUyMFNlY3VyZXMlMjBQb3N0c2Vhc29uJTIwU3BvdCUyMHdpdGglMjBEcmFtYXRpYyUyMExhdGUlMjBXaW5uZXIlMjBBcnRpY2xlfGVufDF8MHx8fDE3OTQzMDA0MDN8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  },
+  "features": [
+    {
+      "feature": "comments",
+      "on": "Article",
+      "options": {},
+      "entities": [
+        "ArticleComment"
+      ],
+      "computed": [
+        {
+          "field": "commentCount",
+          "kind": "count",
+          "entity": "ArticleComment",
+          "key": "articleId",
+          "where": {}
+        }
+      ]
+    },
+    {
+      "feature": "reactions",
+      "on": "Article",
+      "options": {
+        "kinds": [
+          "save"
+        ]
+      },
+      "entities": [
+        "ArticleReaction"
+      ],
+      "computed": [
+        {
+          "field": "saveCount",
+          "kind": "count",
+          "entity": "ArticleReaction",
+          "key": "articleId",
+          "where": {
+            "kind": "save"
+          }
+        },
+        {
+          "field": "mySaveId",
+          "kind": "mine",
+          "entity": "ArticleReaction",
+          "key": "articleId",
+          "where": {
+            "kind": "save"
+          },
+          "owner": "userId"
+        }
+      ]
+    },
+    {
+      "feature": "follow",
+      "on": "Article",
+      "options": {
+        "subject": "Section",
+        "subjectField": "section"
+      },
+      "entities": [
+        "SectionFollow"
+      ],
+      "computed": [
+        {
+          "field": "mySectionFollowId",
+          "kind": "mine",
+          "entity": "SectionFollow",
+          "key": "subject",
+          "where": {},
+          "owner": "followerId",
+          "match": "section"
+        },
+        {
+          "field": "sectionFollowerCount",
+          "kind": "count",
+          "entity": "SectionFollow",
+          "key": "subject",
+          "where": {},
+          "match": "section"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "name": "articleComments",
+      "type": "one-to-many",
+      "from": "Article",
+      "to": "ArticleComment",
+      "foreignKey": "articleId",
+      "onDelete": "CASCADE"
+    },
+    {
+      "name": "articleCommentReplies",
+      "type": "one-to-many",
+      "from": "ArticleComment",
+      "to": "ArticleComment",
+      "foreignKey": "parentId",
+      "onDelete": "CASCADE"
+    },
+    {
+      "name": "articleReactions",
+      "type": "one-to-many",
+      "from": "Article",
+      "to": "ArticleReaction",
+      "foreignKey": "articleId",
+      "onDelete": "CASCADE"
+    }
+  ]
+}

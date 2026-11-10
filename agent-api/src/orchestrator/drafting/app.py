@@ -8,6 +8,7 @@ legacy dynamic flow); static sites keep their own flow in `drafts.py`.
 
 import copy
 import json
+import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -31,6 +32,7 @@ from ..frontend.app.design import (
     design_choices,
     design_notes,
     design_seed,
+    pairing_candidates,
 )
 from ..frontend.app.outline import complete_outline, humanize
 from ..frontend.app.recipes import complete_looks, recommended_looks, style_words
@@ -41,6 +43,7 @@ from ..integration.contract import build_contract
 from .access import secure_access
 from .answer_schema import app_answer_schema
 from .domains import apply_domain, offered, rank_domains
+from .themes import Designer, apply_pairing, design_theme
 
 # v7 (Epic 30): the design choices from the plugin registry; v6 (Epic 29): the media field types; v5: the
 # requirement's own look (`design.requested`); v4 (Epic 25): the access rules; v3 (Story 23.6): the design brief and
@@ -215,6 +218,7 @@ def fix_backend_defaults(work: Path, backend_file: str) -> list[dict[str, Any]]:
     notes += fix_media_fields(data)
     notes += fix_person_relationships(data)
     notes += fix_unsent_codes(data)
+    notes += fix_seed_references(data)
     entities = {e.get("name") for e in data.get("entities") or [] if isinstance(e, dict)}
     for o_index, operation in enumerate(data.get("operations") or []):
         if not isinstance(operation, dict) or operation.get("type") != "custom" or operation.get("response"):
@@ -251,6 +255,57 @@ def media_kind_of(field: dict[str, Any]) -> str | None:
         if any(word in names for word in words):
             return kind
     return None
+
+
+def _is_uuid(value: str) -> bool:
+    try:
+        uuid.UUID(value)
+    except ValueError:
+        return False
+    return True
+
+
+def fix_seed_references(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """A seed row's foreign key written as one of its parent's values (a real IoT draft: `zoneId: "Zone A - Tomato
+    Benches"`, the zone's name) points at that parent's seed row; the row gets a fixed id when it has none. A value
+    no parent row has is left for the validator (and the repair)."""
+    entities = {e.get("name"): e for e in data.get("entities") or [] if isinstance(e, dict)}
+    seeds = {s.get("entity"): s for s in data.get("seed") or [] if isinstance(s, dict)}
+    parents: dict[tuple[str, str], str] = {}  # (child, foreign key) → parent
+    for rel in data.get("relationships") or []:
+        if isinstance(rel, dict) and rel.get("type") in ("one-to-many", "one-to-one") and rel.get("foreignKey"):
+            parents[(rel.get("to"), rel["foreignKey"])] = rel.get("from")
+
+    def key_of(name: str) -> str | None:
+        fields = (entities.get(name) or {}).get("fields") or []
+        primary = next((f for f in fields if isinstance(f, dict) and f.get("primary")), None)
+        return primary.get("name") if primary and primary.get("type") == "uuid" else None
+
+    notes: list[dict[str, Any]] = []
+    for s_index, seed in enumerate(data.get("seed") or []):
+        if not isinstance(seed, dict):
+            continue
+        for r_index, record in enumerate(seed.get("records") or []):
+            if not isinstance(record, dict):
+                continue
+            for key, value in list(record.items()):
+                parent = parents.get((seed.get("entity"), key))
+                if parent is None or not isinstance(value, str) or _is_uuid(value):
+                    continue
+                primary = key_of(parent)
+                rows = [row for row in (seeds.get(parent) or {}).get("records") or [] if isinstance(row, dict)]
+                match = next((row for row in rows if value in row.values()), None)
+                if primary is None or match is None:
+                    continue
+                if not isinstance(match.get(primary), str) or not _is_uuid(match[primary]):
+                    match[primary] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"bga-seed:{parent}:{value}"))
+                record[key] = match[primary]
+                message = f"{seed.get('entity')}.{key}: '{value}' is the {parent} seed row it names"
+                notes.append(
+                    {"spec": "backend", "path": f"/seed/{s_index}/records/{r_index}/{key}", "message": message[:600],
+                     "suggestion": None}
+                )  # fmt: skip
+    return notes
 
 
 def fix_unsent_codes(data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -415,9 +470,11 @@ async def draft_app(
     chosen: dict[str, Any] | None,
     backend_file: str,
     frontend_file: str,
+    designer: Designer | None = None,
 ) -> AppDraft:
     """One engine call for the BackendSpec and the outline (plus repairs only when the BackendSpec is invalid), then
-    the FrontendSpec by code: the outline completed from the BackendSpec and the contract, the screens planned."""
+    the FrontendSpec by code: the outline completed from the BackendSpec and the contract, the screens planned.
+    `designer`: Epic 34's design turn (one LLM turn designs the theme; None: the design data's theme)."""
     await progress("drafting")
     # Story 22.8: an API engine answers in the shape of the three files (structured output); a CLI engine writes them
     inline = context.get("inline")
@@ -505,7 +562,18 @@ async def draft_app(
         notes += edit_notes
     contract = build_contract(backend, build_plan(backend))
     theme = app_theme(chosen)
-    requested_notes = follow_requested(outline, theme)  # the requirement's own look over the design data's choice
+    designed = False
+    if designer is not None:  # Epic 34: the theme designed for this product, checked by code, the data's as fallback
+        await progress("designing the theme")
+        design = outline.get("design") or {}
+        pairings = pairing_candidates(outline.get("locale"), design.get("requested"), design.get("archetype"))
+        made = await design_theme(designer, prompts, requirement, outline, backend, theme, pairings)
+        theme, designed = made.theme, made.pairing is not None
+        if made.pairing:
+            apply_pairing(outline, made.pairing)
+        notes += made.notes
+    # the requirement's own look over the design data's choice (a designed theme keeps what it designed close to it)
+    requested_notes = follow_requested(outline, theme, designed, requirement)
     screens = app_frontend_spec(backend, outline, theme, contract)
     (work / frontend_file).write_text(json.dumps(screens.spec, indent=2, ensure_ascii=False) + "\n")
     notes += outline_fixes + aggregate_notes + requested_notes + screens.assumptions

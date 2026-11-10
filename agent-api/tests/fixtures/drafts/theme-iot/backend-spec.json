@@ -1,0 +1,970 @@
+{
+  "auth": {
+    "roles": [
+      "operator",
+      "admin"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 100,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 30,
+          "name": "code",
+          "required": true,
+          "type": "string",
+          "unique": true
+        },
+        {
+          "maxLength": 1000,
+          "name": "description",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Zone"
+    },
+    {
+      "displayField": "name",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 100,
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "deviceType",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "SENSOR",
+            "CAMERA"
+          ]
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "default": "HEALTHY",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "HEALTHY",
+            "UNHEALTHY",
+            "REBOOTING"
+          ]
+        },
+        {
+          "default": 100,
+          "max": 100,
+          "min": 0,
+          "name": "batteryLevel",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "default": true,
+          "name": "isOnline",
+          "required": true,
+          "type": "boolean"
+        },
+        {
+          "default": "now",
+          "name": "lastSeenAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Device"
+    },
+    {
+      "displayField": "value",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "deviceId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "metric",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "TEMPERATURE",
+            "HUMIDITY",
+            "CO2",
+            "SOIL_MOISTURE"
+          ]
+        },
+        {
+          "name": "value",
+          "required": true,
+          "type": "float"
+        },
+        {
+          "maxLength": 20,
+          "name": "unit",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "now",
+          "index": true,
+          "name": "recordedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Reading"
+    },
+    {
+      "displayField": "pestName",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "deviceId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "maxLength": 100,
+          "name": "pestName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "max": 100,
+          "min": 0,
+          "name": "confidence",
+          "required": true,
+          "type": "float"
+        },
+        {
+          "name": "snapshot",
+          "required": true,
+          "type": "image"
+        },
+        {
+          "default": "PENDING",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "PENDING",
+            "CONFIRMED",
+            "DISMISSED"
+          ]
+        },
+        {
+          "name": "reviewedById",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "name": "reviewedAt",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "index": true,
+          "name": "detectedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Detection"
+    },
+    {
+      "displayField": "message",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "zoneId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "index": true,
+          "name": "deviceId",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 255,
+          "name": "message",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 50,
+          "name": "metric",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "thresholdValue",
+          "nullable": true,
+          "type": "float"
+        },
+        {
+          "name": "currentValue",
+          "nullable": true,
+          "type": "float"
+        },
+        {
+          "default": "ACTIVE",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "ACTIVE",
+            "ACKNOWLEDGED"
+          ]
+        },
+        {
+          "name": "acknowledgedById",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "name": "acknowledgedAt",
+          "nullable": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "index": true,
+          "name": "triggeredAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Alert"
+    }
+  ],
+  "operations": [
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Zone",
+      "filters": [
+        "code"
+      ],
+      "method": "GET",
+      "operationId": "zone.list",
+      "pagination": true,
+      "path": "/zones",
+      "search": [
+        "name",
+        "code"
+      ],
+      "sort": [
+        "name",
+        "code"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Zone",
+      "method": "GET",
+      "operationId": "zone.get",
+      "path": "/zones/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Zone",
+      "method": "POST",
+      "operationId": "zone.create",
+      "path": "/zones",
+      "policy": "adminsOnly",
+      "request": {
+        "entity": "Zone",
+        "fields": [
+          "name",
+          "code",
+          "description"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Zone",
+      "method": "PATCH",
+      "operationId": "zone.update",
+      "path": "/zones/{id}",
+      "policy": "adminsOnly",
+      "request": {
+        "entity": "Zone",
+        "fields": [
+          "name",
+          "code",
+          "description"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Zone",
+      "method": "DELETE",
+      "operationId": "zone.delete",
+      "path": "/zones/{id}",
+      "policy": "adminsOnly",
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Device",
+      "filters": [
+        "zoneId",
+        "deviceType",
+        "status",
+        "isOnline"
+      ],
+      "method": "GET",
+      "operationId": "device.list",
+      "pagination": true,
+      "path": "/devices",
+      "search": [
+        "name"
+      ],
+      "sort": [
+        "name",
+        "lastSeenAt",
+        "batteryLevel"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Device",
+      "method": "GET",
+      "operationId": "device.get",
+      "path": "/devices/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "entity": "Device",
+      "method": "POST",
+      "operationId": "device.create",
+      "path": "/devices",
+      "policy": "adminsOnly",
+      "request": {
+        "entity": "Device",
+        "fields": [
+          "name",
+          "deviceType",
+          "zoneId",
+          "batteryLevel",
+          "isOnline"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "entity": "Device",
+      "method": "PATCH",
+      "operationId": "device.update",
+      "path": "/devices/{id}",
+      "policy": "adminsOnly",
+      "request": {
+        "entity": "Device",
+        "fields": [
+          "name",
+          "deviceType",
+          "zoneId",
+          "batteryLevel",
+          "isOnline"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "entity": "Device",
+      "method": "DELETE",
+      "operationId": "device.delete",
+      "path": "/devices/{id}",
+      "policy": "adminsOnly",
+      "type": "crud"
+    },
+    {
+      "description": "Admin sends remote reboot command to an unhealthy device. Sets device status to REBOOTING and initiates device reboot sequence.",
+      "entity": "Device",
+      "method": "POST",
+      "operationId": "device.reboot",
+      "path": "/devices/{id}/reboot",
+      "policy": "adminsOnly",
+      "rules": [
+        "deviceFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Device"
+      }
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Reading",
+      "filters": [
+        "deviceId",
+        "zoneId",
+        "metric"
+      ],
+      "method": "GET",
+      "operationId": "reading.list",
+      "pagination": true,
+      "path": "/readings",
+      "ranges": [
+        "recordedAt"
+      ],
+      "sort": [
+        "recordedAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Reading",
+      "method": "GET",
+      "operationId": "reading.get",
+      "path": "/readings/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Reading",
+      "method": "POST",
+      "operationId": "reading.create",
+      "path": "/readings",
+      "request": {
+        "entity": "Reading",
+        "fields": [
+          "deviceId",
+          "zoneId",
+          "metric",
+          "value",
+          "unit",
+          "recordedAt"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Detection",
+      "filters": [
+        "zoneId",
+        "deviceId",
+        "status",
+        "pestName"
+      ],
+      "method": "GET",
+      "operationId": "detection.list",
+      "pagination": true,
+      "path": "/detections",
+      "search": [
+        "pestName"
+      ],
+      "sort": [
+        "detectedAt",
+        "confidence"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Detection",
+      "method": "GET",
+      "operationId": "detection.get",
+      "path": "/detections/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Detection",
+      "method": "POST",
+      "operationId": "detection.create",
+      "path": "/detections",
+      "request": {
+        "entity": "Detection",
+        "fields": [
+          "deviceId",
+          "zoneId",
+          "pestName",
+          "confidence",
+          "snapshot",
+          "detectedAt"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "description": "Operator confirms a pending pest detection for greenhouse treatment. Changes status from PENDING to CONFIRMED and records reviewer information.",
+      "entity": "Detection",
+      "method": "POST",
+      "operationId": "detection.confirm",
+      "path": "/detections/{id}/confirm",
+      "policy": "operatorsOnly",
+      "rules": [
+        "detectionFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Detection"
+      }
+    },
+    {
+      "description": "Operator dismisses a pending pest detection as a false alarm. Changes status from PENDING to DISMISSED and records reviewer information.",
+      "entity": "Detection",
+      "method": "POST",
+      "operationId": "detection.dismiss",
+      "path": "/detections/{id}/dismiss",
+      "policy": "operatorsOnly",
+      "rules": [
+        "detectionFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Detection"
+      }
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Alert",
+      "filters": [
+        "zoneId",
+        "deviceId",
+        "status",
+        "metric"
+      ],
+      "method": "GET",
+      "operationId": "alert.list",
+      "pagination": true,
+      "path": "/alerts",
+      "search": [
+        "message"
+      ],
+      "sort": [
+        "triggeredAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Alert",
+      "method": "GET",
+      "operationId": "alert.get",
+      "path": "/alerts/{id}",
+      "type": "crud"
+    },
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Alert",
+      "method": "POST",
+      "operationId": "alert.create",
+      "path": "/alerts",
+      "request": {
+        "entity": "Alert",
+        "fields": [
+          "zoneId",
+          "deviceId",
+          "message",
+          "metric",
+          "thresholdValue",
+          "currentValue",
+          "triggeredAt"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "description": "Operator acknowledges an active alert. Changes status from ACTIVE to ACKNOWLEDGED, recording the operator user id and timestamp.",
+      "entity": "Alert",
+      "method": "POST",
+      "operationId": "alert.acknowledge",
+      "path": "/alerts/{id}/acknowledge",
+      "policy": "operatorsOnly",
+      "rules": [
+        "alertFlow",
+        "acknowledgedIsFinal"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Alert"
+      }
+    },
+    {
+      "operationId": "alert.countWhereStatusActive",
+      "type": "aggregate",
+      "entity": "Alert",
+      "method": "GET",
+      "path": "/alerts/aggregate/count-where-status-active",
+      "summary": "Active Alerts",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "ACTIVE"
+        }
+      }
+    },
+    {
+      "operationId": "detection.countWhereStatusPending",
+      "type": "aggregate",
+      "entity": "Detection",
+      "method": "GET",
+      "path": "/detections/aggregate/count-where-status-pending",
+      "summary": "Pending Detections",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "PENDING"
+        }
+      }
+    },
+    {
+      "operationId": "device.countWhereStatusUnhealthy",
+      "type": "aggregate",
+      "entity": "Device",
+      "method": "GET",
+      "path": "/devices/aggregate/count-where-status-unhealthy",
+      "summary": "Unhealthy Devices",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "UNHEALTHY"
+        }
+      }
+    },
+    {
+      "operationId": "device.countByStatus",
+      "type": "aggregate",
+      "entity": "Device",
+      "method": "GET",
+      "path": "/devices/aggregate/count-by-status",
+      "summary": "Devices by Status",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "status"
+      }
+    },
+    {
+      "operationId": "detection.countByPestName",
+      "type": "aggregate",
+      "entity": "Detection",
+      "method": "GET",
+      "path": "/detections/aggregate/count-by-pest-name",
+      "summary": "Detections by Pest",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "pestName"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "operatorsOnly",
+      "roles": [
+        "operator"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "adminsOnly",
+      "roles": [
+        "admin"
+      ],
+      "type": "role"
+    }
+  ],
+  "project": {
+    "description": "Monitoring app for a commercial greenhouse: sensor telemetry, pest detections, alerts, and remote device management.",
+    "name": "Verdant Greenhouse Monitor",
+    "slug": "verdant-greenhouse-monitor"
+  },
+  "relationships": [
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneDevices",
+      "onDelete": "RESTRICT",
+      "to": "Device",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneReadings",
+      "onDelete": "CASCADE",
+      "to": "Reading",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "deviceId",
+      "from": "Device",
+      "name": "deviceReadings",
+      "onDelete": "CASCADE",
+      "to": "Reading",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneDetections",
+      "onDelete": "CASCADE",
+      "to": "Detection",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "deviceId",
+      "from": "Device",
+      "name": "deviceDetections",
+      "onDelete": "CASCADE",
+      "to": "Detection",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "zoneId",
+      "from": "Zone",
+      "name": "zoneAlerts",
+      "onDelete": "CASCADE",
+      "to": "Alert",
+      "type": "one-to-many"
+    },
+    {
+      "foreignKey": "deviceId",
+      "from": "Device",
+      "name": "deviceAlerts",
+      "onDelete": "SET NULL",
+      "to": "Alert",
+      "type": "one-to-many"
+    }
+  ],
+  "rules": [
+    {
+      "description": "Alert status moves from ACTIVE to ACKNOWLEDGED.",
+      "entity": "Alert",
+      "id": "alertFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "ACTIVE": [
+            "ACKNOWLEDGED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Acknowledged alerts cannot be modified further.",
+      "entity": "Alert",
+      "id": "acknowledgedIsFinal",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "ACKNOWLEDGED"
+        ]
+      }
+    },
+    {
+      "description": "Detection status moves from PENDING to CONFIRMED or DISMISSED.",
+      "entity": "Detection",
+      "id": "detectionFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "PENDING": [
+            "CONFIRMED",
+            "DISMISSED"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Unhealthy device moves to REBOOTING upon reboot command.",
+      "entity": "Device",
+      "id": "deviceFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "HEALTHY": [
+            "UNHEALTHY"
+          ],
+          "UNHEALTHY": [
+            "REBOOTING"
+          ]
+        }
+      }
+    }
+  ],
+  "seed": [
+    {
+      "entity": "Zone",
+      "records": [
+        {
+          "code": "ZONE-A",
+          "description": "Main Bench Zone - Tropical Cultivars",
+          "name": "Zone A - North Green"
+        },
+        {
+          "code": "ZONE-B",
+          "description": "Propagation and Nursery Benches",
+          "name": "Zone B - South Propagation"
+        }
+      ]
+    },
+    {
+      "entity": "Device",
+      "records": [
+        {
+          "batteryLevel": 95,
+          "deviceType": "SENSOR",
+          "isOnline": true,
+          "name": "Zone A Multi-Sensor 01",
+          "status": "HEALTHY"
+        },
+        {
+          "batteryLevel": 18,
+          "deviceType": "SENSOR",
+          "isOnline": false,
+          "name": "Zone B Soil Probe 02",
+          "status": "UNHEALTHY"
+        },
+        {
+          "batteryLevel": 100,
+          "deviceType": "CAMERA",
+          "isOnline": true,
+          "name": "Bench Overhead Cam 01",
+          "status": "HEALTHY"
+        }
+      ]
+    },
+    {
+      "entity": "Alert",
+      "records": [
+        {
+          "currentValue": 1350,
+          "message": "CO2 above 1200 ppm for 10 minutes in Zone A",
+          "metric": "CO2",
+          "status": "ACTIVE",
+          "thresholdValue": 1200
+        }
+      ]
+    },
+    {
+      "entity": "Detection",
+      "records": [
+        {
+          "confidence": 94.5,
+          "pestName": "Aphid Cluster",
+          "snapshot": "https://images.unsplash.com/photo-1643000867361-cd545336249b?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8QXBoaWQlMjBDbHVzdGVyJTIwRGV0ZWN0aW9ufGVufDF8MHx8fDE3OTQzMDEwODZ8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+          "status": "PENDING"
+        }
+      ]
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  },
+  "features": [
+    {
+      "feature": "telemetry",
+      "on": "Reading",
+      "options": {
+        "device": "Device",
+        "deviceField": "deviceId",
+        "time": "recordedAt"
+      },
+      "entities": [],
+      "computed": []
+    }
+  ]
+}

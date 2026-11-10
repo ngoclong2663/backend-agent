@@ -43,6 +43,8 @@ class GenerationOptionsDto(CamelModel):
     business_workflows: bool | None = None
     # 2026-11-08: how a one-click generation's draft thinks (fast: FAST_DRAFT_MODELS); empty: DRAFT_SPEED
     draft_speed: Literal["fast", "thorough"] | None = None
+    # Epic 34 (D7): the design turn of a dynamic draft's theme; empty: DESIGN_THEMES
+    design_themes: bool | None = None
     timeout_seconds: int | None = Field(default=None, ge=60, le=7200)
     # Story 17.6: CRUD modules, models and tests from templates; false makes the engine write the whole backend.
     crud_from_templates: bool = True

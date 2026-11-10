@@ -83,6 +83,9 @@ class Config(BaseSettings):
     # Epic 26 (D7): the business layer of dynamic drafts: workflow discovery, frozen expectations, binding, the
     # guided tour and the evaluation. A draft request's `businessWorkflows` overrides it (to compare with it off).
     business_workflows: bool = True
+    # Epic 34 (D7): one LLM turn designs a dynamic app's colours and type for its product (checked by code, the design
+    # data's theme as the fallback). A draft request's `designThemes` overrides it; off: the design data's theme.
+    design_themes: bool = True
     # 2026-11-08: how a draft's model calls think. `thorough` uses each provider's model; `fast` its FAST_DRAFT_MODELS
     # entry (a pet adoption draft: 85 s instead of 15.6 min, with fewer of the requirement's rules). A draft request's
     # `draftSpeed` overrides it.

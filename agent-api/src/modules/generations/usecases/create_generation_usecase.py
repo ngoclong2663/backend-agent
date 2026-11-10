@@ -232,7 +232,7 @@ class CreateGenerationUsecase:
                 generation_id=gen_id,
                 inputs={  # Epic 26 D7 / Epic 24: the business layer and its provider, and the draft's speed
                     key: options[key]
-                    for key in ("businessWorkflows", "llmProvider", "draftSpeed")
+                    for key in ("businessWorkflows", "llmProvider", "draftSpeed", "designThemes")
                     if options.get(key) is not None
                 },
             )

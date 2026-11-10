@@ -68,7 +68,7 @@ from ..checks.consistency import check_spec_pair
 from ..store import JobStore
 from .app import BACKEND_EXAMPLE as APP_BACKEND_EXAMPLE
 from .app import app_flow, app_inputs, draft_app, outline_notes
-from .business import DraftBusiness, business_on, draft_model, draft_provider
+from .business import DraftBusiness, business_on, design_on, draft_model, draft_provider
 from .design_cards import (
     MAX_SEED,
     best_fit,
@@ -705,6 +705,26 @@ class DraftRunner:
         self.events = events
         self.redis = redis
 
+    def _designer(
+        self, draft: SpecDraftEntity, engine_name: str, state: Path, model: str | None, calls: list[dict[str, Any]]
+    ):
+        """Epic 34: the design turn on the draft's LLM provider (the business steps'); None when there is none."""
+        from ..business.flow import usage_record as provider_usage
+
+        provider = self.llm_provider or draft_provider(draft, engine_name)
+        if provider is None:
+            return None
+
+        async def designer(prompt: RenderedPrompt, schema: dict[str, Any]) -> dict[str, Any] | None:
+            if await self._is_cancelled(draft):
+                raise DraftCancelled("Draft cancelled")
+            answer = await provider.json("design_theme", prompt.text, schema, state_dir=state, model=model)
+            calls.append(provider_usage(provider, prompt.ref, answer, "design_theme"))
+            self.store.update_draft(draft.id, usage=usage_summary(calls))
+            return answer.data
+
+        return designer
+
     async def _is_cancelled(self, draft: SpecDraftEntity) -> bool:
         if self.redis is not None:
             try:
@@ -920,6 +940,7 @@ class DraftRunner:
                 self.store.update_draft(draft.id, usage=usage_summary(calls))
                 if described:
                     app_context = {**context, "requirement_text": described}
+            designer = self._designer(draft, engine.name, state, fast_model, calls) if design_on(draft) else None
             try:
                 outcome = await draft_app(
                     work,
@@ -931,6 +952,7 @@ class DraftRunner:
                     chosen=found[0] if found else None,
                     backend_file=BACKEND_FILE,
                     frontend_file=FRONTEND_FILE,
+                    designer=designer,
                 )
             except BaseException as exc:
                 trace.close({"status": "failed"}, error=f"{type(exc).__name__}: {exc}"[:500])

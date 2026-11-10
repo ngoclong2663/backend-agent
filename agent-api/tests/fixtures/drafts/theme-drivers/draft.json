@@ -1,0 +1,343 @@
+{
+  "draftId": "b1ebcdf1-b57d-4d7e-a864-42429bb1c4ee",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T08:48:34.496242Z",
+  "finishedAt": "2026-11-10T08:49:37.627444Z",
+  "assumptions": [
+    {
+      "path": "/entities/0/fields/7",
+      "message": "Set default parcelSize categories to SMALL, MEDIUM, LARGE enum values.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/1",
+      "message": "Included a DriverProfile entity to capture driver online availability toggle and dispatcher monitoring.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0/fields/8",
+      "message": "Delivery fee is set upon creation by the shop as indicated by requirement 'see new delivery offers with the fee'.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/domain",
+      "message": "Adopted drivers domain with courier area type for driver mobile interaction.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Food Delivery / On-Demand (Hero-Centric Design + Feature-Rich); palette Appetizing warm (orange/red) + trust blue + map accent; fonts Startup Bold (Outfit + Rubik) (Outfit / Rubik); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/relationships/0",
+      "message": "Delivery.driverId names a Driver (a person), not a DriverProfile: the relationship DriverProfile → Delivery was dropped",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/3/response",
+      "message": "delivery.accept: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/4/response",
+      "message": "delivery.confirmGoingToPickup: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5/response",
+      "message": "delivery.confirmPickedUp: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6/response",
+      "message": "delivery.confirmGoingToDropoff: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7/response",
+      "message": "delivery.completeDelivery: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features",
+      "message": "Built on the Courier domain",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/availability",
+      "message": "Availability added to User",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/proof-of-delivery",
+      "message": "Proof of delivery added to Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/tracking",
+      "message": "Tracking added to Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/1",
+      "message": "delivery.get: private to its Shop (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/2",
+      "message": "delivery.list: private to its Shop (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/4",
+      "message": "delivery.confirmGoingToPickup: only the record's own Shop may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5",
+      "message": "delivery.confirmPickedUp: only the record's own Shop may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6",
+      "message": "delivery.confirmGoingToDropoff: only the record's own Shop may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7",
+      "message": "delivery.completeDelivery: only the record's own Shop may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/8",
+      "message": "driverProfile.get: private to its Driver (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/theme",
+      "message": "The theme was designed for this product: High-visibility courier dispatch (the geometric type; High-visibility safety orange with warm asphalt neutrals and crisp geometric typography gives courier drivers and busy shop staff instant glanceability and confident touch targets on mobile.)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/domain",
+      "message": "'domain' is not valid (String should match pattern '^[a-z][a-z0-9-]*$'); left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "DriverProfile: title 'driverId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "DriverProfile: profile needs an image field; shown as record",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "DriverProfile: side needs an image, a video or an audio field; shown as stacked",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'material' replaced by 'playful': three quiet looks offer no choice",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Active Deliveries' is computed by delivery.count (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Unassigned Offers' is computed by delivery.countWhereStatusOffered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Delivered Today' is computed by delivery.countThisDayWhereStatusDelivered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Online Drivers' is computed by driverProfile.countWhereIsOnlineTrue (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (practical and fast to use on a phone, high contrast, a bright orange accent): accent #f97316 (designed as #ea580c)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/workflows",
+      "message": "3 workflow step(s) could not be bound to the app; see the Business tab",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/entities/0/fields/8",
+      "message": "Pricing/fee calculation logic: whether delivery fees are fixed, calculated by distance/parcel size, or manually entered by the shop.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/1",
+      "message": "Customer tracking authentication mechanism: whether tracking is accessed via a public magic link/token or requires customer account sign-in.",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ],
+  "usage": {
+    "calls": [
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "discover_workflows@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "discover_workflows",
+        "costSource": "account",
+        "durationMs": 8072,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 9504,
+        "outputTokens": 1364,
+        "promptSha256": "44b4dfeb344357b254f032a177bd12f63620d587e393ea195c400b45303ff3af",
+        "cacheReadTokens": 4058,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "expect_workflows@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "expect_workflows",
+        "costSource": "account",
+        "durationMs": 8617,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 9904,
+        "outputTokens": 1185,
+        "promptSha256": "a5ec54edc8af4f11be6055e92c8b735c278d23a5393b74df19e7f31fe799a9be",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity_json",
+        "prompt": "draft_app@v10",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "draft_app",
+        "costSource": "account",
+        "durationMs": 21844,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 46955,
+        "outputTokens": 5764,
+        "promptSha256": "64f560781f7a588cb4db97bd0b4de22a93189af29c4f83f15c7a686895546fc7",
+        "cacheReadTokens": 20400,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity_json",
+        "prompt": "repair_spec@v3",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "repair_spec",
+        "costSource": "account",
+        "durationMs": 4824,
+        "modelCalls": 1,
+        "inputTokens": 12806,
+        "outputTokens": 197,
+        "promptSha256": "dfc14a073fd18165486c8610b9c11a0b02f1fa044ba61e97e0a9f55c75ca8f24",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "design_theme@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "design_theme",
+        "costSource": "account",
+        "durationMs": 11089,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 9468,
+        "outputTokens": 3790,
+        "promptSha256": "e8066300bc4e734dee9565dc726c484a82ed3df21fcc46d040e34f74bad06f49",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "bind_workflows@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "bind_workflows",
+        "costSource": "account",
+        "durationMs": 8283,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 16735,
+        "outputTokens": 1612,
+        "promptSha256": "05f3795b197e36c958f91415adef29cda5d60ce7c94c4848fb92cc463cacd343",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      }
+    ],
+    "costUsd": 0.0,
+    "engineMs": 62729,
+    "unpriced": 0,
+    "modelCalls": 6,
+    "inputTokens": 105372,
+    "outputTokens": 13912
+  }
+}

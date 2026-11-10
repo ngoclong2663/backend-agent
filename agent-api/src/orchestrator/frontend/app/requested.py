@@ -36,10 +36,26 @@ def _photos_first(design: dict[str, Any]) -> list[str]:
     return sorted(set(changed))
 
 
-def _colors(theme: dict[str, Any], requested: dict[str, Any]) -> list[str]:
+def _colors(
+    theme: dict[str, Any], requested: dict[str, Any], designed: bool = False, requirement: str = ""
+) -> list[str]:
+    from ...drafting.themes import keeps
+
     preset = THEME_PRESETS.get(theme.get("style") or "") or THEME_PRESETS["minimal"]
     colors = {**preset["colors"], **(theme.get("colors") or {})}
     done = []
+
+    # Epic 34: a designed theme already follows the requested colours (code checked it); what it designed close to
+    # them stays (its own tinted surfaces), the design data's theme is painted over as before
+    def close(key: str, wanted: str | None) -> bool:
+        return designed and keeps(key, colors.get(key), wanted, requirement)
+
+    if close("primary", requested.get("accent")):
+        done.append(f"accent {requested['accent']} (designed as {colors['primary']})")
+        requested = {**requested, "accent": None}
+    if close("background", requested.get("background")):
+        done.append(f"background {requested['background']} (designed as {colors['background']})")
+        requested = {**requested, "background": None}
     if requested.get("accent"):
         colors["primary"] = colors["accent"] = requested[
             "accent"
@@ -73,14 +89,16 @@ def _colors(theme: dict[str, Any], requested: dict[str, Any]) -> list[str]:
     return done
 
 
-def follow_requested(outline: dict[str, Any], theme: dict[str, Any]) -> list[dict[str, Any]]:
+def follow_requested(
+    outline: dict[str, Any], theme: dict[str, Any], designed: bool = False, requirement: str = ""
+) -> list[dict[str, Any]]:
     """Applies `outline.design.requested` to `theme` (the app theme, in place) and to the views of the outline's
-    design and its areas' (in place); returns the notes."""
+    design and its areas' (in place); returns the notes. `designed`: the theme came from Epic 34's design turn."""
     design = outline.get("design") if isinstance(outline.get("design"), dict) else {}
     requested = design.get("requested") or {}
     if not requested:
         return []
-    done = _colors(theme, requested)
+    done = _colors(theme, requested, designed, requirement)
     kind = requested.get("headingFont")
     if kind:
         typography = theme.setdefault("typography", {})

@@ -31,6 +31,8 @@ class CreateSpecDraftRequestDto(CamelModel):
     llm_provider: Literal["antigravity", "claude_code", "gemini_api"] | None = None
     # `fast`: the provider's fast model (FAST_DRAFT_MODELS) for every model call of the draft; empty: DRAFT_SPEED
     draft_speed: Literal["fast", "thorough"] | None = None
+    # Epic 34 (D7): the design turn of a dynamic draft's theme (empty: DESIGN_THEMES)
+    design_themes: bool | None = None
 
 
 class CreateSpecDraftResponseDto(CamelModel):

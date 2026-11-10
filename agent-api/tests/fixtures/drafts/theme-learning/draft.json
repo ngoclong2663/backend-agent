@@ -1,0 +1,314 @@
+{
+  "draftId": "0b32cfce-f583-4291-b8b7-9dfb8b862670",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T08:47:04.375944Z",
+  "finishedAt": "2026-11-10T08:48:19.759551Z",
+  "assumptions": [
+    {
+      "path": "/seed",
+      "message": "Seed categories (Computer Science, Design & Creative, Business & Management) provided to satisfy requirement that courses must belong to an existing category.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0",
+      "message": "Created Category entity to support category browsing and administration.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities",
+      "message": "Deferred Course Review Submission and Lesson Q&A Discussion entities as explicitly stated not needed in this first version.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design/requested/accent",
+      "message": "Deep teal accent set to #005f73 matching requirement specification.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Online Course/E-learning (Feature-Rich Showcase + Social Proof); palette Vibrant learning colors + Progress green; fonts Friendly SaaS (Plus Jakarta Sans / Plus Jakarta Sans); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/entities/2/fields",
+      "message": "Lesson has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/9/response",
+      "message": "course.publish: it answers the Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "course.unpublish: it answers the Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/16/response",
+      "message": "lesson.complete: it answers the Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/17/response",
+      "message": "lesson.retakeQuiz: it answers the Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/21/response",
+      "message": "enrollment.resume: it answers a list of Enrollment",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/22/response",
+      "message": "enrollment.complete: it answers the Enrollment",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features",
+      "message": "Built on the Learning platform domain",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Enrollment",
+      "message": "'Enrollment' is now the Enrollment feature's (CourseEnrollment)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/enrollment",
+      "message": "Enrollment added to Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/completion",
+      "message": "Completion added to Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/comments",
+      "message": "Comments added to Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5",
+      "message": "course.list: who sees a record follows the visibility policy learnerCatalogVisibility",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6",
+      "message": "course.get: who sees a record follows the visibility policy learnerCatalogVisibility",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/9",
+      "message": "course.publish: only the record's own instructor may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/theme",
+      "message": "The theme was designed for this product: Reading room quiet: oiled timber desks, archival paper, and deep sea-teal ink (the humanist type; A deep teal palette grounded in subtle sea-glass neutrals evokes focused, studious discipline, paired with warm humanist typography and comfortable spacing to make lesson reading clear and unhurried.)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/nav/1",
+      "message": "Navigation item 'Enrollment' names no entity; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/entities/Enrollment",
+      "message": "Entity 'Enrollment' is not in the BackendSpec; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "Dashboard item 'Active Enrollments': no entity 'Enrollment'; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "Dashboard item 'Enrollments by Status': no entity 'Enrollment'; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "entity 'Enrollment' is not in the BackendSpec; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Published Courses' is computed by course.countWhereStatusPublished (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Completed Lessons' is computed by lesson.countWhereStatusCompleted (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (calm and studious, plenty of white space, a deep teal accent): accent #005f73 (designed as #005f73)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Courses are added from their category's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Lessons are added from their course's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/workflows",
+      "message": "2 workflow step(s) could not be bound to the app; see the Business tab",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations/course.unpublish",
+      "message": "Should instructors be permitted to unpublish their own published courses or is unpublishing restricted solely to administrators?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Lesson/fields/hasQuiz",
+      "message": "Will future versions require passing grade thresholds or question-level storage for quizzes rather than boolean quiz pass flags on lesson completion?",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ],
+  "usage": {
+    "calls": [
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "discover_workflows@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "discover_workflows",
+        "costSource": "account",
+        "durationMs": 10480,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 9485,
+        "outputTokens": 1758,
+        "promptSha256": "44b4dfeb344357b254f032a177bd12f63620d587e393ea195c400b45303ff3af",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "expect_workflows@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "expect_workflows",
+        "costSource": "account",
+        "durationMs": 10545,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 10539,
+        "outputTokens": 2045,
+        "promptSha256": "a5ec54edc8af4f11be6055e92c8b735c278d23a5393b74df19e7f31fe799a9be",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity_json",
+        "prompt": "draft_app@v10",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "draft_app",
+        "costSource": "account",
+        "durationMs": 33116,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 49423,
+        "outputTokens": 10072,
+        "promptSha256": "64f560781f7a588cb4db97bd0b4de22a93189af29c4f83f15c7a686895546fc7",
+        "cacheReadTokens": 20407,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "design_theme@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "design_theme",
+        "costSource": "account",
+        "durationMs": 5501,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 9669,
+        "outputTokens": 160,
+        "promptSha256": "e8066300bc4e734dee9565dc726c484a82ed3df21fcc46d040e34f74bad06f49",
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      {
+        "model": "gemini-3.8-flash-low",
+        "turns": 1,
+        "engine": "antigravity",
+        "prompt": "bind_workflows@v1",
+        "status": "ok",
+        "costUsd": 0.0,
+        "purpose": "bind_workflows",
+        "costSource": "account",
+        "durationMs": 15400,
+        "modelCalls": 1,
+        "structured": true,
+        "inputTokens": 43358,
+        "outputTokens": 3516,
+        "promptSha256": "05f3795b197e36c958f91415adef29cda5d60ce7c94c4848fb92cc463cacd343",
+        "cacheReadTokens": 16310,
+        "cacheWriteTokens": 0
+      }
+    ],
+    "costUsd": 0.0,
+    "engineMs": 75042,
+    "unpriced": 0,
+    "modelCalls": 5,
+    "inputTokens": 122474,
+    "outputTokens": 17551
+  }
+}

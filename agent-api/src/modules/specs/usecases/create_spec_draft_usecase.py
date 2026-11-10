@@ -27,6 +27,7 @@ class DraftRequest(BaseModel):
     business_workflows: bool | None = None  # Epic 26 D7
     llm_provider: str | None = None  # Epic 24
     draft_speed: str | None = None  # fast | thorough (empty: DRAFT_SPEED)
+    design_themes: bool | None = None  # Epic 34 D7
 
 
 class CreateSpecDraftUsecase:
@@ -65,6 +66,7 @@ class CreateSpecDraftUsecase:
                 ("businessWorkflows", request.business_workflows),
                 ("llmProvider", request.llm_provider),
                 ("draftSpeed", request.draft_speed),
+                ("designThemes", request.design_themes),  # Epic 34 (D7)
             ):
                 if value is not None:
                     inputs[key] = value

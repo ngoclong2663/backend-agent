@@ -96,6 +96,7 @@ lane, tracing, results, and an OpenAPI explorer that sends test calls to the run
 | 31 | [Sample videos: YouTube embeds and stock video files](epic31_sample_videos/epic31_sample_videos.md) (done 2026-11-09) | Phase 5 | 5 |
 | 32 | [Product patterns: screens that behave like the product](epic32_product_patterns/epic32_product_patterns.md) (done 2026-11-09) | Phase 5 | 8 |
 | 33 | [Domain plugins: apps built from what each kind of product really is](epic33_domain_plugins/epic33_domain_plugins.md) (done 2026-11-10) | Phase 5 | 14 |
+| 34 | [Designed themes: a palette and type made for the product](epic34_designed_themes/epic34_designed_themes.md) (done 2026-11-10) | Phase 5 | 5 |
 
 ### Suggested delivery order
 

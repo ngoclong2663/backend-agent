@@ -35,6 +35,14 @@ def business_on(draft: SpecDraftEntity) -> bool:
     return config.business_workflows if wanted is None else bool(wanted)
 
 
+def design_on(draft: SpecDraftEntity) -> bool:
+    """`designThemes` from the draft's request, else DESIGN_THEMES (Epic 34 D7); a fake-engine draft only when asked."""
+    wanted = (draft.inputs or {}).get("designThemes")
+    if wanted is None and draft.engine == "fake":
+        return False
+    return config.design_themes if wanted is None else bool(wanted)
+
+
 def draft_model(draft: SpecDraftEntity, engine_name: str) -> str | None:
     """The model of every call of a `fast` draft (its request's `draftSpeed`, else DRAFT_SPEED): the provider's
     FAST_DRAFT_MODELS entry; None for a thorough draft or a provider without one (its own model)."""

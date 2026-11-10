@@ -1812,8 +1812,9 @@ def app_frontend_spec(
     spec = _spec(name, project, theme, app, pages, forms, navigation)
     if screens.auth and any(page["id"] == "login" for page in pages):  # Story 22.7: the app signs in
         spec["auth"] = {"signIn": "login", "signUp": "register", "login": "auth.login", "me": "auth.me"}
+    every = contract_operations(contract)  # an area's screens know only its roles' operations: the note needs all
     for op_id in uncovered_operations(spec, contract):
-        found = screens.operations[op_id]
+        found = every[op_id]
         screens.unresolved.append(
             _note(
                 "/pages",

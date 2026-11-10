@@ -1,0 +1,55 @@
+# Story 34.5 — Final check
+
+**Epic:** [34 — Designed themes](epic34_designed_themes.md) · **Requirements:** FR-48
+
+## User story
+
+As the user, I want to see the designed themes on real drafts against today's, so that I can judge them.
+
+## Steps
+
+1. The reference requirements drafted again (one at a time); the measures against the baseline.
+2. A blind page: for each requirement, the old and the new theme as swatches and a type specimen, in random order; the user picks.
+
+## Acceptance criteria
+
+- [x] The measures and the blind page are recorded in this Status.
+
+## Status
+
+Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** Real drafts through the API as `admin@bga.local` (dynamic mode, Antigravity,
+`LLM_PROVIDER=antigravity`), one at a time, saved as `tests/fixtures/drafts/theme-<name>/`. Final round:
+
+| App | Draft | Time | Concept (the design turn's) | Pairing |
+|---|---|---|---|---|
+| Yarn shop | `52c9b6f7` | 90 s | Nordic Atelier: crisp bleached linen, soft mist grey, quiet botanical moss | geometric |
+| News | `65f27ef2` | 120 s | Morning press broadsheet, deep maritime navy ink on warm rag newsprint | editorial |
+| Learning | `0b32cfce` | 90 s | Reading room quiet: oiled timber desks, archival paper, deep sea-teal ink | humanist |
+| Drivers | `b1ebcdf1` | 75 s | High-visibility courier dispatch | geometric |
+| IoT | `a324f3e6` | 75 s | Sunlit Glasshouse & Living Canopy | geometric |
+| Socials | `6f76a16c` | 196 s | Electric night club screen, deep tinted obsidian stage with hot pink pulse | loud |
+
+Every theme was designed in one turn (no repair, no fallback). Measures against the baseline (`make theme-report`):
+clichés 1 → 0, grey surfaces 2 → 0, readable 6/6 → 6/6, mean hue gap 101° → 103°, apps sharing faces 2 → 3.
+
+Findings across four rounds, each fixed as a general rule with a regression test:
+1. The yarn shop: `follow_requested` repainted the designed surfaces grey from the requested white (34.4).
+2. Drivers: a multi-area app crashed the plan (`KeyError: 'delivery.driverEarningsWeek'`): an operation only a later
+   area may call and no screen covers was looked up among the first area's operations
+   (`tests/test_generation_fixes.py`).
+3. Drivers: the turn moved off the requested orange twice and was offered the plain-sans pairing the cliché check
+   refuses: the data's theme was kept. Code sets the requested accent; that pairing is not offered.
+4. Three of six took the first-listed pairing: the list follows the app's seed (still three `geometric` after it).
+5. IoT and news: the draft turned "leaf green" and "navy" into stock hexes the turn had to keep: a colour named only in
+   words is followed by its family.
+6. IoT: the draft seeded foreign keys with the parent's name (`zoneId: "Zone A - Tomato Benches"`), the repair didn't
+   fix it and the draft needed review: `fix_seed_references` points such a key at the parent's seed row.
+
+The blind page: `make theme-report ARGS="--html .data/theme-blind-test.html"` (each app's baseline and designed
+theme as swatches and a specimen, in random order, the key folded away). The user's picks: not yet recorded.
+
+Deviations: no app was generated with a designed theme (drafts only; the theme reaches the kit through the same
+FrontendSpec `theme` as before); the pairing choice still leans `geometric` (3 of 6); the colours the user asked for
+keep several primaries close to the baseline's, so most of the change is in the surfaces and the type.

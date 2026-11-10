@@ -1051,6 +1051,19 @@ _Implemented 2026-11-07 (Epic 25)._
 - **Never empty:** an IoT app's devices are simulated through the real ingestion API, so its dashboard has data from
   the first minute.
 
+### FR-48: Designed Themes (Epic 34, done 2026-11-10)
+
+- **One design turn:** after the draft, one LLM turn designs the app's theme for its product: a concept line, six
+  colours (one bold accent, neutrals tinted toward it), a font pairing from the bundled pairings, corners and density.
+  The guidance is our own: the product's world first, the requirement's look as the brief, the machine-made looks to
+  avoid.
+- **Code checks it:** AA text contrast, a primary readable as a button, a known pairing, no cliché (unless the user
+  asked for it), the requested accent, scheme and heading face kept; grey neutrals are tinted by code. One repair with
+  the reasons, then the design data's theme as the fallback, with a note either way.
+- **The requirement wins:** its requested look is applied after the designed theme, as before.
+- **Measured and switchable:** `make theme-report` measures the reference apps against a baseline; a blind page
+  compares old and new themes. `DESIGN_THEMES` (or a request's `designThemes`) turns it off.
+
 ---
 
 ## 5. BackendSpec Input Example

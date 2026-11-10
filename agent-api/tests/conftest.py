@@ -23,6 +23,8 @@ os.environ["FRONTEND_TREES"] = "false"
 os.environ["BACKEND_TESTS"] = "true"  # the validation and repair tests exercise the generated pytest suite
 # Epic 26: drafts keep their engine calls unchanged; the business layer tests turn it on per draft (businessWorkflows)
 os.environ["BUSINESS_WORKFLOWS"] = "false"
+# Epic 34: the design turn is off unless a test asks for it per draft (designThemes)
+os.environ["DESIGN_THEMES"] = "false"
 os.environ.setdefault("TEMPLATE_DIR", str(Path(__file__).parents[2] / ".data" / "fastapi-template"))
 # Pin settings a developer's .env may change (the Makefile exports .env into the test process).
 os.environ["DEFAULT_ENGINE"] = "claude_code"

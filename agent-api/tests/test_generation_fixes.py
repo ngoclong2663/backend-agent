@@ -105,3 +105,47 @@ def test_a_create_test_with_nothing_to_compare_reads_no_body():
     text = next(iter(module_tests(plan, spec, module).values()))
     created = text[text.index("def test_create_availability__ok") :].split("\n\n\n")[0]
     assert "body = response.json()" not in created
+
+
+def test_an_operation_only_a_later_area_may_call_and_no_screen_covers_is_a_note_not_a_crash():
+    """Drivers (Epic 34's final check): an earnings aggregate only drivers may call, on no screen, crashed the plan
+    (`KeyError: 'delivery.driverEarningsWeek'`): the note looked it up among the first area's operations only."""
+    from scripts.domain_report import FIXTURES as DOMAIN_FIXTURES
+    from src.modules.shared.domain.backend_spec import validate_spec_data
+    from src.orchestrator.backend.planner import build_plan
+    from src.orchestrator.drafting.app import app_theme
+    from src.orchestrator.frontend.app.outline import complete_outline
+    from src.orchestrator.frontend.app.screens import app_frontend_spec
+    from src.orchestrator.integration.contract import build_contract
+
+    folder = DOMAIN_FIXTURES / "drafts" / "domain-drivers-v10"
+    backend = json.loads((folder / "backend-spec.json").read_text())
+    week = next(op for op in backend["operations"] if op["operationId"] == "delivery.driverEarningsThisWeek")
+    backend["policies"].append({"name": "driversOnly", "type": "role", "roles": ["driver"]})
+    backend["operations"].append(
+        {**week, "operationId": "delivery.driverEarningsWeek", "path": "/driver/earnings/w", "policy": "driversOnly"}
+    )
+    backend = validate_spec_data(backend).normalized
+    contract = build_contract(backend, build_plan(backend))
+    outline, _ = complete_outline(json.loads((folder / "app-outline.json").read_text()), backend, contract)
+    planned = app_frontend_spec(backend, outline, app_theme(None), contract)
+    assert any("delivery.driverEarningsWeek (GET /driver/earnings/w) has no screen" in n["message"]
+               for n in planned.unresolved)  # fmt: skip
+
+
+def test_a_seed_foreign_key_written_as_its_parents_name_points_at_that_row():
+    """IoT (Epic 34's final check): the draft seeded `zoneId: "Zone A - Tomato Benches"` (the zone's name) and the
+    BackendSpec was invalid; the repair didn't fix it and the draft needed review."""
+    from src.orchestrator.drafting.app import fix_seed_references
+
+    data = json.loads((DRAFTS / "iot-seed-names" / "backend-spec.json").read_text())
+    assert validate_spec_data(json.loads(json.dumps(data))).report.errors
+    notes = fix_seed_references(data)
+    zones = next(s for s in data["seed"] if s["entity"] == "Zone")["records"]
+    devices = next(s for s in data["seed"] if s["entity"] == "Device")["records"]
+    assert devices[0]["zoneId"] == zones[0]["id"] and any("Zone A - Tomato Benches" in n["message"] for n in notes)
+    cameras = next(s for s in data["seed"] if s["entity"] == "PestDetection")["records"]
+    assert cameras[0]["deviceId"] == next(d["id"] for d in devices if d["name"] == "Bench Cam 1")
+    assert not [e for e in validate_spec_data(data).report.errors if e.code == "SEED_INVALID"]
+    unknown = {**data, "seed": [{"entity": "Device", "records": [{**devices[0], "zoneId": "Zone Z"}]}]}
+    assert not fix_seed_references(unknown) and unknown["seed"][0]["records"][0]["zoneId"] == "Zone Z"

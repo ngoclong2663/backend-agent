@@ -43,7 +43,7 @@ DEV_ENV := DB_URL=postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@loc
            VIDEO_PROVIDERS=$(VIDEO_PROVIDERS) YOUTUBE_API_KEY=$(YOUTUBE_API_KEY) PIXABAY_API_KEY=$(PIXABAY_API_KEY)
 
 .PHONY: env up down down-all ps logs dev dev-down dev-api dev-worker dev-ui setup venv migrate test lint template runner runner-node frontend-base icon-index \
-        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app design-plugin-new design-plugin-check domain-new feature-new domain-check domain-report app-design-report app-design-proto kit-test sample-media video-keys
+        host-worker host-worker-stop design-data design-diversity design-check-fixture design-check-app design-plugin-new design-plugin-check domain-new feature-new domain-check domain-report theme-report app-design-report app-design-proto kit-test sample-media video-keys
 
 env:
 	@test -f .env && echo ".env already exists" || ( \
@@ -145,6 +145,10 @@ domain-check:
 # The domains' UX tasks on the recorded drafts (Story 33.1): make domain-report [ARGS=--baseline]
 domain-report:
 	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.domain_report $(ARGS)
+
+# Epic 34: the reference apps' themes measured against the baseline: make theme-report [ARGS="--baseline" | "--html OUT"]
+theme-report:
+	cd $(API_DIR) && $(DEV_ENV) $(PY)/python -m scripts.theme_report $(ARGS)
 
 # The app design report (Story 23.1; Story 30.1: signed in, fingerprints, edge similarity): the golden apps, no model call.
 app-design-report:

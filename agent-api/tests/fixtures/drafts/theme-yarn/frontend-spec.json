@@ -1,0 +1,3126 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "Thread & Needle",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "An online shop for a small yarn and fabric store with inventory management, cart, checkout, and delivered product reviews."
+  },
+  "theme": {
+    "style": "playful",
+    "colorScheme": "light-dark",
+    "colors": {
+      "primary": "#8a9a5b",
+      "secondary": "#dfe5dc",
+      "accent": "#8a9a5b",
+      "background": "#f8f9fa",
+      "foreground": "#212529",
+      "muted": "#e9ecef",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Outfit",
+      "bodyFont": "Inter"
+    },
+    "radius": "none",
+    "density": "comfortable",
+    "direction": {
+      "productType": "E-commerce",
+      "pattern": "Feature-Rich Showcase",
+      "palette": "Brand primary + success green",
+      "fontPairing": "Classic Elegant",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "Thread & Needle",
+      "navigation": [
+        {
+          "label": "Shop Catalog",
+          "page": "products"
+        },
+        {
+          "label": "My Cart",
+          "page": "carts"
+        },
+        {
+          "label": "Orders",
+          "page": "orders"
+        },
+        {
+          "label": "Dashboard",
+          "page": "owners-home"
+        },
+        {
+          "label": "Shop Catalog",
+          "page": "owners-products"
+        },
+        {
+          "label": "My Cart",
+          "page": "owners-carts"
+        },
+        {
+          "label": "Orders",
+          "page": "owners-orders"
+        },
+        {
+          "label": "Reviews",
+          "page": "owners-reviews"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "Thread & Needle",
+    "tagline": "Online yarn and fabric shop",
+    "icon": "Scissors",
+    "nav": [
+      {
+        "entity": "Product",
+        "label": "Shop Catalog",
+        "icon": "Package"
+      },
+      {
+        "entity": "Cart",
+        "label": "My Cart",
+        "icon": "ShoppingCart"
+      },
+      {
+        "entity": "Order",
+        "label": "Orders",
+        "icon": "Receipt"
+      },
+      {
+        "entity": "Review",
+        "label": "Reviews",
+        "icon": "Star"
+      }
+    ],
+    "home": "Product",
+    "entities": {
+      "Product": {
+        "label": "Product",
+        "plural": "Products",
+        "displayField": "name",
+        "listFields": [
+          "name",
+          "category",
+          "color",
+          "price",
+          "stockCount"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "name",
+          "category",
+          "photo",
+          "color",
+          "dimension",
+          "price",
+          "stockCount",
+          "status",
+          "description",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "name": "Product Name",
+          "category": "Type",
+          "color": "Colour",
+          "dimension": "Weight / Width",
+          "price": "Price",
+          "stockCount": "In Stock",
+          "photo": "Photo",
+          "description": "Description",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {},
+        "create": "page"
+      },
+      "Cart": {
+        "label": "Cart",
+        "plural": "Carts",
+        "displayField": "id",
+        "listFields": [
+          "shopperId",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "shopperId",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "fieldLabels": {
+          "shopperId": "Shopper",
+          "status": "Cart Status",
+          "createdAt": "Created at",
+          "updatedAt": "Updated at"
+        },
+        "help": {}
+      },
+      "CartItem": {
+        "label": "Cart Item",
+        "plural": "Cart Items",
+        "displayField": "productId",
+        "listFields": [
+          "productId",
+          "quantity",
+          "price"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "cartId",
+          "productId",
+          "quantity",
+          "price",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "cartId": "Cart",
+          "productId": "Product",
+          "quantity": "Quantity",
+          "price": "Price",
+          "createdAt": "Created at"
+        },
+        "help": {}
+      },
+      "Order": {
+        "label": "Order",
+        "plural": "Orders",
+        "displayField": "id",
+        "listFields": [
+          "shopperId",
+          "status",
+          "paymentStatus",
+          "totalAmount"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "shopperId",
+          "totalAmount",
+          "status",
+          "paymentStatus",
+          "shippingAddress",
+          "createdAt",
+          "updatedAt"
+        ],
+        "fieldLabels": {
+          "shopperId": "Customer",
+          "totalAmount": "Total",
+          "status": "Fulfillment Status",
+          "paymentStatus": "Payment Status",
+          "shippingAddress": "Shipping address",
+          "createdAt": "Placed At",
+          "updatedAt": "Updated at"
+        },
+        "help": {}
+      },
+      "OrderItem": {
+        "label": "Order Item",
+        "plural": "Order Items",
+        "displayField": "productId",
+        "listFields": [
+          "productId",
+          "quantity",
+          "unitPrice",
+          "subtotal"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "orderId",
+          "productId",
+          "quantity",
+          "unitPrice",
+          "subtotal"
+        ],
+        "fieldLabels": {
+          "orderId": "Order",
+          "productId": "Product",
+          "quantity": "Quantity",
+          "unitPrice": "Unit Price",
+          "subtotal": "Subtotal"
+        },
+        "help": {}
+      },
+      "Review": {
+        "label": "Review",
+        "plural": "Reviews",
+        "displayField": "comment",
+        "listFields": [
+          "productId",
+          "rating",
+          "comment",
+          "status",
+          "createdAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "productId",
+          "rating",
+          "comment",
+          "status",
+          "createdAt",
+          "shopperId",
+          "orderId"
+        ],
+        "fieldLabels": {
+          "shopperId": "Shopper id",
+          "productId": "Product",
+          "orderId": "Delivered Order",
+          "rating": "Rating",
+          "comment": "Review",
+          "status": "Status",
+          "createdAt": "Created at"
+        },
+        "help": {},
+        "create": "onRecord"
+      }
+    },
+    "design": {
+      "archetype": "storefront",
+      "shell": "topbar",
+      "mobileNav": "bottom-tabs",
+      "frame": "wide",
+      "density": "comfortable",
+      "mainEntity": "Product",
+      "entities": {
+        "Product": {
+          "view": "media-grid",
+          "roles": {
+            "title": "name",
+            "media": "photo",
+            "price": "price",
+            "stat": "stockCount",
+            "badge": "category",
+            "meta": [
+              "color",
+              "dimension"
+            ]
+          },
+          "detailView": "media",
+          "filtersStyle": "chips",
+          "card": "stacked"
+        },
+        "Cart": {
+          "view": "table",
+          "roles": {
+            "badge": "status"
+          }
+        },
+        "CartItem": {
+          "view": "table",
+          "roles": {
+            "title": "productId",
+            "meta": [
+              "quantity",
+              "price"
+            ]
+          }
+        },
+        "Order": {
+          "view": "table",
+          "roles": {
+            "price": "totalAmount",
+            "badge": "status",
+            "meta": [
+              "createdAt"
+            ]
+          }
+        },
+        "OrderItem": {
+          "view": "table",
+          "roles": {
+            "title": "productId",
+            "price": "subtotal",
+            "meta": [
+              "quantity",
+              "unitPrice"
+            ]
+          }
+        },
+        "Review": {
+          "view": "feed",
+          "roles": {
+            "title": "productId",
+            "badge": "status",
+            "subtitle": "comment",
+            "meta": [
+              "rating",
+              "createdAt"
+            ]
+          }
+        }
+      },
+      "homeView": "catalogue",
+      "looks": [
+        {
+          "recipe": "minimal",
+          "reason": "The requirement asks for it",
+          "fontPairing": "geometric"
+        },
+        {
+          "recipe": "swiss",
+          "reason": "Flat grids and clean content-first structure supporting high typography legibility for craft specifications.",
+          "fontPairing": "workshop"
+        },
+        {
+          "recipe": "luxe",
+          "reason": "Boutique and tactile craft shop aesthetic with high-contrast rules and spacious imagery.",
+          "fontPairing": "humanist"
+        }
+      ],
+      "requested": {
+        "accent": "#8a9a5b",
+        "background": "#f8f9fa",
+        "scheme": "light",
+        "headingFont": "sans",
+        "corners": "sharp",
+        "photos": "prominent",
+        "words": "crisp, minimal and Scandinavian; white space, soft grey and a single moss green accent"
+      },
+      "seed": 1654316089,
+      "reason": "Shoppers browse yarn and fabric with photos and specifications, while shop owners track inventory and fulfill orders.",
+      "replaced": [
+        "Cart: title 'id' left out (no such field)",
+        "Order: title 'id' left out (no such field)",
+        "area 'shoppers': Cart: title 'id' left out (no such field)",
+        "area 'shoppers': Order: title 'id' left out (no such field)",
+        "area 'owners': Order: title 'id' left out (no such field)",
+        "area 'owners': Review: title 'table' left out (no such field)"
+      ],
+      "fontPairing": "geometric"
+    },
+    "areas": [
+      {
+        "id": "shoppers",
+        "label": "Shop",
+        "roles": [
+          "shopper"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "storefront",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "wide",
+          "mainEntity": "Product",
+          "entities": {
+            "Product": {
+              "view": "media-grid",
+              "roles": {
+                "title": "name",
+                "media": "photo",
+                "price": "price",
+                "stat": "stockCount",
+                "badge": "category",
+                "meta": [
+                  "color",
+                  "dimension"
+                ]
+              },
+              "detailView": "media-side",
+              "filtersStyle": "search-first",
+              "card": "stacked"
+            },
+            "Cart": {
+              "view": "table",
+              "roles": {
+                "badge": "status"
+              }
+            },
+            "CartItem": {
+              "view": "table",
+              "roles": {
+                "title": "productId",
+                "meta": [
+                  "quantity",
+                  "price"
+                ]
+              }
+            },
+            "Order": {
+              "view": "table",
+              "roles": {
+                "price": "totalAmount",
+                "badge": "status",
+                "meta": [
+                  "createdAt"
+                ]
+              }
+            },
+            "OrderItem": {
+              "view": "table",
+              "roles": {
+                "title": "productId",
+                "price": "subtotal",
+                "meta": [
+                  "quantity",
+                  "unitPrice"
+                ]
+              }
+            },
+            "Review": {
+              "view": "feed",
+              "roles": {
+                "title": "productId",
+                "badge": "status",
+                "subtitle": "comment",
+                "meta": [
+                  "rating",
+                  "createdAt"
+                ]
+              }
+            }
+          },
+          "homeView": "catalogue"
+        }
+      },
+      {
+        "id": "owners",
+        "label": "Management",
+        "roles": [
+          "shop_owner"
+        ],
+        "prefix": "/owners",
+        "design": {
+          "archetype": "back-office",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "standard",
+          "mainEntity": "Order",
+          "entities": {
+            "Product": {
+              "view": "media-grid",
+              "roles": {
+                "title": "name",
+                "media": "photo",
+                "price": "price",
+                "stat": "stockCount",
+                "badge": "category",
+                "meta": [
+                  "color",
+                  "dimension"
+                ]
+              },
+              "detailView": "media"
+            },
+            "Cart": {
+              "view": "table",
+              "roles": {}
+            },
+            "CartItem": {
+              "view": "table",
+              "roles": {}
+            },
+            "Order": {
+              "view": "table",
+              "roles": {
+                "price": "totalAmount",
+                "badge": "status",
+                "meta": [
+                  "createdAt"
+                ]
+              },
+              "detailView": "split-panel",
+              "filtersStyle": "chips",
+              "card": "text-first"
+            },
+            "OrderItem": {
+              "view": "table",
+              "roles": {
+                "title": "productId",
+                "price": "subtotal",
+                "meta": [
+                  "quantity",
+                  "unitPrice"
+                ]
+              }
+            },
+            "Review": {
+              "view": "table",
+              "roles": {
+                "badge": "status",
+                "subtitle": "comment",
+                "meta": [
+                  "rating",
+                  "createdAt"
+                ]
+              }
+            }
+          },
+          "homeView": "dashboard"
+        }
+      }
+    ],
+    "dashboard": [
+      {
+        "label": "Orders to Fulfill",
+        "kind": "figure",
+        "entity": "Order",
+        "fn": "count",
+        "filter": {
+          "status": "PAID"
+        }
+      },
+      {
+        "label": "Available Products",
+        "kind": "figure",
+        "entity": "Product",
+        "fn": "count",
+        "filter": {
+          "status": "AVAILABLE"
+        }
+      },
+      {
+        "label": "Published Reviews",
+        "kind": "figure",
+        "entity": "Review",
+        "fn": "count",
+        "filter": {
+          "status": "PUBLISHED"
+        }
+      }
+    ],
+    "workflows": {
+      "version": "04a631d9e5e1",
+      "tours": [
+        {
+          "id": "purchase_products",
+          "name": "Purchase Products",
+          "outcome": "Shopper pays for selected items and an order is placed",
+          "roles": [
+            "shopper"
+          ],
+          "steps": [
+            {
+              "id": "browse_items",
+              "role": "shopper",
+              "actor": "Shopper",
+              "title": "Browses products and selects yarn or fabric items. Rule: Item must be displayed with photo, colour, weight/width, price, and stock count",
+              "operationId": "product.get",
+              "page": "products-id",
+              "route": "/products/[id]",
+              "target": {
+                "section": "products-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "product"
+            },
+            {
+              "id": "add_to_cart",
+              "role": "shopper",
+              "actor": "Shopper",
+              "title": "Adds product to cart with chosen quantity (the cart becomes active). Rule: Quantity must be at least 1",
+              "operationId": "cartItem.create",
+              "statusAfter": "active",
+              "page": "products-id",
+              "route": "/products/[id]",
+              "target": {
+                "section": "products-detail",
+                "action": "add-cart-items"
+              },
+              "kind": "do",
+              "record": "cart"
+            },
+            {
+              "id": "update_cart",
+              "role": "shopper",
+              "actor": "Shopper",
+              "title": "Reviews cart and adjusts quantities if needed (the cart becomes active). Rule: Cart reflects updated item quantities and totals",
+              "operationId": "cartItem.update",
+              "statusAfter": "active",
+              "page": "cart-items-id-edit",
+              "route": "/cart-items/[id]/edit",
+              "target": {
+                "section": "cart-items-edit-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "cart",
+              "needs": {
+                "step": "add_to_cart",
+                "role": "shopper",
+                "status": "active"
+              }
+            },
+            {
+              "id": "checkout_order",
+              "role": "shopper",
+              "actor": "Shopper",
+              "title": "Submits checkout and completes payment (the order becomes paid). Rule: Payment must succeed and product stock decreases by purchased quantity",
+              "operationId": "checkout.submit",
+              "statusAfter": "paid",
+              "page": "orders",
+              "route": "/orders",
+              "target": {
+                "section": "orders-actions",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "order"
+            }
+          ]
+        },
+        {
+          "id": "fulfill_order",
+          "name": "Fulfill Order",
+          "outcome": "Order items are dispatched and delivered to the shopper",
+          "roles": [
+            "shop_owner"
+          ],
+          "steps": [
+            {
+              "id": "view_paid_orders",
+              "role": "shop_owner",
+              "actor": "Shop Owner",
+              "title": "Views paid customer orders (the order becomes paid). Rule: Only paid orders ready for shipment are listed",
+              "operationId": "order.get",
+              "statusAfter": "paid",
+              "page": "owners-orders-id",
+              "route": "/owners/orders/[id]",
+              "target": {
+                "section": "orders-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "order"
+            },
+            {
+              "id": "mark_shipped",
+              "role": "shop_owner",
+              "actor": "Shop Owner",
+              "title": "Marks order as shipped (the order becomes shipped). Rule: Order must be in paid status",
+              "operationId": "order.markShipped",
+              "statusAfter": "shipped",
+              "page": "owners-orders-id",
+              "route": "/owners/orders/[id]",
+              "target": {
+                "section": "orders-detail",
+                "action": "mark-shipped"
+              },
+              "kind": "do",
+              "record": "order"
+            },
+            {
+              "id": "mark_delivered",
+              "role": "shop_owner",
+              "actor": "Shop Owner",
+              "title": "Marks order as delivered (the order becomes delivered). Rule: Order must be in shipped status",
+              "operationId": "order.markDelivered",
+              "statusAfter": "delivered",
+              "page": "owners-orders-id",
+              "route": "/owners/orders/[id]",
+              "target": {
+                "section": "orders-detail",
+                "action": "mark-delivered"
+              },
+              "kind": "do",
+              "record": "order",
+              "needs": {
+                "step": "mark_shipped",
+                "role": "shop_owner",
+                "status": "shipped"
+              }
+            }
+          ]
+        },
+        {
+          "id": "manage_catalog_inventory",
+          "name": "Manage Catalog and Inventory",
+          "outcome": "Catalog items and stock counts are accurate and available for shoppers",
+          "roles": [
+            "shop_owner"
+          ],
+          "steps": [
+            {
+              "id": "save_product",
+              "role": "shop_owner",
+              "actor": "Shop Owner",
+              "title": "Creates or edits product with details, price, and stock level (the product becomes available). Rule: Product must include photo, colour, weight or width, price, and stock count",
+              "operationId": "product.create",
+              "statusAfter": "available",
+              "page": "owners-products-new",
+              "route": "/owners/products/new",
+              "target": {
+                "section": "product-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "product"
+            }
+          ]
+        },
+        {
+          "id": "review_product",
+          "name": "Review Product",
+          "outcome": "A customer review is published on the product",
+          "roles": [
+            "shopper"
+          ],
+          "steps": [
+            {
+              "id": "view_delivered_orders",
+              "role": "shopper",
+              "actor": "Shopper",
+              "title": "Views delivered orders and item history (the order becomes delivered). Rule: Order status must be delivered",
+              "operationId": "order.get",
+              "statusAfter": "delivered",
+              "page": "orders-id",
+              "route": "/orders/[id]",
+              "target": {
+                "section": "orders-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "order"
+            },
+            {
+              "id": "submit_review",
+              "role": "shopper",
+              "actor": "Shopper",
+              "title": "Submits review for the delivered product (the review becomes published). Rule: Can only review products from delivered orders",
+              "operationId": "review.submit",
+              "statusAfter": "published",
+              "page": "reviews",
+              "route": "/reviews",
+              "target": {
+                "section": "reviews-actions",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "review"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Products",
+      "sections": [
+        {
+          "id": "products-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "product.list",
+            "fields": [
+              "name",
+              "category",
+              "color",
+              "price",
+              "stockCount"
+            ]
+          },
+          "content": {
+            "entity": "Product",
+            "title": "Products",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "category",
+                "color",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "price",
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "products-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cart-items",
+      "route": "/cart-items",
+      "title": "Cart Items",
+      "sections": [
+        {
+          "id": "cart-items-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "cartItem.list",
+            "fields": [
+              "productId",
+              "quantity",
+              "price"
+            ]
+          },
+          "content": {
+            "entity": "CartItem",
+            "title": "Cart Items",
+            "style": "cards",
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "cart-items-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "cart-items-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cartItem.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this cart item? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart Item deleted"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cart-items-id",
+      "route": "/cart-items/[id]",
+      "title": "Cart Item",
+      "sections": [
+        {
+          "id": "cart-items-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "cartItem.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "cartId",
+              "productId",
+              "quantity",
+              "price",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "CartItem",
+            "title": "Cart Item",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "cart-items-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cartItem.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this cart item? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart Item deleted",
+                  "navigate": "cart-items"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cart-items-id-edit",
+      "route": "/cart-items/[id]/edit",
+      "title": "Edit cart item",
+      "sections": [
+        {
+          "id": "cart-items-edit-form",
+          "component": "AppForm",
+          "form": "cartItem_update",
+          "content": {
+            "entity": "CartItem"
+          }
+        }
+      ]
+    },
+    {
+      "id": "carts",
+      "route": "/carts",
+      "title": "Carts",
+      "sections": [
+        {
+          "id": "carts-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "cart.list",
+            "fields": [
+              "shopperId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Cart",
+            "title": "Carts",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "carts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cart.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this cart? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "carts-new",
+              "label": "New cart"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "carts-id",
+      "route": "/carts/[id]",
+      "title": "Cart",
+      "sections": [
+        {
+          "id": "carts-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "cart.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "shopperId",
+              "status",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Cart",
+            "title": "Cart",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cart.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this cart? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart deleted",
+                  "navigate": "carts"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "cart-items-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "cartItem.list",
+            "params": {
+              "cartId": "$route.id"
+            },
+            "fields": [
+              "productId",
+              "quantity",
+              "price"
+            ]
+          },
+          "content": {
+            "entity": "CartItem",
+            "title": "Cart Items",
+            "style": "cards",
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "cart-items-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "cart-items-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cartItem.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this cart item? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart Item deleted"
+                }
+              }
+            ],
+            "tab": "Cart Items"
+          }
+        }
+      ]
+    },
+    {
+      "id": "carts-new",
+      "route": "/carts/new",
+      "title": "New cart",
+      "sections": [
+        {
+          "id": "cart-create-form",
+          "component": "AppForm",
+          "form": "cart_create",
+          "content": {
+            "entity": "Cart"
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "order-items",
+      "route": "/order-items",
+      "title": "Order Items",
+      "sections": [
+        {
+          "id": "order-items-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "orderItem.list",
+            "fields": [
+              "productId",
+              "quantity",
+              "unitPrice",
+              "subtotal"
+            ]
+          },
+          "content": {
+            "entity": "OrderItem",
+            "title": "Order Items",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "order-items-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "order-items-id",
+      "route": "/order-items/[id]",
+      "title": "Order Item",
+      "sections": [
+        {
+          "id": "order-items-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "orderItem.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "orderId",
+              "productId",
+              "quantity",
+              "unitPrice",
+              "subtotal"
+            ]
+          },
+          "content": {
+            "entity": "OrderItem",
+            "title": "Order Item",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "orders",
+      "route": "/orders",
+      "title": "Orders",
+      "sections": [
+        {
+          "id": "orders-actions",
+          "component": "AppActions",
+          "content": {
+            "entity": "Order",
+            "actions": [
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "checkout.submit",
+                "onSuccess": {
+                  "toast": "Submit: done"
+                },
+                "form": "order_submit"
+              }
+            ]
+          }
+        },
+        {
+          "id": "orders-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "order.list",
+            "fields": [
+              "shopperId",
+              "status",
+              "paymentStatus",
+              "totalAmount"
+            ]
+          },
+          "content": {
+            "entity": "Order",
+            "title": "Orders",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "status",
+                "paymentStatus"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "orders-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "pay",
+                "label": "Pay",
+                "kind": "pay",
+                "operationId": "payments.checkout",
+                "params": {
+                  "recordId": "$record.id"
+                },
+                "allow": "pay"
+              }
+            ],
+            "create": {
+              "page": "orders-new",
+              "label": "New order"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "orders-id",
+      "route": "/orders/[id]",
+      "title": "Order",
+      "sections": [
+        {
+          "id": "orders-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "order.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "shopperId",
+              "totalAmount",
+              "status",
+              "paymentStatus",
+              "shippingAddress",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Order",
+            "title": "Order",
+            "actions": [
+              {
+                "id": "pay",
+                "label": "Pay",
+                "kind": "pay",
+                "operationId": "payments.checkout",
+                "params": {
+                  "recordId": "$route.id"
+                },
+                "allow": "pay"
+              }
+            ]
+          }
+        },
+        {
+          "id": "order-items-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "orderItem.list",
+            "params": {
+              "orderId": "$route.id"
+            },
+            "fields": [
+              "productId",
+              "quantity",
+              "unitPrice",
+              "subtotal"
+            ]
+          },
+          "content": {
+            "entity": "OrderItem",
+            "title": "Order Items",
+            "style": "cards",
+            "controls": {
+              "maxLimit": 100
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "order-items-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Order Items"
+          }
+        }
+      ]
+    },
+    {
+      "id": "orders-new",
+      "route": "/orders/new",
+      "title": "New order",
+      "sections": [
+        {
+          "id": "order-create-form",
+          "component": "AppForm",
+          "form": "order_create",
+          "content": {
+            "entity": "Order"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-home",
+      "route": "/owners",
+      "title": "Thread & Needle",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "order.countWhereStatusPaid"
+          },
+          "content": {
+            "label": "Orders to Fulfill",
+            "kind": "figure",
+            "entity": "Order",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "product.countWhereStatusAvailable"
+          },
+          "content": {
+            "label": "Available Products",
+            "kind": "figure",
+            "entity": "Product",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "review.countWhereStatusPublished"
+          },
+          "content": {
+            "label": "Published Reviews",
+            "kind": "figure",
+            "entity": "Review",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-products",
+          "component": "AppList",
+          "data": {
+            "operationId": "product.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "name",
+              "category",
+              "color"
+            ]
+          },
+          "content": {
+            "entity": "Product",
+            "title": "Recent products",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "category",
+                "color",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "price",
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-products-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "owners-products-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "product.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this product? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Product deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        },
+        {
+          "id": "recent-carts",
+          "component": "AppList",
+          "data": {
+            "operationId": "cart.list",
+            "fields": [
+              "shopperId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Cart",
+            "title": "Recent carts",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-carts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cart.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this cart? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-carts",
+      "route": "/owners/carts",
+      "title": "Carts",
+      "sections": [
+        {
+          "id": "carts-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "cart.list",
+            "fields": [
+              "shopperId",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Cart",
+            "title": "Carts",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-carts-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cart.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this cart? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "owners-carts-new",
+              "label": "New cart"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-carts-id",
+      "route": "/owners/carts/[id]",
+      "title": "Cart",
+      "sections": [
+        {
+          "id": "carts-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "cart.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "shopperId",
+              "status",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Cart",
+            "title": "Cart",
+            "actions": [
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "cart.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this cart? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Cart deleted",
+                  "navigate": "owners-carts"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-carts-new",
+      "route": "/owners/carts/new",
+      "title": "New cart",
+      "sections": [
+        {
+          "id": "cart-create-form",
+          "component": "AppForm",
+          "form": "owners_cart_create",
+          "content": {
+            "entity": "Cart"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-orders",
+      "route": "/owners/orders",
+      "title": "Orders",
+      "sections": [
+        {
+          "id": "orders-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "order.list",
+            "fields": [
+              "shopperId",
+              "status",
+              "paymentStatus",
+              "totalAmount"
+            ]
+          },
+          "content": {
+            "entity": "Order",
+            "title": "Orders",
+            "style": "table",
+            "controls": {
+              "filters": [
+                "status",
+                "paymentStatus"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-orders-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "owners-orders-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "mark-shipped",
+                "label": "Mark shipped",
+                "kind": "mutation",
+                "operationId": "order.markShipped",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Mark shipped: done"
+                }
+              },
+              {
+                "id": "mark-delivered",
+                "label": "Mark delivered",
+                "kind": "mutation",
+                "operationId": "order.markDelivered",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Mark delivered: done"
+                }
+              },
+              {
+                "id": "pay",
+                "label": "Pay",
+                "kind": "pay",
+                "operationId": "payments.checkout",
+                "params": {
+                  "recordId": "$record.id"
+                },
+                "allow": "pay"
+              }
+            ],
+            "create": {
+              "page": "owners-orders-new",
+              "label": "New order"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-orders-id",
+      "route": "/owners/orders/[id]",
+      "title": "Order",
+      "sections": [
+        {
+          "id": "orders-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "order.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "shopperId",
+              "totalAmount",
+              "status",
+              "paymentStatus",
+              "shippingAddress",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Order",
+            "title": "Order",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "owners-orders-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "mark-shipped",
+                "label": "Mark shipped",
+                "kind": "mutation",
+                "operationId": "order.markShipped",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Mark shipped: done"
+                }
+              },
+              {
+                "id": "mark-delivered",
+                "label": "Mark delivered",
+                "kind": "mutation",
+                "operationId": "order.markDelivered",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Mark delivered: done"
+                }
+              },
+              {
+                "id": "pay",
+                "label": "Pay",
+                "kind": "pay",
+                "operationId": "payments.checkout",
+                "params": {
+                  "recordId": "$route.id"
+                },
+                "allow": "pay"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-orders-id-edit",
+      "route": "/owners/orders/[id]/edit",
+      "title": "Edit order",
+      "sections": [
+        {
+          "id": "orders-edit-form",
+          "component": "AppForm",
+          "form": "owners_order_update",
+          "content": {
+            "entity": "Order"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-orders-new",
+      "route": "/owners/orders/new",
+      "title": "New order",
+      "sections": [
+        {
+          "id": "order-create-form",
+          "component": "AppForm",
+          "form": "owners_order_create",
+          "content": {
+            "entity": "Order"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-products",
+      "route": "/owners/products",
+      "title": "Products",
+      "sections": [
+        {
+          "id": "products-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "product.list",
+            "fields": [
+              "name",
+              "category",
+              "color",
+              "price",
+              "stockCount"
+            ]
+          },
+          "content": {
+            "entity": "Product",
+            "title": "Products",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "category",
+                "color",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "price",
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-products-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "owners-products-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "product.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this product? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Product deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "owners-products-new",
+              "label": "New product"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-products-id",
+      "route": "/owners/products/[id]",
+      "title": "Product",
+      "sections": [
+        {
+          "id": "products-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "product.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "category",
+              "photo",
+              "color",
+              "dimension",
+              "price",
+              "stockCount",
+              "status",
+              "description",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Product",
+            "title": "Product",
+            "actions": [
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "owners-products-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "product.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this product? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Product deleted",
+                  "navigate": "owners-products"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "reviews-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "params": {
+              "productId": "$route.id"
+            },
+            "fields": [
+              "rating",
+              "comment",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "shopperId",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Reviews"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-products-id-edit",
+      "route": "/owners/products/[id]/edit",
+      "title": "Edit product",
+      "sections": [
+        {
+          "id": "products-edit-form",
+          "component": "AppForm",
+          "form": "owners_product_update",
+          "content": {
+            "entity": "Product"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-products-new",
+      "route": "/owners/products/new",
+      "title": "New product",
+      "sections": [
+        {
+          "id": "product-create-form",
+          "component": "AppForm",
+          "form": "owners_product_create",
+          "content": {
+            "entity": "Product"
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-reviews",
+      "route": "/owners/reviews",
+      "title": "Reviews",
+      "sections": [
+        {
+          "id": "reviews-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "fields": [
+              "productId",
+              "rating",
+              "comment",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "shopperId",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "owners-reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "owners-reviews-id",
+      "route": "/owners/reviews/[id]",
+      "title": "Review",
+      "sections": [
+        {
+          "id": "reviews-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "review.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "productId",
+              "rating",
+              "comment",
+              "status",
+              "createdAt",
+              "shopperId",
+              "orderId"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Review",
+            "actions": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "payments-cancel",
+      "route": "/payments/cancel",
+      "title": "Payment",
+      "sections": [
+        {
+          "id": "payments-cancel",
+          "component": "AppPayment",
+          "data": {
+            "operationId": "payments.get",
+            "params": {
+              "paymentId": "$query.payment"
+            }
+          },
+          "content": {
+            "variant": "cancel",
+            "title": "Payment",
+            "entity": "Order"
+          }
+        }
+      ]
+    },
+    {
+      "id": "payments-success",
+      "route": "/payments/success",
+      "title": "Payment",
+      "sections": [
+        {
+          "id": "payments-success",
+          "component": "AppPayment",
+          "data": {
+            "operationId": "payments.get",
+            "params": {
+              "paymentId": "$query.payment"
+            }
+          },
+          "content": {
+            "variant": "success",
+            "title": "Payment",
+            "entity": "Order"
+          }
+        }
+      ]
+    },
+    {
+      "id": "products",
+      "route": "/products",
+      "title": "Products",
+      "sections": [
+        {
+          "id": "products-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "product.list",
+            "fields": [
+              "name",
+              "category",
+              "color",
+              "price",
+              "stockCount"
+            ]
+          },
+          "content": {
+            "entity": "Product",
+            "title": "Products",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "category",
+                "color",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt",
+                "price",
+                "name"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "products-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "products-id",
+      "route": "/products/[id]",
+      "title": "Product",
+      "sections": [
+        {
+          "id": "products-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "product.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "name",
+              "category",
+              "photo",
+              "color",
+              "dimension",
+              "price",
+              "stockCount",
+              "status",
+              "description",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Product",
+            "title": "Product",
+            "actions": [
+              {
+                "id": "add-cart-items",
+                "label": "Add to cart",
+                "kind": "mutation",
+                "operationId": "cartItem.create",
+                "form": "cartItem_create_on_product",
+                "onSuccess": {
+                  "toast": "Cart Item created"
+                }
+              },
+              {
+                "id": "add-reviews",
+                "label": "Add review",
+                "kind": "mutation",
+                "operationId": "review.create",
+                "form": "review_create_on_product",
+                "onSuccess": {
+                  "toast": "Review created"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "reviews-tab",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "params": {
+              "productId": "$route.id"
+            },
+            "fields": [
+              "rating",
+              "comment",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "shopperId",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ],
+            "tab": "Reviews"
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "reviews",
+      "route": "/reviews",
+      "title": "Reviews",
+      "sections": [
+        {
+          "id": "reviews-actions",
+          "component": "AppActions",
+          "content": {
+            "entity": "Review",
+            "actions": [
+              {
+                "id": "submit",
+                "label": "Submit",
+                "kind": "mutation",
+                "operationId": "review.submit",
+                "onSuccess": {
+                  "toast": "Submit: done"
+                },
+                "form": "review_submit"
+              }
+            ]
+          }
+        },
+        {
+          "id": "reviews-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "review.list",
+            "fields": [
+              "productId",
+              "rating",
+              "comment",
+              "status",
+              "createdAt"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Reviews",
+            "style": "cards",
+            "controls": {
+              "filters": [
+                "shopperId",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "createdAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "reviews-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "reviews-id",
+      "route": "/reviews/[id]",
+      "title": "Review",
+      "sections": [
+        {
+          "id": "reviews-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "review.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "productId",
+              "rating",
+              "comment",
+              "status",
+              "createdAt",
+              "shopperId",
+              "orderId"
+            ]
+          },
+          "content": {
+            "entity": "Review",
+            "title": "Review",
+            "actions": []
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "cartItem_create_on_product",
+      "operationId": "cartItem.create",
+      "fields": [
+        {
+          "name": "cartId",
+          "type": "string",
+          "label": "Cart",
+          "required": true,
+          "reference": {
+            "entity": "Cart",
+            "listOperation": "cart.list",
+            "detailOperation": "cart.get",
+            "labelField": "id"
+          }
+        },
+        {
+          "name": "productId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "label": "Quantity",
+          "required": true,
+          "min": 1
+        },
+        {
+          "name": "price",
+          "type": "decimal",
+          "label": "Price",
+          "required": true,
+          "min": 0
+        }
+      ],
+      "submitLabel": "Create cart item",
+      "onSuccess": {
+        "toast": "Cart Item created"
+      }
+    },
+    {
+      "id": "review_create_on_product",
+      "operationId": "review.create",
+      "fields": [
+        {
+          "name": "shopperId",
+          "type": "string",
+          "label": "Shopper id",
+          "required": true
+        },
+        {
+          "name": "productId",
+          "type": "string",
+          "hidden": true,
+          "value": "$route.id",
+          "required": true
+        },
+        {
+          "name": "orderId",
+          "type": "string",
+          "label": "Delivered Order",
+          "required": true,
+          "reference": {
+            "entity": "Order",
+            "listOperation": "order.list",
+            "detailOperation": "order.get",
+            "labelField": "id",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "rating",
+          "type": "integer",
+          "label": "Rating",
+          "required": true,
+          "min": 1,
+          "max": 5
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "label": "Review",
+          "required": true,
+          "maxLength": 1000
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Status",
+          "required": false,
+          "values": [
+            "PUBLISHED",
+            "REJECTED"
+          ],
+          "value": "PUBLISHED"
+        }
+      ],
+      "submitLabel": "Create review",
+      "onSuccess": {
+        "toast": "Review created"
+      }
+    },
+    {
+      "id": "cart_create",
+      "operationId": "cart.create",
+      "fields": [
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Cart Status",
+          "required": false,
+          "values": [
+            "ACTIVE"
+          ],
+          "value": "ACTIVE"
+        }
+      ],
+      "submitLabel": "Create cart",
+      "onSuccess": {
+        "toast": "Cart created",
+        "navigate": "carts-id"
+      }
+    },
+    {
+      "id": "cartItem_update",
+      "operationId": "cartItem.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "cartItem.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "cartId",
+          "type": "string",
+          "label": "Cart",
+          "required": false,
+          "reference": {
+            "entity": "Cart",
+            "listOperation": "cart.list",
+            "detailOperation": "cart.get",
+            "labelField": "id"
+          }
+        },
+        {
+          "name": "productId",
+          "type": "string",
+          "label": "Product",
+          "required": false,
+          "reference": {
+            "entity": "Product",
+            "listOperation": "product.list",
+            "detailOperation": "product.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "label": "Quantity",
+          "required": false,
+          "min": 1
+        },
+        {
+          "name": "price",
+          "type": "decimal",
+          "label": "Price",
+          "required": false,
+          "min": 0
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Cart Item saved",
+        "navigate": "cart-items-id"
+      }
+    },
+    {
+      "id": "order_submit",
+      "operationId": "checkout.submit",
+      "fields": [
+        {
+          "name": "cartId",
+          "type": "string",
+          "label": "Cart id",
+          "required": true
+        },
+        {
+          "name": "shippingAddress",
+          "type": "string",
+          "label": "Shipping address",
+          "required": false
+        }
+      ],
+      "submitLabel": "Submit",
+      "onSuccess": {
+        "toast": "Submit: done"
+      }
+    },
+    {
+      "id": "order_create",
+      "operationId": "order.create",
+      "fields": [
+        {
+          "name": "totalAmount",
+          "type": "decimal",
+          "label": "Total",
+          "required": true,
+          "min": 0,
+          "currency": "EUR"
+        },
+        {
+          "name": "shippingAddress",
+          "type": "string",
+          "label": "Shipping address",
+          "required": false,
+          "maxLength": 255
+        }
+      ],
+      "submitLabel": "Create order",
+      "onSuccess": {
+        "toast": "Order created",
+        "navigate": "orders-id"
+      }
+    },
+    {
+      "id": "review_submit",
+      "operationId": "review.submit",
+      "fields": [
+        {
+          "name": "productId",
+          "type": "string",
+          "label": "Product",
+          "required": true,
+          "reference": {
+            "entity": "Product",
+            "listOperation": "product.list",
+            "detailOperation": "product.get",
+            "labelField": "name",
+            "searchParam": "q",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "string",
+          "label": "Delivered Order",
+          "required": true,
+          "reference": {
+            "entity": "Order",
+            "listOperation": "order.list",
+            "detailOperation": "order.get",
+            "labelField": "id",
+            "limitParam": "limit",
+            "pageSize": 50
+          }
+        },
+        {
+          "name": "rating",
+          "type": "integer",
+          "label": "Rating",
+          "required": true,
+          "min": 1.0,
+          "max": 5.0
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "label": "Review",
+          "required": true
+        }
+      ],
+      "submitLabel": "Submit",
+      "onSuccess": {
+        "toast": "Submit: done"
+      }
+    },
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "owners_product_create",
+      "operationId": "product.create",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Product Name",
+          "required": true,
+          "maxLength": 160
+        },
+        {
+          "name": "category",
+          "type": "enum",
+          "label": "Type",
+          "required": true,
+          "values": [
+            "YARN",
+            "FABRIC"
+          ]
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "label": "Colour",
+          "required": true,
+          "maxLength": 60
+        },
+        {
+          "name": "dimension",
+          "type": "string",
+          "label": "Weight / Width",
+          "required": true,
+          "maxLength": 60
+        },
+        {
+          "name": "price",
+          "type": "decimal",
+          "label": "Price",
+          "required": true,
+          "min": 0
+        },
+        {
+          "name": "stockCount",
+          "type": "integer",
+          "label": "In Stock",
+          "required": false,
+          "min": 0,
+          "value": 0
+        },
+        {
+          "name": "photo",
+          "type": "string",
+          "label": "Photo",
+          "required": false,
+          "upload": {
+            "entity": "Product",
+            "field": "photo",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "label": "Description",
+          "required": false,
+          "maxLength": 2000
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Status",
+          "required": false,
+          "values": [
+            "AVAILABLE"
+          ],
+          "value": "AVAILABLE"
+        }
+      ],
+      "submitLabel": "Create product",
+      "onSuccess": {
+        "toast": "Product created",
+        "navigate": "owners-products-id"
+      }
+    },
+    {
+      "id": "owners_product_update",
+      "operationId": "product.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "product.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "label": "Product Name",
+          "required": false,
+          "maxLength": 160
+        },
+        {
+          "name": "category",
+          "type": "enum",
+          "label": "Type",
+          "required": false,
+          "values": [
+            "YARN",
+            "FABRIC"
+          ]
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "label": "Colour",
+          "required": false,
+          "maxLength": 60
+        },
+        {
+          "name": "dimension",
+          "type": "string",
+          "label": "Weight / Width",
+          "required": false,
+          "maxLength": 60
+        },
+        {
+          "name": "price",
+          "type": "decimal",
+          "label": "Price",
+          "required": false,
+          "min": 0
+        },
+        {
+          "name": "stockCount",
+          "type": "integer",
+          "label": "In Stock",
+          "required": false,
+          "min": 0
+        },
+        {
+          "name": "photo",
+          "type": "string",
+          "label": "Photo",
+          "required": false,
+          "upload": {
+            "entity": "Product",
+            "field": "photo",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "label": "Description",
+          "required": false,
+          "maxLength": 2000
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Status",
+          "required": false,
+          "values": [
+            "AVAILABLE"
+          ]
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Product saved",
+        "navigate": "owners-products-id"
+      }
+    },
+    {
+      "id": "owners_cart_create",
+      "operationId": "cart.create",
+      "fields": [
+        {
+          "name": "status",
+          "type": "enum",
+          "label": "Cart Status",
+          "required": false,
+          "values": [
+            "ACTIVE"
+          ],
+          "value": "ACTIVE"
+        }
+      ],
+      "submitLabel": "Create cart",
+      "onSuccess": {
+        "toast": "Cart created",
+        "navigate": "owners-carts-id"
+      }
+    },
+    {
+      "id": "owners_order_create",
+      "operationId": "order.create",
+      "fields": [
+        {
+          "name": "totalAmount",
+          "type": "decimal",
+          "label": "Total",
+          "required": true,
+          "min": 0,
+          "currency": "EUR"
+        },
+        {
+          "name": "shippingAddress",
+          "type": "string",
+          "label": "Shipping address",
+          "required": false,
+          "maxLength": 255
+        }
+      ],
+      "submitLabel": "Create order",
+      "onSuccess": {
+        "toast": "Order created",
+        "navigate": "owners-orders-id"
+      }
+    },
+    {
+      "id": "owners_order_update",
+      "operationId": "order.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "order.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "totalAmount",
+          "type": "decimal",
+          "label": "Total",
+          "required": false,
+          "min": 0,
+          "currency": "EUR"
+        },
+        {
+          "name": "shippingAddress",
+          "type": "string",
+          "label": "Shipping address",
+          "required": false,
+          "maxLength": 255
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Order saved",
+        "navigate": "owners-orders-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  },
+  "assets": [
+    {
+      "id": "seed-1",
+      "kind": "image",
+      "alt": "a group of yarn",
+      "source": "https://images.unsplash.com/photo-1668072587819-7b393944b426?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8Tm9yZGljJTIwV29vbCUyMFlhcm4lMjBQcm9kdWN0fGVufDF8MHx8fDE3OTQzMDAyODd8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Raelle Cameron",
+        "profileUrl": "https://unsplash.com/@raegocreative?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "eHm_wq_Ys7M"
+      }
+    },
+    {
+      "id": "seed-2",
+      "kind": "image",
+      "alt": "beige curtain",
+      "source": "https://images.unsplash.com/photo-1578500467296-441a11d5d55a?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8T3JnYW5pYyUyMFdhc2hlZCUyMExpbmVuJTIwUHJvZHVjdHxlbnwxfDB8fHwxNzk0MjE0ODMyfDA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Katsia Jazwinska",
+        "profileUrl": "https://unsplash.com/@katsiajazwinska?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "cTA8m7VwejE"
+      }
+    }
+  ]
+}

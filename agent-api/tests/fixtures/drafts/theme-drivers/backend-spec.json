@@ -1,0 +1,558 @@
+{
+  "auth": {
+    "roles": [
+      "Shop",
+      "Driver",
+      "Dispatcher"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "displayField": "customerName",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "shopId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "name": "driverId",
+          "nullable": true,
+          "required": false,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 255,
+          "name": "pickupAddress",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 255,
+          "name": "dropoffAddress",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 120,
+          "name": "customerName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 30,
+          "name": "customerPhone",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "parcelSize",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "SMALL",
+            "MEDIUM",
+            "LARGE"
+          ]
+        },
+        {
+          "min": 0,
+          "name": "fee",
+          "required": true,
+          "type": "decimal"
+        },
+        {
+          "default": "offered",
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "offered",
+            "accepted",
+            "going_to_pickup",
+            "picked_up",
+            "going_to_dropoff",
+            "delivered"
+          ]
+        },
+        {
+          "name": "dropoffPhoto",
+          "nullable": true,
+          "required": false,
+          "type": "image"
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "Delivery"
+    },
+    {
+      "displayField": "driverId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "name": "driverId",
+          "required": true,
+          "type": "uuid",
+          "unique": true
+        },
+        {
+          "default": false,
+          "name": "isOnline",
+          "required": true,
+          "type": "boolean"
+        },
+        {
+          "default": "now",
+          "name": "updatedAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "DriverProfile"
+    },
+    {
+      "name": "Availability",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "driverId",
+          "type": "uuid",
+          "required": true,
+          "unique": true
+        },
+        {
+          "name": "onlineSince",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.create",
+      "path": "/deliveries",
+      "policy": "shopOnly",
+      "request": {
+        "fields": [
+          "pickupAddress",
+          "dropoffAddress",
+          "customerName",
+          "customerPhone",
+          "parcelSize",
+          "fee"
+        ],
+        "entity": "Delivery"
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "Delivery",
+      "method": "GET",
+      "operationId": "delivery.get",
+      "path": "/deliveries/{id}",
+      "type": "crud",
+      "policy": "assignedDriverOnly"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "Delivery",
+      "filters": [
+        "status",
+        "shopId",
+        "driverId"
+      ],
+      "method": "GET",
+      "operationId": "delivery.list",
+      "pagination": true,
+      "path": "/deliveries",
+      "sort": [
+        "createdAt"
+      ],
+      "type": "crud",
+      "policy": "assignedDriverOnly"
+    },
+    {
+      "description": "Driver accepts an offered delivery. Driver must be online and carry only one active delivery. Status moves to accepted.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.accept",
+      "path": "/deliveries/{id}/accept",
+      "policy": "driverOnly",
+      "rules": [
+        "deliveryTransition"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "description": "Driver confirms they are heading to pickup location. Status moves to going_to_pickup.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.confirmGoingToPickup",
+      "path": "/deliveries/{id}/going-to-pickup",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryTransition"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "description": "Driver confirms parcel picked up from shop. Status moves to picked_up.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.confirmPickedUp",
+      "path": "/deliveries/{id}/picked-up",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryTransition"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "description": "Driver confirms they are heading to drop-off location. Status moves to going_to_dropoff.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.confirmGoingToDropoff",
+      "path": "/deliveries/{id}/going-to-dropoff",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryTransition"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "description": "Driver completes delivery with mandatory door photo. Status moves to delivered.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.completeDelivery",
+      "path": "/deliveries/{id}/complete",
+      "policy": "deliveryOwnerOnly",
+      "request": {
+        "fields": [
+          "dropoffPhoto"
+        ],
+        "entity": "Delivery"
+      },
+      "rules": [
+        "deliveryTransition",
+        "deliveredIsFinal"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "entity": "DriverProfile",
+      "method": "GET",
+      "operationId": "driverProfile.get",
+      "path": "/driver-profiles/{id}",
+      "type": "crud",
+      "policy": "driverProfileOwnDriver"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "entity": "DriverProfile",
+      "filters": [
+        "isOnline"
+      ],
+      "method": "GET",
+      "operationId": "driverProfile.list",
+      "pagination": true,
+      "path": "/driver-profiles",
+      "policy": "dispatcherOrDriver",
+      "type": "crud"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "entity": "DriverProfile",
+      "method": "PATCH",
+      "operationId": "driverProfile.update",
+      "path": "/driver-profiles/{id}",
+      "policy": "driverOnly",
+      "request": {
+        "fields": [
+          "isOnline"
+        ],
+        "entity": "DriverProfile"
+      },
+      "type": "crud"
+    },
+    {
+      "operationId": "availability.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "Availability",
+      "method": "GET",
+      "path": "/availabilities",
+      "auth": "jwt",
+      "policy": "ownAvailability",
+      "pagination": true
+    },
+    {
+      "operationId": "availability.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "Availability",
+      "method": "POST",
+      "path": "/availabilities",
+      "auth": "jwt",
+      "policy": "ownAvailability"
+    },
+    {
+      "operationId": "availability.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "Availability",
+      "method": "DELETE",
+      "path": "/availabilities/{id}",
+      "auth": "jwt",
+      "policy": "ownAvailability"
+    },
+    {
+      "operationId": "delivery.count",
+      "type": "aggregate",
+      "entity": "Delivery",
+      "method": "GET",
+      "path": "/deliveries/aggregate/count",
+      "summary": "Active Deliveries",
+      "aggregate": {
+        "fn": "count"
+      }
+    },
+    {
+      "operationId": "delivery.countWhereStatusOffered",
+      "type": "aggregate",
+      "entity": "Delivery",
+      "method": "GET",
+      "path": "/deliveries/aggregate/count-where-status-offered",
+      "summary": "Unassigned Offers",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "offered"
+        }
+      }
+    },
+    {
+      "operationId": "delivery.countThisDayWhereStatusDelivered",
+      "type": "aggregate",
+      "entity": "Delivery",
+      "method": "GET",
+      "path": "/deliveries/aggregate/count-this-day-where-status-delivered",
+      "summary": "Delivered Today",
+      "aggregate": {
+        "fn": "count",
+        "period": "day",
+        "dateField": "createdAt",
+        "filters": {
+          "status": "delivered"
+        }
+      }
+    },
+    {
+      "operationId": "driverProfile.countWhereIsOnlineTrue",
+      "type": "aggregate",
+      "entity": "DriverProfile",
+      "method": "GET",
+      "path": "/driver-profiles/aggregate/count-where-is-online-true",
+      "summary": "Online Drivers",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "isOnline": true
+        }
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "shopOnly",
+      "roles": [
+        "Shop"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "driverOnly",
+      "roles": [
+        "Driver"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "dispatcherOnly",
+      "roles": [
+        "Dispatcher"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "dispatcherOrDriver",
+      "roles": [
+        "Dispatcher",
+        "Driver"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "Dispatcher"
+      ],
+      "name": "assignedDriverOnly",
+      "ownerField": "driverId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownAvailability",
+      "type": "ownership",
+      "entity": "Availability",
+      "ownerField": "driverId"
+    },
+    {
+      "name": "driverProfileOwnDriver",
+      "type": "ownership",
+      "ownerField": "driverId",
+      "bypassRoles": [
+        "Dispatcher"
+      ]
+    },
+    {
+      "name": "deliveryOwnerOnly",
+      "type": "ownership",
+      "ownerField": "driverId",
+      "bypassRoles": []
+    }
+  ],
+  "project": {
+    "description": "A courier app for local shops, drivers, and dispatchers.",
+    "name": "Swiftdrop"
+  },
+  "relationships": [],
+  "rules": [
+    {
+      "description": "Allowed delivery status transition progression",
+      "entity": "Delivery",
+      "id": "deliveryTransition",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "accepted": [
+            "going_to_pickup"
+          ],
+          "going_to_dropoff": [
+            "delivered"
+          ],
+          "going_to_pickup": [
+            "picked_up"
+          ],
+          "offered": [
+            "accepted"
+          ],
+          "picked_up": [
+            "going_to_dropoff"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Delivered delivery status cannot change",
+      "entity": "Delivery",
+      "id": "deliveredIsFinal",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "delivered"
+        ]
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  },
+  "features": [
+    {
+      "feature": "availability",
+      "options": {
+        "personField": "driverId"
+      },
+      "entities": [
+        "Availability"
+      ],
+      "computed": [],
+      "on": "DriverProfile"
+    },
+    {
+      "feature": "proof-of-delivery",
+      "on": "Delivery",
+      "options": {
+        "state": "delivered",
+        "field": "dropoffPhoto"
+      },
+      "entities": [],
+      "computed": []
+    },
+    {
+      "feature": "tracking",
+      "on": "Delivery",
+      "options": {},
+      "entities": [],
+      "computed": []
+    }
+  ]
+}

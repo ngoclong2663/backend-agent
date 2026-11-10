@@ -268,6 +268,20 @@ Agent-specific notes:
   `AppPresence`, `AppChart`); kit parts in `components/app/features/`. The UX tasks: `tests/fixtures/domains/` and
   `frontend/app/domain_tasks.py` (`make domain-report [ARGS=--baseline|--replan]`). Screen feedback:
   `orchestrator/feedback.py`, `POST /api/v1/generations/{id}/feedback`, `GET /api/v1/generations/plugin-requests`.
+- Designed themes (Epic 34): `drafting/themes.py`. After `app_theme(chosen)` (the design data's theme), `draft_app`'s
+  `designer` (built in `DraftRunner._designer` on the draft's LLM provider; `DESIGN_THEMES` / a request's
+  `designThemes`; never for a fake-engine draft unless asked) renders `design_theme@v1` (the brief: requirement, name,
+  domain or archetype, main entities, the requested look, the data's category as a hint; the pairings
+  `pairing_candidates` offers) and answers six colours, a pairing, radius and density. `check_theme` gives the reasons
+  (contrast, a readable primary, the pairing, the clichés in `CLICHES` — excused when the user named the accent — the
+  requested accent, scheme and heading kind); one repair with them, then the data's theme. Passing: `designed` keeps
+  the destructive colour, style and direction; `tint_neutrals` tints pure-grey surfaces; `apply_pairing` puts the
+  pairing on the design and the leading look; `follow_requested` still runs after. `make theme-report` measures the
+  reference apps (`tests/fixtures/themes/`) against the baseline; `--html OUT` writes the blind page. `keeps`: a hex
+  the requirement gives is binding, a colour named only in words is followed by its family (hue within 25°, the page's
+  lightness); code sets a requested accent the answer left (`with_requested_accent`); plain-sans pairings are never
+  offered and the list follows the app's seed. `fix_seed_references` (drafting/app.py): a seed foreign key written as
+  the parent's name points at that parent's seed row.
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the
