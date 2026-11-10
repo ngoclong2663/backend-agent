@@ -72,3 +72,13 @@ Findings, each fixed with a regression test on the real drafted spec (`tests/tes
 Deviations: no socials generation (the user stopped it; it is to be tested on Claude Code); no requirement outside the
 domains was generated (the v9 prompt path is covered by tests); the walker's tours were not replayed (the static judge
 measures the tasks); a figure's ownership policy is not applied to its sum (a driver's earnings are everyone's).
+
+**Socials on Claude Code, 2026-11-10** (after Epic 34; `DEFAULT_ENGINE=claude_code`, drafts on `claude-haiku-5-5` by
+`DRAFT_SPEED=fast`, the code lanes on `claude-sonnet-5-5`): `gen_01M72B62EJ5AN94M6X011HG4G3` **COMPLETED**, every
+check, in 5 min ($0.55). The draft was recognized as socials, its theme designed in one turn ("Ring light after
+midnight", hot pink on a violet-tinted near-black, the loud pairing). Live, signed in as two new accounts: the feed
+(401 signed out), a like (201) and a second like (409 DUPLICATE), the clip's `likeCount` 1 → 2 and `myLikeId` for the
+liker only, unlike (204) back to 1, a comment and a reply under it, following the creator (`myCreatorFollowId`,
+`creatorFollowerCount` 1, a second follow 409). A new clip needs its video uploaded first (`FILE_NOT_FOUND` for a bare
+URL, as designed).
+
