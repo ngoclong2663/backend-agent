@@ -6,6 +6,7 @@
   "choose": "Mono headings, hairline borders, dense rows: developer and data tools only.",
   "family": "quiet",
   "css": "recipe.css",
+  "palette": "neutral",
   "order": 150,
   "archetypes": [
     "back-office",

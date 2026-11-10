@@ -6,6 +6,7 @@
   "choose": "High-contrast type, generous space, thin rules: premium catalogues, boutiques and venues; not for dense back offices.",
   "family": "bold",
   "css": "recipe.css",
+  "palette": "contrast",
   "order": 160,
   "archetypes": [
     "catalogue",

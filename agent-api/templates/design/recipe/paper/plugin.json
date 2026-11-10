@@ -6,6 +6,7 @@
   "choose": "Warm off-white, ruled lines, reading first: notes, articles, journals and course text.",
   "family": "quiet",
   "css": "recipe.css",
+  "palette": "paper",
   "order": 140,
   "archetypes": [
     "feed",

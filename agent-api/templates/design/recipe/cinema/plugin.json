@@ -6,6 +6,7 @@
   "choose": "Dark first, quiet surfaces, media first: videos, music and photos watched in the evening; not for products read like print.",
   "family": "bold",
   "css": "recipe.css",
+  "palette": "quiet-dark",
   "order": 130,
   "archetypes": [
     "catalogue",

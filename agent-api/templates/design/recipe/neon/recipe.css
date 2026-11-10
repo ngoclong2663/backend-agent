@@ -1,30 +1,6 @@
-@root, @dark {
-  --background: oklch(0.16 0.03 280);
-  --foreground: oklch(0.95 0.02 280);
-  --card: oklch(0.2 0.04 280);
-  --card-foreground: oklch(0.95 0.02 280);
-  --popover: oklch(0.2 0.04 280);
-  --popover-foreground: oklch(0.95 0.02 280);
-  --muted: oklch(0.26 0.04 280);
-  --muted-foreground: oklch(0.78 0.04 280);
-  --accent: oklch(0.3 0.08 300);
-  --accent-foreground: oklch(0.95 0.02 280);
-  --border: oklch(0.42 0.12 300 / 0.6);
-  --input: oklch(0.42 0.12 300 / 0.6);
-  --primary: oklch(0.82 0.17 195);
-  --primary-foreground: oklch(0.18 0.03 280);
-  --secondary: oklch(0.3 0.1 330);
-  --secondary-foreground: oklch(0.95 0.02 280);
-  --sidebar: oklch(0.18 0.035 280);
-  --sidebar-foreground: oklch(0.95 0.02 280);
-  --sidebar-accent: oklch(0.3 0.08 300);
-  --sidebar-accent-foreground: oklch(0.95 0.02 280);
-  --sidebar-border: oklch(0.42 0.12 300 / 0.6);
-  --radius: 0.25rem;
-  color-scheme: dark;
-}
+@root, @dark { --radius: 0.25rem; color-scheme: dark; }  /* the colours: palette mood 'tinted-dark' from the app's theme */
 @root h1, @root h2, @root h3 { letter-spacing: 0.02em; }
 @root h1 { text-shadow: 0 0 18px color-mix(in oklab, var(--primary) 60%, transparent); }
 @root [data-slot="card"] { border: 1px solid var(--border); box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 25%, transparent), 0 0 24px -8px color-mix(in oklab, var(--primary) 55%, transparent); }
 @root [data-slot="button"] { box-shadow: 0 0 16px -4px var(--primary); }
-@root body { background: radial-gradient(50rem 30rem at 80% -10%, oklch(0.35 0.15 320 / 0.45), transparent 70%), var(--background); }
+@root body { background: radial-gradient(50rem 30rem at 80% -10%, color-mix(in oklab, var(--primary) 35%, transparent), transparent 70%), var(--background); }

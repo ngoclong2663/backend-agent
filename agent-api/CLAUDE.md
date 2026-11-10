@@ -282,6 +282,10 @@ Agent-specific notes:
   lightness); code sets a requested accent the answer left (`with_requested_accent`); plain-sans pairings are never
   offered and the list follows the app's seed. `fix_seed_references` (drafting/app.py): a seed foreign key written as
   the parent's name points at that parent's seed row.
+- Recipe palettes (2026-11-10): a recipe never sets colour tokens; one with its own colours names a `palette` mood
+  (`plugin.json`) and `frontend/app/palettes.py` derives it from the app's built palette (`app_plan_theme` in
+  `frontend/app/plan.py`: pairing, mood, `readable_muted`; a dark mood makes the app dark-scheme). A one-scheme app is
+  drawn in its scheme (`siteConfig.colorScheme`, `forcedTheme` in the provider).
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

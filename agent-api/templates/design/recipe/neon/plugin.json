@@ -6,6 +6,7 @@
   "choose": "Dark, cyberpunk, glowing accents; never for health, finance or legal products.",
   "family": "bold",
   "css": "recipe.css",
+  "palette": "tinted-dark",
   "order": 100,
   "guards": [
     "health",

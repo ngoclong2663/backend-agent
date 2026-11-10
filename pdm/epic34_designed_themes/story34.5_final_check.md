@@ -68,3 +68,12 @@ Also: Claude Code's `error_max_structured_output_retries` (a Haiku draft) stoppe
 without the schema for it, as for a refused schema. Rerun `gen_01M72CCANHBBF2FBCKJ37679PQ` **COMPLETED**: 0 of 54
 public and 0 of 55 signed-in texts below AA (the first run's app: 30 and 6).
 
+**Recipe palettes from the app's colours, 2026-11-10 (the user's decision).** The five recipes that set every colour
+token themselves (neon: a cyan primary on violet whatever the app's theme) name a palette mood now (`plugin.json`
+`palette`); `frontend/app/palettes.py` derives the mood from the app's built palette (neon `tinted-dark`, cinema
+`quiet-dark`, luxe `contrast`, terminal `neutral`, paper `paper`), keeps the app's hue and makes the text readable; a
+dark mood makes the app a dark-scheme app (`plan.app_plan_theme`). Their CSS keeps the style only. On the socials app
+in the browser (each look applied over the built app): every look 0 texts below AA, in the app's pink
+(`.data/recipe-looks.html`, before and after). Tests: `tests/test_recipe_palettes.py` (each mood on four real themes:
+text 7:1, muted text and the primary's label 4.5:1, the hue within 20°, the mood's character).
+

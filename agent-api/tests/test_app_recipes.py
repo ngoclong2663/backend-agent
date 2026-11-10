@@ -92,11 +92,10 @@ def test_a_recipe_that_keeps_the_palette_takes_its_hues_from_the_theme():
 
     from src.orchestrator.frontend.app.recipes import recipe_blocks
 
-    literal = re.compile(r"oklch\(\s*[\d.]+\s+[\d.]+\s+[\d.]+|#[0-9a-fA-F]{6}\b")
-    for name, css in recipe_blocks().items():
-        if "--primary:" in css or "--background:" in css:
-            continue  # a recipe with its own palette (neon, cinema, paper, …) sets the tokens itself
-        assert not literal.findall(css), f"{name} hard-codes colours: {literal.findall(css)[:3]}"
+    literal = re.compile(r"oklch\(\s*[\d.]+\s+([\d.]+)\s+[\d.]+|#[0-9a-fA-F]{6}\b")
+    for name, css in recipe_blocks().items():  # every recipe: the five with their own palette name a mood now
+        hues = [m.group(0) for m in literal.finditer(css) if not (m.group(1) and float(m.group(1)) == 0)]
+        assert not hues, f"{name} hard-codes colours: {hues[:3]}"  # a neutral black shadow has no hue
 
 
 def test_a_one_scheme_app_is_drawn_in_its_scheme():

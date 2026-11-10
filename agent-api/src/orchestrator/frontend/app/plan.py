@@ -14,6 +14,7 @@ from ..planner import _UI_IMPORT, FRONTEND_PLAN_VERSION, _Planner, primitive_clo
 from ..theme import _readable, build_theme, mix
 from .design import kit_design
 from .files import design_plugins_used, frontend_plugins
+from .palettes import DARK_MOODS, mood_of, with_mood
 from .patterns import area_patterns
 from .recipes import first_recipe
 
@@ -92,6 +93,16 @@ def pairing_theme(theme: dict[str, Any], outline: dict[str, Any]) -> dict[str, A
         if value is not None:
             typography[key] = value
     return {**theme, "typography": typography}
+
+
+def app_plan_theme(theme: dict[str, Any], outline: dict[str, Any]) -> dict[str, Any]:
+    """The app's built theme: the look's font pairing (Story 30.6), its recipe's palette mood from the app's own
+    colours (2026-11-10; a dark-only mood makes it a dark-scheme app), the small text made readable (Story 30.3)."""
+    looked = pairing_theme(theme, outline)
+    mood = mood_of(first_recipe(outline.get("design") or {}) if outline.get("design") else None)
+    if mood in DARK_MOODS:
+        looked = {**looked, "colorScheme": "dark"}
+    return readable_muted(with_mood(build_theme(looked), mood))
 
 
 def design_plugins(outline: dict[str, Any]) -> list[dict[str, str]]:
@@ -194,6 +205,7 @@ def plan_app(spec: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]:
     outline = spec.get("app") or {}
     project = spec["project"]
     sections = sorted({s["component"] for route in routes for s in route["sections"] if s["component"] in APP_SECTIONS})
+    theme = app_plan_theme(spec["theme"], outline)
     return {
         "planVersion": FRONTEND_PLAN_VERSION,
         "project": {
@@ -215,7 +227,7 @@ def plan_app(spec: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]:
             "logo": None,
             "navigation": [],
             "footer": {"text": None, "links": []},
-            "themeToggle": spec["theme"]["colorScheme"] == "light-dark",
+            "themeToggle": theme["colorScheme"] == "light-dark",
         },
         "rendering": "app",
         "rendererGaps": [],
@@ -232,7 +244,7 @@ def plan_app(spec: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]:
         "routes": routes,
         "components": [],
         "shadcn": kit_primitives(plugins=frontend_plugins(contract), design=design_plugins(outline)),
-        "theme": readable_muted(build_theme(pairing_theme(spec["theme"], outline))),  # Story 30.6: the look's pairing
+        "theme": theme,
         "data": planner.data(routes),
         "forms": forms,
         "content": [],

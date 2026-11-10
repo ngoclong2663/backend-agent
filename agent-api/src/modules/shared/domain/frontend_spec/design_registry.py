@@ -122,6 +122,9 @@ class DesignPluginDescriptor(BaseModel):
     # recipes
     family: Literal["quiet", "soft", "bold"] | None = None
     guards: list[str] = []  # words of products it must never be used for (health, finance, …)
+    # 2026-11-10: the recipe's colours as a mood derived from the app's own palette (`frontend/app/palettes.py`);
+    # None: the recipe takes the theme's tokens as they are
+    palette: Literal["tinted-dark", "quiet-dark", "contrast", "neutral", "paper"] | None = None
     prefers: dict[str, str] = {}  # tie-breakers (Story 30.7): {"card": "overlay", "density": "compact", "view": …}
     # font pairings (Story 30.6): no kit file, the theme writes them
     heading: str | None = None

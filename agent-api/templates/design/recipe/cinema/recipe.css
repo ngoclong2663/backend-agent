@@ -1,30 +1,5 @@
 /* Style recipe cinema (Epic 30, Story 30.6): dark first, quiet surfaces, the media carries the colour. */
-@root, @dark {
-  --background: oklch(0.13 0.01 260);
-  --foreground: oklch(0.95 0.005 260);
-  --card: oklch(0.17 0.01 260);
-  --card-foreground: oklch(0.95 0.005 260);
-  --popover: oklch(0.17 0.01 260);
-  --popover-foreground: oklch(0.95 0.005 260);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.74 0.01 260);
-  --accent: oklch(0.24 0.015 260);
-  --accent-foreground: oklch(0.95 0.005 260);
-  --border: oklch(0.28 0.01 260);
-  --input: oklch(0.3 0.01 260);
-  --primary: oklch(0.9 0.02 260);
-  --primary-foreground: oklch(0.15 0.01 260);
-  --secondary: oklch(0.24 0.015 260);
-  --secondary-foreground: oklch(0.95 0.005 260);
-  --sidebar: oklch(0.11 0.01 260);
-  --sidebar-foreground: oklch(0.95 0.005 260);
-  --sidebar-accent: oklch(0.2 0.015 260);
-  --sidebar-accent-foreground: oklch(0.95 0.005 260);
-  --sidebar-border: oklch(0.24 0.01 260);
-  --radius: 0.5rem;
-  --destructive: oklch(0.74 0.18 25);  /* reads on the recipe's dark surfaces and a destructive item's hover tint */
-  color-scheme: dark;
-}
+@root, @dark { --radius: 0.5rem; color-scheme: dark; }  /* the colours: palette mood 'quiet-dark' from the app's theme */
 @root h1, @root h2, @root h3 { letter-spacing: -0.015em; }
 @root [data-slot="card"] { border: 1px solid transparent; box-shadow: none; background: var(--card); }
 @root [data-slot="card"]:hover { border-color: var(--border); }

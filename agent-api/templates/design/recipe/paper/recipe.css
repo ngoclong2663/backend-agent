@@ -1,48 +1,5 @@
 /* Style recipe paper (Epic 30, Story 30.6): warm off-white, ruled lines, reading first. */
-@root {
-  --background: oklch(0.975 0.012 85);
-  --foreground: oklch(0.25 0.02 60);
-  --card: oklch(0.99 0.008 85);
-  --card-foreground: oklch(0.25 0.02 60);
-  --popover: oklch(0.99 0.008 85);
-  --popover-foreground: oklch(0.25 0.02 60);
-  --muted: oklch(0.94 0.015 85);
-  --muted-foreground: oklch(0.48 0.02 60);
-  --accent: oklch(0.93 0.02 85);
-  --accent-foreground: oklch(0.25 0.02 60);
-  --border: oklch(0.86 0.02 80);
-  --input: oklch(0.86 0.02 80);
-  --secondary: oklch(0.93 0.02 85);
-  --secondary-foreground: oklch(0.25 0.02 60);
-  --sidebar: oklch(0.955 0.014 85);
-  --sidebar-foreground: oklch(0.25 0.02 60);
-  --sidebar-accent: oklch(0.91 0.02 85);
-  --sidebar-accent-foreground: oklch(0.25 0.02 60);
-  --sidebar-border: oklch(0.86 0.02 80);
-  --radius: 0.25rem;
-}
-@dark {
-  --background: oklch(0.2 0.015 60);
-  --foreground: oklch(0.93 0.015 85);
-  --card: oklch(0.24 0.015 60);
-  --card-foreground: oklch(0.93 0.015 85);
-  --popover: oklch(0.24 0.015 60);
-  --popover-foreground: oklch(0.93 0.015 85);
-  --muted: oklch(0.28 0.015 60);
-  --muted-foreground: oklch(0.75 0.015 85);
-  --accent: oklch(0.3 0.02 60);
-  --accent-foreground: oklch(0.93 0.015 85);
-  --border: oklch(0.36 0.015 60);
-  --input: oklch(0.36 0.015 60);
-  --secondary: oklch(0.3 0.02 60);
-  --secondary-foreground: oklch(0.93 0.015 85);
-  --sidebar: oklch(0.18 0.015 60);
-  --sidebar-foreground: oklch(0.93 0.015 85);
-  --sidebar-accent: oklch(0.28 0.02 60);
-  --sidebar-accent-foreground: oklch(0.93 0.015 85);
-  --sidebar-border: oklch(0.36 0.015 60);
-  --destructive: oklch(0.74 0.18 25);
-}
+@root { --radius: 0.25rem; }  /* the colours: palette mood 'paper' from the app's theme */
 @root h1, @root h2, @root h3 { font-family: var(--font-display), ui-serif, Georgia, serif; font-weight: 500; letter-spacing: 0; }
 @root [data-slot="card"] { box-shadow: none; border: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
 @root [data-slot="table"] tr { border-bottom-color: var(--border); }
