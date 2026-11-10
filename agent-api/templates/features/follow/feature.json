@@ -1,0 +1,141 @@
+{
+  "name": "follow",
+  "label": "Follow",
+  "status": "ready",
+  "attachesTo": "content",
+  "choose": "People follow who made a record (or its section) with one tap and see that they do; their feed shows what they follow.",
+  "replaces": [
+    "follow",
+    "follower",
+    "following",
+    "subscription",
+    "subscribe"
+  ],
+  "options": {
+    "subject": {
+      "default": "Author",
+      "help": "what is followed, as a name (Author, Creator, Section)"
+    },
+    "subjectField": {
+      "default": "authorId",
+      "help": "the target's field holding it (resolved by the domain: {author}, {section})"
+    }
+  },
+  "spec": {
+    "entities": [
+      {
+        "name": "{subject}Follow",
+        "displayField": "subject",
+        "fields": [
+          {
+            "name": "id",
+            "type": "uuid",
+            "primary": true
+          },
+          {
+            "name": "followerId",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "subject",
+            "type": "string",
+            "required": true,
+            "index": true,
+            "maxLength": 80
+          },
+          {
+            "name": "createdAt",
+            "type": "datetime",
+            "required": true,
+            "default": "now"
+          }
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "operationId": "{subjectCamel}Follow.create",
+        "type": "crud",
+        "action": "create",
+        "entity": "{subject}Follow",
+        "method": "POST",
+        "path": "/{subjectPath}-follows",
+        "auth": "jwt",
+        "policy": "own{subject}Follows"
+      },
+      {
+        "operationId": "{subjectCamel}Follow.delete",
+        "type": "crud",
+        "action": "delete",
+        "entity": "{subject}Follow",
+        "method": "DELETE",
+        "path": "/{subjectPath}-follows/{id}",
+        "auth": "jwt",
+        "policy": "own{subject}Follows"
+      }
+    ],
+    "policies": [
+      {
+        "name": "own{subject}Follows",
+        "type": "ownership",
+        "entity": "{subject}Follow",
+        "ownerField": "followerId"
+      }
+    ],
+    "rules": [
+      {
+        "id": "one{subject}FollowEach",
+        "kind": "uniqueTogether",
+        "entity": "{subject}Follow",
+        "params": {
+          "fields": [
+            "followerId",
+            "subject"
+          ]
+        }
+      }
+    ]
+  },
+  "computed": [
+    {
+      "field": "my{subject}FollowId",
+      "kind": "mine",
+      "entity": "{subject}Follow",
+      "key": "subject",
+      "match": "{subjectField}",
+      "owner": "followerId"
+    },
+    {
+      "field": "{subjectCamel}FollowerCount",
+      "kind": "count",
+      "entity": "{subject}Follow",
+      "key": "subject",
+      "match": "{subjectField}"
+    }
+  ],
+  "kit": {
+    "components": [
+      "ReactionButton"
+    ],
+    "slots": [
+      "follow-button"
+    ],
+    "toggles": [
+      {
+        "id": "follow-{subjectPath}",
+        "label": "Follow",
+        "reaction": "follow",
+        "create": "{subjectCamel}Follow.create",
+        "undo": "{subjectCamel}Follow.delete",
+        "state": "my{subject}FollowId",
+        "count": "{subjectCamel}FollowerCount",
+        "body": {
+          "subject": "$record.{subjectField}"
+        }
+      }
+    ]
+  },
+  "replacesAnywhere": true
+}

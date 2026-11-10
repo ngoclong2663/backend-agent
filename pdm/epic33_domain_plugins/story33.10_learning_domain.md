@@ -37,7 +37,7 @@ instructor I want to build a course from lessons, so that the app works like a r
 
 ## Acceptance criteria
 
-- [ ] A learner enrolls, resumes the last lesson from home in one click, completes a lesson, passes a quiz and sees
+- [x] A learner enrolls, resumes the last lesson from home in one click, completes a lesson, passes a quiz and sees
       their progress move; an instructor adds a lesson to a course.
 
 ## Verify
@@ -47,3 +47,14 @@ instructor I want to build a course from lessons, so that the app works like a r
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** `templates/domains/learning` (roles course and lesson; learners `catalogue`,
+instructors and admins `back-office`) with three features: **enrollment** (an `<Course>Enrollment` per learner,
+`myEnrollmentId`, `enrollmentCount`, an Enroll toggle), **completion** (a `<Lesson>Completion`, `myCompletionId` on the
+lesson, and on the course `myCompletedCount` (only the caller's rows) and `lessonCount` (computed fields may sit on
+another entity: `target`), a "Mark complete" toggle sending the lesson's course), and comments on the lesson. The type
+`course-catalogue` puts `AppResume` (Continue, with the progress bar) first on the learners' home. The real v10 draft
+merged all three and passes **5 of 5** tasks (baseline 2).
+
+Deviations: quizzes, reviews and certificates stay the model's entities; the classroom type is not built; the
+`learning` pattern is not added (the area uses `catalogue`).

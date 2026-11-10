@@ -1,0 +1,27 @@
+{
+  "name": "short-video-feed",
+  "label": "Short-video feed",
+  "status": "ready",
+  "choose": "One clip per screen with the like, comment and follow buttons on it; comments in a sheet; a profile grid.",
+  "areas": {
+    "members": {
+      "home": "feed",
+      "pages": [
+        {
+          "id": "feed",
+          "title": "Feed",
+          "route": "/",
+          "menu": true,
+          "sections": [
+            {
+              "slot": "media-feed",
+              "bind": {
+                "role": "content"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

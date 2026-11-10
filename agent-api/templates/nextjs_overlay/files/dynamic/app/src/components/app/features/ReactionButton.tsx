@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowBigUp, Bookmark, Heart } from "lucide-react";
+import { ArrowBigUp, Bookmark, CircleCheck, Heart, UserCheck, UserPlus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +12,9 @@ import { useOperationMutation } from "../bindings";
 import { errorMessage } from "../errors";
 import { recordOf, signal } from "../signals";
 
-const ICONS = { like: Heart, save: Bookmark, upvote: ArrowBigUp } as const;
+const ICONS = { like: Heart, save: Bookmark, upvote: ArrowBigUp, follow: UserPlus, complete: CircleCheck } as const;
+// what the button says once done (a follow reads "Following"); the others keep their label and fill their icon
+const DONE: Record<string, string> = { follow: "Following", complete: "Completed" };
 
 /** Epic 33 (the reactions feature): a like, save or upvote as a toggle. It shows whether the person already did it
  *  (the record's own-row field, `myLikeId`) and the count, changes both at once on a tap, and undoes on a second tap. */
@@ -27,7 +29,8 @@ export function ReactionButton({ action, record }: { action: TAppAction; record?
   useEffect(() => setOptimistic(null), [mine, count]); // the server's answer replaces the guess
   const on = optimistic?.on ?? Boolean(mine);
   const shown = optimistic?.count ?? count;
-  const Icon = ICONS[action.reaction ?? "like"] ?? Heart;
+  const kind = (action.reaction ?? "like") as keyof typeof ICONS;
+  const Icon = on && kind === "follow" ? UserCheck : (ICONS[kind] ?? Heart);
   const pending = add.isPending || remove.isPending;
 
   function toggle() {
@@ -61,8 +64,8 @@ export function ReactionButton({ action, record }: { action: TAppAction; record?
       className="gap-1.5"
     >
       <Icon className={cn("size-4", on && "fill-current")} aria-hidden />
-      <span>{action.label}</span>
-      <span className="tabular-nums">{shown}</span>
+      <span>{on && DONE[kind] ? DONE[kind] : action.label}</span>
+      {action.count && <span className="tabular-nums">{shown}</span>}
     </Button>
   );
 }

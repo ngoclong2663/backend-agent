@@ -30,8 +30,8 @@ curriculum, a driver's active job with its steps), so that I know my way around 
 
 ## Acceptance criteria
 
-- [ ] An area with a type gets the type's pages, every slot bound, and every operation reachable.
-- [ ] Areas without a type plan exactly as before.
+- [x] An area with a type gets the type's pages, every slot bound, and every operation reachable.
+- [x] Areas without a type plan exactly as before.
 
 ## Verify
 
@@ -40,3 +40,18 @@ curriculum, a driver's active job with its steps), so that I know my way around 
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** A type plugin (`templates/domains/<domain>/types/<type>/type.json`) lays out
+areas of its domain; the planner (`_Screens(kind=)`, `_area_type`) puts the type's home slots first on that area's home
+page: `resume-card` (`AppResume`), `availability-toggle` (`AppPresence`), `chart` (`AppChart`); record pages get the
+features' sections (`CommentThread`, `AppTimeline`, a device's `AppChart`) and toggles. Feature entities get no screens
+of their own; every other operation keeps today's screens, so coverage holds (the frontend validates on all five
+domains). The checked domain maps each of the draft's areas to its type by id or by its roles (a draft's `driver` area
+takes the courier type of the domain's `drivers`); a type stays only on an area it lays out. New kit sections:
+`AppResume`, `AppPresence`, `AppTimeline`, `AppChart` (recharts, the kit's), each in `components/app/features/`;
+`make kit-test` passes (type-check, build, routes, scenarios, the kit's tests). Found on the way: areas after the first
+dropped the forms only actions opened (a driver's "Complete delivery" dialog pointed at no form), fixed.
+
+Deviations: a type's pages other than the home are not built page by page (the slots the inventories name beyond the
+home are the features' parts on record pages and today's lists); single-area apps take no type (no area to map); the
+design-plugin gates (D6 of Epic 30) for the new sections are the kit tests, not `design-plugin-check`.

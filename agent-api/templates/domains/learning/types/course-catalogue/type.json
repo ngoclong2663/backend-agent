@@ -1,0 +1,33 @@
+{
+  "name": "course-catalogue",
+  "label": "Course catalogue",
+  "status": "ready",
+  "choose": "Self-paced courses: a catalogue to browse, a Continue card on the home, a lesson player with Mark complete.",
+  "areas": {
+    "learners": {
+      "home": "home",
+      "pages": [
+        {
+          "id": "home",
+          "title": "My learning",
+          "route": "/",
+          "menu": true,
+          "sections": [
+            {
+              "slot": "resume-card",
+              "bind": {
+                "feature": "enrollment"
+              }
+            },
+            {
+              "slot": "card-grid",
+              "bind": {
+                "role": "course"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "magazine",
+  "label": "Magazine",
+  "status": "ready",
+  "choose": "A front page with the lead story and the newest articles per section; clean article pages.",
+  "areas": {
+    "readers": {
+      "home": "front",
+      "pages": [
+        {
+          "id": "front",
+          "title": "Front page",
+          "route": "/",
+          "menu": true,
+          "sections": [
+            {
+              "slot": "card-list",
+              "bind": {
+                "role": "content"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

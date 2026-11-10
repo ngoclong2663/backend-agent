@@ -4,19 +4,96 @@
   "status": "ready",
   "order": 10,
   "choose": "A community where members post (clips, photos or text), react to and comment on each other's posts and follow people.",
-  "words": ["social", "community", "followers", "follow", "feed", "post", "posts", "clip", "clips", "short-video", "like", "likes", "creator", "creators", "members"],
+  "words": [
+    "social",
+    "community",
+    "followers",
+    "follow",
+    "feed",
+    "post",
+    "posts",
+    "clip",
+    "clips",
+    "short-video",
+    "like",
+    "likes",
+    "creator",
+    "creators",
+    "members"
+  ],
   "roles": {
-    "content": {"label": "Post", "words": ["post", "clip", "video", "photo", "story", "reel", "short"], "needs": ["author"]},
-    "member": {"label": "Member", "words": ["member", "user", "creator"], "person": true}
+    "content": {
+      "label": "Post",
+      "words": [
+        "post",
+        "clip",
+        "video",
+        "photo",
+        "story",
+        "reel",
+        "short"
+      ],
+      "needs": [
+        "author"
+      ]
+    },
+    "member": {
+      "label": "Member",
+      "words": [
+        "member",
+        "user",
+        "creator"
+      ],
+      "person": true
+    }
   },
   "areas": [
-    {"id": "members", "label": "Members", "people": ["member", "user", "creator", "viewer"], "pattern": "feed", "main": "content"},
-    {"id": "moderators", "label": "Moderation", "people": ["moderator", "admin", "staff"], "pattern": "back-office"}
+    {
+      "id": "members",
+      "label": "Members",
+      "people": [
+        "member",
+        "user",
+        "creator",
+        "viewer"
+      ],
+      "pattern": "feed",
+      "main": "content"
+    },
+    {
+      "id": "moderators",
+      "label": "Moderation",
+      "people": [
+        "moderator",
+        "admin",
+        "staff"
+      ],
+      "pattern": "back-office"
+    }
   ],
   "features": {
     "required": [
-      {"feature": "comments", "on": "content"},
-      {"feature": "reactions", "on": "content", "options": {"kinds": ["like"]}}
+      {
+        "feature": "comments",
+        "on": "content"
+      },
+      {
+        "feature": "reactions",
+        "on": "content",
+        "options": {
+          "kinds": [
+            "like"
+          ]
+        }
+      },
+      {
+        "feature": "follow",
+        "on": "content",
+        "options": {
+          "subject": "Creator",
+          "subjectField": "{author}"
+        }
+      }
     ],
     "optional": []
   }

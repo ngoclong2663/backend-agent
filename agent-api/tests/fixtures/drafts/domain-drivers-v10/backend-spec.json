@@ -1,0 +1,794 @@
+{
+  "auth": {
+    "loginField": "phone",
+    "roles": [
+      "shop_owner",
+      "driver",
+      "dispatcher",
+      "customer"
+    ],
+    "type": "jwt"
+  },
+  "entities": [
+    {
+      "description": "A courier parcel delivery order requested by a shop.",
+      "displayField": "customerName",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "shopId",
+          "required": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "driverId",
+          "nullable": true,
+          "required": false,
+          "type": "uuid"
+        },
+        {
+          "maxLength": 250,
+          "name": "pickupAddress",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 250,
+          "name": "dropoffAddress",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 120,
+          "name": "customerName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "maxLength": 30,
+          "name": "customerPhone",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "medium",
+          "name": "parcelSize",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "small",
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "default": 0,
+          "min": 0,
+          "name": "fee",
+          "required": true,
+          "type": "decimal"
+        },
+        {
+          "default": "pending",
+          "index": true,
+          "name": "status",
+          "required": true,
+          "type": "enum",
+          "values": [
+            "pending",
+            "assigned",
+            "going_to_pickup",
+            "picked_up",
+            "going_to_dropoff",
+            "delivered"
+          ]
+        },
+        {
+          "name": "doorPhoto",
+          "nullable": true,
+          "required": false,
+          "type": "image"
+        },
+        {
+          "name": "trackingCode",
+          "required": true,
+          "type": "string",
+          "unique": true
+        },
+        {
+          "default": "now",
+          "name": "createdAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "name": "deliveredAt",
+          "nullable": true,
+          "required": false,
+          "type": "datetime"
+        },
+        {
+          "name": "proofPhoto",
+          "type": "image"
+        }
+      ],
+      "name": "Delivery"
+    },
+    {
+      "description": "Tracks driver availability status for receiving parcel delivery offers.",
+      "displayField": "driverId",
+      "fields": [
+        {
+          "name": "id",
+          "primary": true,
+          "type": "uuid"
+        },
+        {
+          "index": true,
+          "name": "driverId",
+          "required": true,
+          "type": "uuid",
+          "unique": true
+        },
+        {
+          "default": false,
+          "index": true,
+          "name": "isOnline",
+          "required": true,
+          "type": "boolean"
+        },
+        {
+          "default": "now",
+          "name": "startedAt",
+          "required": true,
+          "type": "datetime"
+        },
+        {
+          "default": "now",
+          "name": "lastSeenAt",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "name": "DriverShift"
+    },
+    {
+      "name": "Availability",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "driverId",
+          "type": "uuid",
+          "required": true,
+          "unique": true
+        },
+        {
+          "name": "onlineSince",
+          "type": "datetime",
+          "required": true,
+          "default": "now"
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "required": true,
+          "unique": true,
+          "maxLength": 255
+        },
+        {
+          "name": "role",
+          "type": "enum",
+          "values": [
+            "shop_owner",
+            "driver",
+            "dispatcher",
+            "customer"
+          ],
+          "default": "shop_owner"
+        }
+      ],
+      "displayField": "phone"
+    }
+  ],
+  "operations": [
+    {
+      "action": "create",
+      "auth": "jwt",
+      "description": "Shop owner creates a new parcel delivery request with pickup, drop-off, customer details, and parcel size.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.create",
+      "path": "/deliveries",
+      "policy": "shopOwnersOnly",
+      "request": {
+        "entity": "Delivery",
+        "fields": [
+          "pickupAddress",
+          "dropoffAddress",
+          "customerName",
+          "customerPhone",
+          "parcelSize",
+          "fee"
+        ]
+      },
+      "type": "crud"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "description": "Get delivery details by ID. Shop owners, assigned drivers, and dispatchers can view details.",
+      "entity": "Delivery",
+      "method": "GET",
+      "operationId": "delivery.get",
+      "path": "/deliveries/{id}",
+      "type": "crud",
+      "policy": "assignedDriverOnly"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "List deliveries with filtering by status and pagination. Dispatchers see all, drivers see available offers or assigned jobs, shops see their own.",
+      "entity": "Delivery",
+      "filters": [
+        "status",
+        "driverId",
+        "shopId"
+      ],
+      "method": "GET",
+      "operationId": "delivery.list",
+      "pagination": true,
+      "path": "/deliveries",
+      "search": [
+        "customerName",
+        "pickupAddress",
+        "dropoffAddress",
+        "trackingCode"
+      ],
+      "sort": [
+        "createdAt",
+        "status"
+      ],
+      "type": "crud",
+      "policy": "assignedDriverOnly"
+    },
+    {
+      "action": "update",
+      "auth": "jwt",
+      "description": "Update delivery address or contact before it is picked up.",
+      "entity": "Delivery",
+      "method": "PATCH",
+      "operationId": "delivery.update",
+      "path": "/deliveries/{id}",
+      "policy": "shopOwnersOnly",
+      "request": {
+        "entity": "Delivery",
+        "fields": [
+          "pickupAddress",
+          "dropoffAddress",
+          "customerName",
+          "customerPhone",
+          "parcelSize"
+        ]
+      },
+      "rules": [
+        "cannotEditDelivered"
+      ],
+      "type": "crud"
+    },
+    {
+      "action": "delete",
+      "auth": "jwt",
+      "description": "Cancel/delete an unassigned delivery.",
+      "entity": "Delivery",
+      "method": "DELETE",
+      "operationId": "delivery.delete",
+      "path": "/deliveries/{id}",
+      "policy": "shopOwnersOnly",
+      "rules": [
+        "cannotEditDelivered"
+      ],
+      "type": "crud"
+    },
+    {
+      "auth": "none",
+      "description": "Public tracking endpoint for customers using tracking code without needing account authentication.",
+      "entity": "Delivery",
+      "method": "GET",
+      "operationId": "delivery.track",
+      "path": "/deliveries/track/{trackingCode}",
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      },
+      "policy": "assignedDriverOnly"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "description": "Driver retrieves their active ongoing delivery if any.",
+      "entity": "Delivery",
+      "method": "GET",
+      "operationId": "delivery.getMyActive",
+      "path": "/deliveries/active",
+      "policy": "driversOnly",
+      "type": "custom",
+      "response": {
+        "entity": "Delivery",
+        "type": "array"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Driver accepts an available pending delivery offer. Atomically sets driverId and transitions status to assigned. Fails if delivery is already claimed or if driver already has an active delivery.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.accept",
+      "path": "/deliveries/{id}/accept",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Assigned driver confirms they are on the way to pickup location. Status moves from assigned to going_to_pickup.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.goingToPickup",
+      "path": "/deliveries/{id}/going-to-pickup",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Assigned driver confirms parcel collection from shop at pickup address. Status moves from going_to_pickup to picked_up.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.pickedUp",
+      "path": "/deliveries/{id}/picked-up",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Assigned driver confirms heading toward the drop-off location. Status moves from picked_up to going_to_dropoff.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.goingToDropoff",
+      "path": "/deliveries/{id}/going-to-dropoff",
+      "policy": "deliveryOwnerOnly",
+      "rules": [
+        "deliveryFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "auth": "jwt",
+      "description": "Assigned driver confirms delivery completion by uploading a photo of the parcel at the door. Sets doorPhoto, deliveredAt timestamp, and transitions status to delivered. Rule: doorPhoto required.",
+      "entity": "Delivery",
+      "method": "POST",
+      "operationId": "delivery.deliver",
+      "path": "/deliveries/{id}/deliver",
+      "policy": "deliveryOwnerOnly",
+      "request": {
+        "entity": "Delivery",
+        "fields": [
+          "doorPhoto"
+        ]
+      },
+      "rules": [
+        "deliveryFlow"
+      ],
+      "type": "custom",
+      "response": {
+        "entity": "Delivery"
+      }
+    },
+    {
+      "aggregate": {
+        "dateField": "deliveredAt",
+        "field": "fee",
+        "filters": {
+          "status": "delivered"
+        },
+        "fn": "sum",
+        "period": "day"
+      },
+      "auth": "jwt",
+      "description": "Driver calculates total earnings for today from successfully delivered parcels.",
+      "entity": "Delivery",
+      "method": "GET",
+      "operationId": "delivery.driverEarningsToday",
+      "path": "/driver/earnings/today",
+      "policy": "assignedDriverOnly",
+      "type": "aggregate"
+    },
+    {
+      "aggregate": {
+        "dateField": "deliveredAt",
+        "field": "fee",
+        "filters": {
+          "status": "delivered"
+        },
+        "fn": "sum",
+        "period": "week"
+      },
+      "auth": "jwt",
+      "description": "Driver calculates total earnings for the current week from successfully delivered parcels.",
+      "entity": "Delivery",
+      "method": "GET",
+      "operationId": "delivery.driverEarningsThisWeek",
+      "path": "/driver/earnings/week",
+      "policy": "assignedDriverOnly",
+      "type": "aggregate"
+    },
+    {
+      "action": "get",
+      "auth": "jwt",
+      "description": "Driver fetches their current online/shift status.",
+      "entity": "DriverShift",
+      "method": "GET",
+      "operationId": "driverShift.get",
+      "policy": "driversOnly",
+      "type": "crud",
+      "path": "/driver-shifts/{id}"
+    },
+    {
+      "auth": "jwt",
+      "description": "Driver toggles or sets availability to online or offline to receive parcel delivery offers.",
+      "entity": "DriverShift",
+      "method": "POST",
+      "operationId": "driverShift.setOnline",
+      "path": "/driver-shift/toggle",
+      "policy": "driversOnly",
+      "request": {
+        "entity": "DriverShift",
+        "fields": [
+          "isOnline"
+        ]
+      },
+      "type": "custom"
+    },
+    {
+      "action": "list",
+      "auth": "jwt",
+      "description": "Dispatchers monitor all drivers and filter by online status.",
+      "entity": "DriverShift",
+      "filters": [
+        "isOnline"
+      ],
+      "method": "GET",
+      "operationId": "driverShift.list",
+      "pagination": true,
+      "path": "/driver-shifts",
+      "policy": "dispatchersOnly",
+      "sort": [
+        "lastSeenAt"
+      ],
+      "type": "crud"
+    },
+    {
+      "operationId": "availability.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "Availability",
+      "method": "GET",
+      "path": "/availabilities",
+      "auth": "jwt",
+      "policy": "ownAvailability",
+      "pagination": true
+    },
+    {
+      "operationId": "availability.create",
+      "type": "crud",
+      "action": "create",
+      "entity": "Availability",
+      "method": "POST",
+      "path": "/availabilities",
+      "auth": "jwt",
+      "policy": "ownAvailability"
+    },
+    {
+      "operationId": "availability.delete",
+      "type": "crud",
+      "action": "delete",
+      "entity": "Availability",
+      "method": "DELETE",
+      "path": "/availabilities/{id}",
+      "auth": "jwt",
+      "policy": "ownAvailability"
+    },
+    {
+      "operationId": "user.list",
+      "type": "crud",
+      "action": "list",
+      "entity": "User",
+      "method": "GET",
+      "path": "/users",
+      "summary": "Find a user",
+      "policy": "userDirectory",
+      "pagination": {
+        "defaultLimit": 20,
+        "maxLimit": 100
+      },
+      "search": [
+        "phone"
+      ],
+      "filters": [
+        "role"
+      ]
+    },
+    {
+      "operationId": "user.get",
+      "type": "crud",
+      "action": "get",
+      "entity": "User",
+      "method": "GET",
+      "path": "/users/{id}",
+      "summary": "A user",
+      "policy": "userDirectory"
+    },
+    {
+      "operationId": "delivery.countWhereStatusPending",
+      "type": "aggregate",
+      "entity": "Delivery",
+      "method": "GET",
+      "path": "/deliveries/aggregate/count-where-status-pending",
+      "summary": "Pending Offers",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "status": "pending"
+        }
+      }
+    },
+    {
+      "operationId": "delivery.countThisDayWhereStatusDelivered",
+      "type": "aggregate",
+      "entity": "Delivery",
+      "method": "GET",
+      "path": "/deliveries/aggregate/count-this-day-where-status-delivered",
+      "summary": "Delivered Today",
+      "aggregate": {
+        "fn": "count",
+        "period": "day",
+        "dateField": "createdAt",
+        "filters": {
+          "status": "delivered"
+        }
+      }
+    },
+    {
+      "operationId": "driverShift.countWhereIsOnlineTrue",
+      "type": "aggregate",
+      "entity": "DriverShift",
+      "method": "GET",
+      "path": "/driver-shifts/aggregate/count-where-is-online-true",
+      "summary": "Online Drivers",
+      "aggregate": {
+        "fn": "count",
+        "filters": {
+          "isOnline": true
+        }
+      }
+    },
+    {
+      "operationId": "delivery.countByStatus",
+      "type": "aggregate",
+      "entity": "Delivery",
+      "method": "GET",
+      "path": "/deliveries/aggregate/count-by-status",
+      "summary": "Deliveries by Status",
+      "aggregate": {
+        "fn": "count",
+        "groupBy": "status"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "name": "shopOwnersOnly",
+      "roles": [
+        "shop_owner"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "driversOnly",
+      "roles": [
+        "driver"
+      ],
+      "type": "role"
+    },
+    {
+      "name": "dispatchersOnly",
+      "roles": [
+        "dispatcher"
+      ],
+      "type": "role"
+    },
+    {
+      "bypassRoles": [
+        "dispatcher"
+      ],
+      "name": "shopDeliveryOwnership",
+      "ownerField": "shopId",
+      "type": "ownership"
+    },
+    {
+      "bypassRoles": [
+        "dispatcher"
+      ],
+      "name": "assignedDriverOnly",
+      "ownerField": "driverId",
+      "type": "ownership"
+    },
+    {
+      "name": "ownAvailability",
+      "type": "ownership",
+      "entity": "Availability",
+      "ownerField": "driverId"
+    },
+    {
+      "name": "driverShiftOwnDriver",
+      "type": "ownership",
+      "ownerField": "driverId",
+      "bypassRoles": [
+        "dispatcher"
+      ]
+    },
+    {
+      "name": "deliveryOwnerOnly",
+      "type": "ownership",
+      "ownerField": "driverId",
+      "bypassRoles": []
+    },
+    {
+      "name": "userDirectory",
+      "type": "role",
+      "roles": [
+        "shop_owner"
+      ]
+    }
+  ],
+  "project": {
+    "description": "A courier app for local shops, drivers, and dispatchers with delivery status flow and photo proof.",
+    "name": "Swiftdrop",
+    "slug": "swiftdrop"
+  },
+  "rules": [
+    {
+      "description": "Valid delivery status progression: pending -> assigned -> going_to_pickup -> picked_up -> going_to_dropoff -> delivered",
+      "entity": "Delivery",
+      "id": "deliveryFlow",
+      "kind": "transition",
+      "params": {
+        "field": "status",
+        "transitions": {
+          "assigned": [
+            "going_to_pickup"
+          ],
+          "going_to_dropoff": [
+            "delivered"
+          ],
+          "going_to_pickup": [
+            "picked_up"
+          ],
+          "pending": [
+            "assigned"
+          ],
+          "picked_up": [
+            "going_to_dropoff"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Delivered orders cannot be modified or deleted.",
+      "entity": "Delivery",
+      "id": "cannotEditDelivered",
+      "kind": "immutableAfter",
+      "params": {
+        "field": "status",
+        "states": [
+          "delivered"
+        ]
+      }
+    },
+    {
+      "description": "Driver shift uniqueness per driver.",
+      "entity": "DriverShift",
+      "id": "singleShiftPerDriver",
+      "kind": "ownerOnly",
+      "params": {
+        "ownerField": "driverId"
+      }
+    }
+  ],
+  "specVersion": "1.0",
+  "stack": {
+    "database": "postgresql",
+    "framework": "fastapi",
+    "migration": "alembic",
+    "orm": "sqlmodel"
+  },
+  "features": [
+    {
+      "feature": "availability",
+      "options": {
+        "personField": "driverId"
+      },
+      "entities": [
+        "Availability"
+      ],
+      "computed": [],
+      "on": "DriverShift"
+    },
+    {
+      "feature": "proof-of-delivery",
+      "on": "Delivery",
+      "options": {
+        "state": "delivered",
+        "field": "proofPhoto"
+      },
+      "entities": [],
+      "computed": []
+    },
+    {
+      "feature": "tracking",
+      "on": "Delivery",
+      "options": {},
+      "entities": [],
+      "computed": []
+    }
+  ],
+  "relationships": [
+    {
+      "name": "deliveryDriverId",
+      "type": "one-to-many",
+      "from": "User",
+      "to": "Delivery",
+      "foreignKey": "driverId",
+      "onDelete": "SET NULL"
+    }
+  ]
+}

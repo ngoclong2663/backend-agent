@@ -83,6 +83,8 @@ type FeatureComputedField = {
   key: string;
   where?: Record<string, unknown>;
   owner?: string | null;
+  match?: string | null;
+  target?: string | null;
 };
 
 type FieldDef = {

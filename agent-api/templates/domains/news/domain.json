@@ -1,0 +1,97 @@
+{
+  "name": "news",
+  "label": "News",
+  "status": "ready",
+  "order": 20,
+  "choose": "A news site: writers draft articles in sections, editors review and publish, readers read, save, follow sections and comment.",
+  "words": [
+    "news",
+    "article",
+    "articles",
+    "editor",
+    "editors",
+    "writer",
+    "writers",
+    "newsroom",
+    "headline",
+    "headlines",
+    "journalism",
+    "magazine",
+    "sections",
+    "publish",
+    "readers"
+  ],
+  "roles": {
+    "content": {
+      "label": "Article",
+      "words": [
+        "article",
+        "story",
+        "post",
+        "news"
+      ],
+      "needs": [
+        "section"
+      ]
+    },
+    "reader": {
+      "label": "Reader",
+      "words": [
+        "reader",
+        "user"
+      ],
+      "person": true
+    }
+  },
+  "areas": [
+    {
+      "id": "readers",
+      "label": "Readers",
+      "people": [
+        "reader",
+        "subscriber",
+        "visitor"
+      ],
+      "pattern": "feed",
+      "main": "content"
+    },
+    {
+      "id": "newsroom",
+      "label": "Newsroom",
+      "people": [
+        "writer",
+        "editor",
+        "journalist",
+        "staff",
+        "admin"
+      ],
+      "pattern": "back-office"
+    }
+  ],
+  "features": {
+    "required": [
+      {
+        "feature": "comments",
+        "on": "content"
+      },
+      {
+        "feature": "reactions",
+        "on": "content",
+        "options": {
+          "kinds": [
+            "save"
+          ]
+        }
+      },
+      {
+        "feature": "follow",
+        "on": "content",
+        "options": {
+          "subject": "Section",
+          "subjectField": "{section}"
+        }
+      }
+    ],
+    "optional": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "tracking",
+  "status": "ready",
+  "label": "Tracking",
+  "attachesTo": "delivery",
+  "choose": "Everyone involved follows a job's steps as a timeline.",
+  "kit": {
+    "slots": [
+      "timeline"
+    ]
+  }
+}

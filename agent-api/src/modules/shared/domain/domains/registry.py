@@ -123,12 +123,30 @@ class FeatureComputed(_Model):
     entity: str  # the feature's entity holding the rows (placeholders allowed: `{Target}Reaction`)
     key: str  # its foreign key to the target (`{target}Id`)
     where: dict[str, Any] = {}  # equality filters (`{"kind": "like"}`)
-    owner: str | None = None  # `mine`: the owner field compared with the caller
+    owner: str | None = None  # `mine`: the owner field compared with the caller; `count`: the caller's rows only
+    match: str | None = None  # the target's field the rows' key points at (placeholders allowed); none: its id
+    target: str | None = None  # another entity carrying the field (placeholders allowed: `{course}`)
+
+
+class FeatureToggle(_Model):
+    """A one-tap toggle the feature puts on its target's cards and page (a like, a save, a follow). Templated like the
+    spec (`{target}`, `{kind}`, `{record}` = the record's id in that place); `each: "kinds"` repeats it per kind."""
+
+    id: str
+    label: str
+    reaction: str  # its icon and its name in the tasks: like, save, upvote, follow, complete
+    create: str
+    undo: str | None = None
+    state: str  # the record's field holding the caller's own row id
+    count: str | None = None
+    body: dict[str, Any] = {}
+    each: str | None = None
 
 
 class FeatureKit(_Model):
     components: list[str] = []  # files under the feature's frontend/files, registered for its slots
     slots: list[str] = []
+    toggles: list[FeatureToggle] = []
 
 
 class FeatureDescriptor(_Model):
@@ -142,6 +160,9 @@ class FeatureDescriptor(_Model):
     computed: list[FeatureComputed] = []
     kit: FeatureKit = FeatureKit()
     replaces: list[str] = []  # drafted entity words the feature takes over (`comment`, `like`), dropped with a note
+    # True: a drafted entity named like one of `replaces` goes even when it doesn't point at the target (a follow
+    # points at a person, not at the post the button sits on)
+    replaces_anywhere: bool = Field(default=False, alias="replacesAnywhere")
     uses: list[str] = []  # other features it needs
 
 

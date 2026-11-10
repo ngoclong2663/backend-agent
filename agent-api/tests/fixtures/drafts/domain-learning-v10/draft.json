@@ -1,0 +1,262 @@
+{
+  "draftId": "0118e746-e14a-4e27-8828-cdc6180e321d",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T06:01:36.910810Z",
+  "finishedAt": "2026-11-10T06:03:00.771506Z",
+  "assumptions": [
+    {
+      "path": "/entities/Course/fields/5/default",
+      "message": "Set default course status to draft and enrollment status to active upon creation.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design/requested/accent",
+      "message": "Configured deep teal #005f73 as requested accent color to match the calm and studious aesthetic.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/entities/Review/fields/3",
+      "message": "Included 1-5 integer star rating and optional text comment for course reviews based on requirement description.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Online Course/E-learning (Feature-Rich Showcase + Social Proof); palette Vibrant learning colors + Progress green; fonts Friendly SaaS (Plus Jakarta Sans / Plus Jakarta Sans); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/entities/2/fields",
+      "message": "Lesson has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "course.publish: it answers the Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/11/response",
+      "message": "course.unpublish: it answers the Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/17/response",
+      "message": "lesson.start: it answers the Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/26/response",
+      "message": "enrollment.complete: it answers the Enrollment",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features",
+      "message": "Built on the Learning platform domain",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Enrollment",
+      "message": "'Enrollment' is now the Enrollment feature's (CourseEnrollment)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/enrollment",
+      "message": "Enrollment added to Course",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/LessonProgress",
+      "message": "'LessonProgress' is now the Completion feature's (LessonCompletion)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/completion",
+      "message": "Completion added to Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/comments",
+      "message": "Comments added to Lesson",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/2/fields",
+      "message": "Lesson has a video but no image field: its player shows the first frame as the poster",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6",
+      "message": "course.get: who sees a record follows the visibility policy publishedCoursesOnly",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7",
+      "message": "course.list: who sees a record follows the visibility policy publishedCoursesOnly",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10",
+      "message": "course.publish: only the record's own instructor may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/27",
+      "message": "review.get: made by its learner for everyone (every other role reads it)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/28",
+      "message": "review.list: made by its learner for everyone (every other role reads it)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/8",
+      "message": "course.update: 'status' changes only through its actions (course.publish, course.unpublish)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/15",
+      "message": "lesson.update: 'status' changes only through its actions (lesson.start)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/nav/2",
+      "message": "Navigation item 'Enrollment' names no entity; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/entities/Enrollment",
+      "message": "Entity 'Enrollment' is not in the BackendSpec; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/entities/LessonProgress",
+      "message": "Entity 'LessonProgress' is not in the BackendSpec; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "Dashboard item 'Active Enrollments': no entity 'Enrollment'; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "Dashboard item 'Completed Enrollments': no entity 'Enrollment'; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "Dashboard item 'Average Course Rating': 'avg' needs a number field of Review; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "entity 'Enrollment' is not in the BackendSpec; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Course: stat 'rating' left out (no such field)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Published Courses' is computed by course.countWhereStatusPublished (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Courses by Status' is computed by course.countByStatus (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (calm and studious, plenty of white space, a deep teal accent): accent #005f73",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Quiz submissions are added from their quiz's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Reviews are added from their course's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Courses are added from their category's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Lessons are added from their course's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Quizes are added from their lesson's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/workflows",
+      "message": "5 workflow step(s) could not be bound to the app; see the Business tab",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations/lesson.update",
+      "message": "Whether instructors may edit or delete lessons once learners have active progress on them.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/rules/0",
+      "message": "Whether unpublished courses can ever be re-published by an instructor or administrator.",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

@@ -1,0 +1,1601 @@
+{
+  "specVersion": "1.0",
+  "project": {
+    "name": "The Harbour Ledger",
+    "mode": "dynamic",
+    "flow": "app",
+    "description": "A city news site where writers draft stories in sections, editors review and publish, and readers read and comment on published articles."
+  },
+  "theme": {
+    "style": "editorial",
+    "colorScheme": "light-dark",
+    "colors": {
+      "primary": "#1e3a8a",
+      "secondary": "#ededee",
+      "accent": "#1e3a8a",
+      "background": "#fbfbfa",
+      "foreground": "#0f172a",
+      "muted": "#ededee",
+      "destructive": "#dc2626"
+    },
+    "typography": {
+      "headingFont": "Playfair Display",
+      "bodyFont": "Source Serif 4"
+    },
+    "radius": "sm",
+    "density": "comfortable",
+    "direction": {
+      "productType": "Bookmark & Read-Later",
+      "pattern": "Minimal & Direct + Demo",
+      "palette": "Paper warm white + ink neutral + minimal accent + tag colors",
+      "fontPairing": "Minimalist Monochrome Editorial",
+      "source": "ui-ux-pro-max@28b3b8dee8c9"
+    }
+  },
+  "layout": {
+    "shell": "sidebar",
+    "header": {
+      "logoText": "The Harbour Ledger",
+      "navigation": [
+        {
+          "label": "Articles",
+          "page": "articles"
+        },
+        {
+          "label": "Dashboard",
+          "page": "newsroom-home"
+        },
+        {
+          "label": "Articles",
+          "page": "newsroom-articles"
+        }
+      ]
+    }
+  },
+  "app": {
+    "name": "The Harbour Ledger",
+    "tagline": "A city news site covering City, Business, Culture, and Sport",
+    "icon": "Newspaper",
+    "nav": [
+      {
+        "entity": "Article",
+        "label": "Articles",
+        "icon": "Newspaper"
+      }
+    ],
+    "home": "Article",
+    "entities": {
+      "Article": {
+        "label": "Article",
+        "plural": "Articles",
+        "displayField": "headline",
+        "listFields": [
+          "headline",
+          "section",
+          "status",
+          "publishedAt"
+        ],
+        "listStyle": "cards",
+        "detailFields": [
+          "headline",
+          "summary",
+          "section",
+          "content",
+          "coverImage",
+          "status",
+          "publishedAt",
+          "scheduledAt",
+          "changeNotes",
+          "writerId",
+          "createdAt",
+          "updatedAt"
+        ],
+        "fieldLabels": {
+          "writerId": "Writer",
+          "headline": "Headline",
+          "summary": "Summary",
+          "content": "Story Content",
+          "section": "News Section",
+          "status": "Editorial Status",
+          "coverImage": "Cover Image",
+          "changeNotes": "Editor Feedback",
+          "scheduledAt": "Scheduled For",
+          "publishedAt": "Published Date",
+          "createdAt": "Created at",
+          "updatedAt": "Updated at"
+        },
+        "help": {
+          "changeNotes": "Specific revision requests and feedback provided by the reviewing editor",
+          "content": "Full article body text",
+          "headline": "Title of the article draft",
+          "section": "City, Business, Culture, or Sport"
+        },
+        "create": "page"
+      },
+      "ArticleComment": {
+        "label": "Article comment",
+        "plural": "Article comments",
+        "displayField": "text",
+        "listFields": [
+          "text",
+          "articleId",
+          "authorId",
+          "parentId"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "articleId",
+          "authorId",
+          "parentId",
+          "text",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "articleId": "Article",
+          "authorId": "Author",
+          "parentId": "Parent",
+          "text": "Text",
+          "createdAt": "Created at"
+        },
+        "help": {}
+      },
+      "ArticleReaction": {
+        "label": "Article reaction",
+        "plural": "Article reactions",
+        "displayField": "articleId",
+        "listFields": [
+          "articleId",
+          "userId",
+          "kind",
+          "createdAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "articleId",
+          "userId",
+          "kind",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "articleId": "Article",
+          "userId": "User",
+          "kind": "Kind",
+          "createdAt": "Created at"
+        },
+        "help": {}
+      },
+      "SectionFollow": {
+        "label": "Section follow",
+        "plural": "Section follows",
+        "displayField": "subject",
+        "listFields": [
+          "subject",
+          "followerId",
+          "createdAt"
+        ],
+        "listStyle": "table",
+        "detailFields": [
+          "followerId",
+          "subject",
+          "createdAt"
+        ],
+        "fieldLabels": {
+          "followerId": "Follower",
+          "subject": "Subject",
+          "createdAt": "Created at"
+        },
+        "help": {}
+      }
+    },
+    "design": {
+      "archetype": "catalogue",
+      "shell": "topbar",
+      "mobileNav": "bottom-tabs",
+      "frame": "standard",
+      "density": "comfortable",
+      "mainEntity": "Article",
+      "entities": {
+        "Article": {
+          "view": "cards",
+          "roles": {
+            "title": "headline",
+            "media": "coverImage",
+            "badge": "section",
+            "subtitle": "summary",
+            "meta": [
+              "publishedAt",
+              "writerId"
+            ]
+          },
+          "detailView": "reader",
+          "filtersStyle": "chips",
+          "card": "stacked",
+          "aspect": "square"
+        },
+        "ArticleComment": {
+          "view": "table",
+          "roles": {}
+        }
+      },
+      "homeView": "featured",
+      "looks": [
+        {
+          "recipe": "editorial",
+          "reason": "The requirement asks for it",
+          "fontPairing": "editorial"
+        },
+        {
+          "recipe": "paper",
+          "reason": "Crisp grids and neutral surfaces provide an authentic newsprint feel with excellent reading comfort.",
+          "fontPairing": "bookish"
+        },
+        {
+          "recipe": "soft",
+          "reason": "A bolder option (added by code)",
+          "fontPairing": "editorial"
+        }
+      ],
+      "requested": {
+        "accent": "#1e3a8a",
+        "background": "#fbfbfa",
+        "headingFont": "serif",
+        "words": "Look: editorial and trustworthy, a classic serif for headlines, off-white paper and a navy accent."
+      },
+      "seed": 1195048517,
+      "fontPairing": "editorial",
+      "reason": "A front page with a lead story and section-based reading pairs with reader-first article typography and structured newsroom editorial management.",
+      "replaced": [
+        "look 'swiss' replaced by 'soft': three quiet looks offer no choice"
+      ]
+    },
+    "areas": [
+      {
+        "id": "readers",
+        "label": "Readers",
+        "roles": [
+          "reader"
+        ],
+        "prefix": "/",
+        "design": {
+          "archetype": "catalogue",
+          "shell": "topbar",
+          "mobileNav": "bottom-tabs",
+          "frame": "wide",
+          "mainEntity": "Article",
+          "entities": {
+            "Article": {
+              "view": "cards",
+              "roles": {
+                "title": "headline",
+                "media": "coverImage",
+                "badge": "section",
+                "subtitle": "summary",
+                "meta": [
+                  "publishedAt",
+                  "writerId"
+                ]
+              },
+              "detailView": "reader",
+              "filtersStyle": "facets",
+              "card": "stacked",
+              "aspect": "square"
+            },
+            "ArticleComment": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "featured"
+        }
+      },
+      {
+        "id": "newsroom",
+        "label": "Newsroom",
+        "roles": [
+          "writer",
+          "editor"
+        ],
+        "prefix": "/newsroom",
+        "design": {
+          "archetype": "back-office",
+          "shell": "sidebar",
+          "mobileNav": "drawer",
+          "frame": "standard",
+          "mainEntity": "Article",
+          "entities": {
+            "Article": {
+              "view": "table",
+              "roles": {
+                "title": "headline",
+                "badge": "status",
+                "subtitle": "summary",
+                "meta": [
+                  "section",
+                  "updatedAt"
+                ],
+                "media": "coverImage"
+              },
+              "detailView": "split-panel",
+              "filtersStyle": "chips",
+              "card": "text-first",
+              "aspect": "square"
+            },
+            "ArticleComment": {
+              "view": "table",
+              "roles": {}
+            }
+          },
+          "homeView": "dashboard"
+        }
+      }
+    ],
+    "domain": {
+      "name": "news",
+      "roles": {
+        "content": "Article"
+      },
+      "types": {
+        "newsroom": "magazine",
+        "readers": "magazine"
+      },
+      "features": []
+    },
+    "dashboard": [
+      {
+        "label": "Published Articles",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {},
+        "period": "week"
+      },
+      {
+        "label": "Drafts in Review",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "in_review"
+        }
+      },
+      {
+        "label": "Changes Requested",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "changes_requested"
+        }
+      },
+      {
+        "label": "Scheduled Articles",
+        "kind": "figure",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {
+          "status": "scheduled"
+        }
+      },
+      {
+        "label": "Articles by Section",
+        "kind": "pie",
+        "entity": "Article",
+        "fn": "count",
+        "filter": {},
+        "groupBy": "section"
+      }
+    ],
+    "workflows": {
+      "version": "a3a323dc6668",
+      "tours": [
+        {
+          "id": "publish_article",
+          "name": "Article drafting and publication",
+          "outcome": "Article is published and available to readers",
+          "roles": [
+            "editor",
+            "writer"
+          ],
+          "steps": [
+            {
+              "id": "draft_article",
+              "role": "writer",
+              "actor": "Writer",
+              "title": "Draft article in section (the article becomes draft). Rule: Section must be City, Business, Culture, or Sport",
+              "operationId": "article.create",
+              "statusAfter": "draft",
+              "page": "newsroom-articles-new",
+              "route": "/newsroom/articles/new",
+              "target": {
+                "section": "article-create-form",
+                "action": "submit"
+              },
+              "kind": "do",
+              "record": "article"
+            },
+            {
+              "id": "submit_for_review",
+              "role": "writer",
+              "actor": "Writer",
+              "title": "Submit article for review (the article becomes in_review). Rule: Draft must have headline and content",
+              "operationId": "article.submitForReview",
+              "statusAfter": "in_review",
+              "page": "newsroom-articles-id",
+              "route": "/newsroom/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "submit-for-review"
+              },
+              "kind": "do",
+              "record": "article",
+              "needs": {
+                "step": "draft_article",
+                "role": "writer",
+                "status": "draft"
+              }
+            },
+            {
+              "id": "editor_reviews",
+              "role": "editor",
+              "actor": "Editor",
+              "title": "Review article draft (the article becomes in_review). Rule: Only in-review articles can be reviewed",
+              "operationId": "article.get",
+              "statusAfter": "in_review",
+              "page": "newsroom-articles-id",
+              "route": "/newsroom/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "article"
+            },
+            {
+              "id": "publish_draft",
+              "role": "editor",
+              "actor": "Editor",
+              "title": "Publish article (the article becomes published). Rule: Only editors can publish",
+              "operationId": "article.publish",
+              "statusAfter": "published",
+              "page": "newsroom-articles-id",
+              "route": "/newsroom/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": "publish"
+              },
+              "kind": "do",
+              "record": "article",
+              "needs": {
+                "step": "submit_for_review",
+                "role": "writer",
+                "status": "in_review"
+              }
+            }
+          ]
+        },
+        {
+          "id": "read_and_comment",
+          "name": "Article reading and commenting",
+          "outcome": "Reader has read an article and contributed a comment",
+          "roles": [
+            "reader"
+          ],
+          "steps": [
+            {
+              "id": "browse_news",
+              "role": "reader",
+              "actor": "Reader",
+              "title": "Browse front page and section news. Rule: Readers only ever see published articles",
+              "operationId": "article.list",
+              "page": "home",
+              "route": "/",
+              "target": {
+                "section": "articles-list",
+                "action": null
+              },
+              "kind": "look",
+              "record": "article"
+            },
+            {
+              "id": "read_story",
+              "role": "reader",
+              "actor": "Reader",
+              "title": "Read article. Rule: Article must be published",
+              "operationId": "article.get",
+              "page": "articles-id",
+              "route": "/articles/[id]",
+              "target": {
+                "section": "articles-detail",
+                "action": null
+              },
+              "kind": "look",
+              "record": "article"
+            },
+            {
+              "id": "post_comment",
+              "role": "reader",
+              "actor": "Reader",
+              "title": "Post comment (the comment becomes posted). Rule: Comment text cannot be empty",
+              "operationId": "articleComment.create",
+              "statusAfter": "posted",
+              "page": "articles-id",
+              "route": "/articles/[id]",
+              "skip": "no screen performs this step",
+              "kind": "note",
+              "record": "comment"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt",
+                "updatedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-save",
+                "label": "Save",
+                "kind": "reaction",
+                "reaction": "save",
+                "operationId": "articleReaction.create",
+                "undoOperationId": "articleReaction.delete",
+                "state": "mySaveId",
+                "count": "saveCount",
+                "body": {
+                  "articleId": "$record.id",
+                  "kind": "save"
+                }
+              },
+              {
+                "id": "follow-section",
+                "label": "Follow",
+                "kind": "reaction",
+                "reaction": "follow",
+                "operationId": "sectionFollow.create",
+                "undoOperationId": "sectionFollow.delete",
+                "state": "mySectionFollowId",
+                "count": "sectionFollowerCount",
+                "body": {
+                  "subject": "$record.section"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "articles",
+      "route": "/articles",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt",
+                "updatedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-save",
+                "label": "Save",
+                "kind": "reaction",
+                "reaction": "save",
+                "operationId": "articleReaction.create",
+                "undoOperationId": "articleReaction.delete",
+                "state": "mySaveId",
+                "count": "saveCount",
+                "body": {
+                  "articleId": "$record.id",
+                  "kind": "save"
+                }
+              },
+              {
+                "id": "follow-section",
+                "label": "Follow",
+                "kind": "reaction",
+                "reaction": "follow",
+                "operationId": "sectionFollow.create",
+                "undoOperationId": "sectionFollow.delete",
+                "state": "mySectionFollowId",
+                "count": "sectionFollowerCount",
+                "body": {
+                  "subject": "$record.section"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "articles-id",
+      "route": "/articles/[id]",
+      "title": "Article",
+      "sections": [
+        {
+          "id": "articles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "article.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "headline",
+              "summary",
+              "section",
+              "content",
+              "coverImage",
+              "status",
+              "publishedAt",
+              "scheduledAt",
+              "changeNotes",
+              "writerId",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Article",
+            "actions": [
+              {
+                "id": "react-save",
+                "label": "Save",
+                "kind": "reaction",
+                "reaction": "save",
+                "operationId": "articleReaction.create",
+                "undoOperationId": "articleReaction.delete",
+                "state": "mySaveId",
+                "count": "saveCount",
+                "body": {
+                  "articleId": "$route.id",
+                  "kind": "save"
+                }
+              },
+              {
+                "id": "follow-section",
+                "label": "Follow",
+                "kind": "reaction",
+                "reaction": "follow",
+                "operationId": "sectionFollow.create",
+                "undoOperationId": "sectionFollow.delete",
+                "state": "mySectionFollowId",
+                "count": "sectionFollowerCount",
+                "body": {
+                  "subject": "$record.section"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "articles-comments",
+          "component": "CommentThread",
+          "content": {
+            "entity": "ArticleComment",
+            "title": "Comments",
+            "thread": {
+              "list": "articleComment.list",
+              "target": "articleId",
+              "parent": "parentId",
+              "text": "text",
+              "owner": "authorId",
+              "maxLimit": 100,
+              "create": "articleComment.create",
+              "update": "articleComment.update",
+              "remove": "articleComment.delete"
+            },
+            "operations": [
+              "articleComment.list",
+              "articleComment.create",
+              "articleComment.update",
+              "articleComment.delete"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "route": "/login",
+      "title": "Sign in",
+      "sections": [
+        {
+          "id": "login",
+          "component": "AppAuth",
+          "form": "auth_login",
+          "content": {
+            "variant": "signIn",
+            "title": "Sign in"
+          }
+        }
+      ]
+    },
+    {
+      "id": "newsroom-home",
+      "route": "/newsroom",
+      "title": "The Harbour Ledger",
+      "sections": [
+        {
+          "id": "figure-1",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countThisWeek"
+          },
+          "content": {
+            "label": "Published Articles",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-2",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusInReview"
+          },
+          "content": {
+            "label": "Drafts in Review",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-3",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusChangesRequested"
+          },
+          "content": {
+            "label": "Changes Requested",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-4",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countWhereStatusScheduled"
+          },
+          "content": {
+            "label": "Scheduled Articles",
+            "kind": "figure",
+            "entity": "Article",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "figure-5",
+          "component": "AppDashboard",
+          "data": {
+            "operationId": "article.countBySection"
+          },
+          "content": {
+            "label": "Articles by Section",
+            "kind": "pie",
+            "entity": "Article",
+            "groupBy": "section",
+            "fn": "count"
+          }
+        },
+        {
+          "id": "recent-articles",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "params": {
+              "limit": 5,
+              "sort": "-createdAt"
+            },
+            "fields": [
+              "headline",
+              "section",
+              "status"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Recent articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt",
+                "updatedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-save",
+                "label": "Save",
+                "kind": "reaction",
+                "reaction": "save",
+                "operationId": "articleReaction.create",
+                "undoOperationId": "articleReaction.delete",
+                "state": "mySaveId",
+                "count": "saveCount",
+                "body": {
+                  "articleId": "$record.id",
+                  "kind": "save"
+                }
+              },
+              {
+                "id": "follow-section",
+                "label": "Follow",
+                "kind": "reaction",
+                "reaction": "follow",
+                "operationId": "sectionFollow.create",
+                "undoOperationId": "sectionFollow.delete",
+                "state": "mySectionFollowId",
+                "count": "sectionFollowerCount",
+                "body": {
+                  "subject": "$record.section"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "newsroom-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "newsroom-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit-for-review",
+                "label": "Submit for review",
+                "kind": "mutation",
+                "operationId": "article.submitForReview",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit for review: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted"
+                }
+              }
+            ],
+            "variant": "recent"
+          }
+        }
+      ]
+    },
+    {
+      "id": "newsroom-articles",
+      "route": "/newsroom/articles",
+      "title": "Articles",
+      "sections": [
+        {
+          "id": "articles-list",
+          "component": "AppList",
+          "data": {
+            "operationId": "article.list",
+            "fields": [
+              "headline",
+              "section",
+              "status",
+              "publishedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Articles",
+            "style": "cards",
+            "controls": {
+              "search": true,
+              "filters": [
+                "section",
+                "status"
+              ],
+              "maxLimit": 100,
+              "sort": [
+                "publishedAt",
+                "createdAt",
+                "updatedAt"
+              ]
+            },
+            "actions": [
+              {
+                "id": "react-save",
+                "label": "Save",
+                "kind": "reaction",
+                "reaction": "save",
+                "operationId": "articleReaction.create",
+                "undoOperationId": "articleReaction.delete",
+                "state": "mySaveId",
+                "count": "saveCount",
+                "body": {
+                  "articleId": "$record.id",
+                  "kind": "save"
+                }
+              },
+              {
+                "id": "follow-section",
+                "label": "Follow",
+                "kind": "reaction",
+                "reaction": "follow",
+                "operationId": "sectionFollow.create",
+                "undoOperationId": "sectionFollow.delete",
+                "state": "mySectionFollowId",
+                "count": "sectionFollowerCount",
+                "body": {
+                  "subject": "$record.section"
+                }
+              },
+              {
+                "id": "view",
+                "label": "View",
+                "kind": "link",
+                "page": "newsroom-articles-id",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "newsroom-articles-id-edit",
+                "params": {
+                  "id": "$record.id"
+                }
+              },
+              {
+                "id": "submit-for-review",
+                "label": "Submit for review",
+                "kind": "mutation",
+                "operationId": "article.submitForReview",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit for review: done"
+                }
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$record.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$record.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted"
+                }
+              }
+            ],
+            "create": {
+              "page": "newsroom-articles-new",
+              "label": "New article"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "newsroom-articles-id",
+      "route": "/newsroom/articles/[id]",
+      "title": "Article",
+      "sections": [
+        {
+          "id": "articles-detail",
+          "component": "AppDetail",
+          "data": {
+            "operationId": "article.get",
+            "params": {
+              "id": "$route.id"
+            },
+            "fields": [
+              "headline",
+              "summary",
+              "section",
+              "content",
+              "coverImage",
+              "status",
+              "publishedAt",
+              "scheduledAt",
+              "changeNotes",
+              "writerId",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "content": {
+            "entity": "Article",
+            "title": "Article",
+            "actions": [
+              {
+                "id": "react-save",
+                "label": "Save",
+                "kind": "reaction",
+                "reaction": "save",
+                "operationId": "articleReaction.create",
+                "undoOperationId": "articleReaction.delete",
+                "state": "mySaveId",
+                "count": "saveCount",
+                "body": {
+                  "articleId": "$route.id",
+                  "kind": "save"
+                }
+              },
+              {
+                "id": "follow-section",
+                "label": "Follow",
+                "kind": "reaction",
+                "reaction": "follow",
+                "operationId": "sectionFollow.create",
+                "undoOperationId": "sectionFollow.delete",
+                "state": "mySectionFollowId",
+                "count": "sectionFollowerCount",
+                "body": {
+                  "subject": "$record.section"
+                }
+              },
+              {
+                "id": "edit",
+                "label": "Edit",
+                "kind": "link",
+                "page": "newsroom-articles-id-edit",
+                "params": {
+                  "id": "$route.id"
+                }
+              },
+              {
+                "id": "submit-for-review",
+                "label": "Submit for review",
+                "kind": "mutation",
+                "operationId": "article.submitForReview",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Submit for review: done"
+                }
+              },
+              {
+                "id": "request-changes",
+                "label": "Request changes",
+                "kind": "mutation",
+                "operationId": "article.requestChanges",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Request changes: done"
+                },
+                "form": "newsroom_article_requestChanges"
+              },
+              {
+                "id": "schedule",
+                "label": "Schedule",
+                "kind": "mutation",
+                "operationId": "article.schedule",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Schedule: done"
+                },
+                "form": "newsroom_article_schedule"
+              },
+              {
+                "id": "publish",
+                "label": "Publish",
+                "kind": "mutation",
+                "operationId": "article.publish",
+                "params": {
+                  "id": "$route.id"
+                },
+                "onSuccess": {
+                  "toast": "Publish: done"
+                }
+              },
+              {
+                "id": "delete",
+                "label": "Delete",
+                "kind": "mutation",
+                "operationId": "article.delete",
+                "params": {
+                  "id": "$route.id"
+                },
+                "confirm": "Delete this article? This cannot be undone.",
+                "variant": "destructive",
+                "onSuccess": {
+                  "toast": "Article deleted",
+                  "navigate": "newsroom-articles"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "articles-comments",
+          "component": "CommentThread",
+          "content": {
+            "entity": "ArticleComment",
+            "title": "Comments",
+            "thread": {
+              "list": "articleComment.list",
+              "target": "articleId",
+              "parent": "parentId",
+              "text": "text",
+              "owner": "authorId",
+              "maxLimit": 100,
+              "create": "articleComment.create",
+              "update": "articleComment.update",
+              "remove": "articleComment.delete"
+            },
+            "operations": [
+              "articleComment.list",
+              "articleComment.create",
+              "articleComment.update",
+              "articleComment.delete"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "newsroom-articles-id-edit",
+      "route": "/newsroom/articles/[id]/edit",
+      "title": "Edit article",
+      "sections": [
+        {
+          "id": "articles-edit-form",
+          "component": "AppForm",
+          "form": "newsroom_article_update",
+          "content": {
+            "entity": "Article"
+          }
+        }
+      ]
+    },
+    {
+      "id": "newsroom-articles-new",
+      "route": "/newsroom/articles/new",
+      "title": "New article",
+      "sections": [
+        {
+          "id": "article-create-form",
+          "component": "AppForm",
+          "form": "newsroom_article_create",
+          "content": {
+            "entity": "Article"
+          }
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "route": "/register",
+      "title": "Create an account",
+      "sections": [
+        {
+          "id": "register",
+          "component": "AppAuth",
+          "form": "auth_register",
+          "content": {
+            "variant": "signUp",
+            "title": "Create an account"
+          }
+        }
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "id": "auth_login",
+      "operationId": "auth.login",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true
+        }
+      ],
+      "submitLabel": "Sign in"
+    },
+    {
+      "id": "auth_register",
+      "operationId": "auth.register",
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "E-mail",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "maxLength": 128
+        }
+      ],
+      "submitLabel": "Create account"
+    },
+    {
+      "id": "newsroom_article_create",
+      "operationId": "article.create",
+      "fields": [
+        {
+          "name": "headline",
+          "type": "string",
+          "label": "Headline",
+          "required": true,
+          "maxLength": 200,
+          "help": "Title of the article draft"
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "label": "Summary",
+          "required": false,
+          "maxLength": 500
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "label": "Story Content",
+          "required": true,
+          "help": "Full article body text"
+        },
+        {
+          "name": "section",
+          "type": "enum",
+          "label": "News Section",
+          "required": true,
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ],
+          "help": "City, Business, Culture, or Sport"
+        },
+        {
+          "name": "coverImage",
+          "type": "string",
+          "label": "Cover Image",
+          "required": false,
+          "upload": {
+            "entity": "Article",
+            "field": "coverImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Create article",
+      "onSuccess": {
+        "toast": "Article created",
+        "navigate": "newsroom-articles-id"
+      }
+    },
+    {
+      "id": "newsroom_article_requestChanges",
+      "operationId": "article.requestChanges",
+      "params": {
+        "id": "$route.id"
+      },
+      "fields": [
+        {
+          "name": "changeNotes",
+          "type": "text",
+          "label": "Editor Feedback",
+          "required": false,
+          "help": "Specific revision requests and feedback provided by the reviewing editor"
+        }
+      ],
+      "submitLabel": "Request changes",
+      "onSuccess": {
+        "toast": "Request changes: done"
+      }
+    },
+    {
+      "id": "newsroom_article_schedule",
+      "operationId": "article.schedule",
+      "params": {
+        "id": "$route.id"
+      },
+      "fields": [
+        {
+          "name": "scheduledAt",
+          "type": "datetime",
+          "label": "Scheduled For",
+          "required": false
+        }
+      ],
+      "submitLabel": "Schedule",
+      "onSuccess": {
+        "toast": "Schedule: done"
+      }
+    },
+    {
+      "id": "newsroom_article_update",
+      "operationId": "article.update",
+      "params": {
+        "id": "$route.id"
+      },
+      "load": {
+        "operationId": "article.get",
+        "params": {
+          "id": "$route.id"
+        }
+      },
+      "fields": [
+        {
+          "name": "headline",
+          "type": "string",
+          "label": "Headline",
+          "required": false,
+          "maxLength": 200,
+          "help": "Title of the article draft"
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "label": "Summary",
+          "required": false,
+          "maxLength": 500
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "label": "Story Content",
+          "required": false,
+          "help": "Full article body text"
+        },
+        {
+          "name": "section",
+          "type": "enum",
+          "label": "News Section",
+          "required": false,
+          "values": [
+            "City",
+            "Business",
+            "Culture",
+            "Sport"
+          ],
+          "help": "City, Business, Culture, or Sport"
+        },
+        {
+          "name": "coverImage",
+          "type": "string",
+          "label": "Cover Image",
+          "required": false,
+          "upload": {
+            "entity": "Article",
+            "field": "coverImage",
+            "presign": "files.presign",
+            "kind": "image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/gif"
+            ],
+            "maxSize": 5242880
+          }
+        }
+      ],
+      "submitLabel": "Save changes",
+      "onSuccess": {
+        "toast": "Article saved",
+        "navigate": "newsroom-articles-id"
+      }
+    }
+  ],
+  "auth": {
+    "signIn": "login",
+    "signUp": "register",
+    "login": "auth.login",
+    "me": "auth.me"
+  },
+  "assets": [
+    {
+      "id": "seed-1",
+      "kind": "image",
+      "alt": "a harbor filled with lots of boats under a cloudy blue sky",
+      "source": "https://images.unsplash.com/photo-1671443290089-8e2ae54ac608?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8SGFyYm91ciUyMEV4cGFuc2lvbiUyMFJlYWNoZXMlMjBLZXklMjBNaWxlc3RvbmUlMjBBaGVhZCUyMG9mJTIwU2NoZWR1bGUlMjBBcnRpY2xlfGVufDF8MHx8fDE3OTQyOTA1NTB8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Simon Hurry",
+        "profileUrl": "https://unsplash.com/@bullterriere?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "av1Y78yrQgk"
+      }
+    },
+    {
+      "id": "seed-2",
+      "kind": "image",
+      "alt": "green and white typewriter on black textile",
+      "source": "https://images.unsplash.com/photo-1593510987459-9a1489817a3b?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8UXVhcnRlcmx5JTIwVmVudHVyZSUyMENhcGl0YWwlMjBJbmZsb3dzJTIwSGl0JTIwTmV3JTIwUmVjb3JkJTIwaW4lMjBEaXN0cmljdCUyMEFydGljbGV8ZW58MXwwfHx8MTc5NDI5MDU1MXww&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Markus Winkler",
+        "profileUrl": "https://unsplash.com/@markuswinkler?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "44QtHj3fZDY"
+      }
+    },
+    {
+      "id": "seed-3",
+      "kind": "image",
+      "alt": "A large crowd enjoys an outdoor festival",
+      "source": "https://images.unsplash.com/photo-1744232255607-cad8c181b221?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8V2F0ZXJmcm9udCUyMEFydHMlMjAlMjYlMjBNdXNpYyUyMEZlc3RpdmFsJTIwUmV0dXJucyUyMGZvciUyMEF1dHVtbiUyMFNlYXNvbiUyMEFydGljbGV8ZW58MXwwfHx8MTc5NDI5MDU1M3ww&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Kayl Photo",
+        "profileUrl": "https://unsplash.com/@kayl_photo?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "ad6qLWflSrI"
+      }
+    },
+    {
+      "id": "seed-4",
+      "kind": "image",
+      "alt": "people playing soccer on field during daytime",
+      "source": "https://images.unsplash.com/photo-1600442715978-d0268caa17f5?ixid=M3wxMTI2MDQwfDB8MXxzZWFyY2h8MXx8TGF0ZSUyMFN0b3BwYWdlJTIwV2lubmVyJTIwU2VuZHMlMjBIYXJib3VyJTIwRkMlMjB0byUyMEN1cCUyMFNlbWlmaW5hbHMlMjBBcnRpY2xlfGVufDF8MHx8fDE3OTQyOTA1NTR8MA&ixlib=rb-4.1.0&w=1200&h=800&fit=crop&auto=format&q=80",
+      "credit": {
+        "provider": "unsplash",
+        "name": "Karsten Winegeart",
+        "profileUrl": "https://unsplash.com/@_karsten?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "sourceUrl": "https://unsplash.com/?utm_source=fullstack_generation_agent&utm_medium=referral",
+        "photoId": "a5HB3E0B01g"
+      }
+    }
+  ]
+}

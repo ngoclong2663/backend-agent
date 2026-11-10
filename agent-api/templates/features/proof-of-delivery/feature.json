@@ -1,0 +1,28 @@
+{
+  "name": "proof-of-delivery",
+  "status": "ready",
+  "label": "Proof of delivery",
+  "attachesTo": "delivery",
+  "choose": "A job is finished with a photo of the parcel at the door.",
+  "options": {
+    "state": {
+      "default": "delivered"
+    },
+    "field": {
+      "default": "proofPhoto"
+    }
+  },
+  "spec": {
+    "targetFields": [
+      {
+        "name": "{field}",
+        "type": "image"
+      }
+    ]
+  },
+  "kit": {
+    "slots": [
+      "proof-capture"
+    ]
+  }
+}

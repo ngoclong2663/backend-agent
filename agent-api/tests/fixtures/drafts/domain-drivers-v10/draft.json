@@ -1,0 +1,262 @@
+{
+  "draftId": "140399a7-cb7a-40f1-a327-805191f26c71",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T06:04:57.870500Z",
+  "finishedAt": "2026-11-10T06:08:50.442616Z",
+  "assumptions": [
+    {
+      "path": "/entities/0/fields/11",
+      "message": "Added a unique trackingCode string to Delivery so customers can track their parcel progress without an account.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0/fields/8",
+      "message": "Added fee field to Delivery so driver earnings can be calculated for today and this week upon successful delivery.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/0/fields/7",
+      "message": "Assigned small, medium, large as standard values for parcelSize enum.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/areas",
+      "message": "Added customer role to auth roles and created a dedicated tracking area alongside drivers and dispatch areas based on the drivers domain specification.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "Configured bright orange #f97316 accent with playful, glass, and minimal look recipes as suggested by mobile courier on-demand design patterns.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Food Delivery / On-Demand (Hero-Centric Design + Feature-Rich); palette Appetizing warm (orange/red) + trust blue + map accent; fonts Startup Bold (Outfit + Rubik) (Outfit / Rubik); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/operations/5/response",
+      "message": "delivery.track: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/6/response",
+      "message": "delivery.getMyActive: it answers a list of Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7/response",
+      "message": "delivery.accept: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/8/response",
+      "message": "delivery.goingToPickup: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/9/response",
+      "message": "delivery.pickedUp: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "delivery.goingToDropoff: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/11/response",
+      "message": "delivery.deliver: it answers the Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features",
+      "message": "Built on the Courier domain",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/availability",
+      "message": "Availability added to User",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Delivery",
+      "message": "Proof of delivery added Delivery.proofPhoto",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/proof-of-delivery",
+      "message": "Proof of delivery added to Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/tracking",
+      "message": "Tracking added to Delivery",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/1",
+      "message": "delivery.get: private to its driver (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/2",
+      "message": "delivery.list: private to its driver (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/5",
+      "message": "delivery.track: private to its driver (the staff read every record)",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/7",
+      "message": "delivery.accept: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/8",
+      "message": "delivery.goingToPickup: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/9",
+      "message": "delivery.pickedUp: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/10",
+      "message": "delivery.goingToDropoff: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/11",
+      "message": "delivery.deliver: only the record's own driver may do this",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/Delivery",
+      "message": "Delivery: shop_owner create it for a driver, chosen in the form (driverId); it then belongs to that driver",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/entities/DriverShift/create",
+      "message": "DriverShift has no parent record to be made on; placed by default",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "DriverShift: title 'driverId' left out (a uuid field is not a name)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "area 'dispatch' moved first: sign-up gives the role 'shop_owner'",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'playful' left out: a playful look does not suit this product",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'playful' left out: a playful look does not suit this product",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Pending Offers' is computed by delivery.countWhereStatusPending (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Delivered Today' is computed by delivery.countThisDayWhereStatusDelivered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Online Drivers' is computed by driverShift.countWhereIsOnlineTrue (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Deliveries by Status' is computed by delivery.countByStatus (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (Look: practical and fast to use on a phone, high contrast, a bright orange accent.): accent #f97316; rounded corners",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/layout/header/navigation",
+      "message": "Driver Shifts joined the navigation",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/workflows",
+      "message": "2 workflow step(s) could not be bound to the app; see the Business tab",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/entities/0/fields/8",
+      "message": "How delivery fees are determined (e.g. flat rate, calculated by parcel size, or distance) is unspecified in the requirements.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/rules/0",
+      "message": "Whether shop owners or dispatchers can cancel deliveries after they have been accepted by a driver is not specified.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/pages",
+      "message": "delivery.track (GET /deliveries/track/{trackingCode}) has no screen: the kit has no place for its parameters",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ]
+}

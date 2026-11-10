@@ -126,7 +126,8 @@ def _check_field_shown(task, area: _Area, words: list[str]) -> dict[str, Any]:
     for page in area.pages:
         for section in page.get("sections") or []:
             fields = (section.get("data") or {}).get("fields") or []
-            if any(any(w in f.lower() for w in words) for f in fields):
+            content = section.get("content") or {}
+            if any(any(w in f.lower() for w in words) for f in fields) or any(content.get(w) is True for w in words):
                 return _result(task, True, clicks=1 if page is area.home else 2)
     return _result(task, False, f"no {'/'.join(words)} shown in the area")
 

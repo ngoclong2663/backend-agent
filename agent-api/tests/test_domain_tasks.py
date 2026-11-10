@@ -86,5 +86,6 @@ def test_a_role_without_an_area_fails_with_why():
 def test_the_baseline_is_todays_kit_on_the_recorded_drafts():
     """The baseline was taken before any domain plugin; the recorded drafts still judge the same."""
     baseline = json.loads(BASELINE.read_text())
-    assert report()["domains"] == baseline["domains"]
+    now = {name: {k: v for k, v in domain.items() if k != "draft"} for name, domain in report()["domains"].items()}
+    assert now == baseline["domains"]
     assert baseline["summary"] == {"tasks": 24, "passed": 11}

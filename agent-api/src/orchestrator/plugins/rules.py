@@ -451,7 +451,13 @@ class RulesPlugin(Plugin):
             return [Code(tuple(lines), imports)] if lines else []
         snake = to_snake(module["entity"])
         lines, names = [], []
+        # the body's fields when the operation names them: a transition or a total the body can't carry is not checked
+        # against it (a status that moves only through its actions is not in the update's DTO; found on a real news
+        # draft: `dto.status` on a DTO without it answered every update with 500)
+        sent = {to_snake(name) for name in op["requestFields"]} if op.get("requestFields") is not None else None
         for check in _checks(op):
+            if check["kind"] != "immutableAfter" and sent is not None and check["attr"] not in sent:
+                continue
             names.append(check["constant"])
             if check["kind"] == "immutableAfter":
                 lines.append(f"{check['constant']}.check({record}.{check['attr']})")

@@ -148,6 +148,22 @@
     ],
     "slots": [
       "reaction-button"
+    ],
+    "toggles": [
+      {
+        "id": "react-{kind}",
+        "label": "{Kind}",
+        "reaction": "{kind}",
+        "create": "{target}Reaction.create",
+        "undo": "{target}Reaction.delete",
+        "state": "my{Kind}Id",
+        "count": "{kind}Count",
+        "body": {
+          "{target}Id": "{record}",
+          "kind": "{kind}"
+        },
+        "each": "kinds"
+      }
     ]
   }
 }

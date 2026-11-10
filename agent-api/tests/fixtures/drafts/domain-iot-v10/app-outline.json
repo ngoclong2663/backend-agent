@@ -1,0 +1,604 @@
+{
+  "name": "Verdant Greenhouse Monitor",
+  "tagline": "Commercial greenhouse sensor telemetry, camera pest detection, and device health monitoring",
+  "icon": "Sprout",
+  "nav": [
+    {
+      "entity": "Alert",
+      "label": "Alerts",
+      "icon": "BellRing"
+    },
+    {
+      "entity": "PestDetection",
+      "label": "Pest Detections",
+      "icon": "Bug"
+    },
+    {
+      "entity": "Device",
+      "label": "Device Health",
+      "icon": "Cpu"
+    },
+    {
+      "entity": "Zone",
+      "label": "Greenhouse Zones",
+      "icon": "LayoutGrid"
+    }
+  ],
+  "home": "dashboard",
+  "entities": {
+    "Zone": {
+      "label": "Greenhouse Zone",
+      "plural": "Greenhouse Zones",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "code",
+        "targetCrop"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "name",
+        "code",
+        "description",
+        "targetCrop",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "name": "Zone Name",
+        "code": "Zone Code",
+        "description": "Description",
+        "targetCrop": "Target Crop",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "code": "Identifier for the greenhouse sector or bench group."
+      }
+    },
+    "Device": {
+      "label": "Device",
+      "plural": "Devices",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "zoneId",
+        "deviceType",
+        "batteryLevel",
+        "status"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "name",
+        "zoneId",
+        "deviceType",
+        "batteryLevel",
+        "isOnline",
+        "status",
+        "lastSeenAt",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "zoneId": "Greenhouse Zone",
+        "name": "Name",
+        "deviceType": "Device Type",
+        "batteryLevel": "Battery Level (%)",
+        "isOnline": "Online Status",
+        "status": "Device Status",
+        "lastSeenAt": "Last Seen",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "status": "Operational state of device, flagged when low battery or offline, rebooting when reboot command sent."
+      }
+    },
+    "Reading": {
+      "label": "Environmental Reading",
+      "plural": "Environmental Readings",
+      "displayField": "recordedAt",
+      "listFields": [
+        "zoneId",
+        "temperature",
+        "humidity",
+        "co2",
+        "recordedAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "deviceId",
+        "zoneId",
+        "temperature",
+        "humidity",
+        "co2",
+        "soilMoisture",
+        "recordedAt"
+      ],
+      "fieldLabels": {
+        "deviceId": "Sensor Device",
+        "zoneId": "Zone",
+        "temperature": "Temperature (°C)",
+        "humidity": "Humidity (%)",
+        "co2": "CO2 (ppm)",
+        "soilMoisture": "Soil Moisture (%)",
+        "recordedAt": "Recorded At"
+      },
+      "help": {
+        "co2": "Carbon dioxide level in parts per million.",
+        "soilMoisture": "Volumetric soil moisture percentage."
+      }
+    },
+    "PestDetection": {
+      "label": "Pest Detection",
+      "plural": "Pest Detections",
+      "displayField": "pestType",
+      "listFields": [
+        "pestType",
+        "zoneId",
+        "confidence",
+        "status",
+        "detectedAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "cameraDeviceId",
+        "zoneId",
+        "pestType",
+        "confidence",
+        "snapshot",
+        "status",
+        "notes",
+        "detectedAt"
+      ],
+      "fieldLabels": {
+        "cameraDeviceId": "Bench Camera",
+        "zoneId": "Greenhouse Zone",
+        "pestType": "Identified Pest",
+        "confidence": "Confidence Score",
+        "snapshot": "Snapshot Image",
+        "status": "Review Status",
+        "notes": "Notes",
+        "detectedAt": "Detected At"
+      },
+      "help": {
+        "confidence": "Model confidence score between 0.0 and 1.0.",
+        "snapshot": "Camera snapshot taken over bench."
+      }
+    },
+    "Alert": {
+      "label": "Alert",
+      "plural": "Alerts",
+      "displayField": "message",
+      "listFields": [
+        "message",
+        "zoneId",
+        "severity",
+        "status",
+        "triggeredAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "zoneId",
+        "ruleId",
+        "severity",
+        "message",
+        "status",
+        "triggeredAt",
+        "viewedAt",
+        "acknowledgedAt",
+        "acknowledgedBy"
+      ],
+      "fieldLabels": {
+        "zoneId": "Greenhouse Zone",
+        "ruleId": "Alert Rule",
+        "message": "Message",
+        "severity": "Severity",
+        "status": "Alert Status",
+        "acknowledgedBy": "Acknowledged By",
+        "triggeredAt": "Triggered At",
+        "viewedAt": "Viewed At",
+        "acknowledgedAt": "Acknowledged At"
+      },
+      "help": {
+        "status": "Alert workflow state: triggered, viewed, or acknowledged."
+      }
+    }
+  },
+  "design": {
+    "archetype": "workspace",
+    "shell": "sidebar",
+    "mobileNav": "drawer",
+    "frame": "full",
+    "density": "compact",
+    "mainEntity": "Alert",
+    "entities": {
+      "Zone": {
+        "view": "table",
+        "roles": {}
+      },
+      "Device": {
+        "view": "table",
+        "roles": {}
+      },
+      "Reading": {
+        "view": "table",
+        "roles": {}
+      },
+      "PestDetection": {
+        "view": "cards",
+        "roles": {
+          "media": "snapshot"
+        },
+        "card": "stacked"
+      },
+      "Alert": {
+        "dateField": "triggeredAt",
+        "view": "calendar",
+        "roles": {},
+        "detailView": "split-panel",
+        "filtersStyle": "toolbar",
+        "card": "stacked"
+      }
+    },
+    "homeView": "dashboard",
+    "looks": [
+      {
+        "recipe": "swiss",
+        "reason": "Clean, technical grid aesthetic with high data density matches greenhouse monitoring and telemetry charts.",
+        "fontPairing": "workshop"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Clean minimal layout with crisp boundaries emphasizes telemetry and rapid operator triage.",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "glass",
+        "reason": "A bolder option (added by code)",
+        "fontPairing": "geometric"
+      }
+    ],
+    "requested": {
+      "accent": "#2e7d32",
+      "background": "#f9fbf9",
+      "scheme": "light",
+      "words": "Look: clean and technical, light background, a leaf green accent."
+    },
+    "seed": 116635346,
+    "reason": "A high-density operational cockpit allows operators and admins to monitor greenhouse telemetry, review detections, and act on alerts.",
+    "replaced": [
+      "look 'neon' left out: a neon look does not suit this product",
+      "look 'enterprise' replaced by 'glass': three quiet looks offer no choice"
+    ],
+    "fontPairing": "workshop"
+  },
+  "areas": [
+    {
+      "id": "operators",
+      "label": "Greenhouse Operator",
+      "roles": [
+        "operator"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "full",
+        "density": "compact",
+        "mainEntity": "Alert",
+        "entities": {
+          "Zone": {
+            "view": "table",
+            "roles": {}
+          },
+          "Device": {
+            "view": "table",
+            "roles": {}
+          },
+          "Reading": {
+            "view": "table",
+            "roles": {}
+          },
+          "PestDetection": {
+            "view": "cards",
+            "roles": {
+              "media": "snapshot"
+            },
+            "card": "stacked"
+          },
+          "Alert": {
+            "dateField": "triggeredAt",
+            "view": "calendar",
+            "roles": {},
+            "detailView": "record",
+            "filtersStyle": "chips",
+            "card": "text-first"
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "admins",
+      "label": "Greenhouse Administrator",
+      "roles": [
+        "admin"
+      ],
+      "prefix": "/admins",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "full",
+        "density": "compact",
+        "mainEntity": "Device",
+        "entities": {
+          "Zone": {
+            "view": "table",
+            "roles": {}
+          },
+          "Device": {
+            "view": "table",
+            "roles": {},
+            "detailView": "split-panel",
+            "filtersStyle": "chips",
+            "card": "text-first"
+          },
+          "Reading": {
+            "view": "table",
+            "roles": {}
+          },
+          "PestDetection": {
+            "view": "cards",
+            "roles": {
+              "media": "snapshot"
+            },
+            "card": "stacked"
+          },
+          "Alert": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "domain": {
+    "name": "iot",
+    "roles": {
+      "device": "Device",
+      "reading": "Reading"
+    },
+    "types": {
+      "admins": "sensor-monitoring",
+      "operators": "sensor-monitoring"
+    },
+    "features": []
+  },
+  "dashboard": [
+    {
+      "label": "Triggered Alerts",
+      "kind": "figure",
+      "entity": "Alert",
+      "fn": "count",
+      "filter": {
+        "status": "TRIGGERED"
+      }
+    },
+    {
+      "label": "Pending Detections",
+      "kind": "figure",
+      "entity": "PestDetection",
+      "fn": "count",
+      "filter": {
+        "status": "PENDING"
+      }
+    },
+    {
+      "label": "Flagged Devices",
+      "kind": "figure",
+      "entity": "Device",
+      "fn": "count",
+      "filter": {
+        "status": "FLAGGED"
+      }
+    },
+    {
+      "label": "Detections by Status",
+      "kind": "pie",
+      "entity": "PestDetection",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    }
+  ],
+  "workflows": {
+    "version": "bffe6e83c4da",
+    "tours": [
+      {
+        "id": "respond_to_alerts",
+        "name": "Respond to Alerts",
+        "outcome": "Triggered greenhouse environmental or pest alert is reviewed and acknowledged.",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "steps": [
+          {
+            "id": "detect_breach",
+            "role": "admin",
+            "actor": "Greenhouse Administrator",
+            "title": "Record threshold breach when sensor reading or pest detection meets rule condition (the alert becomes triggered). Rule: Condition must persist for configured duration or meet confidence threshold",
+            "operationId": "alert.recordBreach",
+            "statusAfter": "triggered",
+            "page": "admins-alerts",
+            "route": "/admins/alerts",
+            "target": {
+              "section": "alerts-actions",
+              "action": "record-breach"
+            },
+            "kind": "do",
+            "record": "alert"
+          },
+          {
+            "id": "review_alert",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "View alert details and recent zone history on dashboard (the alert becomes viewed)",
+            "operationId": "alert.view",
+            "statusAfter": "viewed",
+            "page": "alerts-id",
+            "route": "/alerts/[id]",
+            "target": {
+              "section": "alerts-detail",
+              "action": "view"
+            },
+            "kind": "do",
+            "record": "alert",
+            "needs": {
+              "step": "detect_breach",
+              "role": "admin",
+              "status": "triggered"
+            }
+          },
+          {
+            "id": "ack_alert",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Acknowledge alert to confirm awareness and ongoing response (the alert becomes acknowledged). Rule: Operator must be signed in",
+            "operationId": "alert.acknowledge",
+            "statusAfter": "acknowledged",
+            "page": "alerts-id",
+            "route": "/alerts/[id]",
+            "target": {
+              "section": "alerts-detail",
+              "action": "acknowledge"
+            },
+            "kind": "do",
+            "record": "alert",
+            "needs": {
+              "step": "review_alert",
+              "role": "operator",
+              "status": "viewed"
+            }
+          }
+        ]
+      },
+      {
+        "id": "review_pest_detections",
+        "name": "Review Pest Detections",
+        "outcome": "Camera pest detection snapshot is validated or dismissed.",
+        "roles": [
+          "operator"
+        ],
+        "steps": [
+          {
+            "id": "ingest_detection",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Receive camera snapshot with detected pest and confidence score (the detection becomes pending). Rule: Snapshot must include identified pest and confidence score",
+            "operationId": "pestDetection.create",
+            "statusAfter": "pending",
+            "page": "devices-id-pest-detections-new",
+            "route": "/devices/[id]/pest-detections/new",
+            "target": {
+              "section": "pest-detection-create-in-device-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "detection"
+          },
+          {
+            "id": "review_detection",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Review detection snapshot and confidence score (the detection becomes reviewed)",
+            "operationId": "pestDetection.review",
+            "statusAfter": "reviewed",
+            "page": "pest-detections-id",
+            "route": "/pest-detections/[id]",
+            "target": {
+              "section": "pest-detections-detail",
+              "action": "review"
+            },
+            "kind": "do",
+            "record": "detection",
+            "needs": {
+              "step": "ingest_detection",
+              "role": "operator",
+              "status": "pending"
+            }
+          },
+          {
+            "id": "confirm_detection",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Confirm pest presence for targeted treatment (the detection becomes confirmed). Rule: Operator must verify image details",
+            "operationId": "pestDetection.confirm",
+            "statusAfter": "confirmed",
+            "page": "pest-detections-id",
+            "route": "/pest-detections/[id]",
+            "target": {
+              "section": "pest-detections-detail",
+              "action": "confirm"
+            },
+            "kind": "do",
+            "record": "detection",
+            "needs": {
+              "step": "review_detection",
+              "role": "operator",
+              "status": "reviewed"
+            }
+          }
+        ]
+      },
+      {
+        "id": "manage_device_health",
+        "name": "Manage Device Health",
+        "outcome": "Unresponsive or low-health device is identified and issued a reboot command.",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "steps": [
+          {
+            "id": "inspect_device_status",
+            "role": "operator",
+            "actor": "Greenhouse Operator",
+            "title": "Check dashboard for offline devices and low battery indicators (the device becomes flagged)",
+            "operationId": "device.flag",
+            "statusAfter": "flagged",
+            "page": "devices-id",
+            "route": "/devices/[id]",
+            "target": {
+              "section": "devices-detail",
+              "action": "flag"
+            },
+            "kind": "do",
+            "record": "device"
+          },
+          {
+            "id": "reboot_device",
+            "role": "admin",
+            "actor": "Greenhouse Administrator",
+            "title": "Send reboot command to unresponsive device (the device becomes rebooting). Rule: Only administrators can issue device commands",
+            "operationId": "device.reboot",
+            "statusAfter": "rebooting",
+            "page": "admins-devices-id",
+            "route": "/admins/devices/[id]",
+            "target": {
+              "section": "devices-detail",
+              "action": "reboot"
+            },
+            "kind": "do",
+            "record": "device",
+            "needs": {
+              "step": "inspect_device_status",
+              "role": "operator",
+              "status": "flagged"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

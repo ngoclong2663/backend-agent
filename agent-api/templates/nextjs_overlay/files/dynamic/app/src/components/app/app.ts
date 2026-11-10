@@ -10,7 +10,7 @@ export type TAppAction = {
   undoOperationId?: string;
   state?: string;
   count?: string;
-  reaction?: "like" | "save" | "upvote";
+  reaction?: "like" | "save" | "upvote" | "follow" | "complete";
   page?: string;
   params?: Record<string, unknown>;
   operationId?: string;
@@ -67,6 +67,16 @@ export type TAppContent = {
     maxLimit?: number;
   };
   operations?: string[];
+  /** Epic 33 (`CommentThread`): under the record (default) or in a sheet opened by a button (screen feedback). */
+  placement?: "inline" | "sheet";
+  /** Epic 33 (`AppResume`): the person's records to continue (their own row set), with their progress. */
+  resume?: { state: string; done?: string; total?: string; recordPage: string };
+  /** Epic 33 (`AppPresence`): online while the person has a row; going online adds it, offline removes it. */
+  presence?: { list: string; create: string; remove?: string };
+  /** Epic 33 (`AppTimeline`): a record's status as steps, in the order its transitions run. */
+  timeline?: { field: string; states: string[] };
+  /** Epic 33 (`AppChart`): readings over time, one small chart per measure. */
+  chart?: { time: string; series: { field: string; label: string; unit?: string }[]; hours?: number };
 };
 
 /** One app section as the screen planner wrote it (Epic 22): its binding is in `data`, `form` and `content`. */

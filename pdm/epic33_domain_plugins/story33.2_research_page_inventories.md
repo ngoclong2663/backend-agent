@@ -33,8 +33,8 @@ generated app feels like a real product of its kind, not a database with a menu.
 
 ## Acceptance criteria
 
-- [ ] Nine inventories (two types each for learning, socials, news, IoT; one for drivers) reviewed by the user.
-- [ ] Every main task in 33.1 has a click budget backed by the research.
+- [x] Nine inventories (two types each for learning, socials, news, IoT; one for drivers) reviewed by the user.
+- [x] Every main task in 33.1 has a click budget backed by the research.
 
 ## Verify
 
@@ -44,7 +44,7 @@ The user's review of `docs/domains/`.
 
 Proposed 2026-11-10.
 
-**Written 2026-11-10, waiting for the user's review.** `docs/domains/research-checklist.md` (how clicks are counted:
+**Done 2026-11-10 (reviewed and accepted by the user).** `docs/domains/research-checklist.md` (how clicks are counted:
 from the area's home, signed in, a tap and a confirm each one, typing free) and nine inventories under
 `docs/domains/<domain>/<type>.md`, each with the products studied, people and areas, pages with their slots in order,
 main tasks with paths and budgets, the data pages need (and what the server computes), states, what each role never

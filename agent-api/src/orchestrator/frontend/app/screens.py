@@ -347,11 +347,13 @@ class _Screens:
         allowed: set[str] | None = None,
         pattern: Any = None,
         main: str | None = None,
+        kind: Any = None,
     ):
         """`pattern`: the area's product pattern (Epic 32; None or `back-office`: the planner as it always was);
         `main`: the area's main entity."""
         self.backend, self.outline, self.contract = backend, outline, contract
         self.pattern, self.main = pattern, main
+        self.kind = kind  # Epic 33: the area's type plugin (its home slots); None: no type
         self._shapes: dict[str, dict[str, Any]] | None = None
         self.operations = contract_operations(contract)
         if allowed is not None:  # Story 23.10: an area plans only what its roles may call
@@ -1012,7 +1014,7 @@ class _Screens:
                 delete["onSuccess"]["navigate"] = slug
             actions.append(delete)
             self.place(crud["delete"])
-        return actions
+        return self.with_proof(entity, actions)
 
     def list_section(
         self,
@@ -1296,39 +1298,206 @@ class _Screens:
         return [attached for attached in self.features.get(entity, []) if attached["feature"] == feature]
 
     def reaction_actions(self, entity: str, record: str) -> list[dict[str, Any]]:
-        """The reactions feature: one toggle per kind, showing whether the person did it and the count."""
+        """The features' toggles on a record (a like, a save, a follow): each shows whether the person did it."""
+        from ...drafting.features import feature_toggles
+
+        person = ((self.backend.get("auth") or {}).get("userEntity")) or "User"
         out: list[dict[str, Any]] = []
-        for attached in self._attached(entity, "reactions"):
-            owned = next(iter(attached.get("entities") or []), None)
-            crud = self.feature_crud.get(owned or "", {})
-            create, delete = crud.get("create"), crud.get("delete")
-            if not create or create not in self.operations:
-                continue
-            target_field = entity[:1].lower() + entity[1:] + "Id"
-            for kind in (attached.get("options") or {}).get("kinds") or ["like"]:
-                kind = str(kind)
-                title = kind[:1].upper() + kind[1:]
+        for attached in self.features.get(entity, []):
+            for toggle in feature_toggles(attached, person, record):
+                if toggle["create"] not in self.operations:
+                    continue
+                undo = toggle.get("undo")
                 out.append(
                     {
-                        "id": f"react-{kind}",
-                        "label": title,
+                        "id": toggle["id"],
+                        "label": toggle["label"],
                         "kind": "reaction",
-                        "reaction": kind,
-                        "operationId": create,
-                        **({"undoOperationId": delete} if delete in self.operations else {}),
-                        "state": f"my{title}Id",
-                        "count": f"{kind}Count",
-                        "body": {target_field: record, "kind": kind},
+                        "reaction": toggle["reaction"],
+                        "operationId": toggle["create"],
+                        **({"undoOperationId": undo} if undo in self.operations else {}),
+                        "state": toggle["state"],
+                        **({"count": toggle["count"]} if toggle.get("count") else {}),
+                        "body": toggle.get("body") or {},
                     }
                 )
-            self.place(create)
-            if delete in self.operations:
-                self.place(delete)
+                self.place(toggle["create"])
+                if undo in self.operations:
+                    self.place(undo)
         return out
 
+    def _feature_of(self, feature: str) -> list[dict[str, Any]]:
+        return [attached for items in self.features.values() for attached in items if attached["feature"] == feature]
+
+    def type_home(self) -> None:
+        """Epic 33: the area's type puts its home slots first on the home page (a resume card, an Online switch, the
+        charts of the last day). A slot the app has nothing for is left out."""
+        if self.kind is None:
+            return
+        home = next((page for page in self.pages if page["id"] == "home"), None)
+        pages = [page for page in self.kind.pages if page.route == "/"]
+        if home is None or not pages:
+            return
+        added: list[dict[str, Any]] = []
+        for slot in pages[0].sections:
+            section = None
+            if slot.slot == "resume-card":
+                section = self.resume_section()
+            elif slot.slot == "availability-toggle":
+                section = self.presence_section()
+            elif slot.slot == "chart":
+                section = self.chart_section(None)
+            if section is not None:
+                added.append(section)
+        home["sections"] = added + home["sections"]
+
+    def resume_section(self) -> dict[str, Any] | None:
+        for attached in self._feature_of("enrollment"):
+            course = attached["on"]
+            listing = self.crud.get(course, {}).get("list")
+            if not listing or course not in self.entities:
+                continue
+            total = next(
+                (c["field"] for f in self._feature_of("completion") for c in f.get("computed") or []
+                 if c.get("target") == course and c["kind"] == "count" and not c.get("owner")),
+                None,
+            )  # fmt: skip
+            done = next(
+                (c["field"] for f in self._feature_of("completion") for c in f.get("computed") or []
+                 if c.get("target") == course and c.get("owner")),
+                None,
+            )  # fmt: skip
+            self.place(listing)
+            resume = {"state": "myEnrollmentId", "recordPage": f"{self.slug(course)}-id"}
+            return {
+                "id": "resume",
+                "component": "AppResume",
+                "data": {"operationId": listing, "params": {}, "fields": []},
+                "content": {
+                    "entity": course,
+                    "title": "Continue learning",
+                    "resume": resume | ({"done": done, "total": total} if done and total else {}),
+                    "progress": bool(done and total),
+                },
+            }
+        return None
+
+    def presence_section(self) -> dict[str, Any] | None:
+        for attached in self._feature_of("availability"):
+            owned = next(iter(attached.get("entities") or []), None)
+            crud = self.feature_crud.get(owned or "", {})
+            listing, create, remove = crud.get("list"), crud.get("create"), crud.get("delete")
+            if not (listing in self.operations and create in self.operations):
+                continue
+            used = [op for op in (listing, create, remove) if op in self.operations]
+            for op_id in used:
+                self.place(op_id)
+            presence = {"list": listing, "create": create, **({"remove": remove} if remove in self.operations else {})}
+            return {
+                "id": "presence",
+                "component": "AppPresence",
+                "content": {
+                    "title": "Availability",
+                    "presence": presence,
+                    "operations": used,
+                    "actions": [{"id": "go-online", "label": "Go online", "kind": "mutation", "operationId": create}],
+                },
+            }
+        return None
+
+    def chart_section(self, device: str | None) -> dict[str, Any] | None:
+        """Telemetry: the readings' measures over the last day (on a device's page: that device's)."""
+        for attached in self._feature_of("telemetry"):
+            reading = attached["on"]
+            options = attached.get("options") or {}
+            listing = self.crud.get(reading, {}).get("list")
+            if not listing or listing not in self.operations or reading not in self.entities:
+                continue
+            if device is not None and options.get("device") != device:
+                continue
+            key = options.get("deviceField")
+            if device is not None and key not in self.query_params(listing):
+                continue
+            series = [
+                {"field": name, "label": humanize(name)}
+                for name in _numeric(self.entities[reading], {key or ""})
+                if name in self.response_fields(listing)
+            ]
+            if not series:
+                continue
+            self.place(listing)
+            params = {key: "$route.id"} if device is not None and key else {}
+            return {
+                "id": f"{self.slug(reading)}-chart",
+                "component": "AppChart",
+                "data": {"operationId": listing, "params": params, "fields": []},
+                "content": {
+                    "entity": reading,
+                    "title": "Last 24 hours",
+                    "chart": {"time": options.get("time") or "createdAt", "series": series[:6], "hours": 24},
+                },
+            }
+        return None
+
+    def device_charts(self, entity: str) -> list[dict[str, Any]]:
+        section = self.chart_section(entity) if self._feature_of("telemetry") else None
+        return [section] if section else []
+
+    def timeline_sections(self, entity: str) -> list[dict[str, Any]]:
+        """Tracking: the record's status as the steps of its journey, in the order its flow's states are declared."""
+        if not self._attached(entity, "tracking"):
+            return []
+        flow = self.transitions.get(entity) or {}
+        field = flow.get("field")
+        values = next((f.get("values") for f in self.entities[entity].get("fields") or [] if f["name"] == field), None)
+        get = self.crud[entity].get("get")
+        if not field or not values or not get:
+            return []
+        return [
+            {
+                "id": f"{self.slug(entity)}-timeline",
+                "component": "AppTimeline",
+                "data": {"operationId": get, "params": {"id": "$route.id"},
+                         "fields": [field]},
+                "content": {"entity": entity, "title": "Progress", "timeline": {"field": field, "states": values}},
+            }
+        ]  # fmt: skip
+
+    def with_proof(self, entity: str, actions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Proof of delivery: the move to the delivered state asks for the photo first (a form in a dialog)."""
+        for attached in self._attached(entity, "proof-of-delivery"):
+            options = attached.get("options") or {}
+            state, photo = options.get("state"), options.get("field")
+            update = self.crud[entity].get("update")
+            props = self.request(update)[0] if update else {}
+            meta = (props.get(photo or "") or {}).get("x-bga") or {}
+            if not update or meta.get("source") != "upload":
+                continue
+            flow = self.transitions.get(entity) or {}
+            for action in actions:
+                if (action.get("body") or {}).get(flow.get("field")) != state or action.get("form"):
+                    continue
+                form_id = f"{self.slug(entity).replace('-', '_')}_{to_kebab(str(state)).replace('-', '_')}_proof"
+                if not any(form["id"] == form_id for form in self.forms):
+                    status = {"name": flow["field"], "type": "string", "hidden": True, "value": state, "required": True}
+                    upload = self.upload_field(entity, photo, meta.get("upload") or {}, True, self.shown(entity))
+                    self.add_form(
+                        {
+                            "id": form_id,
+                            "operationId": update,
+                            "fields": [status, upload],
+                            "submitLabel": action["label"],
+                            "onSuccess": action.get("onSuccess") or {},
+                        }
+                    )
+                action["form"] = form_id
+                action.pop("body", None)
+        return actions
+
     def feature_sections(self, entity: str) -> list[dict[str, Any]]:
-        """The comments feature: the record's thread, written and answered on its page."""
-        out: list[dict[str, Any]] = []
+        """The comments feature: the record's thread, written and answered on its page; tracking: its status as steps;
+        telemetry: on a device's page, its readings as charts."""
+        out: list[dict[str, Any]] = self.timeline_sections(entity) + self.device_charts(entity)
         for attached in self._attached(entity, "comments"):
             owned = next(iter(attached.get("entities") or []), None)
             crud = self.feature_crud.get(owned or "", {})
@@ -1522,6 +1691,7 @@ class _Screens:
             self.page("home", "/", name, self.dashboard(name))
             nav.insert(0, {"label": self.w("dashboard"), "page": "home"})
         self.nav = nav + self.nav
+        self.type_home()
         if self.consumer:
             self.nav = self.pattern_menu()
         else:
@@ -1714,7 +1884,9 @@ def _area_screens(
         }
         main = design.get("mainEntity") or home_entity(design)
         pattern = screen_pattern(design.get("archetype"), area.get("roles") or [], main, contract)
-        screens = _Screens(backend, area_outline, contract, allowed, pattern=pattern, main=main)
+        screens = _Screens(
+            backend, area_outline, contract, allowed, pattern=pattern, main=main, kind=_area_type(outline, area["id"])
+        )
         built = screens.build(name)
         if index == 0:
             first = screens
@@ -1733,7 +1905,14 @@ def _area_screens(
             renamed["id"] = ids[page["id"]]
             renamed["route"] = prefix + ("" if page["route"] == "/" else page["route"])
             pages.append(renamed)
-        used = {s.get("form") for page in own for s in page["sections"]}
+        # the forms its pages open: a section's, and an action's dialog (found on the courier draft: a driver's
+        # "Complete delivery" pointed at a form the area never kept)
+        used = {s.get("form") for page in own for s in page["sections"]} | {
+            action.get("form")
+            for page in own
+            for s in page["sections"]
+            for action in (s.get("content") or {}).get("actions") or []
+        }
         for form in screens.forms:
             if form["id"] in used:
                 forms.append({**_renamed(form, ids, form_ids), "id": form_ids[form["id"]]})
@@ -1778,3 +1957,28 @@ def _spec(
 
 def _description(project: dict[str, Any]) -> dict[str, Any]:
     return {"description": project["description"]} if project.get("description") else {}
+
+
+def _area_type(outline: dict[str, Any], area: str) -> Any:
+    """Epic 33: the type plugin's part for this area (its home slots), from the outline's checked domain."""
+    domain = outline.get("domain") or {}
+    name = (domain.get("types") or {}).get(area)
+    if not domain.get("name") or not name:
+        return None
+    from src.modules.shared.domain.domains.registry import registry
+
+    kind = registry().type(domain["name"], name)
+    if kind is None:
+        return None
+    # the draft's own area id (`driver`) mapped to a type that lays out one of the domain's areas (`drivers`)
+    return kind.areas.get(area) or (next(iter(kind.areas.values())) if len(kind.areas) == 1 else None)
+
+
+def _numeric(entity: dict[str, Any], skip: set[str]) -> list[str]:
+    """An entity's measures: its number fields that are not keys, counts of its own or settings."""
+    out = []
+    for item in entity.get("fields") or []:
+        name = item["name"]
+        if item.get("type") in ("integer", "float", "decimal") and name not in skip and not name.endswith("Id"):
+            out.append(name)
+    return out

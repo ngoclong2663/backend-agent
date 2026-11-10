@@ -1,0 +1,24 @@
+{
+  "name": "telemetry",
+  "status": "ready",
+  "label": "Telemetry",
+  "attachesTo": "reading",
+  "choose": "Readings over time drawn as charts per measure, on the overview and on each device.",
+  "options": {
+    "device": {
+      "default": "Device"
+    },
+    "deviceField": {
+      "default": "deviceId"
+    },
+    "time": {
+      "default": "recordedAt"
+    }
+  },
+  "kit": {
+    "slots": [
+      "chart",
+      "reading-grid"
+    ]
+  }
+}

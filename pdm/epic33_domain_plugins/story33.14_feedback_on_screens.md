@@ -55,3 +55,16 @@ change applied, so that I can fix the UI without rewriting my requirement and ge
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** `orchestrator/feedback.py`: one LLM turn (`screen_feedback`, the comment passed
+as data, what it points at, the app's menu, pages, the target page's actions and its accent) answers a patch from a
+fixed vocabulary (`rename-menu`, `page-title`, `comments` inline or sheet, `remove-action`, `accent`) or says `data` /
+`request`; code applies each change to a copy of the FrontendSpec, drops what doesn't fit with why, and turns a choices
+answer with nothing applicable into a request (never silently lost). `POST /api/v1/generations/{id}/feedback`
+(`{target: "<page>/<section>", comment}`) returns the outcome, the changes and the revised FrontendSpec; requests are
+appended to `ARTIFACT_ROOT/plugin-requests.jsonl`, listed for admins at `GET /api/v1/generations/plugin-requests`. The
+kit's `CommentThread` renders in a sheet when `placement: "sheet"`. Tests: `test_screen_feedback.py`.
+
+Deviations: no inspect mode in the UI yet; applying a revised spec is a new generation from it (no revision history or
+restore, no frontend-only rebuild); the turn runs in the API process with the configured LLM provider (a container API
+can't reach the host-only Antigravity login; the worker-queued version is future work); no custom view slot offer.

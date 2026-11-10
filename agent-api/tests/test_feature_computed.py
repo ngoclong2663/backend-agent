@@ -133,7 +133,8 @@ def test_the_generated_code_counts_and_finds_the_callers_row():
     assert "func.count()" in repo and ".group_by(col(ClipReactionModel.clip_id))" in repo
     assert "col(ClipReactionModel.member_id) == viewer" in repo and "col(ClipReactionModel.kind) == 'like'" in repo
     dto = next(t for p, t in files.items() if p.endswith("dtos/clip_response_dto.py"))
-    assert "like_count: int = 0" in dto and "my_like_id: uuid.UUID | None = None" in dto
+    # required, as the contract lists them (found on real runs: the openapi check flagged them optional)
+    assert "like_count: int\n" in dto and "my_like_id: uuid.UUID | None\n" in dto
     usecases = "\n".join(t for p, t in files.items() if "/usecases/" in p)
     assert "viewer=current_user.id if current_user else None" in usecases  # get and list know the caller
 

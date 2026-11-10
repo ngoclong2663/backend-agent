@@ -1,0 +1,33 @@
+{
+  "name": "courier",
+  "label": "Courier",
+  "status": "ready",
+  "choose": "A driver's phone: an Online switch and the offers on the home, the active job as steps, earnings.",
+  "areas": {
+    "drivers": {
+      "home": "home",
+      "pages": [
+        {
+          "id": "home",
+          "title": "Today",
+          "route": "/",
+          "menu": true,
+          "sections": [
+            {
+              "slot": "availability-toggle",
+              "bind": {
+                "feature": "availability"
+              }
+            },
+            {
+              "slot": "offer-list",
+              "bind": {
+                "role": "delivery"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -2,9 +2,11 @@ from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Header, Query, status
 from fastapi.responses import FileResponse
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 from sse_starlette import EventSourceResponse
 
-from src.modules.auth.presenter import CurrentUserDep
+from src.modules.auth.presenter import AdminUserDep, CurrentUserDep
 from src.modules.generations.presenter.dtos import (
     ArtifactDto,
     ArtifactListDto,
@@ -32,6 +34,7 @@ from src.modules.generations.usecases import (
     RequirementInput,
     StreamGenerationEventsUsecaseDep,
 )
+from src.modules.generations.usecases.screen_feedback_usecase import ScreenFeedbackUsecaseDep, plugin_requests
 from src.modules.previews.presenter.dtos import PreviewDto
 from src.modules.shared.domain.enums import GenerationMode, GenerationStatus
 
@@ -127,6 +130,12 @@ async def get_workflow_graph(
     return await usecase.execute(mode)
 
 
+@generation_router.get("/plugin-requests", response_model=dict[str, Any])
+async def list_plugin_requests(user: AdminUserDep) -> dict[str, Any]:
+    """Epic 33 (Story 33.14): what users asked of their screens that no plugin could do, newest first."""
+    return {"items": plugin_requests()}
+
+
 @generation_router.get("/{generation_id}", response_model=GenerationDetailDto)
 async def get_generation(generation_id: str, user: CurrentUserDep, usecase: GetGenerationUsecaseDep):
     return GenerationDetailDto.from_detail(await usecase.execute(generation_id, user))
@@ -142,6 +151,22 @@ async def cancel_generation(
     return CancelGenerationResponseDto(
         generation_id=generation.id, status=generation.status, cancel_requested=generation.cancel_requested
     )
+
+
+class ScreenFeedbackRequestDto(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    target: str | None = Field(default=None, max_length=200)  # `<page id>/<section id>` (`data-bga-section`)
+    comment: str = Field(min_length=1, max_length=1000)
+
+
+@generation_router.post("/{generation_id}/feedback", response_model=dict[str, Any])
+async def screen_feedback(
+    generation_id: str, body: ScreenFeedbackRequestDto, user: CurrentUserDep, usecase: ScreenFeedbackUsecaseDep
+) -> dict[str, Any]:
+    """Epic 33 (Story 33.14): a comment on a screen, turned into changes of the app's choices (the revised
+    FrontendSpec to generate again), a data change, or a plugin request."""
+    return await usecase.execute(generation_id, user, body.target, body.comment)
 
 
 @generation_router.get("/{generation_id}/events")

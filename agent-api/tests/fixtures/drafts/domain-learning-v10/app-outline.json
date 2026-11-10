@@ -1,0 +1,757 @@
+{
+  "name": "Brightpath Academy",
+  "tagline": "Calm, self-paced online course academy",
+  "icon": "GraduationCap",
+  "nav": [
+    {
+      "entity": "Course",
+      "label": "Courses",
+      "icon": "BookOpen"
+    },
+    {
+      "entity": "Category",
+      "label": "Categories",
+      "icon": "Tag"
+    },
+    {
+      "entity": "Review",
+      "label": "Course Reviews",
+      "icon": "Star"
+    }
+  ],
+  "home": "Course",
+  "entities": {
+    "Category": {
+      "label": "Category",
+      "plural": "Categories",
+      "displayField": "name",
+      "listFields": [
+        "name",
+        "status"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "name",
+        "description",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "name": "Category Name",
+        "description": "Description",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    },
+    "Course": {
+      "label": "Course",
+      "plural": "Courses",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "categoryId",
+        "instructorId",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "categoryId",
+        "instructorId",
+        "title",
+        "description",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "categoryId": "Category",
+        "instructorId": "Instructor",
+        "title": "Title",
+        "description": "Course Description",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "categoryId": "Choose an active category for the course."
+      }
+    },
+    "Lesson": {
+      "label": "Lesson",
+      "plural": "Lessons",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "courseId",
+        "orderIndex",
+        "contentType",
+        "status"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "courseId",
+        "title",
+        "orderIndex",
+        "contentType",
+        "textContent",
+        "videoFile",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "title": "Lesson Title",
+        "orderIndex": "Lesson Order",
+        "contentType": "Type",
+        "textContent": "Content",
+        "videoFile": "Video",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {
+        "orderIndex": "Sequential order of the lesson in the curriculum."
+      }
+    },
+    "Quiz": {
+      "label": "Quiz",
+      "plural": "Quizes",
+      "displayField": "title",
+      "listFields": [
+        "title",
+        "lessonId"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "lessonId",
+        "title",
+        "questions",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "lessonId": "Lesson",
+        "title": "Quiz Title",
+        "questions": "Questions",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    },
+    "QuizSubmission": {
+      "label": "Quiz submission",
+      "plural": "Quiz submissions",
+      "displayField": "quizId",
+      "listFields": [
+        "quizId",
+        "learnerId",
+        "status",
+        "completedAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "quizId",
+        "learnerId",
+        "status",
+        "completedAt"
+      ],
+      "fieldLabels": {
+        "quizId": "Quiz",
+        "learnerId": "Learner",
+        "status": "Status",
+        "completedAt": "Completed Date"
+      },
+      "help": {}
+    },
+    "Review": {
+      "label": "Review",
+      "plural": "Reviews",
+      "displayField": "rating",
+      "listFields": [
+        "courseId",
+        "learnerId",
+        "rating",
+        "createdAt"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "courseId",
+        "learnerId",
+        "rating",
+        "comment",
+        "status",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "learnerId": "Learner",
+        "rating": "Star Rating",
+        "comment": "Review Feedback",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    },
+    "CourseEnrollment": {
+      "label": "Course enrollment",
+      "plural": "Course enrollments",
+      "displayField": "courseId",
+      "listFields": [
+        "courseId",
+        "learnerId",
+        "enrolledAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "courseId",
+        "learnerId",
+        "enrolledAt"
+      ],
+      "fieldLabels": {
+        "courseId": "Course",
+        "learnerId": "Learner",
+        "enrolledAt": "Enrolled at"
+      },
+      "help": {}
+    },
+    "LessonCompletion": {
+      "label": "Lesson completion",
+      "plural": "Lesson completions",
+      "displayField": "lessonId",
+      "listFields": [
+        "lessonId",
+        "courseId",
+        "learnerId",
+        "completedAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "lessonId",
+        "courseId",
+        "learnerId",
+        "completedAt"
+      ],
+      "fieldLabels": {
+        "lessonId": "Lesson",
+        "courseId": "Course id",
+        "learnerId": "Learner",
+        "completedAt": "Completed at"
+      },
+      "help": {}
+    },
+    "LessonComment": {
+      "label": "Lesson comment",
+      "plural": "Lesson comments",
+      "displayField": "text",
+      "listFields": [
+        "text",
+        "lessonId",
+        "authorId",
+        "parentId"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "lessonId",
+        "authorId",
+        "parentId",
+        "text",
+        "createdAt"
+      ],
+      "fieldLabels": {
+        "lessonId": "Lesson",
+        "authorId": "Author",
+        "parentId": "Parent",
+        "text": "Text",
+        "createdAt": "Created at"
+      },
+      "help": {}
+    }
+  },
+  "design": {
+    "archetype": "learning",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "wide",
+    "density": "comfortable",
+    "mainEntity": "Course",
+    "entities": {
+      "Category": {
+        "view": "table",
+        "roles": {
+          "title": "name",
+          "badge": "status"
+        },
+        "filtersStyle": "toolbar"
+      },
+      "Course": {
+        "view": "cards",
+        "roles": {
+          "title": "title",
+          "badge": "categoryId",
+          "meta": [
+            "instructorId",
+            "createdAt"
+          ]
+        },
+        "detailView": "split-panel",
+        "filtersStyle": "chips",
+        "card": "stacked"
+      },
+      "Lesson": {
+        "view": "table",
+        "roles": {
+          "title": "title",
+          "badge": "status",
+          "meta": [
+            "contentType",
+            "orderIndex"
+          ],
+          "media": "videoFile"
+        },
+        "detailView": "reader"
+      },
+      "Quiz": {
+        "view": "cards",
+        "roles": {
+          "title": "title"
+        },
+        "card": "text-first"
+      },
+      "QuizSubmission": {
+        "view": "table",
+        "roles": {}
+      },
+      "Review": {
+        "view": "feed",
+        "roles": {
+          "title": "courseId",
+          "badge": "rating",
+          "subtitle": "comment"
+        }
+      },
+      "LessonComment": {
+        "view": "table",
+        "roles": {}
+      }
+    },
+    "homeView": "catalogue",
+    "looks": [
+      {
+        "recipe": "clay",
+        "reason": "Calm, studious, and airy with ample whitespace and rounded components fitting self-paced education.",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Refined flat design emphasizing quiet reading, clarity, and deep teal focus.",
+        "fontPairing": "workshop"
+      },
+      {
+        "recipe": "swiss",
+        "reason": "Structured informational clarity and high readability across curriculums and categories.",
+        "fontPairing": "neutral"
+      }
+    ],
+    "requested": {
+      "accent": "#005f73",
+      "words": "calm and studious, plenty of white space, a deep teal accent"
+    },
+    "seed": 2681966919,
+    "reason": "Brightpath Academy is a calm self-paced learning platform where learners browse courses and progress through lessons, while instructors and admins manage curriculums.",
+    "replaced": [
+      "entity 'Enrollment' is not in the BackendSpec; left out",
+      "Course: stat 'rating' left out (no such field)"
+    ],
+    "fontPairing": "geometric"
+  },
+  "areas": [
+    {
+      "id": "learners",
+      "label": "Learner Workspace",
+      "roles": [
+        "learner"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "learning",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "wide",
+        "density": "comfortable",
+        "mainEntity": "Course",
+        "entities": {
+          "Category": {
+            "view": "table",
+            "roles": {}
+          },
+          "Course": {
+            "view": "table",
+            "roles": {},
+            "detailView": "split-panel",
+            "filtersStyle": "toolbar",
+            "card": "stacked"
+          },
+          "Lesson": {
+            "view": "cards",
+            "roles": {
+              "media": "videoFile"
+            },
+            "detailView": "watch",
+            "card": "stacked"
+          },
+          "Quiz": {
+            "view": "table",
+            "roles": {}
+          },
+          "QuizSubmission": {
+            "view": "table",
+            "roles": {}
+          },
+          "Review": {
+            "view": "table",
+            "roles": {}
+          },
+          "LessonComment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "catalogue"
+      }
+    },
+    {
+      "id": "instructors",
+      "label": "Instructor Studio",
+      "roles": [
+        "instructor"
+      ],
+      "prefix": "/instructors",
+      "design": {
+        "archetype": "workspace",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "full",
+        "density": "comfortable",
+        "mainEntity": "Course",
+        "entities": {
+          "Category": {
+            "view": "table",
+            "roles": {}
+          },
+          "Course": {
+            "groupBy": "status",
+            "view": "board",
+            "roles": {},
+            "detailView": "record",
+            "filtersStyle": "chips",
+            "card": "stacked"
+          },
+          "Lesson": {
+            "view": "cards",
+            "roles": {
+              "media": "videoFile"
+            },
+            "detailView": "watch",
+            "card": "stacked"
+          },
+          "Quiz": {
+            "view": "table",
+            "roles": {}
+          },
+          "QuizSubmission": {
+            "view": "table",
+            "roles": {}
+          },
+          "Review": {
+            "view": "table",
+            "roles": {}
+          },
+          "LessonComment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "admins",
+      "label": "Admin Console",
+      "roles": [
+        "admin"
+      ],
+      "prefix": "/admins",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "standard",
+        "density": "compact",
+        "mainEntity": "Category",
+        "entities": {
+          "Category": {
+            "view": "cards",
+            "roles": {},
+            "detailView": "split-panel",
+            "filtersStyle": "toolbar",
+            "card": "text-first"
+          },
+          "Course": {
+            "view": "table",
+            "roles": {}
+          },
+          "Lesson": {
+            "view": "cards",
+            "roles": {
+              "media": "videoFile"
+            },
+            "detailView": "watch",
+            "card": "stacked"
+          },
+          "Quiz": {
+            "view": "table",
+            "roles": {}
+          },
+          "QuizSubmission": {
+            "view": "table",
+            "roles": {}
+          },
+          "Review": {
+            "view": "table",
+            "roles": {}
+          },
+          "LessonComment": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    }
+  ],
+  "domain": {
+    "name": "learning",
+    "roles": {
+      "course": "Course",
+      "lesson": "Lesson"
+    },
+    "types": {
+      "admins": "course-catalogue",
+      "instructors": "course-catalogue",
+      "learners": "course-catalogue"
+    },
+    "features": []
+  },
+  "dashboard": [
+    {
+      "label": "Published Courses",
+      "kind": "figure",
+      "entity": "Course",
+      "fn": "count",
+      "filter": {
+        "status": "published"
+      }
+    },
+    {
+      "label": "Courses by Status",
+      "kind": "pie",
+      "entity": "Course",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    }
+  ],
+  "workflows": {
+    "version": "8268a4355517",
+    "tours": [
+      {
+        "id": "course_learning_and_completion",
+        "name": "Learn and Complete Course",
+        "outcome": "Learner finishes all lessons and completes the course.",
+        "roles": [
+          "learner"
+        ],
+        "steps": [
+          {
+            "id": "step_browse_catalogue",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Browse catalogue by category. Rule: Only published courses are visible",
+            "operationId": "course.list",
+            "page": "home",
+            "route": "/",
+            "target": {
+              "section": "resume",
+              "action": null
+            },
+            "kind": "look",
+            "record": "course"
+          },
+          {
+            "id": "step_enroll_course",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Enroll in course (the enrollment becomes active). Rule: Learner must not already be enrolled",
+            "operationId": "courseEnrollment.create",
+            "statusAfter": "active",
+            "page": "courses-id",
+            "route": "/courses/[id]",
+            "target": {
+              "section": "courses-detail",
+              "action": "enroll"
+            },
+            "kind": "do",
+            "record": "enrollment"
+          },
+          {
+            "id": "step_view_lesson",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Resume and view next lesson (the lesson becomes in_progress). Rule: Must follow lesson order",
+            "operationId": "lesson.start",
+            "statusAfter": "in_progress",
+            "page": "lessons-id",
+            "route": "/lessons/[id]",
+            "target": {
+              "section": "lessons-detail",
+              "action": "start"
+            },
+            "kind": "do",
+            "record": "lesson"
+          },
+          {
+            "id": "step_mark_lesson_complete",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Mark lesson complete (the lesson_progress becomes completed). Rule: All previous lessons must be completed",
+            "operationId": "lessonCompletion.create",
+            "statusAfter": "completed",
+            "page": "lessons-id",
+            "route": "/lessons/[id]",
+            "target": {
+              "section": "lessons-detail",
+              "action": "complete"
+            },
+            "kind": "do",
+            "record": "lesson_progress"
+          },
+          {
+            "id": "step_complete_course",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Complete course (the enrollment becomes completed). Rule: All lessons in the course must be marked complete",
+            "operationId": null,
+            "statusAfter": "completed",
+            "automatic": true,
+            "page": "courses-id",
+            "route": "/courses/[id]",
+            "kind": "note",
+            "record": "enrollment"
+          }
+        ]
+      },
+      {
+        "id": "course_publishing",
+        "name": "Publish Course",
+        "outcome": "A structured course is published and available for learner enrollment.",
+        "roles": [
+          "admin",
+          "instructor"
+        ],
+        "steps": [
+          {
+            "id": "step_create_category",
+            "role": "admin",
+            "actor": "Administrator",
+            "title": "Create category (the category becomes active). Rule: Category name must be unique",
+            "operationId": "category.create",
+            "statusAfter": "active",
+            "page": "admins-categories-new",
+            "route": "/admins/categories/new",
+            "target": {
+              "section": "category-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "category"
+          },
+          {
+            "id": "step_create_course",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Create course draft (the course becomes draft). Rule: Must select an existing category",
+            "operationId": "course.create",
+            "statusAfter": "draft",
+            "page": "instructors-categories-id-courses-new",
+            "route": "/instructors/categories/[id]/courses/new",
+            "target": {
+              "section": "course-create-in-category-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "course"
+          },
+          {
+            "id": "step_add_lessons",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Add ordered lessons and quizzes (the lesson becomes draft). Rule: Lessons must have video or written content and sequential order",
+            "operationId": "lesson.create",
+            "statusAfter": "draft",
+            "page": "instructors-courses-id-lessons-new",
+            "route": "/instructors/courses/[id]/lessons/new",
+            "target": {
+              "section": "lesson-create-in-course-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "lesson"
+          },
+          {
+            "id": "step_publish_course",
+            "role": "instructor",
+            "actor": "Instructor",
+            "title": "Publish course (the course becomes published). Rule: Course must contain at least one lesson",
+            "operationId": "course.publish",
+            "statusAfter": "published",
+            "page": "instructors-courses-id",
+            "route": "/instructors/courses/[id]",
+            "target": {
+              "section": "courses-detail",
+              "action": "publish"
+            },
+            "kind": "do",
+            "record": "course",
+            "needs": {
+              "step": "step_create_course",
+              "role": "instructor",
+              "status": "draft"
+            }
+          }
+        ]
+      },
+      {
+        "id": "course_reviewing",
+        "name": "Review Course",
+        "outcome": "Learner review and rating are published for the completed course.",
+        "roles": [
+          "learner"
+        ],
+        "steps": [
+          {
+            "id": "step_submit_review",
+            "role": "learner",
+            "actor": "Learner",
+            "title": "Submit course rating and review (the review becomes published). Rule: Learner must have completed the course and can only review once",
+            "operationId": "review.create",
+            "statusAfter": "published",
+            "page": "courses-id-reviews-new",
+            "route": "/courses/[id]/reviews/new",
+            "target": {
+              "section": "review-create-in-course-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "review"
+          }
+        ]
+      }
+    ]
+  }
+}

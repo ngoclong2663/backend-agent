@@ -78,7 +78,7 @@ def _replaced(spec: dict[str, Any], feature: FeatureDescriptor, target: str, own
         if not any(bare == w or bare == pluralize(w) or name.lower() == w for w in words):
             continue
         fields = {field["name"] for field in entity.get("fields") or []}
-        if fk in fields or name in children:
+        if fk in fields or name in children or feature.replaces_anywhere:
             out.append(name)
     return out
 
@@ -117,7 +117,7 @@ def attach(spec: dict[str, Any], uses: list[dict[str, Any]]) -> tuple[dict[str, 
             continue
         target = target or person
         options = {**{k: v.get("default") for k, v in feature.options.items()}, **(use.get("options") or {})}
-        words = _words(target, person)
+        words = {**_words(target, person), **_option_words(options)}
         lists = {name: _option_values(feature, options, name) for name in feature.options}
         fragment = _fill(feature.spec, words, lists)
         new_names = [entity["name"] for entity in fragment.get("entities") or []]
@@ -137,6 +137,7 @@ def attach(spec: dict[str, Any], uses: list[dict[str, Any]]) -> tuple[dict[str, 
         for key in ("entities", "relationships", "operations", "rules", "policies", "seed"):
             if fragment.get(key):
                 out.setdefault(key, []).extend(fragment[key])
+        _target_fields(out, target, fragment.get("targetFields") or [], notes, feature.label)
         computed = []
         for item in feature.computed:
             values = lists.get("kinds") if "{kind}" in item.field or "{Kind}" in item.field else [None]
@@ -153,6 +154,56 @@ def attach(spec: dict[str, Any], uses: list[dict[str, Any]]) -> tuple[dict[str, 
     if not out["features"]:
         out.pop("features")
     return out, notes
+
+
+def _target_fields(
+    spec: dict[str, Any], target: str, fields: list[dict[str, Any]], notes: list[Note], label: str
+) -> None:
+    """Fields a feature needs on its target (a delivery's proof photo): added when missing; a drafted one of the same
+    name takes the feature's type (a `proofPhoto` drafted as a string becomes an image)."""
+    entity = next((e for e in spec.get("entities") or [] if e["name"] == target), None)
+    if entity is None:
+        return
+    for wanted in fields:
+        found = next((f for f in entity["fields"] if f["name"] == wanted["name"]), None)
+        if found is None:
+            entity["fields"].append(dict(wanted))
+            notes.append(_note(f"/entities/{target}", f"{label} added {target}.{wanted['name']}"))
+        elif found.get("type") != wanted.get("type"):
+            found["type"] = wanted["type"]
+            for key in ("maxLength",):
+                found.pop(key, None)
+
+
+def _option_words(options: dict[str, Any]) -> dict[str, str]:
+    """A feature's text options as placeholders (`{subject}` = Author), with camel and kebab forms."""
+    out: dict[str, str] = {}
+    for name, value in options.items():
+        if isinstance(value, str) and value:
+            out[name] = value
+            out[f"{name}Camel"] = _camel(value)
+            out[f"{name}Path"] = to_kebab(value)
+    return out
+
+
+def feature_toggles(attached: dict[str, Any], person: str, record: str) -> list[dict[str, Any]]:
+    """The toggles an attached feature (a spec's `features` entry) puts on its target, filled for this place
+    (`record`: `$record.id` on a card, `$route.id` on the record's page)."""
+    feature = registry().feature(attached["feature"])
+    if feature is None:
+        return []
+    options = attached.get("options") or {}
+    words = {**_words(attached["on"], person), **_option_words(options), "record": record}
+    lists = {name: _option_values(feature, options, name) for name in feature.options}
+    out = []
+    for toggle in feature.kit.toggles:
+        values = lists.get(toggle.each, [None]) if toggle.each else [None]
+        for value in values:
+            extra = {} if value is None else {"kind": str(value), "Kind": str(value)[:1].upper() + str(value)[1:]}
+            filled = _fill(toggle.model_dump(exclude_none=True), {**words, **extra}, lists)
+            filled.pop("each", None)
+            out.append(filled)
+    return out
 
 
 def _note(path: str, message: str) -> Note:

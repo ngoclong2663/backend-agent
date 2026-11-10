@@ -1,0 +1,105 @@
+{
+  "name": "drivers",
+  "label": "Courier",
+  "status": "ready",
+  "order": 40,
+  "choose": "A delivery app: shops create deliveries, online drivers take offers and follow the steps to drop-off, customers follow their delivery.",
+  "words": [
+    "courier",
+    "delivery",
+    "deliveries",
+    "driver",
+    "drivers",
+    "parcel",
+    "parcels",
+    "pickup",
+    "drop-off",
+    "dropoff",
+    "dispatch",
+    "dispatcher",
+    "dispatchers",
+    "shipment",
+    "rider"
+  ],
+  "roles": {
+    "delivery": {
+      "label": "Delivery",
+      "words": [
+        "delivery",
+        "order",
+        "job",
+        "parcel",
+        "shipment"
+      ],
+      "needs": [
+        "status"
+      ]
+    },
+    "driver": {
+      "label": "Driver",
+      "words": [
+        "driver",
+        "courier",
+        "rider"
+      ],
+      "person": true
+    }
+  },
+  "areas": [
+    {
+      "id": "drivers",
+      "label": "Drivers",
+      "people": [
+        "driver",
+        "courier",
+        "rider"
+      ],
+      "pattern": "back-office",
+      "main": "delivery"
+    },
+    {
+      "id": "customers",
+      "label": "Customers",
+      "people": [
+        "customer",
+        "recipient"
+      ],
+      "pattern": "back-office",
+      "main": "delivery"
+    },
+    {
+      "id": "dispatch",
+      "label": "Dispatch",
+      "people": [
+        "dispatcher",
+        "shop",
+        "merchant",
+        "admin"
+      ],
+      "pattern": "back-office"
+    }
+  ],
+  "features": {
+    "required": [
+      {
+        "feature": "availability",
+        "options": {
+          "personField": "driverId"
+        }
+      },
+      {
+        "feature": "proof-of-delivery",
+        "on": "delivery",
+        "options": {
+          "state": "{state:deliver}",
+          "field": "proofPhoto"
+        }
+      },
+      {
+        "feature": "tracking",
+        "on": "delivery"
+      }
+    ],
+    "optional": []
+  }
+}

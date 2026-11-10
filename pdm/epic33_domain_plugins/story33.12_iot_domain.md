@@ -63,3 +63,12 @@ the real run in the UI.
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** `templates/domains/iot` (roles device and reading; operators and admins) with
+**telemetry** (kit-only: `AppChart`, one small line chart per measure of the readings over the last 24 hours up to the
+newest, with the latest value; on the operators' overview through the `sensor-monitoring` type, and on each device's
+page filtered by the device). The real v10 draft passes **5 of 5** tasks (baseline 4): acknowledge an alert in one
+click, the 24 h chart, offline devices, review a detection, reboot.
+
+Deviations: no ingestion API with device keys, no alert-rule engine, no command queue and no simulator (D11): the
+readings, alerts and detections are the model's entities and the charts draw what the seed and the app hold.

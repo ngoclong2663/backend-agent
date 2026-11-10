@@ -66,7 +66,7 @@ type TEntityInfo = {
   actionPolicies?: Record<string, { roles?: string[]; ownerField?: string; bypassRoles?: string[]; unless?: Record<string, unknown> }>;
   ownerField?: string;
   /** Epic 33: what a feature computes per record (a count of rows pointing at it, the caller's own row) */
-  computed?: { field: string; kind: "count" | "mine"; entity: string; key: string; where: TRecord; owner?: string }[];
+  computed?: { field: string; kind: "count" | "mine"; entity: string; key: string; where: TRecord; owner?: string; match?: string }[];
 };
 
 const presentation = entities as unknown as Record<string, TEntityInfo>;
@@ -160,10 +160,12 @@ function present(entity: string | null, record: TRecord, user: TRecord | null = 
   }
   for (const item of info.computed ?? []) {
     // Epic 33: as the backend computes it: rows pointing at this record, or the id of the caller's own row
+    const pointed = item.match ? record[item.match] : own; // the record's id, or the field the rows follow (its creator)
     const rows = records(item.entity).filter(
-      (row) => String(row[item.key]) === String(own) && Object.entries(item.where).every(([key, value]) => row[key] === value),
+      (row) => String(row[item.key]) === String(pointed) && Object.entries(item.where).every(([key, value]) => row[key] === value),
     );
-    if (item.kind === "count") out[item.field] = rows.length;
+    if (item.kind === "count" && !item.owner) out[item.field] = rows.length;
+    else if (item.kind === "count") out[item.field] = user ? rows.filter((row) => String(row[item.owner as string]) === String(user.id)).length : 0;
     else {
       const mine = user && item.owner ? rows.find((row) => String(row[item.owner as string]) === String(user.id)) : undefined;
       out[item.field] = mine ? mine[presentation[item.entity]?.primaryKey ?? "id"] : null;

@@ -156,7 +156,7 @@ def present(record: dict[str, Any], model: dict[str, Any], by_entity: dict[str, 
             None if row is None else {"id": row.get(child["primaryKeyField"]), "label": row.get(child["labelField"])}
         )
     for item in model.get("computed", []):  # Epic 33: a feature's count from the fixtures; no viewer, no own row
-        out[item["field"]] = _computed_value(item, record.get(own), by_entity)
+        out[item["field"]] = _computed_value(item, record.get(item.get("matchField") or own), by_entity)
     out["allowedActions"] = list(actions)
     return out
 
@@ -164,12 +164,12 @@ def present(record: dict[str, Any], model: dict[str, Any], by_entity: dict[str, 
 def _computed_value(item: dict[str, Any], own: Any, by_entity: dict[str, list[dict[str, Any]]]) -> Any:
     """A computed field of a fixture row (Epic 33): the rows pointing at it for a `count`; null for `mine` (fixtures
     are read by no one)."""
-    if item["kind"] == "mine":
-        return None
+    if item["kind"] == "mine" or item.get("owner") or item.get("ownerField"):
+        return 0 if item["kind"] == "count" else None  # the caller's own rows: fixtures are read by no one
     where = item.get("whereFields") or item.get("where") or {}
     rows = by_entity.get(item["entity"]) or []
     key = item.get("keyField") or item["key"]
-    return sum(1 for row in rows if row.get(key) == own and all(row.get(k) == v for k, v in where.items()))
+    return sum(1 for row in rows if str(row.get(key)) == str(own) and all(row.get(k) == v for k, v in where.items()))
 
 
 # -- examples ----------------------------------------------------------------------------------------------------
@@ -966,6 +966,7 @@ class _Builder:
                                 "key": item["keyField"],
                                 "where": item["whereFields"],
                                 **({"owner": item["ownerField"]} if item.get("ownerField") else {}),
+                                **({"match": item["matchField"]} if item.get("matchField") else {}),
                             }
                             for item in model["computed"]
                         ]
@@ -1017,7 +1018,7 @@ def presented_record(contract: dict[str, Any], entity: str | None, record: dict[
             None if row is None else {"id": row.get(child["primaryKeyField"]), "label": row.get(child["labelField"])}
         )
     for item in info.get("computed") or []:  # Epic 33
-        out[item["field"]] = _computed_value(item, own, fixtures)
+        out[item["field"]] = _computed_value(item, record.get(item["match"]) if item.get("match") else own, fixtures)
     out["allowedActions"] = list(info["allowedActions"])
     return out
 

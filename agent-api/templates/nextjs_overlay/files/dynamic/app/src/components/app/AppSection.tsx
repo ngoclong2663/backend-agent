@@ -7,6 +7,10 @@ import { AppDetail } from "./AppDetail";
 import { AppForm } from "./AppForm";
 import { AppList } from "./AppList";
 import { AppAuth, AppLinks, AppPayment, useSession } from "./plugins";
+import { AppChart } from "./features/AppChart";
+import { AppPresence } from "./features/AppPresence";
+import { AppResume } from "./features/AppResume";
+import { AppTimeline } from "./features/AppTimeline";
 import { CommentThread } from "./features/CommentThread";
 
 type AppSectionProps = {
@@ -52,6 +56,18 @@ export function AppSection({ pageId, section, title, heading, hideTitle }: AppSe
       break;
     case "CommentThread": // Epic 33: the comments feature
       body = <CommentThread section={section} />;
+      break;
+    case "AppResume": // Epic 33: the enrollment feature's resume card
+      body = <AppResume section={section} />;
+      break;
+    case "AppPresence": // Epic 33: the availability feature's Online switch
+      body = <AppPresence section={section} />;
+      break;
+    case "AppTimeline": // Epic 33: the tracking feature
+      body = <AppTimeline section={section} />;
+      break;
+    case "AppChart": // Epic 33: the telemetry feature
+      body = <AppChart section={section} />;
       break;
   }
   return (

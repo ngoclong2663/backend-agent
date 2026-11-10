@@ -1,0 +1,196 @@
+{
+  "draftId": "b44df76e-868d-422b-9c92-e0ccefa20e24",
+  "engine": "antigravity_json",
+  "createdAt": "2026-11-10T06:04:57.952740Z",
+  "finishedAt": "2026-11-10T06:06:09.044228Z",
+  "assumptions": [
+    {
+      "path": "/auth/roles",
+      "message": "Greenhouse Operator is the primary default operational role assigned upon registration, while Greenhouse Administrator manages devices and alert rules.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/2/fields",
+      "message": "Sensors record temperature, humidity, CO2 ppm, and soil moisture percent on a minute-by-minute cadence.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/3/fields",
+      "message": "Bench cameras capture snapshots with identified pest name and confidence score between 0.0 and 1.0.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/4/fields/4",
+      "message": "Alert severity is assigned as an enum (LOW, MEDIUM, HIGH, CRITICAL) to assist operator prioritization.",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "Applied leaf green (#2e7d32) accent with crisp light background (#f9fbf9) and Swiss style for dense telemetry charts as requested.",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/theme",
+      "message": "Design direction: Weather App (Hero-Centric Design); palette Atmospheric gradients (sky blue → sunset → storm grey) + temp scale; fonts Spatial Clear (Inter / Inter); from ui-ux-pro-max@28b3b8dee8c9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/operations/10/response",
+      "message": "device.flag: it answers the Device",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/11/response",
+      "message": "device.reboot: it answers the Device",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/18/response",
+      "message": "pestDetection.review: it answers the PestDetection",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/19/response",
+      "message": "pestDetection.confirm: it answers the PestDetection",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/20/response",
+      "message": "pestDetection.dismiss: it answers the PestDetection",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/24/response",
+      "message": "alert.view: it answers the Alert",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/operations/25/response",
+      "message": "alert.acknowledge: it answers the Alert",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features",
+      "message": "Built on the Edge AI / IoT domain",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/features/telemetry",
+      "message": "Telemetry added to Reading",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/app/domain",
+      "message": "'domain' is not valid (String should match pattern '^[a-z][a-z0-9-]*$'); left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "Dashboard item 'Average Zone Temperature': 'avg' needs a number field of Reading; left out",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'neon' left out: a neon look does not suit this product",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design",
+      "message": "look 'enterprise' replaced by 'glass': three quiet looks offer no choice",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/0",
+      "message": "'Triggered Alerts' is computed by alert.countWhereStatusTriggered (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/1",
+      "message": "'Pending Detections' is computed by pestDetection.countWhereStatusPending (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/2",
+      "message": "'Flagged Devices' is computed by device.countWhereStatusFlagged (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/dashboard/3",
+      "message": "'Detections by Status' is computed by pestDetection.countByStatus (added)",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app/design/requested",
+      "message": "The look follows the requirement (Look: clean and technical, light background, a leaf green accent.): accent #2e7d32; background #f9fbf9",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Environmental Readings are added from their device's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Pest Detections are added from their device's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Devices are added from their greenhouse zone's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Environmental Readings are added from their device's page",
+      "suggestion": null,
+      "spec": "frontend"
+    },
+    {
+      "path": "/app",
+      "message": "Pest Detections are added from their device's page",
+      "suggestion": null,
+      "spec": "frontend"
+    }
+  ],
+  "unresolved": [
+    {
+      "path": "/operations",
+      "message": "What exact physical protocol or automated webhook is used by bench cameras and sensor gateways to push telemetry and image files?",
+      "suggestion": null,
+      "spec": "backend"
+    },
+    {
+      "path": "/entities/2",
+      "message": "How long should sensor reading historical data be retained before automated rollup or archiving?",
+      "suggestion": null,
+      "spec": "backend"
+    }
+  ]
+}

@@ -398,6 +398,30 @@
           ],
           "default": null,
           "title": "Owner"
+        },
+        "match": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Match"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target"
         }
       },
       "required": [

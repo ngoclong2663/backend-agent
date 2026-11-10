@@ -31,7 +31,7 @@ want drafts to be reviewed before they're published, so that the app works like 
 
 ## Acceptance criteria
 
-- [ ] A reader bookmarks an article and follows a section in one click each; an editor publishes a reviewed article
+- [x] A reader bookmarks an article and follows a section in one click each; an editor publishes a reviewed article
       in two clicks; readers never see drafts.
 
 ## Verify
@@ -41,3 +41,12 @@ want drafts to be reviewed before they're published, so that the app works like 
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** `templates/domains/news` (role `content` = the article; readers `feed`, newsroom
+`back-office`; comments, reactions `save` as the bookmark, follow `Section` on the article's section field) and the type
+`magazine`. The real v10 draft (Antigravity) merged the three features (`ArticleComment`, `ArticleReaction`,
+`SectionFollow`) and passes **4 of 4** tasks (baseline 1): save with its state in one click, follow a section in one
+click, publish in one click, reply under a comment.
+
+Deviations: the editorial workflow is the model's own transitions (they already passed "publish"); "For you" (the
+followed sections' newest articles) and the link-aggregator type are not built.

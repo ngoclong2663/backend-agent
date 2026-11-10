@@ -1,0 +1,139 @@
+{
+  "name": "enrollment",
+  "status": "ready",
+  "label": "Enrollment",
+  "attachesTo": "course",
+  "choose": "People enroll in a record (a course) with one tap and find it again from their home.",
+  "replaces": [
+    "enrollment",
+    "enrolment",
+    "registration",
+    "subscription"
+  ],
+  "options": {
+    "personField": {
+      "default": "learnerId",
+      "help": "the enrolled person's field"
+    }
+  },
+  "spec": {
+    "entities": [
+      {
+        "name": "{Target}Enrollment",
+        "fields": [
+          {
+            "name": "id",
+            "type": "uuid",
+            "primary": true
+          },
+          {
+            "name": "{target}Id",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "{personField}",
+            "type": "uuid",
+            "required": true,
+            "index": true
+          },
+          {
+            "name": "enrolledAt",
+            "type": "datetime",
+            "required": true,
+            "default": "now"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "{target}Enrollments",
+        "type": "one-to-many",
+        "from": "{Target}",
+        "to": "{Target}Enrollment",
+        "foreignKey": "{target}Id",
+        "onDelete": "CASCADE"
+      }
+    ],
+    "operations": [
+      {
+        "operationId": "{target}Enrollment.create",
+        "type": "crud",
+        "action": "create",
+        "entity": "{Target}Enrollment",
+        "method": "POST",
+        "path": "/{targetPath}-enrollments",
+        "auth": "jwt",
+        "policy": "own{Target}Enrollments"
+      },
+      {
+        "operationId": "{target}Enrollment.delete",
+        "type": "crud",
+        "action": "delete",
+        "entity": "{Target}Enrollment",
+        "method": "DELETE",
+        "path": "/{targetPath}-enrollments/{id}",
+        "auth": "jwt",
+        "policy": "own{Target}Enrollments"
+      }
+    ],
+    "policies": [
+      {
+        "name": "own{Target}Enrollments",
+        "type": "ownership",
+        "entity": "{Target}Enrollment",
+        "ownerField": "{personField}"
+      }
+    ],
+    "rules": [
+      {
+        "id": "one{Target}EnrollmentEach",
+        "kind": "uniqueTogether",
+        "entity": "{Target}Enrollment",
+        "params": {
+          "fields": [
+            "{target}Id",
+            "{personField}"
+          ]
+        }
+      }
+    ]
+  },
+  "computed": [
+    {
+      "field": "myEnrollmentId",
+      "kind": "mine",
+      "entity": "{Target}Enrollment",
+      "key": "{target}Id",
+      "owner": "{personField}"
+    },
+    {
+      "field": "enrollmentCount",
+      "kind": "count",
+      "entity": "{Target}Enrollment",
+      "key": "{target}Id"
+    }
+  ],
+  "kit": {
+    "slots": [
+      "cta-panel",
+      "resume-card"
+    ],
+    "toggles": [
+      {
+        "id": "enroll",
+        "label": "Enroll",
+        "reaction": "enroll",
+        "create": "{target}Enrollment.create",
+        "undo": "{target}Enrollment.delete",
+        "state": "myEnrollmentId",
+        "count": "enrollmentCount",
+        "body": {
+          "{target}Id": "{record}"
+        }
+      }
+    ]
+  }
+}

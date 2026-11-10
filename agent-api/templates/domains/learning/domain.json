@@ -1,0 +1,110 @@
+{
+  "name": "learning",
+  "label": "Learning platform",
+  "status": "ready",
+  "order": 30,
+  "choose": "Instructors publish courses made of lessons; learners enroll, follow the lessons, mark them done and see their progress.",
+  "words": [
+    "course",
+    "courses",
+    "lesson",
+    "lessons",
+    "learner",
+    "learners",
+    "instructor",
+    "instructors",
+    "quiz",
+    "quizzes",
+    "enroll",
+    "enrollment",
+    "curriculum",
+    "student",
+    "students",
+    "learning",
+    "academy"
+  ],
+  "roles": {
+    "course": {
+      "label": "Course",
+      "words": [
+        "course",
+        "class",
+        "program",
+        "programme"
+      ]
+    },
+    "lesson": {
+      "label": "Lesson",
+      "words": [
+        "lesson",
+        "lecture",
+        "chapter",
+        "module"
+      ]
+    },
+    "learner": {
+      "label": "Learner",
+      "words": [
+        "learner",
+        "student"
+      ],
+      "person": true
+    }
+  },
+  "areas": [
+    {
+      "id": "learners",
+      "label": "Learners",
+      "people": [
+        "learner",
+        "student"
+      ],
+      "pattern": "catalogue",
+      "main": "course"
+    },
+    {
+      "id": "instructors",
+      "label": "Instructors",
+      "people": [
+        "instructor",
+        "teacher",
+        "author"
+      ],
+      "pattern": "back-office"
+    },
+    {
+      "id": "admins",
+      "label": "Admin",
+      "people": [
+        "admin",
+        "staff"
+      ],
+      "pattern": "back-office"
+    }
+  ],
+  "features": {
+    "required": [
+      {
+        "feature": "enrollment",
+        "on": "course",
+        "options": {
+          "personField": "learnerId"
+        }
+      },
+      {
+        "feature": "completion",
+        "on": "lesson",
+        "options": {
+          "course": "{entity:course}",
+          "courseField": "{role:course}",
+          "personField": "learnerId"
+        }
+      },
+      {
+        "feature": "comments",
+        "on": "lesson"
+      }
+    ],
+    "optional": []
+  }
+}

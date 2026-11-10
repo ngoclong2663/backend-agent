@@ -250,6 +250,24 @@ Agent-specific notes:
   person's text on a record (a comment, a review) keeps the record's readers, writes stay the author's.
   `frontend/app/ux_checks.py` judges a planned app per area
   (`make app-design-report ARGS="--ux-only [--baseline]"`; `tests/fixtures/app-golden/ux-baseline.json`).
+- Domain plugins (Epic 33): three kinds read by `modules/shared/domain/domains/registry.py`: a **domain**
+  (`templates/domains/<d>/domain.json`: core entities by role, areas and their people, required and optional features),
+  its **types** (`types/<t>/type.json`: an area's home slots) and shared **features** (`templates/features/<f>/feature.json`:
+  a BackendSpec fragment with placeholders, computed fields, kit toggles). `make domain-check` / `domain-new` /
+  `feature-new`. Drafting: `drafting/domains.rank_domains` offers domains to `draft_app@v10` (v9 plus the domain block,
+  only when one is ranked); `apply_domain` checks the outline's `domain` (roles played by drafted entities, `{author}`,
+  `{section}`, `{entity:x}`, `{role:x}`, `{state:x}`, `{time}` options resolved) and `drafting/features.attach` merges
+  each feature as plain entries (the model's own `Comment`/`Like` dropped with a note), before the checks. The spec's
+  `features` block (code-written, never in the drafting schema) carries **computed fields**: `count` or `mine` (the
+  caller's own row), on the target or another entity (`target`), keyed by its id or a field (`match`), the caller's rows
+  only (`owner` on a count). They are core: the planner's `model["computed"]`, `references(records, viewer)` in the
+  generated repository, the response DTO, the policies plugin giving reads the caller, the contract (`readOnly`,
+  `x-bga.computed`), the mocks' `present()` and `presented_record`. Self-relationships (a reply's parent) configure
+  (`remoteSide`). The planner gives feature entities no screens; targets get the features' toggles (`kind: reaction`,
+  `ReactionButton`) and sections (`CommentThread`, `AppTimeline`, `AppChart`), a type's home its slots (`AppResume`,
+  `AppPresence`, `AppChart`); kit parts in `components/app/features/`. The UX tasks: `tests/fixtures/domains/` and
+  `frontend/app/domain_tasks.py` (`make domain-report [ARGS=--baseline|--replan]`). Screen feedback:
+  `orchestrator/feedback.py`, `POST /api/v1/generations/{id}/feedback`, `GET /api/v1/generations/plugin-requests`.
 - Designed pages (Epic 21): a page may be an element **tree** (`FrontendSpec` `pages[].tree` + `css`, `layout.chrome`
   / `footerTree`; `TreeNode` in `schema_v1.py`), as Frontend-Agent's site JSON writes it. `frontend_spec/trees.py`
   classifies node types (elements, shadcn primitives, Lucide icons, library sections, data components), checks the

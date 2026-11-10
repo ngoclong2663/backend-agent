@@ -1,0 +1,33 @@
+{
+  "name": "sensor-monitoring",
+  "label": "Sensor monitoring",
+  "status": "ready",
+  "choose": "An overview of every metric as a chart over the last 24 hours, the device list with status, alerts to acknowledge.",
+  "areas": {
+    "operators": {
+      "home": "overview",
+      "pages": [
+        {
+          "id": "overview",
+          "title": "Overview",
+          "route": "/",
+          "menu": true,
+          "sections": [
+            {
+              "slot": "chart",
+              "bind": {
+                "feature": "telemetry"
+              }
+            },
+            {
+              "slot": "alert-list",
+              "bind": {
+                "entity": "alert"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -282,7 +282,9 @@ class FeatureComputedField(SpecModel):
     entity: str
     key: str
     where: dict[str, Any] = {}
-    owner: str | None = None
+    owner: str | None = None  # `mine`: the caller's row; `count`: only the caller's rows (lessons I completed)
+    match: str | None = None  # the record's field the rows' `key` points at (its creator, its section); none: its id
+    target: str | None = None  # the entity carrying the field, when not the attachment's (a course's lesson count)
 
 
 class FeatureAttachment(SpecModel):

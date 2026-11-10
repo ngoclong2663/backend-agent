@@ -29,6 +29,10 @@ APP_SECTIONS: dict[str, str] = {
     "AppPayment": "The return from the checkout: the payment's status, polled until it settles (payments)",
     # Epic 33: feature plugins' sections
     "CommentThread": "A record's comments with replies, written and answered in place (comments feature)",
+    "AppResume": "What the person is in the middle of, with progress and Continue (enrollment feature)",
+    "AppPresence": "The person's Online switch (availability feature)",
+    "AppTimeline": "A record's status as the steps of its journey (tracking feature)",
+    "AppChart": "Readings over time, a small chart per measure (telemetry feature)",
 }
 
 

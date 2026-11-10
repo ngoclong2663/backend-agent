@@ -1,0 +1,89 @@
+{
+  "name": "availability",
+  "status": "ready",
+  "label": "Availability",
+  "attachesTo": "app",
+  "choose": "A worker goes online and offline; only online workers get new jobs.",
+  "replaces": [
+    "availability",
+    "shift",
+    "presence"
+  ],
+  "options": {
+    "personField": {
+      "default": "driverId"
+    }
+  },
+  "spec": {
+    "entities": [
+      {
+        "name": "Availability",
+        "fields": [
+          {
+            "name": "id",
+            "type": "uuid",
+            "primary": true
+          },
+          {
+            "name": "{personField}",
+            "type": "uuid",
+            "required": true,
+            "unique": true
+          },
+          {
+            "name": "onlineSince",
+            "type": "datetime",
+            "required": true,
+            "default": "now"
+          }
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "operationId": "availability.list",
+        "type": "crud",
+        "action": "list",
+        "entity": "Availability",
+        "method": "GET",
+        "path": "/availabilities",
+        "auth": "jwt",
+        "policy": "ownAvailability",
+        "pagination": true
+      },
+      {
+        "operationId": "availability.create",
+        "type": "crud",
+        "action": "create",
+        "entity": "Availability",
+        "method": "POST",
+        "path": "/availabilities",
+        "auth": "jwt",
+        "policy": "ownAvailability"
+      },
+      {
+        "operationId": "availability.delete",
+        "type": "crud",
+        "action": "delete",
+        "entity": "Availability",
+        "method": "DELETE",
+        "path": "/availabilities/{id}",
+        "auth": "jwt",
+        "policy": "ownAvailability"
+      }
+    ],
+    "policies": [
+      {
+        "name": "ownAvailability",
+        "type": "ownership",
+        "entity": "Availability",
+        "ownerField": "{personField}"
+      }
+    ]
+  },
+  "kit": {
+    "slots": [
+      "availability-toggle"
+    ]
+  }
+}

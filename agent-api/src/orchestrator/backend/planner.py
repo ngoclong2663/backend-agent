@@ -258,12 +258,10 @@ def _computed(models: list[dict[str, Any]], spec: dict[str, Any]) -> None:
     repository's `references()` fills per page of records: a grouped count, or the caller's own row id."""
     by_entity = {model["entity"]: model for model in models if model.get("entity")}
     for attached in spec.get("features") or []:
-        target = by_entity.get(attached["on"])
-        if target is None:
-            continue
         for computed in attached.get("computed") or []:
+            target = by_entity.get(computed.get("target") or attached["on"])
             rows = by_entity.get(computed["entity"])
-            if rows is None:
+            if rows is None or target is None:
                 continue
             target.setdefault("computed", []).append(
                 {
@@ -279,6 +277,11 @@ def _computed(models: list[dict[str, Any]], spec: dict[str, Any]) -> None:
                     **(
                         {"owner": to_snake(computed["owner"]), "ownerField": computed["owner"]}
                         if computed.get("owner")
+                        else {}
+                    ),
+                    **(
+                        {"match": to_snake(computed["match"]), "matchField": computed["match"]}
+                        if computed.get("match")
                         else {}
                     ),
                     "pkType": next(c for c in rows["columns"] if c["primaryKey"])["type"],

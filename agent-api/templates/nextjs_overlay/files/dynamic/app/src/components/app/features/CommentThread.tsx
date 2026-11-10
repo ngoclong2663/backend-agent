@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { canUse, type TAppSection, type TRecord, type TRouteParams } from "../app";
 import { useOperationMutation, useOperationQuery } from "../bindings";
@@ -113,6 +114,30 @@ function Comment({ comment, thread, mine, onReply, onDelete }: {
 /** Epic 33 (the comments feature): a record's comments with replies, written and answered where the person is.
  *  Replies sit one level under the comment they answer; answering a reply answers its comment. */
 export function CommentThread({ section }: { section: TAppSection }) {
+  if (section.content?.placement === "sheet") {
+    const title = section.content?.title ?? "Comments";
+    return (
+      <Sheet>
+        <SheetTrigger render={<Button variant="outline" size="sm" className="w-fit gap-1.5" data-bga-action="open-comments" />}>
+          <MessageCircle className="size-4" aria-hidden />
+          {title}
+        </SheetTrigger>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>{title}</SheetTitle>
+            <SheetDescription className="sr-only">{title}</SheetDescription>
+          </SheetHeader>
+          <div className="px-4 pb-6">
+            <Thread section={section} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+  return <Thread section={section} />;
+}
+
+function Thread({ section }: { section: TAppSection }) {
   const thread = section.content?.thread;
   const route = (useParams() ?? {}) as TRouteParams;
   const session = useSession();

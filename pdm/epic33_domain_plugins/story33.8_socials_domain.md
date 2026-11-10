@@ -43,3 +43,15 @@ my own posts on my profile, so that it works like the social apps I already know
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** `templates/domains/socials` (roles `content`, `member`; areas members `feed`,
+moderators `back-office`; required comments, reactions `like`, follow `Creator` on the post's author) and the type
+`short-video-feed`. The **follow** feature: a `<Subject>Follow` per follower and subject (a person's id or a section,
+kept as text), `my<Subject>FollowId` and `<subject>FollowerCount` computed on the post by its author field (`match`), a
+toggle reading "Follow" / "Following"; it replaces any drafted follow entity (`replacesAnywhere`). Toggles are now
+generic: a feature's `kit.toggles` describe them (reactions per kind, follow, enroll, complete). Real drafts
+(Antigravity, v10): the socials reference requirement is recognized and merged; re-planned with today's plugins it
+passes **5 of 5** tasks (baseline 2).
+
+Deviations: notifications and reports stay the model's entities (not features yet); a comment's author shows "You" or
+"Member" (no person profile feature); profiles with follower counts per person are not a page of their own.

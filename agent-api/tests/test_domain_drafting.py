@@ -27,7 +27,13 @@ def _outline(**domain):
 def test_the_domain_answer_merges_its_features_into_the_draft():
     backend = json.loads((DRAFT / "backend-spec.json").read_text())
     merged, block, notes = apply_domain(backend, _outline(roles={"content": "Clip"}))
-    assert block == {"name": "socials", "roles": {"content": "Clip"}, "types": {}, "features": []}
+    # an area the answer named no type for takes the domain's first ready one
+    assert block == {
+        "name": "socials",
+        "roles": {"content": "Clip"},
+        "types": {"members": "short-video-feed"},
+        "features": [],
+    }
     assert {"ClipComment", "ClipReaction"} <= {e["name"] for e in merged["entities"]}
     assert notes[0]["message"] == "Built on the Socials domain"
     assert validate_spec_data(merged).report.valid

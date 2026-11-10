@@ -1,0 +1,628 @@
+{
+  "name": "Swiftdrop",
+  "tagline": "Fast local shop parcel deliveries and courier dispatch",
+  "icon": "PackageCheck",
+  "nav": [
+    {
+      "entity": "Delivery",
+      "label": "Deliveries",
+      "icon": "Package"
+    },
+    {
+      "entity": "DriverShift",
+      "label": "Driver Shifts",
+      "icon": "Truck"
+    },
+    {
+      "entity": "User"
+    }
+  ],
+  "home": "Delivery",
+  "entities": {
+    "Delivery": {
+      "label": "Delivery",
+      "plural": "Deliveries",
+      "displayField": "customerName",
+      "listFields": [
+        "customerName",
+        "pickupAddress",
+        "dropoffAddress",
+        "parcelSize",
+        "status"
+      ],
+      "listStyle": "cards",
+      "detailFields": [
+        "pickupAddress",
+        "dropoffAddress",
+        "customerName",
+        "customerPhone",
+        "parcelSize",
+        "fee",
+        "status",
+        "doorPhoto",
+        "driverId",
+        "createdAt",
+        "deliveredAt",
+        "shopId",
+        "trackingCode",
+        "proofPhoto"
+      ],
+      "fieldLabels": {
+        "shopId": "Merchant Shop",
+        "driverId": "Assigned Driver",
+        "pickupAddress": "Pickup Address",
+        "dropoffAddress": "Drop-off Address",
+        "customerName": "Customer Name",
+        "customerPhone": "Customer Phone",
+        "parcelSize": "Parcel Size",
+        "fee": "Delivery Fee",
+        "status": "Status",
+        "doorPhoto": "Door Proof Photo",
+        "trackingCode": "Tracking code",
+        "createdAt": "Created at",
+        "deliveredAt": "Delivered at",
+        "proofPhoto": "Proof photo"
+      },
+      "help": {
+        "doorPhoto": "Photo taken of parcel placed at the door upon delivery",
+        "fee": "Payment fee earned by the courier for fulfilling this delivery",
+        "parcelSize": "Size category of the parcel (small, medium, large)"
+      },
+      "create": "page"
+    },
+    "DriverShift": {
+      "label": "Driver Shift",
+      "plural": "Driver Shifts",
+      "displayField": "driverId",
+      "listFields": [
+        "driverId",
+        "isOnline",
+        "startedAt",
+        "lastSeenAt"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "driverId",
+        "isOnline",
+        "startedAt",
+        "lastSeenAt"
+      ],
+      "fieldLabels": {
+        "driverId": "Driver",
+        "isOnline": "Online Status",
+        "startedAt": "Shift Started",
+        "lastSeenAt": "Last Active"
+      },
+      "help": {
+        "isOnline": "Indicates whether the driver is actively available to accept delivery offers"
+      }
+    },
+    "Availability": {
+      "label": "Availability",
+      "plural": "Availabilities",
+      "displayField": "driverId",
+      "listFields": [
+        "driverId",
+        "onlineSince"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "driverId",
+        "onlineSince"
+      ],
+      "fieldLabels": {
+        "driverId": "Driver",
+        "onlineSince": "Online since"
+      },
+      "help": {}
+    },
+    "User": {
+      "label": "User",
+      "plural": "Users",
+      "displayField": "phone",
+      "listFields": [
+        "phone",
+        "role"
+      ],
+      "listStyle": "table",
+      "detailFields": [
+        "phone",
+        "role"
+      ],
+      "fieldLabels": {
+        "phone": "Phone",
+        "role": "Role"
+      },
+      "help": {}
+    }
+  },
+  "design": {
+    "archetype": "workspace",
+    "shell": "topbar",
+    "mobileNav": "bottom-tabs",
+    "frame": "narrow",
+    "density": "compact",
+    "mainEntity": "Delivery",
+    "entities": {
+      "Delivery": {
+        "view": "cards",
+        "roles": {
+          "title": "customerName",
+          "media": "doorPhoto",
+          "price": "fee",
+          "badge": "status",
+          "meta": [
+            "parcelSize",
+            "dropoffAddress",
+            "createdAt"
+          ]
+        },
+        "detailView": "split-panel",
+        "filtersStyle": "chips",
+        "card": "text-first"
+      },
+      "DriverShift": {
+        "view": "table",
+        "roles": {
+          "badge": "isOnline",
+          "meta": [
+            "startedAt",
+            "lastSeenAt"
+          ]
+        },
+        "detailView": "record",
+        "filtersStyle": "toolbar",
+        "card": "text-first"
+      },
+      "Availability": {
+        "view": "table",
+        "roles": {}
+      },
+      "User": {
+        "view": "table",
+        "roles": {}
+      }
+    },
+    "homeView": "feed",
+    "looks": [
+      {
+        "recipe": "glass",
+        "reason": "Clean modern mobile interface with translucent panels keeping active maps and steps visible.",
+        "fontPairing": "geometric"
+      },
+      {
+        "recipe": "minimal",
+        "reason": "Fast, distraction-free flat UI prioritizing rapid order scanning and street readability.",
+        "fontPairing": "neutral"
+      },
+      {
+        "recipe": "enterprise",
+        "reason": "Recommended: Data-Dense Dashboard for Status Page / Incident Management",
+        "fontPairing": "neutral"
+      }
+    ],
+    "requested": {
+      "accent": "#f97316",
+      "scheme": "light",
+      "corners": "rounded",
+      "words": "Look: practical and fast to use on a phone, high contrast, a bright orange accent."
+    },
+    "seed": 870483698,
+    "fontPairing": "geometric",
+    "reason": "Fast mobile-first layout with high contrast cards for couriers on the road and structured operational tables for dispatchers.",
+    "replaced": [
+      "DriverShift: title 'driverId' left out (a uuid field is not a name)",
+      "area 'dispatch' moved first: sign-up gives the role 'shop_owner'",
+      "look 'playful' left out: a playful look does not suit this product",
+      "look 'playful' left out: a playful look does not suit this product"
+    ]
+  },
+  "areas": [
+    {
+      "id": "dispatch",
+      "label": "Dispatch & Operations",
+      "roles": [
+        "dispatcher",
+        "shop_owner"
+      ],
+      "prefix": "/",
+      "design": {
+        "archetype": "back-office",
+        "shell": "sidebar",
+        "mobileNav": "drawer",
+        "frame": "wide",
+        "density": "compact",
+        "mainEntity": "Delivery",
+        "entities": {
+          "Delivery": {
+            "groupBy": "status",
+            "view": "board",
+            "roles": {
+              "media": "doorPhoto"
+            },
+            "detailView": "profile",
+            "filtersStyle": "facets",
+            "card": "stacked"
+          },
+          "DriverShift": {
+            "view": "table",
+            "roles": {}
+          },
+          "Availability": {
+            "view": "table",
+            "roles": {}
+          },
+          "User": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "dashboard"
+      }
+    },
+    {
+      "id": "drivers",
+      "label": "Driver Portal",
+      "roles": [
+        "driver"
+      ],
+      "prefix": "/drivers",
+      "design": {
+        "archetype": "workspace",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "narrow",
+        "density": "comfortable",
+        "mainEntity": "Delivery",
+        "entities": {
+          "Delivery": {
+            "view": "table",
+            "roles": {
+              "media": "doorPhoto"
+            },
+            "detailView": "profile",
+            "filtersStyle": "toolbar",
+            "card": "text-first"
+          },
+          "DriverShift": {
+            "view": "table",
+            "roles": {}
+          },
+          "Availability": {
+            "view": "table",
+            "roles": {}
+          },
+          "User": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "feed"
+      }
+    },
+    {
+      "id": "customers",
+      "label": "Track Delivery",
+      "roles": [
+        "customer"
+      ],
+      "prefix": "/customers",
+      "design": {
+        "archetype": "workspace",
+        "shell": "topbar",
+        "mobileNav": "bottom-tabs",
+        "frame": "narrow",
+        "density": "comfortable",
+        "mainEntity": "Delivery",
+        "entities": {
+          "Delivery": {
+            "view": "cards",
+            "roles": {
+              "media": "doorPhoto"
+            },
+            "detailView": "record",
+            "filtersStyle": "toolbar",
+            "card": "stacked"
+          },
+          "DriverShift": {
+            "view": "table",
+            "roles": {}
+          },
+          "Availability": {
+            "view": "table",
+            "roles": {}
+          },
+          "User": {
+            "view": "table",
+            "roles": {}
+          }
+        },
+        "homeView": "feed"
+      }
+    }
+  ],
+  "domain": {
+    "name": "drivers",
+    "roles": {
+      "delivery": "Delivery"
+    },
+    "types": {
+      "drivers": "courier"
+    },
+    "features": []
+  },
+  "dashboard": [
+    {
+      "label": "Pending Offers",
+      "kind": "figure",
+      "entity": "Delivery",
+      "fn": "count",
+      "filter": {
+        "status": "pending"
+      }
+    },
+    {
+      "label": "Delivered Today",
+      "kind": "figure",
+      "entity": "Delivery",
+      "fn": "count",
+      "filter": {
+        "status": "delivered"
+      },
+      "period": "day"
+    },
+    {
+      "label": "Online Drivers",
+      "kind": "figure",
+      "entity": "DriverShift",
+      "fn": "count",
+      "filter": {
+        "isOnline": true
+      }
+    },
+    {
+      "label": "Deliveries by Status",
+      "kind": "bar",
+      "entity": "Delivery",
+      "fn": "count",
+      "filter": {},
+      "groupBy": "status"
+    },
+    {
+      "label": "Driver Earnings This Week",
+      "kind": "figure",
+      "entity": "Delivery",
+      "fn": "sum",
+      "field": "fee",
+      "filter": {
+        "status": "delivered"
+      },
+      "period": "week"
+    },
+    {
+      "label": "Driver earnings today",
+      "kind": "figure",
+      "entity": "Delivery",
+      "fn": "sum"
+    }
+  ],
+  "workflows": {
+    "version": "efe22a34b6fb",
+    "tours": [
+      {
+        "id": "deliver_parcel",
+        "name": "Parcel Delivery Fulfillment",
+        "outcome": "Parcel is picked up from the shop, delivered to the customer door with photo proof, and earnings are credited.",
+        "roles": [
+          "customer",
+          "driver",
+          "shop_owner"
+        ],
+        "steps": [
+          {
+            "id": "create_delivery",
+            "role": "shop_owner",
+            "actor": "Shop Owner",
+            "title": "Books a delivery with pickup, drop-off, customer contact, and parcel size (the delivery becomes pending). Rule: Must provide valid pickup address, drop-off address, customer name, phone, and parcel size",
+            "operationId": "delivery.create",
+            "statusAfter": "pending",
+            "page": "deliveries-new",
+            "route": "/deliveries/new",
+            "target": {
+              "section": "delivery-create-form",
+              "action": "submit"
+            },
+            "kind": "do",
+            "record": "delivery"
+          },
+          {
+            "id": "go_online",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Switches status to online to receive offers (the driver_shift becomes online). Rule: Driver must be authenticated",
+            "operationId": "driverShift.setOnline",
+            "statusAfter": "online",
+            "page": "drivers-driver-shifts",
+            "route": "/drivers/driver-shifts",
+            "target": {
+              "section": "driver-shifts-actions",
+              "action": "set-online"
+            },
+            "kind": "do",
+            "record": "driver_shift"
+          },
+          {
+            "id": "accept_offer",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Accepts an available delivery offer (the delivery becomes assigned). Rule: Only one driver can take each offer and a driver carries one delivery at a time",
+            "operationId": "delivery.accept",
+            "statusAfter": "assigned",
+            "page": "drivers-deliveries-id",
+            "route": "/drivers/deliveries/[id]",
+            "target": {
+              "section": "deliveries-detail",
+              "action": "accept"
+            },
+            "kind": "do",
+            "record": "delivery",
+            "needs": {
+              "step": "create_delivery",
+              "role": "shop_owner",
+              "status": "pending"
+            }
+          },
+          {
+            "id": "going_to_pickup",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Confirms heading toward pickup location (the delivery becomes going_to_pickup). Rule: Must be the assigned driver",
+            "operationId": "delivery.goingToPickup",
+            "statusAfter": "going_to_pickup",
+            "page": "drivers-deliveries-id",
+            "route": "/drivers/deliveries/[id]",
+            "target": {
+              "section": "deliveries-detail",
+              "action": "going-to-pickup"
+            },
+            "kind": "do",
+            "record": "delivery",
+            "needs": {
+              "step": "accept_offer",
+              "role": "driver",
+              "status": "assigned"
+            }
+          },
+          {
+            "id": "confirm_pickup",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Confirms parcel collected from shop (the delivery becomes picked_up). Rule: Must be at pickup location",
+            "operationId": "delivery.pickedUp",
+            "statusAfter": "picked_up",
+            "page": "drivers-deliveries-id",
+            "route": "/drivers/deliveries/[id]",
+            "target": {
+              "section": "deliveries-detail",
+              "action": "picked-up"
+            },
+            "kind": "do",
+            "record": "delivery",
+            "needs": {
+              "step": "going_to_pickup",
+              "role": "driver",
+              "status": "going_to_pickup"
+            }
+          },
+          {
+            "id": "going_to_dropoff",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Confirms heading toward drop-off location (the delivery becomes going_to_dropoff). Rule: Must have picked up the parcel",
+            "operationId": "delivery.goingToDropoff",
+            "statusAfter": "going_to_dropoff",
+            "page": "drivers-deliveries-id",
+            "route": "/drivers/deliveries/[id]",
+            "target": {
+              "section": "deliveries-detail",
+              "action": "going-to-dropoff"
+            },
+            "kind": "do",
+            "record": "delivery",
+            "needs": {
+              "step": "confirm_pickup",
+              "role": "driver",
+              "status": "picked_up"
+            }
+          },
+          {
+            "id": "complete_delivery",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Submits photo of parcel at door and confirms completion (the delivery becomes delivered). Rule: A photo of the parcel at the door is required",
+            "operationId": "delivery.deliver",
+            "statusAfter": "delivered",
+            "page": "drivers-deliveries-id",
+            "route": "/drivers/deliveries/[id]",
+            "target": {
+              "section": "deliveries-detail",
+              "action": "deliver"
+            },
+            "kind": "do",
+            "record": "delivery",
+            "needs": {
+              "step": "going_to_dropoff",
+              "role": "driver",
+              "status": "going_to_dropoff"
+            }
+          },
+          {
+            "id": "track_progress",
+            "role": "customer",
+            "actor": "Customer",
+            "title": "Views delivery tracking page with live status updates. Rule: Must have a valid delivery tracking identifier",
+            "operationId": "delivery.get",
+            "page": "customers-deliveries-id",
+            "route": "/customers/deliveries/[id]",
+            "target": {
+              "section": "deliveries-detail",
+              "action": null
+            },
+            "kind": "look",
+            "record": "delivery"
+          }
+        ]
+      },
+      {
+        "id": "track_earnings",
+        "name": "Driver Earnings Review",
+        "outcome": "Driver reviews their accumulated delivery earnings for today and the current week.",
+        "roles": [
+          "driver"
+        ],
+        "steps": [
+          {
+            "id": "view_earnings",
+            "role": "driver",
+            "actor": "Driver",
+            "title": "Views total delivery earnings for today and this week. Rule: Aggregates fees only from successfully delivered parcels",
+            "operationId": "delivery.driverEarningsToday",
+            "page": "drivers-dashboard",
+            "route": "/drivers/dashboard",
+            "target": {
+              "section": "figure-6",
+              "action": null
+            },
+            "kind": "look",
+            "record": "earnings_summary"
+          }
+        ]
+      },
+      {
+        "id": "monitor_operations",
+        "name": "Dispatch Operations Monitoring",
+        "outcome": "Dispatcher verifies delivery statuses and fleet availability to keep local fulfillment running smoothly.",
+        "roles": [
+          "dispatcher"
+        ],
+        "steps": [
+          {
+            "id": "review_dispatch_board",
+            "role": "dispatcher",
+            "actor": "Dispatcher",
+            "title": "Reviews all deliveries filtered by status and monitors which drivers are online. Rule: Displays real-time status of all active deliveries and online drivers",
+            "operationId": "delivery.countByStatus",
+            "page": "home",
+            "route": "/",
+            "target": {
+              "section": "figure-4",
+              "action": null
+            },
+            "kind": "look",
+            "record": "dispatch_overview"
+          }
+        ]
+      }
+    ]
+  }
+}

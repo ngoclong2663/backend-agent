@@ -315,6 +315,29 @@ class RelationsPlugin(Plugin):
         )
 
 
+def _repoint(
+    meta: dict[str, Any], plan: dict[str, Any], entity: str, removed: dict[str, Any], kept: list[dict[str, Any]]
+) -> None:
+    """The fixtures pointing at a removed row (a quiz's submissions) go too, and theirs after them: the seed must insert
+    (found on a learning draft: a submission's quiz was the one-to-one child removed here, and the seed failed on its
+    foreign key). They are dropped rather than pointed elsewhere, which could fill the pair a `uniqueTogether` rule's
+    success scenario keeps free (the mocks then answered its create with 409)."""
+    model = next((m for m in plan["models"] if m.get("entity") == entity), None)
+    if model is None:
+        return
+    pk = next(c["apiName"] for c in model["columns"] if c["primaryKey"])
+    gone = removed.get(pk)
+    for other in plan["models"]:
+        for column in other["columns"]:
+            fk = column.get("foreignKey") or {}
+            if fk.get("references", "").partition(".")[0] != model["table"] or not other.get("entity"):
+                continue
+            rows = meta["fixtures"].get(other["entity"]) or []
+            for row in [r for r in rows if r.get(column["apiName"]) == gone]:
+                rows.remove(row)
+                _repoint(meta, plan, other["entity"], row, rows)
+
+
 def _one_to_one(contract: dict[str, Any], plan: dict[str, Any]) -> None:
     """A one-to-one child's fixtures leave one parent free, its create succeeds there, and a second child of a parent
     that has one is a scenario (409 CONFLICT, the unique foreign key)."""
@@ -330,7 +353,8 @@ def _one_to_one(contract: dict[str, Any], plan: dict[str, Any]) -> None:
             if not rows or not parents:
                 continue
             if len(rows) >= len(parents) and len(rows) > 1:
-                rows.pop()  # the last parent keeps no child, so a create has somewhere to go
+                removed = rows.pop()  # the last parent keeps no child, so a create has somewhere to go
+                _repoint(meta, plan, child["entity"], removed, rows)
             taken = {row.get(child["field"]) for row in rows}
             free = next((p[parent_pk] for p in parents if p[parent_pk] not in taken), None)
             create = next(

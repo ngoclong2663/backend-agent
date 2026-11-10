@@ -1,0 +1,84 @@
+{
+  "name": "iot",
+  "label": "Edge AI / IoT",
+  "status": "ready",
+  "order": 50,
+  "choose": "Sensors and cameras report readings and detections; operators watch charts, find offline devices and acknowledge alerts; admins manage devices.",
+  "words": [
+    "iot",
+    "sensor",
+    "sensors",
+    "device",
+    "devices",
+    "telemetry",
+    "monitoring",
+    "camera",
+    "cameras",
+    "alert",
+    "alerts",
+    "reading",
+    "readings",
+    "greenhouse",
+    "detection",
+    "detections"
+  ],
+  "roles": {
+    "device": {
+      "label": "Device",
+      "words": [
+        "device",
+        "sensor",
+        "camera"
+      ]
+    },
+    "reading": {
+      "label": "Reading",
+      "words": [
+        "reading",
+        "readings",
+        "measurement",
+        "telemetry",
+        "sensorreading"
+      ],
+      "needs": [
+        "time"
+      ]
+    }
+  },
+  "areas": [
+    {
+      "id": "operators",
+      "label": "Operators",
+      "people": [
+        "operator",
+        "technician",
+        "viewer"
+      ],
+      "pattern": "back-office",
+      "main": "device"
+    },
+    {
+      "id": "admins",
+      "label": "Admin",
+      "people": [
+        "admin",
+        "staff"
+      ],
+      "pattern": "back-office"
+    }
+  ],
+  "features": {
+    "required": [
+      {
+        "feature": "telemetry",
+        "on": "reading",
+        "options": {
+          "device": "{entity:device}",
+          "deviceField": "{role:device}",
+          "time": "{time}"
+        }
+      }
+    ],
+    "optional": []
+  }
+}

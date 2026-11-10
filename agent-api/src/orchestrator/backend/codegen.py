@@ -763,24 +763,33 @@ class _Module:
             model = item["model"]
             imports.add(MODELS_PKG.replace("/", "."), model)
             key = f"col({model}.{item['key']})"
-            where = [f"{key}.in_(own_ids)"] + [
+            ids = "own_ids"
+            if item.get("match"):  # rows pointing at one of the record's fields (its creator, its section), as text
+                ids = f"{item['attr']}_keys"
+                lines.append(
+                    f"        {ids} = {{str(record.{item['match']}) for record in records"
+                    f" if record.{item['match']} is not None}}"
+                )
+            where = [f"{key}.in_({ids})"] + [
                 f"col({model}.{attr}) == {value!r}" for attr, value in item["where"].items()
             ]
-            lines.append(f'        found["{item["attr"]}"] = {{}}')
+            mine = item["kind"] == "mine" or bool(item.get("owner"))
+            if item.get("owner"):
+                where.append(f"col({model}.{item['owner']}) == viewer")
+            guard = f"        if {ids} and viewer is not None:" if mine else f"        if {ids}:"
             if item["kind"] == "count":
                 imports.add("sqlmodel", "func")
-                lines += [
-                    "        if own_ids:",
-                    f"            query = select({key}, func.count()).where({', '.join(where)}).group_by({key})",
-                    f'            found["{item["attr"]}"] = dict(self.session.exec(query).all())',
-                ]
+                query = f"select({key}, func.count()).where({', '.join(where)}).group_by({key})"
             else:
-                where.append(f"col({model}.{item['owner']}) == viewer")
-                lines += [
-                    "        if own_ids and viewer is not None:",
-                    f"            query = select({key}, col({model}.id)).where({', '.join(where)})",
-                    f'            found["{item["attr"]}"] = dict(self.session.exec(query).all())',
-                ]
+                query = f"select({key}, col({model}.id)).where({', '.join(where)})"
+            text = "str(key)" if item.get("match") else "key"
+            lines += [
+                f'        found["{item["attr"]}"] = {{}}',
+                guard,
+                f"            query = {query}",
+                f'            found["{item["attr"]}"] = '
+                f"{{{text}: value for key, value in self.session.exec(query).all()}}",
+            ]
         return lines
 
     # -- aggregates (Epic 21) ------------------------------------------------------------------------------------
@@ -972,12 +981,12 @@ class _Module:
             fields.append(f"    {child['attr']}: {summary_dto(child['entity'])} | None")
             entries.append(f'"{child["attr"]}": refs.get("{child["attr"]}", {{}}).get(entity.{self.pk["attr"]})')
         for item in self.computed:  # Epic 33: what a feature computes per record
-            pk = f"entity.{self.pk['attr']}"
+            pk = f"str(entity.{item['match']})" if item.get("match") else f"entity.{self.pk['attr']}"
             if item["kind"] == "count":
-                fields.append(f"    {item['attr']}: int = 0")
+                fields.append(f"    {item['attr']}: int")  # always sent: required, as the contract has it
                 entries.append(f'"{item["attr"]}": refs.get("{item["attr"]}", {{}}).get({pk}, 0)')
             else:
-                fields.append(f"    {item['attr']}: {_type({'type': item['pkType']}, imports)} | None = None")
+                fields.append(f"    {item['attr']}: {_type({'type': item['pkType']}, imports)} | None")
                 entries.append(f'"{item["attr"]}": refs.get("{item["attr"]}", {{}}).get({pk})')
         for item in self._response_fields():  # Story 10.1: what plugins add to a record
             self._imports(imports, item.imports)

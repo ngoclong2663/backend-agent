@@ -660,11 +660,17 @@ class _SemanticChecker:
             target = self._entity_ref(attached.on, f"{path}/on")
             taken = set(self.fields[target.name]) if target else set()
             for c_index, computed in enumerate(attached.computed):
+                carrier = self.entities.get(computed.target) if computed.target else target
+                if computed.target:
+                    self._entity_ref(computed.target, f"{path}/computed/{c_index}/target")
+                if computed.match and carrier is not None:
+                    self._field_refs(carrier, [computed.match], f"{path}/computed/{c_index}/match")
+            for c_index, computed in enumerate(attached.computed):
                 c_path = f"{path}/computed/{c_index}"
                 rows = self._entity_ref(computed.entity, f"{c_path}/entity")
                 keys = [computed.key, *computed.where, *([computed.owner] if computed.owner else [])]
                 self._field_refs(rows, keys, f"{c_path}/fields")
-                if computed.field in taken:
+                if computed.field in taken and not computed.target:
                     self._add(C.UNKNOWN_FIELD_REF, f"{c_path}/field", f"'{computed.field}' is already a field")
                 if computed.kind == "mine" and not computed.owner:
                     self._add(C.UNKNOWN_FIELD_REF, f"{c_path}/owner", "A `mine` field needs the rows' owner field")

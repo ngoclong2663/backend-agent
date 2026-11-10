@@ -48,3 +48,15 @@ run in the UI.
 ## Status
 
 Proposed 2026-11-10.
+
+**Done 2026-11-10 (with deviations).** `templates/domains/drivers` (role delivery; areas drivers, customers, dispatch)
+with **availability** (an `Availability` row per driver: online while it exists; `AppPresence`, the Online switch, first
+on the driver's home through the `courier` type), **proof-of-delivery** (a target field: the delivery's photo becomes an
+image, and the move to the delivered state, a transition or the model's own "complete" operation, asks for it in a
+dialog) and **tracking** (kit-only: `AppTimeline` shows the delivery's status as steps, in the order its states are
+declared). The real v10 draft drafted a customer role (the domain offers the area) and passes **4 of 5** tasks
+(baseline 2): accept in one tap, deliver with a photo, go online, follow the steps; earnings sat two clicks away in that
+draft (the model's figures, not a domain feature).
+
+Deviations: dispatch is the model's own flow (offers, the first to accept, one job at a time are its rules when
+drafted); earnings are the model's aggregates; offers are not limited to online drivers.
