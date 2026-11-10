@@ -53,3 +53,18 @@ theme as swatches and a specimen, in random order, the key folded away). The use
 Deviations: no app was generated with a designed theme (drafts only; the theme reaches the kit through the same
 FrontendSpec `theme` as before); the pairing choice still leans `geometric` (3 of 6); the colours the user asked for
 keep several primaries close to the baseline's, so most of the change is in the surfaces and the type.
+
+**Follow-up 2026-11-10 (the user: "the color is too ugly and hard to read", the socials app on Claude Code).** Measured
+in a browser (each text against the pixels behind it): 30 of 54 texts below AA on the public pages, the page headings
+and filters below AA signed in, at about 1:1. Two kit bugs, not the designed colours:
+1. A one-scheme app was drawn in the other scheme: `next-themes` defaulted to light when the app has no toggle, so a
+   dark-only app's page took the light rules (the recipe's pale gradient) under its near-white text. The site config
+   carries `colorScheme`; the provider forces it (`forcedTheme`). The static goldens were updated for it
+   (`UPDATE_SNAPSHOTS=1`: `providers.tsx`, `site.ts`, `.bga/owned.json`; a light-only site renders as before).
+2. Recipes painted their own hues: playful's sky-to-mint page and blue shadows, aurora's and glass's violet and cyan
+   glows. They mix from the theme's primary and accent now; a test refuses hard-coded hues in a recipe that keeps the
+   palette (neon, cinema, luxe, terminal and paper set their own palette: open, the user's decision).
+Also: Claude Code's `error_max_structured_output_retries` (a Haiku draft) stopped the draft; the JSON CLI now asks once
+without the schema for it, as for a refused schema. Rerun `gen_01M72CCANHBBF2FBCKJ37679PQ` **COMPLETED**: 0 of 54
+public and 0 of 55 signed-in texts below AA (the first run's app: 30 and 6).
+

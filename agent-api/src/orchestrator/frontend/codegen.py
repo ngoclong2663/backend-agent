@@ -765,6 +765,9 @@ def site_ts(plan: dict[str, Any], spec: dict[str, Any]) -> str:
             ],
         },
         "themeToggle": plan["shell"]["themeToggle"],
+        # 2026-11-10: a one-scheme app is drawn in its scheme (a dark-only app's page was drawn as a light one: the
+        # recipes' and components' light rules over its dark colours, white text on a pale gradient)
+        "colorScheme": plan["theme"]["colorScheme"],
         "pages": {route["pageId"]: route["route"] for route in plan["routes"]},
     }
     return (

@@ -153,7 +153,11 @@ class CliJsonProvider(LlmProvider):
             prompt, schema, scratch, home, bool(images), model, timeout, state_dir, invocation_id
         )
         structured: bool | None = None if schema is None else True
-        if schema is not None and not outcome.completed and "schema" in (outcome.error or "").lower():
+        # the CLI refused the schema, or gave up fitting the model's answer to it (`claude`'s
+        # error_max_structured_output_retries, a socials draft on Haiku 2026-11-10): asked once without it, the answer
+        # checked against the schema in code (`LlmProvider.json`)
+        error = (outcome.error or "").lower()
+        if schema is not None and not outcome.completed and ("schema" in error or "structured_output" in error):
             notes.append("the CLI refused the answer schema; asked without it")
             outcome = await self._turn(
                 prompt, None, scratch, home, bool(images), model, timeout, state_dir, f"{invocation_id}-noschema"

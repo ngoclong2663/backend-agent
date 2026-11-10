@@ -2,8 +2,8 @@
 @root body {
   background:
     radial-gradient(45rem 35rem at 5% 0%, color-mix(in oklab, var(--primary) 70%, transparent), transparent 65%),
-    radial-gradient(45rem 35rem at 95% 15%, oklch(0.7 0.17 280 / 0.6), transparent 65%),
-    radial-gradient(40rem 30rem at 60% 100%, oklch(0.78 0.14 190 / 0.55), transparent 65%),
+    radial-gradient(45rem 35rem at 95% 15%, color-mix(in oklab, var(--primary) 60%, transparent), transparent 65%),
+    radial-gradient(40rem 30rem at 60% 100%, color-mix(in oklab, var(--chart-2) 55%, transparent), transparent 65%),
     var(--background);
   background-attachment: fixed;
 }

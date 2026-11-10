@@ -167,6 +167,16 @@ def test_a_refused_schema_is_asked_again_without_it(tmp_path, kind):
     assert first["schema"] == SCHEMA and second["schema"] is None
 
 
+def test_a_structured_output_the_cli_gave_up_on_is_asked_again_without_the_schema(tmp_path):
+    """A socials draft on Claude (Haiku) failed: `error_max_structured_output_retries` named no "schema", so the
+    draft stopped instead of asking without the schema."""
+    provider = _cli("claude", tmp_path)
+    answer = _ask(provider, tmp_path, "List. MODE=max_structured")
+    assert answer.data == ANSWER and answer.structured is False
+    first, second = _records(tmp_path, provider.name)
+    assert first["schema"] == SCHEMA and second["schema"] is None
+
+
 @pytest.mark.parametrize("kind", ["agy", "claude"])
 def test_a_wrong_shape_is_asked_again_once_with_its_errors(tmp_path, kind):
     provider = _cli(kind, tmp_path)

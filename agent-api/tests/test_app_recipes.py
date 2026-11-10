@@ -83,3 +83,36 @@ def test_product_rows_rank_the_design_data():
     rows = product_rows("An online course platform with lessons and enrolments")
     assert rows and all("Product Type" in row for row in rows)
     assert product_rows("   ") == []
+
+
+def test_a_recipe_that_keeps_the_palette_takes_its_hues_from_the_theme():
+    """2026-11-10 (the socials app on Claude): the playful recipe painted a fixed sky-blue-to-mint page behind a pink
+    app's text. A recipe that doesn't set the palette mixes its gradients and shadows from the theme's tokens."""
+    import re
+
+    from src.orchestrator.frontend.app.recipes import recipe_blocks
+
+    literal = re.compile(r"oklch\(\s*[\d.]+\s+[\d.]+\s+[\d.]+|#[0-9a-fA-F]{6}\b")
+    for name, css in recipe_blocks().items():
+        if "--primary:" in css or "--background:" in css:
+            continue  # a recipe with its own palette (neon, cinema, paper, …) sets the tokens itself
+        assert not literal.findall(css), f"{name} hard-codes colours: {literal.findall(css)[:3]}"
+
+
+def test_a_one_scheme_app_is_drawn_in_its_scheme():
+    """The same app: dark only, but next-themes drew it light (no `.dark`), so the light rules applied over its dark
+    colours. The site config carries the scheme; the provider forces it."""
+    from pathlib import Path
+
+    from src.orchestrator.frontend.codegen import site_ts
+
+    plan = {
+        "shell": {"shell": "app", "logoText": "Loop", "logo": None, "navigation": [],
+                  "footer": {"text": None, "links": []}, "themeToggle": False},
+        "theme": {"colorScheme": "dark"},
+        "routes": [],
+    }  # fmt: skip
+    spec = {"project": {"name": "Loop", "locale": "en", "mode": "dynamic"}}
+    assert '"colorScheme": "dark"' in site_ts(plan, spec)
+    providers = Path(__file__).parents[1] / "templates/nextjs_overlay/files/common/src/app/providers.tsx"
+    assert "forcedTheme={forced}" in providers.read_text()
