@@ -253,7 +253,16 @@ def query_keys_ts(contract: dict[str, Any]) -> str:
             f'  detail: (params: object = {{}}) => [...{keys}.all, "detail", params] as const,\n'
             "};\n"
         )
+    if not resources:
+        out.append("export {};\n")  # still a module when the contract has no operations
     return "\n".join(out)
+
+
+def _named_import(names: list[str], source: str) -> str:
+    """`import { … } from source`, or nothing when there are no names (an empty list is no import)."""
+    if not names:
+        return ""
+    return "import {\n" + "".join(f"  {name},\n" for name in names) + f'}} from "{source}";\n'
 
 
 def queries_ts(contract: dict[str, Any]) -> str:
@@ -293,10 +302,8 @@ def queries_ts(contract: dict[str, Any]) -> str:
     body = "\n".join(out)
     imports = (
         'import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";\n'
-        "import {\n" + "".join(f"  {op.function},\n" for op in ops) + '} from "./operations";\n'
-        "import {\n"
-        + "".join(f"  {k},\n" for k in sorted({op.keys for op in ops}))
-        + '} from "./query-keys";\n'
+        + _named_import([op.function for op in ops], "./operations")
+        + _named_import(sorted({op.keys for op in ops}), "./query-keys")
         + _type_imports(body, {"TQueryOptions"})
     )
     return "\n".join(['"use client";\n\n' + HEADER, imports, body])

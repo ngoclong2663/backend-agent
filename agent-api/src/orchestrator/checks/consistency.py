@@ -100,6 +100,7 @@ class _Checker:
         self.contract = contract
         self.operations = contract_operations(contract)
         self.issues: list[SpecIssue] = []
+        self.has_backend = backend is not None
         self.backend = backend or {}
         self.op_index = {op["operationId"]: i for i, op in enumerate(self.backend.get("operations", []))}
         self.entity_index = {entity["name"]: i for i, entity in enumerate(self.backend.get("entities", []))}
@@ -594,6 +595,19 @@ class _Checker:
                                     warning=True,
                                 )
 
+    def app_data(self) -> None:
+        """An app (`project.flow: "app"`) is drawn from its BackendSpec's records: with none there is nothing to
+        show, and generation would write an empty API client."""
+        if not self.has_backend or (self.frontend.get("project") or {}).get("flow") != "app":
+            return
+        if not self.backend.get("entities") or not self.backend.get("operations"):
+            self.add(
+                C.FE_APP_FLOW,
+                "/app",
+                "The app has no data: its BackendSpec declares no entities or no operations",
+                backend_path="/entities" if not self.backend.get("entities") else "/operations",
+            )
+
     def coverage(self) -> None:
         from src.modules.shared.domain.frontend_spec import uncovered_operations
 
@@ -613,6 +627,7 @@ def check_consistency(
 ) -> list[SpecIssue]:
     """`frontend` and `backend` are the normalized specs; `contract` comes from `build_contract(backend)`."""
     checker = _Checker(frontend, contract, backend)
+    checker.app_data()
     checker.bindings()
     checker.forms()
     checker.seed_assets()

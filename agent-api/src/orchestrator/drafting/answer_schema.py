@@ -182,6 +182,11 @@ def _app_answer_schema(design: bool, domain: bool = False) -> dict[str, Any]:
     backend, backend_defs = _relocate(spec_json_schema(), "", set())
     # Epic 33: the features block is code's (merged after the draft), never the model's to write
     backend.get("properties", {}).pop("features", None)
+    # An app is built from its data: the spec's defaults (`[]`) would let an answer of only `project` and `stack`
+    # pass, and generation then has nothing to draw. An app draft names at least one entity and one operation.
+    for key in ("entities", "operations"):
+        backend["properties"][key]["minItems"] = 1
+    backend["required"] = [*backend.get("required", []), "entities", "operations"]
     for name in ("FeatureAttachment", "FeatureComputedField"):
         backend_defs.pop(name, None)
     outline, outline_defs = _relocate(outline_schema(design, domain), "Outline", set(backend_defs))
